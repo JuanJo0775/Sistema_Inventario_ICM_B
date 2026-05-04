@@ -26,6 +26,68 @@ Instrucciones para asistentes de código (Antigravity, Cursor u otras herramient
 4. **API**: REST JSON bajo `/api/v1/`; errores `{ error, message, detail }`; permisos alineados al ERS; OpenAPI con tags oficiales.
 5. **Tests**: casos críticos del README de arquitectura (horario auxiliar, inmutabilidad, validación cruzada, serial, devoluciones, ajustes, consistencia ledger).
 
-## Idioma
 
-- Respuestas al equipo en **español** salvo que pidan otro idioma.
+### API / OpenAPI (icm-api-openapi.mdc)
+
+- Prefijo API: `/api/v1/`. Cambios incompatibles -> nueva versión `/api/v2/`.
+- Documentar endpoints con `@extend_schema`: `summary`, `description`, `tags`, `request`, `responses`, `parameters`.
+- Usar únicamente los tags en `shared/openapi.py` para consistencia en Swagger.
+- Rutas públicas deben declarar `auth=[]` cuando corresponda.
+- Forma uniforme de errores:
+
+```
+{
+	"error": "codigo_maquina",
+	"message": "Mensaje legible",
+	"detail": {}
+}
+```
+
+### Capas Django (icm-capas-django.mdc)
+
+- `models.py`: entidades y restricciones (sin lógica de negocio).
+- `serializers.py`: validación/transformación I/O (sin reglas de dominio).
+- `views.py`: validar entrada y delegar (sin lógica de negocio).
+- `services.py`: toda la lógica de negocio y transacciones.
+- `selectors.py`: lecturas complejas, sin efectos secundarios.
+- `permissions.py`: RBAC y restricciones (p. ej. horario auxiliar).
+
+Principios clave: operaciones que alteren stock deben usar `@transaction.atomic` y `select_for_update()` donde aplique; movimientos/auditoría inmutables.
+
+### Contexto y trazabilidad (icm-contexto-requisitos.mdc)
+
+- Antes de cambiar comportamiento o contratos, alinear con `docs/README_ARQUITECTURA.md`, `docs/ERS_ICM_Requisitos.md` y `docs/README_API.md`.
+- En cambios de lógica de dominio, referenciar RF/BR/RNF impactados en docstrings/PRs.
+- Recordar horario y roles del negocio (`auxiliar_despacho` en America/Bogota: 07:00–12:00 y 14:00–17:00).
+
+## Propuesta: reglas mejoradas para `AGENTS` / `.cursor` (plantilla)
+
+Para facilitar reglas más robustas y consistentes, propongo una plantilla y una serie de reglas mejoradas que pueden añadirse a `.cursor/rules/`:
+
+- Plantilla mínima (`.mdc`):
+
+```
+---
+description: Short description
+globs:
+	- "**/views.py"
+	- "**/serializers.py"
+alwaysApply: false
+---
+
+# Title
+
+- Key points...
+```
+
+- Reglas sugeridas:
+	- `icm-openapi-checks.mdc`: validar que nuevos endpoints tengan `@extend_schema` con `request` y `responses`.
+	- `icm-service-logic.mdc`: advertir si hay lógica de dominio en `views.py` o `serializers.py` (sugerir mover a `services.py`).
+	- `icm-stock-transactions.mdc`: detectar operaciones que escriben stock y asegurar `@transaction.atomic` y `select_for_update()` en `services.py`.
+	- `icm-trazabilidad.mdc`: forzar mención de RF/BR/RNF en docstrings de funciones que alteran invariantes del dominio.
+
+Estas reglas pueden implementarse como heurísticas sencillas en `.cursor` y luego pulirse con reglas más avanzadas (regex, AST checks) si el tooling lo permite.
+
+---
+
+Si quieres, aplico estas reglas como archivos `.cursor/rules/*.mdc` nuevos y los commiteo; también puedo crear PRs separados por regla para revisión.
