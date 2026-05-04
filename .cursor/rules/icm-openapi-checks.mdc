@@ -1,0 +1,50 @@
+---
+description: Validación de documentación OpenAPI en endpoints REST
+globs:
+  - "**/views.py"
+  - "**/serializers.py"
+alwaysApply: false
+---
+
+# Documentación OpenAPI (drf-spectacular)
+
+Nuevos endpoints o cambios en contratos **deben** documentarse con `@extend_schema`.
+
+## Checklist por endpoint
+
+- [ ] **`@extend_schema`** presente en la vista
+- [ ] **`summary`**: frase corta (p. ej. "Crear entrada de inventario")
+- [ ] **`description`**: párrafo con contexto (p. ej. "Registra una entrada de producto...")
+- [ ] **`tags`**: uno de los tags definidos en `shared/openapi.py` (Autenticación, Catálogo, Inventario, Movimientos, Reportes, Alertas, Auditoría)
+- [ ] **`request`**: serializer de entrada (si aplica)
+- [ ] **`responses`**: dict con códigos HTTP (200, 201, 400, 401, 403, 404, 409)
+- [ ] **Rutas públicas**: `auth=[]` si no requieren token
+
+## Patrón recomendado
+
+```python
+from drf_spectacular.utils import extend_schema
+from shared.openapi import TAGS_INVENTORY
+
+@extend_schema(
+    summary="Obtener stock por ubicación",
+    description="RF-004 — Retorna stock vigente del producto en todas las ubicaciones",
+    tags=[TAGS_INVENTORY],
+    parameters=[
+        OpenApiParameter(name="product_id", description="UUID del producto")
+    ],
+    responses=InventoryStockReadSerializer,
+)
+@api_view(["GET"])
+def get_inventory_stock(request):
+    # ...
+```
+
+## Errores comunes a evitar
+
+- ❌ Endpoint sin `@extend_schema` → Swagger vacío
+- ❌ `tags=[...]` con strings personalizados → Inconsistencia en Swagger
+- ❌ Sin `responses` → Contrato vago
+- ❌ `auth=[]` no declarado en rutas públicas → Exigencia innecesaria de Bearer
+
+Tras cambiar contrato: actualizar `docs/README_API.md` y tests de integración.

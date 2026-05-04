@@ -1,0 +1,74 @@
+---
+description: Lógica de negocio debe estar en services.py, no en views ni serializers
+globs:
+  - "**/views.py"
+  - "**/serializers.py"
+alwaysApply: false
+---
+
+# Separación de capas — Lógica en services.py
+
+**Regla de oro:** Si es una regla de dominio (RF/BR/RNF), vive en `services.py`.
+
+Ver [AGENTS.md](../../AGENTS.md#capas-django) y [`icm-capas-django.mdc`](icm-capas-django.mdc).
+
+## Signos de alarma
+
+| ❌ Anti-patrón | Ubicación | Solución |
+|---|---|---|
+| Validación de stock / operaciones que alteran inventario | `views.py` o `serializers.py` | Mover a `services.py` con `@transaction.atomic` |
+| Cálculo de horario auxiliar o permisos tiempo-dependientes | `serializers.py` validation | Usar `permissions.py` o llamar desde `services.py` |
+| Búsqueda que requiere `select_related` o `prefetch_related` | `views.py` | Mover a `selectors.py` como Query Object |
+| Validación cruzada (ej: `scanned_code` vs `order_sku`) | `serializers.py` | Mover a `services.py` (requiere contexto de transacción) |
+| Creación de movimientos con ledger derivado | `views.py` | Usar `services.register_entry()` o similar |
+
+## Patrón correcto
+
+```python
+# views.py — Orquestación HTTP
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_entry_view(request):
+    serializer = EntryCreateSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    
+    # Delegar TODO al servicio
+    movement = services.register_entry(
+        product_id=serializer.validated_data["product_id"],
+        destination_location_id=serializer.validated_data["location_id"],
+        quantity=serializer.validated_data["quantity"],
+        executed_by=request.user,
+    )
+    return Response(MovementReadSerializer(movement).data, status=201)
+
+# services.py — Regla de negocio (RF-005, BR-04, BR-10, BR-11)
+@transaction.atomic
+def register_entry(product_id, destination_location_id, quantity, executed_by):
+    """RF-005 — Entrada de inventario (BR-04, BR-10, BR-11)."""
+    product = Product.objects.get(pk=product_id)
+    
+    # Validaciones de dominio
+    if product.category.requires_serial_number and not request.data.get("serial_number"):
+        raise SerialNumberRequiredError()
+    
+    # Operación atómica con lock
+    stock_row = _lock_stock(product_id, destination_location_id)
+    stock_row.quantity += quantity
+    stock_row.save()
+    
+    # Crear movimiento (ledger inmutable)
+    movement = Movement.objects.create(...)
+    
+    # Auditoría
+    log_event(...)
+    
+    return movement
+```
+
+## Checklist
+
+- [ ] Lógica de validación complejas vive en `services.py` o `selectors.py`
+- [ ] `views.py` valida autenticación/permisos, deserializa, delega, responde
+- [ ] `serializers.py` valida entrada/salida, sin acceso a BD ni lógica de dominio
+- [ ] `selectors.py` para lecturas complejas (sin efectos secundarios)
+- [ ] Excepciones de dominio personalizadas (ej: `InsufficientStockError`)
