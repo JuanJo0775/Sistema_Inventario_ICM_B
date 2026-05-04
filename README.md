@@ -31,10 +31,6 @@ En esta fase, el objetivo principal es tener una base técnica completa:
 
 Documentación funcional y arquitectónica disponible en el repositorio:
 
-- [ERS_ICM_Requisitos.md](ERS_ICM_Requisitos.md): requisitos funcionales, no funcionales y reglas de negocio.
-- [README_ARQUITECTURA.md](README_ARQUITECTURA.md): arquitectura técnica consolidada (estructura, desacoplamiento, inventario, Docker, testing, SOLID y patrones).
-- [ICM_Informe_Elicitacion_v2_plus.docx.md](ICM_Informe_Elicitacion_v2_plus.docx.md): contexto de levantamiento y análisis del dominio.
-
 - [README_API.md](docs/README_API.md): especificación y checklist de la API (OpenAPI, endpoints, tags y estándares).
 - [README_ARQUITECTURA.md](docs/README_ARQUITECTURA.md): arquitectura técnica consolidada (estructura, desacoplamiento, inventario, Docker, testing, SOLID y patrones).
 - [ERS_ICM_Requisitos.md](docs/ERS_ICM_Requisitos.md): requisitos funcionales, no funcionales y reglas de negocio.
