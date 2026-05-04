@@ -1,0 +1,26 @@
+---
+description: Capas Django ICM — models, serializers, views, services, selectors
+globs:
+  - "apps/**/*.py"
+  - "shared/**/*.py"
+  - "config/**/*.py"
+alwaysApply: false
+---
+
+# Capas y responsabilidades
+
+| Archivo | Responsabilidad |
+|---------|-----------------|
+| `models.py` | Entidades y restricciones de datos. **Sin** lógica de negocio. |
+| `serializers.py` | Validación/transformación I-O. **Sin** reglas de dominio. |
+| `views.py` | HTTP: validar entrada, delegar, responder. **Sin** reglas de dominio. |
+| `services.py` | **Toda** la lógica de negocio, transacciones, invariantes BR. |
+| `selectors.py` | Lecturas complejas, sin efectos secundarios (query objects). |
+| `permissions.py` | RBAC y restricciones DRF (p. ej. horario auxiliar). |
+
+## Principios
+
+- Escritura: `services.py`. Lectura compleja: `selectors.py`. Comunicación entre apps preferible vía **servicios** (contratos), no acoplar modelos ajenos sin justificación.
+- Operaciones que alteren stock: `@transaction.atomic`; donde haya carrera en stock, `select_for_update()`.
+- Movimientos y auditoría: **inmutables** en API (sin PUT/PATCH/DELETE que muten historia); correcciones según BR-06/BR-07 vía flujos definidos en `README_ARQUITECTURA.md`.
+- Type hints en `services.py` y `selectors.py`. Excepciones de dominio coherentes con `shared/exceptions.py`.

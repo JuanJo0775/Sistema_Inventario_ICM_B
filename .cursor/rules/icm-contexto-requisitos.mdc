@@ -1,0 +1,19 @@
+---
+description: Contexto ICM, documentación fuente y trazabilidad RF/BR/RNF
+alwaysApply: true
+---
+
+# Sistema Inventario ICM — contexto
+
+Antes de cambiar comportamiento o contratos, alinea con la especificación y la arquitectura del repo:
+
+- `docs/README_ARQUITECTURA.md` — capas, ledger, BR-01…BR-13, checklist de integridad
+- `docs/ERS_ICM_Requisitos.md` — RF/RNF y criterios Gherkin
+- `docs/README_API.md` — REST `/api/v1/`, OpenAPI, errores uniformes
+- `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` — dominio (ICM, marca Can, 3 ubicaciones)
+
+## Trazabilidad obligatoria
+
+- En cambios de lógica de dominio, menciona en docstrings o comentarios de PR los **RF/BR/RNF** impactados cuando aplique.
+- Roles: `almacenista`, `auxiliar_despacho`, `administrador`. Zona horaria negocio auxiliar: **America/Bogota** (07:00–12:00 y 14:00–17:00).
+- No simplificar BR críticas (validación cruzada despacho BR-08, inmutabilidad BR-10, ledger BR-11, Ley 1581 / datos cliente).
