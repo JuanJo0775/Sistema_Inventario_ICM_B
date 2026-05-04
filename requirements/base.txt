@@ -1,0 +1,37 @@
+# Core Django
+Django>=4.2,<5
+djangorestframework>=3.14,<4
+djangorestframework-simplejwt>=5.3,<6
+
+# API Documentation
+drf-spectacular==0.27.0
+
+# Database
+psycopg2-binary==2.9.9
+
+# Environment Variables
+python-decouple==3.8
+
+# CORS
+django-cors-headers==4.3.1
+
+# Filtering
+django-filter==23.5
+
+# PDF Generation
+WeasyPrint==60.1
+
+# Testing
+pytest==7.4.3
+pytest-django==4.7.0
+pytest-cov==4.1.0
+factory-boy==3.3.0
+faker==20.1.0
+
+# Code Quality
+black==23.12.1
+flake8==6.1.0
+isort==5.13.2
+
+# Development Tools
+django-debug-toolbar==4.2.0

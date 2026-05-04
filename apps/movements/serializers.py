@@ -1,0 +1,101 @@
+"""Serializers de movimientos (RF-005–RF-009)."""
+
+from __future__ import annotations
+
+from rest_framework import serializers
+
+from apps.movements.models import Movement
+
+
+class MovementSerializer(serializers.ModelSerializer):
+    product_sku = serializers.CharField(source="product.sku", read_only=True)
+
+    class Meta:
+        model = Movement
+        fields = (
+            "id",
+            "movement_type",
+            "product",
+            "product_sku",
+            "origin_location",
+            "destination_location",
+            "quantity",
+            "stock_previo_origen",
+            "stock_resultante_origen",
+            "stock_previo_destino",
+            "stock_resultante_destino",
+            "serial_number",
+            "quantity_invoiced",
+            "discrepancy_note",
+            "justification",
+            "scanned_code",
+            "order_sku",
+            "invoice_number",
+            "invoice_pdf",
+            "related_movement",
+            "executed_by",
+            "created_at",
+        )
+        read_only_fields = fields
+
+
+class EntryCreateSerializer(serializers.Serializer):
+    product_id = serializers.UUIDField()
+    location_id = serializers.UUIDField()
+    quantity = serializers.IntegerField(min_value=1)
+    serial_number = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    qty_invoiced = serializers.IntegerField(required=False, allow_null=True)
+    discrepancy_note = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    cold_chain_acknowledged = serializers.BooleanField(default=False)
+    electrical_safety_acknowledged = serializers.BooleanField(default=False)
+
+
+class DispatchCreateSerializer(serializers.Serializer):
+    product_id = serializers.UUIDField()
+    location_id = serializers.UUIDField()
+    quantity = serializers.IntegerField(min_value=1)
+    movement_type = serializers.CharField()
+    scanned_code = serializers.CharField()
+    order_sku = serializers.CharField()
+    customer_data = serializers.DictField(required=False, child=serializers.CharField(allow_blank=True))
+    note = serializers.CharField(required=False, allow_blank=True)
+    cold_chain_acknowledged = serializers.BooleanField(default=False)
+    electrical_safety_acknowledged = serializers.BooleanField(default=False)
+    privacy_notice_acknowledged = serializers.BooleanField(default=False)
+
+
+class TransferCreateSerializer(serializers.Serializer):
+    product_id = serializers.UUIDField()
+    origin_id = serializers.UUIDField()
+    destination_id = serializers.UUIDField()
+    quantity = serializers.IntegerField(min_value=1)
+    cold_chain_acknowledged = serializers.BooleanField(default=False)
+    electrical_safety_acknowledged = serializers.BooleanField(default=False)
+
+
+class ReturnCreateSerializer(serializers.Serializer):
+    product_id = serializers.UUIDField()
+    serial_number = serializers.CharField()
+    reason = serializers.CharField()
+    product_condition = serializers.CharField()
+
+
+class ReturnApproveSerializer(serializers.Serializer):
+    destination_location_id = serializers.UUIDField()
+
+
+class ReturnRejectSerializer(serializers.Serializer):
+    reason = serializers.CharField()
+
+
+class AdjustmentCreateSerializer(serializers.Serializer):
+    product_id = serializers.UUIDField()
+    location_id = serializers.UUIDField()
+    new_quantity = serializers.IntegerField(min_value=0)
+    justification = serializers.CharField()
+
+
+class CorrectionCreateSerializer(serializers.Serializer):
+    origin_id = serializers.UUIDField()
+    destination_id = serializers.UUIDField()
+    quantity = serializers.IntegerField(min_value=1)

@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual env
+.venv/
+env/
+venv/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+media/
+staticfiles/
+static/
+*.pot
+
+# Docker / env
+.env
+.env.*
+
+# Coverage / pytest
+.coverage
+htmlcov/
+
+# Migrations
+*/migrations/*
+!*/migrations/__init__.py
+
+# Env
+.env
+.env.*
+
+# Pytest
+.pytest_cache/
+
+# IDEs
+.vscode/
+.idea/

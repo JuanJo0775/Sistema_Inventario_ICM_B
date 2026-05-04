@@ -1,0 +1,1 @@
+"""Movements (ledger) app skeleton."""
