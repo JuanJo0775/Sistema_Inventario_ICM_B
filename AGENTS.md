@@ -9,6 +9,8 @@ Instrucciones para asistentes de código (GitHub Copilot, Cursor, Antigravity, W
 | `docs/README_ARQUITECTURA.md` | Arquitectura modular, ledger + stock derivado, BR-01…BR-13, SOLID, testing, Docker |
 | `docs/ERS_ICM_Requisitos.md` | RF-001…RF-012, RNF-001…RNF-006, criterios Gherkin, tabla de trazabilidad |
 | `docs/README_API.md` | Especificación `/api/v1/`, JWT, tags OpenAPI, checklist de publicación |
+| `docs/test/README_TEST.md` | Guía oficial de pruebas: suite Gherkin dinámica, unit/integration docs y comandos de regeneración |
+| `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` | Matriz viva RF ↔ tests con cobertura y brechas documentadas |
 | `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` | Contexto de negocio ICM, marca Can, 3 ubicaciones, clientes mayoristas |
 
 ## Cursor rules vinculados
@@ -18,6 +20,18 @@ Instrucciones para asistentes de código (GitHub Copilot, Cursor, Antigravity, W
 | [`.cursor/rules/icm-contexto-requisitos.mdc`](.cursor/rules/icm-contexto-requisitos.mdc) | Global | Trazabilidad RF/BR/RNF, roles, zona horaria America/Bogota |
 | [`.cursor/rules/icm-capas-django.mdc`](.cursor/rules/icm-capas-django.mdc) | `apps/**/*.py`, `shared/**/*.py` | Separación de responsabilidades: models, serializers, views, services, selectors, permissions |
 | [`.cursor/rules/icm-api-openapi.mdc`](.cursor/rules/icm-api-openapi.mdc) | `**/views.py`, `**/serializers.py`, `config/urls.py` | Contrato REST `/api/v1/`, `@extend_schema`, tags, errores uniformes |
+
+## Recordatorio operativo
+
+Antes de cambiar comportamiento o contratos, alinea el trabajo con la documentación oficial del repo y con estas reglas prácticas:
+
+- Arquitectura: el negocio vive en `services.py`; las lecturas complejas viven en `selectors.py`; `models.py`, `serializers.py` y `views.py` no deben contener reglas de dominio.
+- Inventario: `Movement` es la fuente de verdad; `StockByLocation` es derivado y solo se actualiza en la misma transacción del movimiento; no se permite stock negativo.
+- API: el contrato REST usa `/api/v1/`, JSON, JWT Bearer y errores uniformes con `{ error, message, detail }`; los endpoints nuevos o modificados deben documentarse con `@extend_schema` y usar solo los tags oficiales definidos en `shared/openapi.py`.
+- Negocio crítico: mantener inmutabilidad de movimientos y auditoría, validación cruzada de despacho (`scanned_code` vs `order_sku`), serial obligatorio para Electroterapia, prefijo `CAN-` para la marca Can y la ventana horaria de `auxiliar_despacho` en `America/Bogota`.
+- Desarrollo: en local se usa PostgreSQL; no asumir Docker salvo que la tarea o el usuario lo pidan de forma explícita.
+- Validación: para cambios de lógica, prioriza tests del dominio afectado y cubre los casos críticos del ERS y la arquitectura antes de ampliar el alcance.
+- Pruebas: usa `docs/test/README_TEST.md` como guía operativa; si cambias escenarios Gherkin o tests no Gherkin, regenera la documentación correspondiente y revisa `docs/test/TRAZABILIDAD_ERS_GHERKIN.md`.
 
 ## Inicio rápido (comandos frecuentes)
 
