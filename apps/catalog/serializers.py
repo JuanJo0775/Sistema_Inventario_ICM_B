@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from uuid import UUID
+
 from rest_framework import serializers
 
 from apps.catalog.models import Category, ComboItem, Product, ProductCombo, Subcategory
@@ -54,6 +56,23 @@ class ProductSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "created_at", "updated_at", "category_slug")
 
 
+class ProductUpdateSerializer(serializers.Serializer):
+    """Campos opcionales para actualización parcial (RF-003)."""
+
+    name = serializers.CharField(required=False)
+    sku = serializers.CharField(required=False)
+    category_id = serializers.UUIDField(required=False)
+    subcategory_id = serializers.UUIDField(required=False, allow_null=True)
+    barcode = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    brand = serializers.CharField(required=False, allow_blank=True)
+    requires_cold_chain = serializers.BooleanField(required=False)
+    expiration_date = serializers.DateField(required=False, allow_null=True)
+    weight_grams = serializers.IntegerField(required=False, allow_null=True, min_value=0)
+    notes = serializers.CharField(required=False, allow_blank=True)
+    reorder_point = serializers.IntegerField(required=False, min_value=0)
+    is_active = serializers.BooleanField(required=False)
+
+
 class ProductCreateSerializer(serializers.Serializer):
     sku = serializers.CharField()
     name = serializers.CharField()
@@ -85,4 +104,44 @@ class ComboSerializer(serializers.ModelSerializer):
 
 
 class ResolveIdentifierQuerySerializer(serializers.Serializer):
-    q = serializers.CharField()
+    """Acepta `q` o `identifier` (BR-13, RF-003)."""
+
+    q = serializers.CharField(required=False, allow_blank=True)
+    identifier = serializers.CharField(required=False, allow_blank=True)
+
+    def validate(self, attrs: dict) -> dict:
+        raw = (attrs.get("q") or attrs.get("identifier") or "").strip()
+        if not raw:
+            raise serializers.ValidationError("Indique el parámetro de consulta `q` o `identifier`.")
+        attrs["_value"] = raw
+        return attrs
+
+
+class ComboCreateSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    sku = serializers.CharField()
+    is_active = serializers.BooleanField(required=False, default=True)
+    items = serializers.ListField(
+        child=serializers.DictField(),
+        allow_empty=False,
+    )
+
+    def validate_items(self, value: list) -> list:
+        out = []
+        for row in value:
+            pid = row.get("product_id")
+            if not pid:
+                raise serializers.ValidationError("Cada ítem requiere product_id.")
+            try:
+                uid = UUID(str(pid))
+            except ValueError as exc:
+                raise serializers.ValidationError("product_id debe ser UUID válido.") from exc
+            out.append({"product_id": uid, "quantity": int(row.get("quantity", 1))})
+        return out
+
+
+class CategoryCreateSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    description = serializers.CharField(required=False, allow_blank=True, default="")
+    requires_serial_number = serializers.BooleanField(required=False, default=False)
+    is_returnable = serializers.BooleanField(required=False, default=False)
