@@ -1,4 +1,5 @@
-from apps.authentication.views import HealthCheckView, ICMTokenObtainPairView, UserListCreateView
+from apps.authentication.views import (HealthCheckView, ICMTokenObtainPairView,
+                                       UserListCreateView)
 
 
 def test_auth_views_are_exposed():

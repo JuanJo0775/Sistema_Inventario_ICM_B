@@ -26,6 +26,7 @@ def get_user_by_id(user_id: UUID | str) -> User:
     """
     if isinstance(user_id, str):
         import uuid
+
         user_id = uuid.UUID(user_id)
     return User.objects.get(pk=user_id)
 
@@ -60,8 +61,12 @@ def get_user_profile(user: User) -> dict[str, Any]:
     base = user_login_profile(user)
     return {
         **base,
-        "created_at": user.created_at.isoformat() if getattr(user, "created_at", None) else None,
-        "updated_at": user.updated_at.isoformat() if getattr(user, "updated_at", None) else None,
+        "created_at": user.created_at.isoformat()
+        if getattr(user, "created_at", None)
+        else None,
+        "updated_at": user.updated_at.isoformat()
+        if getattr(user, "updated_at", None)
+        else None,
         "last_login": user.last_login.isoformat() if user.last_login else None,
         "created_by": user.created_by_id,
     }

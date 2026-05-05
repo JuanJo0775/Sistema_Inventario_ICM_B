@@ -57,7 +57,9 @@ def get_audit_log_by_movement(movement_id: UUID) -> QuerySet[AuditLog]:
     )
 
 
-def get_audit_log_by_user(target_user_id: int, executor_role: str) -> QuerySet[AuditLog]:
+def get_audit_log_by_user(
+    target_user_id: int, executor_role: str
+) -> QuerySet[AuditLog]:
     """
     RF-012 — Eventos donde el usuario objetivo es el actor (`user`).
 

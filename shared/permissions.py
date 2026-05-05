@@ -10,7 +10,9 @@ class IsAlmacenista(BasePermission):
 
     def has_permission(self, request, view) -> bool:
         u = request.user
-        return bool(u and u.is_authenticated and getattr(u, "role", None) == "almacenista")
+        return bool(
+            u and u.is_authenticated and getattr(u, "role", None) == "almacenista"
+        )
 
 
 class IsAuxiliarDespacho(BasePermission):
@@ -18,7 +20,9 @@ class IsAuxiliarDespacho(BasePermission):
 
     def has_permission(self, request, view) -> bool:
         u = request.user
-        return bool(u and u.is_authenticated and getattr(u, "role", None) == "auxiliar_despacho")
+        return bool(
+            u and u.is_authenticated and getattr(u, "role", None) == "auxiliar_despacho"
+        )
 
 
 class IsAdministrador(BasePermission):
@@ -26,7 +30,9 @@ class IsAdministrador(BasePermission):
 
     def has_permission(self, request, view) -> bool:
         u = request.user
-        return bool(u and u.is_authenticated and getattr(u, "role", None) == "administrador")
+        return bool(
+            u and u.is_authenticated and getattr(u, "role", None) == "administrador"
+        )
 
 
 class IsAlmacenistaOrAuxiliar(BasePermission):
@@ -35,7 +41,9 @@ class IsAlmacenistaOrAuxiliar(BasePermission):
     def has_permission(self, request, view) -> bool:
         u = request.user
         return bool(
-            u and u.is_authenticated and getattr(u, "role", None) in ("almacenista", "auxiliar_despacho")
+            u
+            and u.is_authenticated
+            and getattr(u, "role", None) in ("almacenista", "auxiliar_despacho")
         )
 
 
@@ -45,7 +53,9 @@ class IsAlmacenistaOrAdministrador(BasePermission):
     def has_permission(self, request, view) -> bool:
         u = request.user
         return bool(
-            u and u.is_authenticated and getattr(u, "role", None) in ("almacenista", "administrador")
+            u
+            and u.is_authenticated
+            and getattr(u, "role", None) in ("almacenista", "administrador")
         )
 
 

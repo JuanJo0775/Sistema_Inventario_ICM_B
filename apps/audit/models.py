@@ -32,7 +32,10 @@ class AuditEventType(models.TextChoices):
     RETURN_APPROVED = "RETURN_APPROVED", "Devolución aprobada"
     RETURN_REJECTED = "RETURN_REJECTED", "Devolución rechazada"
     ALERT_ACKNOWLEDGED = "ALERT_ACKNOWLEDGED", "Alerta reconocida"
-    UNAUTHORIZED_ACCESS_ATTEMPT = "UNAUTHORIZED_ACCESS_ATTEMPT", "Intento de acceso no autorizado"
+    UNAUTHORIZED_ACCESS_ATTEMPT = (
+        "UNAUTHORIZED_ACCESS_ATTEMPT",
+        "Intento de acceso no autorizado",
+    )
     MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD = (
         "MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD",
         "Intento de modificación sobre registro inmutable",

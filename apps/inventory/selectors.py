@@ -36,7 +36,10 @@ def get_stock_by_product(product_id: UUID) -> dict[str, Any]:
         for r in rows
     ]
     total = int(
-        StockByLocation.objects.filter(product_id=product_id).aggregate(s=Sum("current_stock"))["s"] or 0
+        StockByLocation.objects.filter(product_id=product_id).aggregate(
+            s=Sum("current_stock")
+        )["s"]
+        or 0
     )
     return {
         "product_id": str(product_id),
@@ -69,25 +72,35 @@ def search_products(
     Usa `select_related` para evitar N+1.
     """
     q = (query or "").strip()
-    qs = Product.objects.filter(is_active=True).select_related("category", "subcategory")
+    qs = Product.objects.filter(is_active=True).select_related(
+        "category", "subcategory"
+    )
     if category_id:
         qs = qs.filter(category_id=category_id)
     if subcategory_id:
         qs = qs.filter(subcategory_id=subcategory_id)
     if not q:
         return qs.order_by("sku")[:50]
-    return qs.filter(Q(sku__icontains=q) | Q(barcode__icontains=q) | Q(name__icontains=q)).order_by("sku")[:50]
+    return qs.filter(
+        Q(sku__icontains=q) | Q(barcode__icontains=q) | Q(name__icontains=q)
+    ).order_by("sku")[:50]
 
 
-def reconstruct_stock_from_ledger(product_id: UUID, location_id: UUID) -> dict[str, Any]:
+def reconstruct_stock_from_ledger(
+    product_id: UUID, location_id: UUID
+) -> dict[str, Any]:
     """
     RF-004, BR-11 — Compara stock derivado con suma del ledger para producto/ubicación.
 
     Returns:
         dict con `status` CONSISTENT|DISCREPANCY, `reconstructed` y `actual`.
     """
-    reconstructed = ledger_net_quantity_for_location(product_id=product_id, location_id=location_id)
-    row = StockByLocation.objects.filter(product_id=product_id, location_id=location_id).first()
+    reconstructed = ledger_net_quantity_for_location(
+        product_id=product_id, location_id=location_id
+    )
+    row = StockByLocation.objects.filter(
+        product_id=product_id, location_id=location_id
+    ).first()
     actual = int(row.current_stock) if row else 0
     status = "CONSISTENT" if reconstructed == actual else "DISCREPANCY"
     return {"status": status, "reconstructed": reconstructed, "actual": actual}
@@ -96,7 +109,10 @@ def reconstruct_stock_from_ledger(product_id: UUID, location_id: UUID) -> dict[s
 def consolidated_stock_total(product_id: UUID) -> int:
     """Total consolidado en una sola agregación (RNF-004)."""
     return int(
-        StockByLocation.objects.filter(product_id=product_id).aggregate(total=Sum("current_stock"))["total"] or 0
+        StockByLocation.objects.filter(product_id=product_id).aggregate(
+            total=Sum("current_stock")
+        )["total"]
+        or 0
     )
 
 
@@ -111,7 +127,9 @@ def get_full_inventory(filters: dict[str, Any] | None = None) -> list[dict[str, 
         Lista de dicts con producto, totales y desglose por ubicación.
     """
     filters = filters or {}
-    qs = Product.objects.filter(is_active=True).select_related("category", "subcategory")
+    qs = Product.objects.filter(is_active=True).select_related(
+        "category", "subcategory"
+    )
     if filters.get("category_id"):
         qs = qs.filter(category_id=filters["category_id"])
     if filters.get("location_id"):
@@ -165,7 +183,11 @@ def get_low_stock_products(threshold: int = 5) -> QuerySet[Product]:
         .filter(t__lt=threshold)
         .values_list("id", flat=True)
     )
-    return Product.objects.filter(id__in=list(ids)).select_related("category").order_by("sku")
+    return (
+        Product.objects.filter(id__in=list(ids))
+        .select_related("category")
+        .order_by("sku")
+    )
 
 
 def search_products_duration_seconds(query: str) -> tuple[list[str], float]:

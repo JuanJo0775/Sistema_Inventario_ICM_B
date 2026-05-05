@@ -25,7 +25,9 @@ def sync_stock_alerts_for_product(product_id: UUID, *, user=None) -> None:
 
     Debe ejecutarse tras movimientos que alteren stock consolidado.
     """
-    agg = StockByLocation.objects.filter(product_id=product_id).aggregate(s=Sum("current_stock"))
+    agg = StockByLocation.objects.filter(product_id=product_id).aggregate(
+        s=Sum("current_stock")
+    )
     total_qty = int(agg["s"] or 0)
     product = Product.objects.get(pk=product_id)
     threshold = int(product.reorder_point)
@@ -45,7 +47,11 @@ def sync_stock_alerts_for_product(product_id: UUID, *, user=None) -> None:
                 message=f"Stock total {total_qty} en o por debajo del umbral {threshold}.",
             )
     else:
-        rb = user if user is not None and getattr(user, "is_authenticated", False) else None
+        rb = (
+            user
+            if user is not None and getattr(user, "is_authenticated", False)
+            else None
+        )
         open_alerts.update(is_resolved=True, resolved_at=timezone.now(), resolved_by=rb)
 
 
@@ -86,17 +92,23 @@ def sync_expiry_alerts_for_product(product_id: UUID, *, user=None) -> None:
             alert.is_resolved = False
             alert.resolved_at = None
             alert.resolved_by = None
-            alert.save(update_fields=["message", "is_resolved", "resolved_at", "resolved_by"])
+            alert.save(
+                update_fields=["message", "is_resolved", "resolved_at", "resolved_by"]
+            )
 
 
-def check_and_create_minimum_stock_alert(product: Product, location: Location) -> Alert | None:
+def check_and_create_minimum_stock_alert(
+    product: Product, location: Location
+) -> Alert | None:
     """
     RF-011, BR-11 — Alerta de stock bajo por producto y ubicación (sin duplicados activos).
 
     Usa `reorder_point` del producto como umbral mínimo.
     """
     threshold = int(getattr(product, "reorder_point", 0) or 0)
-    row = StockByLocation.objects.filter(product_id=product.id, location_id=location.id).first()
+    row = StockByLocation.objects.filter(
+        product_id=product.id, location_id=location.id
+    ).first()
     qty = int(row.current_stock) if row else 0
     if qty > threshold:
         return None
@@ -122,7 +134,9 @@ def check_and_create_expiration_alerts() -> list[Alert]:
     Returns:
         Lista vacía reservada para extensiones que retornen instancias creadas.
     """
-    for pid in Product.objects.filter(expiration_date__isnull=False, is_active=True).values_list("id", flat=True):
+    for pid in Product.objects.filter(
+        expiration_date__isnull=False, is_active=True
+    ).values_list("id", flat=True):
         sync_expiry_alerts_for_product(pid)
     return []
 
@@ -136,7 +150,9 @@ def resolve_alert(executor: User, alert_id: UUID) -> Alert:
         UnauthorizedDomainActionError: Rol distinto de almacenista.
     """
     if getattr(executor, "role", None) != RoleChoices.ALMACENISTA:
-        raise UnauthorizedDomainActionError("Solo el almacenista puede resolver alertas.")
+        raise UnauthorizedDomainActionError(
+            "Solo el almacenista puede resolver alertas."
+        )
     alert = Alert.objects.select_for_update().get(pk=alert_id)
     alert.is_resolved = True
     alert.resolved_at = timezone.now()

@@ -1,11 +1,6 @@
-from apps.inventory.views import (
-    InventoryFullListView,
-    LocationDetailView,
-    LocationListCreateView,
-    ProductSearchView,
-    StockByLocationView,
-    StockByProductView,
-)
+from apps.inventory.views import (InventoryFullListView, LocationDetailView,
+                                  LocationListCreateView, ProductSearchView,
+                                  StockByLocationView, StockByProductView)
 
 
 def test_inventory_views_are_available():

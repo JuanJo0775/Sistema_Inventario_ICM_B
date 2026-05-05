@@ -94,11 +94,15 @@ def audit_log_event(
             detail=metadata or {},
         )
     except Exception:
-        logger.exception("audit_log_event: no se pudo persistir el log (event_type=%s)", event_type)
+        logger.exception(
+            "audit_log_event: no se pudo persistir el log (event_type=%s)", event_type
+        )
         return None
 
 
-def log_unauthorized_access_attempt(*, user: User | None, request: HttpRequest | None, detail: dict | None) -> AuditLog:
+def log_unauthorized_access_attempt(
+    *, user: User | None, request: HttpRequest | None, detail: dict | None
+) -> AuditLog:
     """RNF-003 — Registra intentos de acceso a recursos no permitidos."""
     return log_event(
         AuditEventType.UNAUTHORIZED_ACCESS_ATTEMPT,
@@ -109,7 +113,9 @@ def log_unauthorized_access_attempt(*, user: User | None, request: HttpRequest |
     )
 
 
-def log_immutable_modification_attempt(*, user: User | None, request: HttpRequest | None, detail: dict | None) -> AuditLog:
+def log_immutable_modification_attempt(
+    *, user: User | None, request: HttpRequest | None, detail: dict | None
+) -> AuditLog:
     """BR-10 / RF-012 — Intento de modificar registros inmutables."""
     return log_event(
         AuditEventType.MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD,

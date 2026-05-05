@@ -4,13 +4,15 @@ from __future__ import annotations
 
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.exceptions import PermissionDenied
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
+from rest_framework_simplejwt.serializers import (TokenObtainPairSerializer,
+                                                  TokenRefreshSerializer)
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.authentication.models import UserRole
-from apps.authentication.services import OutsideOperatingHoursError, authenticate_user, is_within_operating_hours
+from apps.authentication.services import (OutsideOperatingHoursError,
+                                          authenticate_user,
+                                          is_within_operating_hours)
 
 User = get_user_model()
 
@@ -32,8 +34,14 @@ def user_login_profile(user: User) -> dict:
 class LoginRequestSerializer(serializers.Serializer):
     """Cuerpo de login: contraseña obligatoria; usuario o correo (al menos uno)."""
 
-    username = serializers.CharField(required=False, allow_blank=True, help_text="Nombre de usuario único.")
-    email = serializers.EmailField(required=False, allow_blank=True, help_text="Correo registrado (alternativa a username).")
+    username = serializers.CharField(
+        required=False, allow_blank=True, help_text="Nombre de usuario único."
+    )
+    email = serializers.EmailField(
+        required=False,
+        allow_blank=True,
+        help_text="Correo registrado (alternativa a username).",
+    )
     password = serializers.CharField(write_only=True)
 
 
@@ -51,7 +59,9 @@ class ICMTokenObtainPairSerializer(TokenObtainPairSerializer):
             required=False,
             allow_blank=True,
         )
-        self.fields["email"] = serializers.EmailField(write_only=True, required=False, allow_blank=True)
+        self.fields["email"] = serializers.EmailField(
+            write_only=True, required=False, allow_blank=True
+        )
 
     def validate(self, attrs):
         request = self.context.get("request")
@@ -77,7 +87,9 @@ class ICMTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         if not username:
             raise serializers.ValidationError(
-                {self.username_field: "Indique nombre de usuario o correo electrónico."},
+                {
+                    self.username_field: "Indique nombre de usuario o correo electrónico."
+                },
                 code="required",
             )
 
@@ -120,10 +132,18 @@ class ICMTokenRefreshSerializer(TokenRefreshSerializer):
         refresh = RefreshToken(attrs["refresh"])
         user_id = refresh.get("user_id")
         if user_id is not None:
-            user = User.objects.filter(pk=user_id).only("id", "role", "is_active").first()
-            if user is not None and user.is_active and getattr(user, "role", None) == UserRole.AUXILIAR_DESPACHO:
+            user = (
+                User.objects.filter(pk=user_id).only("id", "role", "is_active").first()
+            )
+            if (
+                user is not None
+                and user.is_active
+                and getattr(user, "role", None) == UserRole.AUXILIAR_DESPACHO
+            ):
                 if not is_within_operating_hours():
-                    raise PermissionDenied(detail="Acceso no permitido fuera del horario operativo del auxiliar de despacho.")
+                    raise PermissionDenied(
+                        detail="Acceso no permitido fuera del horario operativo del auxiliar de despacho."
+                    )
         return super().validate(attrs)
 
 
@@ -147,7 +167,14 @@ class UserSerializer(serializers.ModelSerializer):
             "updated_at",
             "last_login",
         )
-        read_only_fields = ("id", "created_at", "updated_at", "last_login", "created_by", "is_staff")
+        read_only_fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "last_login",
+            "created_by",
+            "is_staff",
+        )
 
 
 class UserCreateSerializer(serializers.Serializer):
@@ -156,12 +183,16 @@ class UserCreateSerializer(serializers.Serializer):
     email = serializers.EmailField()
     first_name = serializers.CharField(required=False, allow_blank=True, default="")
     last_name = serializers.CharField(required=False, allow_blank=True, default="")
-    phone = serializers.CharField(required=False, allow_blank=True, max_length=20, default="")
+    phone = serializers.CharField(
+        required=False, allow_blank=True, max_length=20, default=""
+    )
     role = serializers.ChoiceField(choices=UserRole.choices)
 
     def validate_username(self, value: str) -> str:
         if User.objects.filter(username__iexact=value.strip()).exists():
-            raise serializers.ValidationError("Ya existe un usuario con ese nombre de usuario.")
+            raise serializers.ValidationError(
+                "Ya existe un usuario con ese nombre de usuario."
+            )
         return value.strip()
 
     def validate_email(self, value: str) -> str:

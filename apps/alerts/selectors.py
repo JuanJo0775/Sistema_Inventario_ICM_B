@@ -28,4 +28,8 @@ def get_active_alerts(filters: dict[str, Any] | None = None) -> QuerySet[Alert]:
 
 def get_alerts_by_product(product_id: UUID) -> QuerySet[Alert]:
     """RF-011 — Todas las alertas de un producto (activas e histórico)."""
-    return Alert.objects.filter(product_id=product_id).select_related("location").order_by("-created_at")
+    return (
+        Alert.objects.filter(product_id=product_id)
+        .select_related("location")
+        .order_by("-created_at")
+    )
