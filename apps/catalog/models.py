@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from shared.models import BaseModel
+from shared.utils.validators import normalize_sku, validate_can_sku, validate_sku_format
 
 
 class Category(BaseModel):
@@ -108,6 +110,23 @@ class Product(BaseModel):
             models.Index(fields=("barcode",)),
             models.Index(fields=("category",)),
         ]
+
+    def clean(self) -> None:
+        """
+        RF-003, BR-12 — Validación SKU marca Can (prefijo CAN-) y formato seguro.
+
+        Criterios alineados a `docs/ERS_ICM_Requisitos.md` (RF-003, BR-12) e informe de elicitación
+        (marca Can, prefijo CAN-). Se ejecuta en Admin y ModelForm; la API sigue validando en
+        `catalog.services`.
+        """
+        sku = normalize_sku(self.sku or "")
+        if not sku:
+            raise ValidationError({"sku": "El SKU es obligatorio."})
+        try:
+            validate_sku_format(sku)
+            validate_can_sku(sku, brand=self.brand)
+        except ValueError as exc:
+            raise ValidationError({"sku": str(exc)}) from exc
 
     def __str__(self) -> str:
         return f"{self.sku} — {self.name}"
