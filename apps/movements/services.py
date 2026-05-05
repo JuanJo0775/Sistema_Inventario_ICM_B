@@ -3,55 +3,37 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, time
+from datetime import timedelta
 from typing import Any
 from uuid import UUID
 
-from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import transaction
+from django.db.models import Sum
 from django.utils import timezone
 
 from apps.alerts import services as alert_services
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
-from apps.authentication.services import BOGOTA, is_within_operating_hours
 from apps.catalog.models import Product
 from apps.catalog.services import resolve_identifier
-from apps.inventory.models import StockByLocation
+from apps.inventory.models import Location, StockByLocation
 from apps.movements.models import InvoiceCounter, Movement, MovementType
 from shared.exceptions import (
     AdjustmentJustificationRequiredError,
     AlertAcknowledgementRequiredError,
-    CorrectionWindowClosedError,
     CrossValidationFailedError,
     DiscrepancyNoteRequiredError,
+    ImmutableRecordError,
     InsufficientStockError,
+    PrivacyConsentRequiredError,
     ProductNotReturnableError,
     SerialNumberRequiredError,
+    StockMismatchError,
+    UnauthorizedDomainActionError,
 )
 
 logger = logging.getLogger(__name__)
-
-
-def _operating_band(local_dt: datetime) -> tuple[str, datetime.date] | None:
-    """Retorna ('morning'|'afternoon', date) si está en franja auxiliar; si no, None."""
-    t = local_dt.time()
-    if time(7, 0) <= t <= time(12, 0):
-        return "morning", local_dt.date()
-    if time(14, 0) <= t <= time(17, 0):
-        return "afternoon", local_dt.date()
-    return None
-
-
-def _same_auxiliar_correction_window(created_at: datetime, *, now: datetime | None = None) -> bool:
-    """BR-06 — Misma franja horaria calendario local que la creación."""
-    now = now or timezone.now()
-    c_local = timezone.localtime(created_at, BOGOTA)
-    n_local = timezone.localtime(now, BOGOTA)
-    b1 = _operating_band(c_local)
-    b2 = _operating_band(n_local)
-    return bool(b1 and b2 and b1 == b2)
 
 
 def _lock_stock(product_id: UUID, location_id: UUID) -> StockByLocation:
@@ -66,12 +48,47 @@ def _lock_stock(product_id: UUID, location_id: UUID) -> StockByLocation:
     return row
 
 
+def _consolidated_stock_total(*, product_id: UUID) -> int:
+    agg = StockByLocation.objects.filter(product_id=product_id).aggregate(s=Sum("current_stock"))
+    return int(agg["s"] or 0)
+
+
 def _next_invoice_number() -> str:
     """BR-13 — Numeración ICM-0001 atómica (singleton id=1)."""
     row, _ = InvoiceCounter.objects.select_for_update().get_or_create(pk=1, defaults={"last_number": 0})
     row.last_number = int(row.last_number) + 1
     row.save(update_fields=["last_number"])
     return f"ICM-{row.last_number:04d}"
+
+
+def generate_invoice_number() -> str:
+    """
+    BR-13 — Numeración secuencial de factura.
+
+    Debe invocarse dentro de la misma transacción `atomic` que el despacho que persiste el movimiento.
+    """
+    return _next_invoice_number()
+
+
+def generate_invoice_pdf(
+    movement: Movement,
+    *,
+    invoice_number: str | None = None,
+    product: Product | None = None,
+    quantity: int | None = None,
+    movement_type: str | None = None,
+) -> ContentFile | None:
+    """
+    BR-13 — Genera PDF del comprobante; si falla solo registra log (no invalida el movimiento).
+
+    Args:
+        movement: Movimiento asociado (usa sus FKs si faltan argumentos).
+    """
+    inv = invoice_number or movement.invoice_number or "BORRADOR"
+    prod = product or movement.product
+    qty = quantity if quantity is not None else movement.quantity
+    mtype = movement_type or movement.movement_type
+    return _try_build_invoice_pdf(invoice_number=inv, product=prod, quantity=qty, movement_type=mtype)
 
 
 def _try_build_invoice_pdf(
@@ -81,7 +98,7 @@ def _try_build_invoice_pdf(
     quantity: int,
     movement_type: str,
 ) -> ContentFile | None:
-    """BR-13 — Genera PDF y lo retorna como ContentFile (sin mutar el movimiento post-insert)."""
+    """BR-13 — Genera PDF y lo retorna como ContentFile."""
     try:
         from weasyprint import HTML
     except Exception as exc:  # pragma: no cover - entorno sin WeasyPrint
@@ -100,6 +117,23 @@ def _try_build_invoice_pdf(
     """
     pdf_bytes = HTML(string=html).write_pdf()
     return ContentFile(pdf_bytes, name=f"{invoice_number}.pdf")
+
+
+def check_and_create_alerts(product: Product, location: Location | None = None) -> None:
+    """
+    RF-011 — Verifica umbrales y vencimientos; no debe bloquear la operación principal.
+
+    Args:
+        product: Producto afectado.
+        location: Si se indica, evalúa además alerta de stock mínimo por ubicación.
+    """
+    try:
+        if location is not None:
+            alert_services.check_and_create_minimum_stock_alert(product, location)
+        alert_services.sync_stock_alerts_for_product(product.id)
+        alert_services.sync_expiry_alerts_for_product(product.id)
+    except Exception:
+        logger.exception("check_and_create_alerts falló para product_id=%s", product.id)
 
 
 def _product_allows_returns(product: Product) -> bool:
@@ -130,6 +164,10 @@ def register_entry(
     RF-005 — Entrada de mercancía.
 
     Valida BR-04 (serial en categorías que lo exigen) y BR-09 (nota si hay discrepancia).
+
+    Raises:
+        SerialNumberRequiredError: BR-04.
+        DiscrepancyNoteRequiredError: BR-09.
     """
     product = Product.objects.select_for_update().select_related("category").get(pk=product_id)
     if product.category.requires_serial_number and not (serial_number or "").strip():
@@ -169,7 +207,8 @@ def register_entry(
         movement=movement,
         detail={"type": MovementType.ENTRADA},
     )
-    alert_services.sync_stock_alerts_for_product(product_id)
+    loc = Location.objects.get(pk=location_id)
+    check_and_create_alerts(product, loc)
     return movement
 
 
@@ -181,8 +220,9 @@ def register_dispatch(
     quantity: int,
     movement_type: str,
     *,
-    scanned_code: str,
-    order_sku: str,
+    scanned_code: str | None = None,
+    order_sku: str | None = None,
+    serial_number: str | None = None,
     customer_data: dict[str, Any] | None = None,
     note: str | None = None,
     cold_chain_acknowledged: bool = False,
@@ -190,10 +230,16 @@ def register_dispatch(
     privacy_notice_acknowledged: bool = False,
 ) -> Movement:
     """
-    RF-006, BR-08, BR-11, BR-13 — Salida con validación cruzada y factura digital.
+    RF-006, BR-04, BR-08, BR-11, BR-13 — Salida con validación cruzada opcional y factura.
 
-    `scanned_code` debe resolver al mismo SKU que `order_sku`.
-    Datos de cliente mayorista (Ley 1581) solo en auditoría, no en el ledger.
+    BR-08: si `scanned_code` y `order_sku` se envían, se valida contra `resolve_identifier`.
+    Si ninguno se envía, despacho manual sin validación cruzada.
+
+    Raises:
+        CrossValidationFailedError: Validación cruzada o datos de venta mayor incompletos.
+        PrivacyConsentRequiredError: Ley 1581 sin consentimiento.
+        InsufficientStockError: BR-11.
+        SerialNumberRequiredError: BR-04.
     """
     if movement_type not in {
         MovementType.SALIDA_VENTA_MAYOR,
@@ -203,12 +249,34 @@ def register_dispatch(
     }:
         raise ValueError("Tipo de salida inválido.")
 
-    scanned_product = resolve_identifier(scanned_code)
-    if scanned_product is None or scanned_product.id != product_id:
-        raise CrossValidationFailedError(detail={"scanned": scanned_code, "expected_product_id": str(product_id)})
-    product = Product.objects.select_related("category").get(pk=product_id)
-    if product.sku != order_sku:
-        raise CrossValidationFailedError(detail={"resolved_sku": product.sku, "order_sku": order_sku})
+    sc = (scanned_code or "").strip()
+    osku = (order_sku or "").strip()
+    if bool(sc) ^ bool(osku):
+        raise CrossValidationFailedError(
+            "Para validación cruzada envíe ambos `scanned_code` y `order_sku`, o ninguno para despacho manual.",
+            detail={"scanned_code": sc, "order_sku": osku},
+        )
+
+    if sc and osku:
+        try:
+            scanned_product = resolve_identifier(sc)
+        except Product.DoesNotExist as e:
+            raise CrossValidationFailedError(
+                "No se pudo resolver el código escaneado.",
+                detail={"scanned_code": sc},
+            ) from e
+        if scanned_product.id != product_id:
+            raise CrossValidationFailedError(
+                detail={"scanned": sc, "expected_product_id": str(product_id)},
+            )
+        product = Product.objects.select_related("category").get(pk=product_id)
+        if product.sku != osku:
+            raise CrossValidationFailedError(detail={"resolved_sku": product.sku, "order_sku": osku})
+    else:
+        product = Product.objects.select_related("category").get(pk=product_id)
+
+    if product.category.requires_serial_number and not (serial_number or "").strip():
+        raise SerialNumberRequiredError()
 
     cold, electric = _requires_ack_flags(product)
     if cold and not cold_chain_acknowledged:
@@ -220,16 +288,15 @@ def register_dispatch(
     if movement_type == MovementType.SALIDA_VENTA_MAYOR:
         cd = customer_data or {}
         required = ("customer_name", "customer_email", "customer_phone", "customer_address")
-        missing = [k for k in required if not (cd.get(k) or "").strip()]
+        missing = [k for k in required if not (str(cd.get(k) or "")).strip()]
         if missing:
             raise CrossValidationFailedError(
                 "La venta mayor requiere datos completos del cliente.",
                 detail={"missing": missing},
             )
-        if not privacy_notice_acknowledged:
-            raise CrossValidationFailedError(
-                "Debe confirmar el aviso de privacidad (Ley 1581) antes de almacenar datos personales.",
-            )
+        ack = bool(cd.get("privacy_notice_acknowledged")) or bool(privacy_notice_acknowledged)
+        if not ack:
+            raise PrivacyConsentRequiredError()
         extra_audit["customer_data"] = cd
     if note:
         extra_audit["note"] = note
@@ -250,7 +317,7 @@ def register_dispatch(
     origin.last_movement_at = timezone.now()
     origin.save(update_fields=["current_stock", "last_movement_at", "updated_at"])
 
-    invoice_number = _next_invoice_number()
+    invoice_number = generate_invoice_number()
     pdf_file = _try_build_invoice_pdf(
         invoice_number=invoice_number,
         product=product,
@@ -264,8 +331,9 @@ def register_dispatch(
         quantity=quantity,
         stock_previo_origen=before,
         stock_resultante_origen=after,
-        scanned_code=scanned_code,
-        order_sku=order_sku,
+        scanned_code=sc or None,
+        order_sku=osku or None,
+        serial_number=serial_number,
         invoice_number=invoice_number,
         invoice_pdf=pdf_file,
         executed_by=user,
@@ -278,7 +346,8 @@ def register_dispatch(
         movement=movement,
         detail={"type": movement_type, **extra_audit},
     )
-    alert_services.sync_stock_alerts_for_product(product_id)
+    loc = Location.objects.get(pk=location_id)
+    check_and_create_alerts(product, loc)
     movement.refresh_from_db()
     return movement
 
@@ -295,7 +364,13 @@ def register_internal_transfer(
     electrical_safety_acknowledged: bool = False,
     related_movement: Movement | None = None,
 ) -> Movement:
-    """RF-007, BR-11 — Traslado interno entre ubicaciones."""
+    """
+    RF-007, BR-11 — Traslado interno entre ubicaciones.
+
+    Raises:
+        InsufficientStockError: Stock insuficiente en origen.
+        StockMismatchError: Si el total consolidado cambia tras el traslado (bug / inconsistencia).
+    """
     if origin_id == destination_id:
         raise ValueError("Origen y destino deben ser distintos.")
 
@@ -306,12 +381,18 @@ def register_internal_transfer(
     if electric and not electrical_safety_acknowledged:
         raise AlertAcknowledgementRequiredError("Debe reconocer la alerta de seguridad eléctrica.")
 
-    origin = _lock_stock(product_id, origin_id)
+    total_before = _consolidated_stock_total(product_id=product_id)
+
+    first_id, second_id = sorted([origin_id, destination_id], key=lambda u: str(u))
+    row_first = _lock_stock(product_id, first_id)
+    row_second = _lock_stock(product_id, second_id)
+    origin = row_first if row_first.location_id == origin_id else row_second
+    dest = row_second if row_first.location_id == origin_id else row_first
+
     if origin.current_stock < quantity:
         raise InsufficientStockError(
             detail={"location_id": str(origin_id), "available": origin.current_stock, "requested": quantity}
         )
-    dest = _lock_stock(product_id, destination_id)
 
     obo = origin.current_stock
     oao = obo - quantity
@@ -324,6 +405,12 @@ def register_internal_transfer(
     dest.current_stock = dad
     dest.last_movement_at = timezone.now()
     dest.save(update_fields=["current_stock", "last_movement_at", "updated_at"])
+
+    total_after = _consolidated_stock_total(product_id=product_id)
+    if total_before != total_after:
+        raise StockMismatchError(
+            detail={"before": total_before, "after": total_after},
+        )
 
     movement = Movement.objects.create(
         movement_type=MovementType.TRASLADO,
@@ -352,99 +439,59 @@ def register_internal_transfer(
 def register_return(
     user,
     product_id: UUID,
-    serial_number: str,
-    reason: str,
-    product_condition: str,
+    location_id: UUID,
+    quantity: int,
+    *,
+    serial_number: str | None = None,
+    related_movement_id: UUID | None = None,
 ) -> Movement:
     """
-    RF-008, BR-05 — Devolución registrada en ledger (sin alterar stock hasta aprobación).
+    RF-008 — Devolución que incrementa stock en ubicación (BR-04, BR-05, BR-11).
 
-    La aprobación crea una ENTRADA vinculada (`related_movement`); el stock se deriva del ledger.
+    Raises:
+        ReturnNotAllowedError: BR-05.
+        SerialNumberRequiredError: BR-04.
     """
-    product = Product.objects.select_related("category").get(pk=product_id)
+    product = Product.objects.select_for_update().select_related("category").get(pk=product_id)
     if not _product_allows_returns(product):
         raise ProductNotReturnableError()
-    movement = Movement.objects.create(
-        movement_type=MovementType.DEVOLUCION,
-        product_id=product_id,
-        quantity=1,
-        serial_number=serial_number,
-        executed_by=user,
-    )
-    log_event(
-        AuditEventType.RETURN_CREATED,
-        description=f"Devolución pendiente de aprobación: {reason}",
-        user=user,
-        movement=movement,
-        detail={"reason": reason, "product_condition": product_condition},
-    )
-    return movement
+    if product.category.requires_serial_number and not (serial_number or "").strip():
+        raise SerialNumberRequiredError()
 
+    related: Movement | None = None
+    if related_movement_id:
+        related = Movement.objects.select_for_update().filter(pk=related_movement_id).first()
+        if related is None:
+            raise ValueError("related_movement_id no existe.")
 
-def _return_has_approval_entry(ret: Movement) -> bool:
-    return Movement.objects.filter(
-        related_movement_id=ret.pk,
-        movement_type=MovementType.ENTRADA,
-    ).exists()
-
-
-@transaction.atomic
-def approve_return(almacenista_user, movement_id: UUID, destination_location_id: UUID) -> Movement:
-    """RF-008, BR-02 — Aprueba devolución y genera entrada asociada."""
-    if getattr(almacenista_user, "role", None) != "almacenista":
-        from shared.exceptions import UnauthorizedCredentialManagementError
-
-        raise UnauthorizedCredentialManagementError()
-    ret = Movement.objects.select_for_update().get(pk=movement_id)
-    if ret.movement_type != MovementType.DEVOLUCION or _return_has_approval_entry(ret):
-        raise ValueError("Movimiento de devolución inválido para aprobación.")
-
-    dest = _lock_stock(ret.product_id, destination_location_id)
+    dest = _lock_stock(product_id, location_id)
     before = dest.current_stock
-    after = before + ret.quantity
+    after = before + quantity
     dest.current_stock = after
     dest.last_movement_at = timezone.now()
     dest.save(update_fields=["current_stock", "last_movement_at", "updated_at"])
 
-    entry = Movement.objects.create(
-        movement_type=MovementType.ENTRADA,
-        product_id=ret.product_id,
-        destination_location_id=destination_location_id,
-        quantity=ret.quantity,
+    movement = Movement.objects.create(
+        movement_type=MovementType.DEVOLUCION,
+        product_id=product_id,
+        destination_location_id=location_id,
+        quantity=quantity,
         stock_previo_destino=before,
         stock_resultante_destino=after,
-        serial_number=ret.serial_number,
-        related_movement=ret,
-        executed_by=almacenista_user,
+        serial_number=serial_number,
+        related_movement=related,
+        executed_by=user,
     )
     log_event(
-        AuditEventType.RETURN_APPROVED,
-        description="Devolución aprobada; entrada asociada creada",
-        user=almacenista_user,
-        movement=entry,
-        detail={"return_id": str(ret.id)},
+        AuditEventType.RETURN_CREATED,
+        description="Devolución registrada",
+        user=user,
+        movement=movement,
+        detail={"type": MovementType.DEVOLUCION},
     )
-    alert_services.sync_stock_alerts_for_product(ret.product_id)
-    return entry
-
-
-@transaction.atomic
-def reject_return(almacenista_user, movement_id: UUID, reason: str) -> None:
-    """RF-008 — Rechaza devolución (solo auditoría; el registro DEVOLUCION permanece inmutable)."""
-    if getattr(almacenista_user, "role", None) != "almacenista":
-        from shared.exceptions import UnauthorizedCredentialManagementError
-
-        raise UnauthorizedCredentialManagementError()
-    ret = Movement.objects.select_for_update().get(pk=movement_id)
-    if ret.movement_type != MovementType.DEVOLUCION or _return_has_approval_entry(ret):
-        raise ValueError("Devolución inválida.")
-    log_event(
-        AuditEventType.RETURN_REJECTED,
-        description=f"Devolución rechazada: {reason}",
-        user=almacenista_user,
-        movement=ret,
-        detail={"reason": reason},
-    )
+    loc = Location.objects.get(pk=location_id)
+    check_and_create_alerts(product, loc)
+    return movement
 
 
 @transaction.atomic
@@ -455,11 +502,15 @@ def register_adjustment(
     new_quantity: int,
     justification: str,
 ) -> Movement:
-    """RF-009, BR-07 — Ajuste formal con delta explícito."""
-    if getattr(almacenista_user, "role", None) != "almacenista":
-        from shared.exceptions import UnauthorizedCredentialManagementError
+    """
+    RF-009, BR-07 — Ajuste formal con delta explícito.
 
-        raise UnauthorizedCredentialManagementError()
+    Raises:
+        UnauthorizedDomainActionError: Solo almacenista.
+        AdjustmentJustificationRequiredError: Justificación vacía.
+    """
+    if getattr(almacenista_user, "role", None) != "almacenista":
+        raise UnauthorizedDomainActionError("Solo el almacenista puede registrar ajustes de inventario.")
     if not (justification or "").strip():
         raise AdjustmentJustificationRequiredError()
 
@@ -492,28 +543,31 @@ def register_adjustment(
         description="Ajuste de inventario",
         user=almacenista_user,
         movement=movement,
-        detail={},
+        detail={"delta": delta, "justification": justification.strip()},
     )
-    alert_services.sync_stock_alerts_for_product(product_id)
+    product = Product.objects.get(pk=product_id)
+    check_and_create_alerts(product)
     return movement
 
 
 @transaction.atomic
 def correct_movement_within_window(user, movement_id: UUID, corrected_data: dict[str, Any]) -> list[Movement]:
     """
-    BR-06 — Autocorrección de traslado dentro de la misma franja horaria.
+    BR-06 — Autocorrección de traslado dentro de 5 minutos desde `created_at` (PROMPT FASE LÓGICA).
 
     Implementación: traslado inverso + traslado corregido; sin mutar el movimiento original (BR-10).
+
+    Raises:
+        UnauthorizedDomainActionError: Usuario distinto al autor.
+        ImmutableRecordError: Ventana de 5 minutos cerrada.
     """
     original = Movement.objects.select_related("product").get(pk=movement_id)
     if original.movement_type != MovementType.TRASLADO:
-        raise ValueError("Solo se soporta corrección de traslados en esta versión base.")
+        raise ValueError("Solo se soporta corrección de traslados en esta versión.")
     if original.executed_by_id != user.id:
-        raise CorrectionWindowClosedError("Solo el autor del movimiento puede corregirlo.")
-    if getattr(user, "role", None) == "auxiliar_despacho" and not _same_auxiliar_correction_window(original.created_at):
-        raise CorrectionWindowClosedError()
-    if getattr(user, "role", None) == "auxiliar_despacho" and not is_within_operating_hours():
-        raise CorrectionWindowClosedError("Fuera de horario operativo.")
+        raise UnauthorizedDomainActionError("Solo el autor del movimiento puede corregirlo.")
+    if timezone.now() - original.created_at > timedelta(minutes=5):
+        raise ImmutableRecordError("La ventana de autocorrección (5 minutos) ya cerró para este movimiento.")
 
     new_origin = UUID(str(corrected_data["origin_id"]))
     new_dest = UUID(str(corrected_data["destination_id"]))
@@ -554,10 +608,10 @@ def correct_movement_within_window(user, movement_id: UUID, corrected_data: dict
 
 def ledger_net_quantity_for_location(*, product_id: UUID, location_id: UUID) -> int:
     """
-    Suma algebraica inferida desde el ledger para verificación de consistencia.
+    Suma algebraica inferida desde el ledger para verificación de consistencia (BR-11).
 
-    Convención: entradas suman en destino; salidas restan en origen; traslados afectan ambos.
-    Las DEVOLUCION no suman hasta que exista ENTRADA vinculada (se cuenta la ENTRADA).
+    Convención: entradas suman en destino; salidas restan en origen; traslados afectan ambos;
+    devoluciones con destino suman; ajustes según origen/destino.
     """
     total = 0
     qs = Movement.objects.filter(product_id=product_id).order_by("created_at")
@@ -582,4 +636,6 @@ def ledger_net_quantity_for_location(*, product_id: UUID, location_id: UUID) -> 
                 total += m.quantity
             if m.origin_location_id == location_id:
                 total -= m.quantity
+        elif m.movement_type == MovementType.DEVOLUCION and m.destination_location_id == location_id:
+            total += m.quantity
     return total

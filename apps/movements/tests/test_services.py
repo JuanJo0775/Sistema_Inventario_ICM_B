@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import timedelta
 from unittest.mock import patch
 
 import pytest
@@ -116,10 +116,11 @@ def test_internal_transfer_does_not_change_global_stock(almacenista_user, sample
 
 
 @pytest.mark.django_db
-def test_return_blocked_for_non_returnable_category(almacenista_user, sample_product):
+def test_return_blocked_for_non_returnable_category(almacenista_user, sample_product, sample_locations):
     assert sample_product.category.is_returnable is False
+    loc = sample_locations[0]
     with pytest.raises(ProductNotReturnableError):
-        register_return(almacenista_user, sample_product.id, "SN", "motivo", "bueno")
+        register_return(almacenista_user, sample_product.id, loc.id, 1, serial_number="SN")
 
 
 @pytest.mark.django_db
@@ -159,14 +160,12 @@ def test_correction_within_window_creates_reversal_and_fixed(almacenista_user, s
         cold_chain_acknowledged=True,
         electrical_safety_acknowledged=True,
     )
-    fixed_time = timezone.make_aware(datetime(2026, 5, 1, 10, 0, 0))
+    fixed_time = m.created_at + timedelta(seconds=30)
     with patch("django.utils.timezone.now", return_value=fixed_time):
-        with patch("apps.movements.services.is_within_operating_hours", return_value=True):
-            with patch("apps.movements.services._same_auxiliar_correction_window", return_value=True):
-                out = correct_movement_within_window(
-                    almacenista_user,
-                    m.id,
-                    {"origin_id": a.id, "destination_id": b.id, "quantity": 2},
-                )
+        out = correct_movement_within_window(
+            almacenista_user,
+            m.id,
+            {"origin_id": a.id, "destination_id": b.id, "quantity": 2},
+        )
     assert len(out) == 2
     assert Movement.objects.filter(related_movement=m).exists()

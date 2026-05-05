@@ -2,40 +2,45 @@
 
 from __future__ import annotations
 
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from django.http import FileResponse
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.movements.models import Movement
+from apps.movements.models import Movement, MovementType
 from apps.movements.serializers import (
+    AdjustmentCorrectionSerializer,
     AdjustmentCreateSerializer,
     CorrectionCreateSerializer,
     DispatchCreateSerializer,
     EntryCreateSerializer,
     MovementSerializer,
-    ReturnApproveSerializer,
     ReturnCreateSerializer,
-    ReturnRejectSerializer,
     TransferCreateSerializer,
 )
 from apps.movements.services import (
-    approve_return,
     correct_movement_within_window,
     register_adjustment,
     register_dispatch,
     register_entry,
     register_internal_transfer,
     register_return,
-    reject_return,
 )
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenista, IsAlmacenistaOrAuxiliar
 
 
 @extend_schema_view(
-    get=extend_schema(summary="Listar movimientos", responses={200: MovementSerializer(many=True)}),
+    get=extend_schema(
+        summary="Listar movimientos", 
+        responses={
+            200: MovementSerializer(many=True),
+            400: OpenApiResponse(description="Filtros de búsqueda inválidos."),
+            401: OpenApiResponse(description="No autenticado."),
+        }
+    ),
 )
 class MovementListView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
@@ -54,20 +59,42 @@ class MovementListView(generics.ListAPIView):
 
 
 @extend_schema_view(
-    get=extend_schema(summary="Detalle de movimiento", responses={200: MovementSerializer}),
+    get=extend_schema(
+        summary="Listar entradas", 
+        responses={
+            200: MovementSerializer(many=True),
+            401: OpenApiResponse(description="No autenticado."),
+        }
+    ),
+    post=extend_schema(
+        summary="Registrar entrada",
+        request=EntryCreateSerializer,
+        responses={
+            201: MovementSerializer,
+            400: OpenApiResponse(description="Error de validación (ej. falta de número de serie obligatorio)."),
+            401: OpenApiResponse(description="No autenticado."),
+            403: OpenApiResponse(description="Permiso denegado (rol no permitido o fuera de horario operativo)."),
+        },
+    ),
 )
-class MovementDetailView(generics.RetrieveAPIView):
-    permission_classes = (IsAuthenticated,)
-    queryset = Movement.objects.select_related("product", "executed_by")
-    serializer_class = MovementSerializer
-
-
-class EntryCreateView(APIView):
+class EntryListCreateView(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+    pagination_class = ICMPageNumberPagination
 
-    @extend_schema(request=EntryCreateSerializer, responses=MovementSerializer)
-    def post(self, request):
-        ser = EntryCreateSerializer(data=request.data)
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return EntryCreateSerializer
+        return MovementSerializer
+
+    def get_queryset(self):
+        return (
+            Movement.objects.filter(movement_type=MovementType.ENTRADA)
+            .select_related("product", "executed_by", "destination_location")
+            .order_by("-created_at")
+        )
+
+    def create(self, request, *args, **kwargs):
+        ser = self.get_serializer(data=request.data)
         ser.is_valid(raise_exception=True)
         d = ser.validated_data
         movement = register_entry(
@@ -84,12 +111,69 @@ class EntryCreateView(APIView):
         return Response(MovementSerializer(movement).data, status=status.HTTP_201_CREATED)
 
 
-class DispatchCreateView(APIView):
-    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+@extend_schema_view(
+    get=extend_schema(
+        summary="Detalle de entrada", 
+        responses={
+            200: MovementSerializer,
+            401: OpenApiResponse(description="No autenticado."),
+            404: OpenApiResponse(description="Entrada no encontrada."),
+        }
+    ),
+)
+class EntryDetailView(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = MovementSerializer
 
-    @extend_schema(request=DispatchCreateSerializer, responses=MovementSerializer)
-    def post(self, request):
-        ser = DispatchCreateSerializer(data=request.data)
+    def get_queryset(self):
+        return Movement.objects.filter(movement_type=MovementType.ENTRADA).select_related(
+            "product", "executed_by", "destination_location"
+        )
+
+
+@extend_schema_view(
+    get=extend_schema(
+        summary="Listar despachos", 
+        responses={
+            200: MovementSerializer(many=True),
+            401: OpenApiResponse(description="No autenticado."),
+        }
+    ),
+    post=extend_schema(
+        summary="Registrar despacho",
+        request=DispatchCreateSerializer,
+        responses={
+            201: MovementSerializer,
+            400: OpenApiResponse(description="Error de validación (ej. stock insuficiente, validación cruzada fallida)."),
+            401: OpenApiResponse(description="No autenticado."),
+            403: OpenApiResponse(description="Permiso denegado."),
+        },
+    ),
+)
+class DispatchListCreateView(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+    pagination_class = ICMPageNumberPagination
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return DispatchCreateSerializer
+        return MovementSerializer
+
+    def get_queryset(self):
+        salidas = (
+            MovementType.SALIDA_VENTA_MAYOR,
+            MovementType.SALIDA_VENTA_MENOR,
+            MovementType.SALIDA_DANO,
+            MovementType.SALIDA_VENCIMIENTO,
+        )
+        return (
+            Movement.objects.filter(movement_type__in=salidas)
+            .select_related("product", "executed_by", "origin_location")
+            .order_by("-created_at")
+        )
+
+    def create(self, request, *args, **kwargs):
+        ser = self.get_serializer(data=request.data)
         ser.is_valid(raise_exception=True)
         d = ser.validated_data
         movement = register_dispatch(
@@ -98,8 +182,9 @@ class DispatchCreateView(APIView):
             d["location_id"],
             d["quantity"],
             d["movement_type"],
-            scanned_code=d["scanned_code"],
-            order_sku=d["order_sku"],
+            scanned_code=d.get("scanned_code"),
+            order_sku=d.get("order_sku"),
+            serial_number=d.get("serial_number"),
             customer_data=d.get("customer_data"),
             note=d.get("note"),
             cold_chain_acknowledged=d.get("cold_chain_acknowledged", False),
@@ -109,12 +194,100 @@ class DispatchCreateView(APIView):
         return Response(MovementSerializer(movement).data, status=status.HTTP_201_CREATED)
 
 
-class TransferCreateView(APIView):
+@extend_schema_view(
+    get=extend_schema(
+        summary="Detalle de despacho", 
+        responses={
+            200: MovementSerializer,
+            401: OpenApiResponse(description="No autenticado."),
+            404: OpenApiResponse(description="Despacho no encontrado."),
+        }
+    ),
+)
+class DispatchDetailView(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = MovementSerializer
+
+    def get_queryset(self):
+        salidas = (
+            MovementType.SALIDA_VENTA_MAYOR,
+            MovementType.SALIDA_VENTA_MENOR,
+            MovementType.SALIDA_DANO,
+            MovementType.SALIDA_VENCIMIENTO,
+        )
+        return Movement.objects.filter(movement_type__in=salidas).select_related(
+            "product", "executed_by", "origin_location"
+        )
+
+
+class DispatchInvoiceDownloadView(APIView):
+    """BR-13 — Descarga del PDF de factura asociado al despacho."""
+
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
 
-    @extend_schema(request=TransferCreateSerializer, responses=MovementSerializer)
-    def post(self, request):
-        ser = TransferCreateSerializer(data=request.data)
+    @extend_schema(
+        summary="Descargar PDF de factura",
+        responses={
+            200: None,
+            401: OpenApiResponse(description="No autenticado."),
+            404: OpenApiResponse(description="Factura o despacho no disponible."),
+        }
+    )
+    def get(self, request, pk):
+        salidas = (
+            MovementType.SALIDA_VENTA_MAYOR,
+            MovementType.SALIDA_VENTA_MENOR,
+            MovementType.SALIDA_DANO,
+            MovementType.SALIDA_VENCIMIENTO,
+        )
+        movement = Movement.objects.filter(pk=pk, movement_type__in=salidas).first()
+        if not movement or not movement.invoice_pdf:
+            from django.http import Http404
+            raise Http404("Factura no disponible.")
+        return FileResponse(
+            movement.invoice_pdf.open("rb"),
+            as_attachment=True,
+            filename=movement.invoice_pdf.name.split("/")[-1],
+        )
+
+
+@extend_schema_view(
+    get=extend_schema(
+        summary="Listar traslados", 
+        responses={
+            200: MovementSerializer(many=True),
+            401: OpenApiResponse(description="No autenticado."),
+        }
+    ),
+    post=extend_schema(
+        summary="Registrar traslado",
+        request=TransferCreateSerializer,
+        responses={
+            201: MovementSerializer,
+            400: OpenApiResponse(description="Error de validación (ej. stock insuficiente)."),
+            401: OpenApiResponse(description="No autenticado."),
+            403: OpenApiResponse(description="Permiso denegado."),
+        },
+    ),
+)
+class TransferListCreateView(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+    pagination_class = ICMPageNumberPagination
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return TransferCreateSerializer
+        return MovementSerializer
+
+    def get_queryset(self):
+        return (
+            Movement.objects.filter(movement_type=MovementType.TRASLADO)
+            .select_related("product", "executed_by", "origin_location", "destination_location")
+            .order_by("-created_at")
+        )
+
+    def create(self, request, *args, **kwargs):
+        ser = self.get_serializer(data=request.data)
         ser.is_valid(raise_exception=True)
         d = ser.validated_data
         movement = register_internal_transfer(
@@ -129,52 +302,93 @@ class TransferCreateView(APIView):
         return Response(MovementSerializer(movement).data, status=status.HTTP_201_CREATED)
 
 
-class ReturnCreateView(APIView):
-    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+@extend_schema_view(
+    get=extend_schema(
+        summary="Listar devoluciones", 
+        responses={
+            200: MovementSerializer(many=True),
+            401: OpenApiResponse(description="No autenticado."),
+        }
+    ),
+    post=extend_schema(
+        summary="Registrar devolución",
+        request=ReturnCreateSerializer,
+        responses={
+            201: MovementSerializer,
+            400: OpenApiResponse(description="Error de validación (ej. el producto no admite devolución)."),
+            401: OpenApiResponse(description="No autenticado."),
+            403: OpenApiResponse(description="Permiso denegado (solo almacenista)."),
+        },
+    ),
+)
+class ReturnListCreateView(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+    pagination_class = ICMPageNumberPagination
 
-    @extend_schema(request=ReturnCreateSerializer, responses=MovementSerializer)
-    def post(self, request):
-        ser = ReturnCreateSerializer(data=request.data)
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return ReturnCreateSerializer
+        return MovementSerializer
+
+    def get_queryset(self):
+        return (
+            Movement.objects.filter(movement_type=MovementType.DEVOLUCION)
+            .select_related("product", "executed_by", "destination_location")
+            .order_by("-created_at")
+        )
+
+    def create(self, request, *args, **kwargs):
+        ser = self.get_serializer(data=request.data)
         ser.is_valid(raise_exception=True)
         d = ser.validated_data
         movement = register_return(
             request.user,
             d["product_id"],
-            d["serial_number"],
-            d["reason"],
-            d["product_condition"],
+            d["location_id"],
+            d["quantity"],
+            serial_number=d.get("serial_number"),
+            related_movement_id=d.get("related_movement_id"),
         )
         return Response(MovementSerializer(movement).data, status=status.HTTP_201_CREATED)
 
 
-class ReturnApproveView(APIView):
+@extend_schema_view(
+    get=extend_schema(
+        summary="Listar ajustes", 
+        responses={
+            200: MovementSerializer(many=True),
+            401: OpenApiResponse(description="No autenticado."),
+        }
+    ),
+    post=extend_schema(
+        summary="Registrar ajuste",
+        request=AdjustmentCreateSerializer,
+        responses={
+            201: MovementSerializer,
+            400: OpenApiResponse(description="Error de validación (ej. justificación obligatoria faltante)."),
+            401: OpenApiResponse(description="No autenticado."),
+            403: OpenApiResponse(description="Permiso denegado (solo almacenista)."),
+        },
+    ),
+)
+class AdjustmentListCreateView(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
+    pagination_class = ICMPageNumberPagination
 
-    @extend_schema(request=ReturnApproveSerializer, responses=MovementSerializer)
-    def post(self, request, pk):
-        ser = ReturnApproveSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        movement = approve_return(request.user, pk, ser.validated_data["destination_location_id"])
-        return Response(MovementSerializer(movement).data, status=status.HTTP_201_CREATED)
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return AdjustmentCreateSerializer
+        return MovementSerializer
 
+    def get_queryset(self):
+        return (
+            Movement.objects.filter(movement_type=MovementType.AJUSTE)
+            .select_related("product", "executed_by", "origin_location", "destination_location")
+            .order_by("-created_at")
+        )
 
-class ReturnRejectView(APIView):
-    permission_classes = (IsAuthenticated, IsAlmacenista)
-
-    @extend_schema(request=ReturnRejectSerializer, responses={204: None})
-    def post(self, request, pk):
-        ser = ReturnRejectSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        reject_return(request.user, pk, ser.validated_data["reason"])
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class AdjustmentCreateView(APIView):
-    permission_classes = (IsAuthenticated, IsAlmacenista)
-
-    @extend_schema(request=AdjustmentCreateSerializer, responses=MovementSerializer)
-    def post(self, request):
-        ser = AdjustmentCreateSerializer(data=request.data)
+    def create(self, request, *args, **kwargs):
+        ser = self.get_serializer(data=request.data)
         ser.is_valid(raise_exception=True)
         d = ser.validated_data
         movement = register_adjustment(
@@ -187,10 +401,63 @@ class AdjustmentCreateView(APIView):
         return Response(MovementSerializer(movement).data, status=status.HTTP_201_CREATED)
 
 
-class MovementCorrectionView(APIView):
+class AdjustmentCorrectView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
 
-    @extend_schema(request=CorrectionCreateSerializer, responses=MovementSerializer(many=True))
+    @extend_schema(
+        summary="Corregir ajuste dentro de ventana de tiempo",
+        request=AdjustmentCorrectionSerializer, 
+        responses={
+            201: MovementSerializer(many=True),
+            400: OpenApiResponse(description="Error de validación (ej. ajuste original inválido)."),
+            401: OpenApiResponse(description="No autenticado."),
+            403: OpenApiResponse(description="Permiso denegado."),
+            404: OpenApiResponse(description="Ajuste no encontrado."),
+            405: OpenApiResponse(description="La ventana de corrección ha expirado (inmutable)."),
+        }
+    )
+    def post(self, request):
+        ser = AdjustmentCorrectionSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        d = dict(ser.validated_data)
+        mid = d.pop("movement_id")
+        movements = correct_movement_within_window(request.user, mid, d)
+        return Response(MovementSerializer(movements, many=True).data, status=status.HTTP_201_CREATED)
+
+
+@extend_schema_view(
+    get=extend_schema(
+        summary="Detalle de movimiento", 
+        responses={
+            200: MovementSerializer,
+            401: OpenApiResponse(description="No autenticado."),
+            404: OpenApiResponse(description="Movimiento no encontrado."),
+        }
+    ),
+)
+class MovementDetailView(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset = Movement.objects.select_related("product", "executed_by")
+    serializer_class = MovementSerializer
+
+
+class MovementCorrectionView(APIView):
+    """Corrección por id de movimiento en URL (compatibilidad)."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+
+    @extend_schema(
+        summary="Corrección de movimiento (URL)",
+        request=CorrectionCreateSerializer, 
+        responses={
+            201: MovementSerializer(many=True),
+            400: OpenApiResponse(description="Error de validación de datos."),
+            401: OpenApiResponse(description="No autenticado."),
+            403: OpenApiResponse(description="Permiso denegado."),
+            404: OpenApiResponse(description="Movimiento no encontrado."),
+            405: OpenApiResponse(description="La ventana de corrección ha expirado (inmutable)."),
+        }
+    )
     def post(self, request, pk):
         ser = CorrectionCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)

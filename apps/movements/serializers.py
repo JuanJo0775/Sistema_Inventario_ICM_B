@@ -55,9 +55,10 @@ class DispatchCreateSerializer(serializers.Serializer):
     location_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
     movement_type = serializers.CharField()
-    scanned_code = serializers.CharField()
-    order_sku = serializers.CharField()
-    customer_data = serializers.DictField(required=False, child=serializers.CharField(allow_blank=True))
+    scanned_code = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    order_sku = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    serial_number = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    customer_data = serializers.JSONField(required=False)
     note = serializers.CharField(required=False, allow_blank=True)
     cold_chain_acknowledged = serializers.BooleanField(default=False)
     electrical_safety_acknowledged = serializers.BooleanField(default=False)
@@ -75,17 +76,10 @@ class TransferCreateSerializer(serializers.Serializer):
 
 class ReturnCreateSerializer(serializers.Serializer):
     product_id = serializers.UUIDField()
-    serial_number = serializers.CharField()
-    reason = serializers.CharField()
-    product_condition = serializers.CharField()
-
-
-class ReturnApproveSerializer(serializers.Serializer):
-    destination_location_id = serializers.UUIDField()
-
-
-class ReturnRejectSerializer(serializers.Serializer):
-    reason = serializers.CharField()
+    location_id = serializers.UUIDField()
+    quantity = serializers.IntegerField(min_value=1)
+    serial_number = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    related_movement_id = serializers.UUIDField(required=False, allow_null=True)
 
 
 class AdjustmentCreateSerializer(serializers.Serializer):
@@ -96,6 +90,15 @@ class AdjustmentCreateSerializer(serializers.Serializer):
 
 
 class CorrectionCreateSerializer(serializers.Serializer):
+    origin_id = serializers.UUIDField()
+    destination_id = serializers.UUIDField()
+    quantity = serializers.IntegerField(min_value=1)
+
+
+class AdjustmentCorrectionSerializer(serializers.Serializer):
+    """Cuerpo para `POST .../adjustments/correct/` con id de movimiento."""
+
+    movement_id = serializers.UUIDField()
     origin_id = serializers.UUIDField()
     destination_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
