@@ -1,18 +1,13 @@
 """Re-exporta excepciones de dominio usadas por movimientos (README_ARQUITECTURA §7.5)."""
 
-from shared.exceptions import (
-    AdjustmentJustificationRequiredError,
-    CrossValidationFailedError,
-    DiscrepancyNoteRequiredError,
-    ICMBaseException,
-    ImmutableRecordError,
-    InsufficientStockError,
-    PrivacyConsentRequiredError,
-    ReturnNotAllowedError,
-    SerialNumberRequiredError,
-    StockMismatchError,
-    UnauthorizedDomainActionError,
-)
+from shared.exceptions import (AdjustmentJustificationRequiredError,
+                               CrossValidationFailedError,
+                               DiscrepancyNoteRequiredError, ICMBaseException,
+                               ImmutableRecordError, InsufficientStockError,
+                               PrivacyConsentRequiredError,
+                               ReturnNotAllowedError,
+                               SerialNumberRequiredError, StockMismatchError,
+                               UnauthorizedDomainActionError)
 
 
 class ImmutableMovementError(ImmutableRecordError):

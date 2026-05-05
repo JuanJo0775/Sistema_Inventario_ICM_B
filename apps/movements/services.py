@@ -19,43 +19,40 @@ from apps.catalog.models import Product
 from apps.catalog.services import resolve_identifier
 from apps.inventory.models import Location, StockByLocation
 from apps.movements.models import InvoiceCounter, Movement, MovementType
-from shared.exceptions import (
-    AdjustmentJustificationRequiredError,
-    AlertAcknowledgementRequiredError,
-    CrossValidationFailedError,
-    DiscrepancyNoteRequiredError,
-    ImmutableRecordError,
-    InsufficientStockError,
-    PrivacyConsentRequiredError,
-    ProductNotReturnableError,
-    SerialNumberRequiredError,
-    StockMismatchError,
-    UnauthorizedDomainActionError,
-)
+from shared.exceptions import (AdjustmentJustificationRequiredError,
+                               AlertAcknowledgementRequiredError,
+                               CrossValidationFailedError,
+                               DiscrepancyNoteRequiredError,
+                               ImmutableRecordError, InsufficientStockError,
+                               PrivacyConsentRequiredError,
+                               ProductNotReturnableError,
+                               SerialNumberRequiredError, StockMismatchError,
+                               UnauthorizedDomainActionError)
 
 logger = logging.getLogger(__name__)
 
 
 def _lock_stock(product_id: UUID, location_id: UUID) -> StockByLocation:
-    row, _ = (
-        StockByLocation.objects.select_for_update()
-        .get_or_create(
-            product_id=product_id,
-            location_id=location_id,
-            defaults={"current_stock": 0},
-        )
+    row, _ = StockByLocation.objects.select_for_update().get_or_create(
+        product_id=product_id,
+        location_id=location_id,
+        defaults={"current_stock": 0},
     )
     return row
 
 
 def _consolidated_stock_total(*, product_id: UUID) -> int:
-    agg = StockByLocation.objects.filter(product_id=product_id).aggregate(s=Sum("current_stock"))
+    agg = StockByLocation.objects.filter(product_id=product_id).aggregate(
+        s=Sum("current_stock")
+    )
     return int(agg["s"] or 0)
 
 
 def _next_invoice_number() -> str:
     """BR-13 — Numeración ICM-0001 atómica (singleton id=1)."""
-    row, _ = InvoiceCounter.objects.select_for_update().get_or_create(pk=1, defaults={"last_number": 0})
+    row, _ = InvoiceCounter.objects.select_for_update().get_or_create(
+        pk=1, defaults={"last_number": 0}
+    )
     row.last_number = int(row.last_number) + 1
     row.save(update_fields=["last_number"])
     return f"ICM-{row.last_number:04d}"
@@ -88,7 +85,9 @@ def generate_invoice_pdf(
     prod = product or movement.product
     qty = quantity if quantity is not None else movement.quantity
     mtype = movement_type or movement.movement_type
-    return _try_build_invoice_pdf(invoice_number=inv, product=prod, quantity=qty, movement_type=mtype)
+    return _try_build_invoice_pdf(
+        invoice_number=inv, product=prod, quantity=qty, movement_type=mtype
+    )
 
 
 def _try_build_invoice_pdf(
@@ -169,17 +168,29 @@ def register_entry(
         SerialNumberRequiredError: BR-04.
         DiscrepancyNoteRequiredError: BR-09.
     """
-    product = Product.objects.select_for_update().select_related("category").get(pk=product_id)
+    product = (
+        Product.objects.select_for_update()
+        .select_related("category")
+        .get(pk=product_id)
+    )
     if product.category.requires_serial_number and not (serial_number or "").strip():
         raise SerialNumberRequiredError()
-    if qty_invoiced is not None and qty_invoiced != quantity and not (discrepancy_note or "").strip():
+    if (
+        qty_invoiced is not None
+        and qty_invoiced != quantity
+        and not (discrepancy_note or "").strip()
+    ):
         raise DiscrepancyNoteRequiredError()
 
     cold, electric = _requires_ack_flags(product)
     if cold and not cold_chain_acknowledged:
-        raise AlertAcknowledgementRequiredError("Debe reconocer la alerta de cadena de frío.")
+        raise AlertAcknowledgementRequiredError(
+            "Debe reconocer la alerta de cadena de frío."
+        )
     if electric and not electrical_safety_acknowledged:
-        raise AlertAcknowledgementRequiredError("Debe reconocer la alerta de seguridad eléctrica.")
+        raise AlertAcknowledgementRequiredError(
+            "Debe reconocer la alerta de seguridad eléctrica."
+        )
 
     dest = _lock_stock(product_id, location_id)
     before = dest.current_stock
@@ -271,7 +282,9 @@ def register_dispatch(
             )
         product = Product.objects.select_related("category").get(pk=product_id)
         if product.sku != osku:
-            raise CrossValidationFailedError(detail={"resolved_sku": product.sku, "order_sku": osku})
+            raise CrossValidationFailedError(
+                detail={"resolved_sku": product.sku, "order_sku": osku}
+            )
     else:
         product = Product.objects.select_related("category").get(pk=product_id)
 
@@ -280,21 +293,32 @@ def register_dispatch(
 
     cold, electric = _requires_ack_flags(product)
     if cold and not cold_chain_acknowledged:
-        raise AlertAcknowledgementRequiredError("Debe reconocer la alerta de cadena de frío.")
+        raise AlertAcknowledgementRequiredError(
+            "Debe reconocer la alerta de cadena de frío."
+        )
     if electric and not electrical_safety_acknowledged:
-        raise AlertAcknowledgementRequiredError("Debe reconocer la alerta de seguridad eléctrica.")
+        raise AlertAcknowledgementRequiredError(
+            "Debe reconocer la alerta de seguridad eléctrica."
+        )
 
     extra_audit: dict[str, Any] = {}
     if movement_type == MovementType.SALIDA_VENTA_MAYOR:
         cd = customer_data or {}
-        required = ("customer_name", "customer_email", "customer_phone", "customer_address")
+        required = (
+            "customer_name",
+            "customer_email",
+            "customer_phone",
+            "customer_address",
+        )
         missing = [k for k in required if not (str(cd.get(k) or "")).strip()]
         if missing:
             raise CrossValidationFailedError(
                 "La venta mayor requiere datos completos del cliente.",
                 detail={"missing": missing},
             )
-        ack = bool(cd.get("privacy_notice_acknowledged")) or bool(privacy_notice_acknowledged)
+        ack = bool(cd.get("privacy_notice_acknowledged")) or bool(
+            privacy_notice_acknowledged
+        )
         if not ack:
             raise PrivacyConsentRequiredError()
         extra_audit["customer_data"] = cd
@@ -377,9 +401,13 @@ def register_internal_transfer(
     product = Product.objects.select_related("category").get(pk=product_id)
     cold, electric = _requires_ack_flags(product)
     if cold and not cold_chain_acknowledged:
-        raise AlertAcknowledgementRequiredError("Debe reconocer la alerta de cadena de frío.")
+        raise AlertAcknowledgementRequiredError(
+            "Debe reconocer la alerta de cadena de frío."
+        )
     if electric and not electrical_safety_acknowledged:
-        raise AlertAcknowledgementRequiredError("Debe reconocer la alerta de seguridad eléctrica.")
+        raise AlertAcknowledgementRequiredError(
+            "Debe reconocer la alerta de seguridad eléctrica."
+        )
 
     total_before = _consolidated_stock_total(product_id=product_id)
 
@@ -391,7 +419,11 @@ def register_internal_transfer(
 
     if origin.current_stock < quantity:
         raise InsufficientStockError(
-            detail={"location_id": str(origin_id), "available": origin.current_stock, "requested": quantity}
+            detail={
+                "location_id": str(origin_id),
+                "available": origin.current_stock,
+                "requested": quantity,
+            }
         )
 
     obo = origin.current_stock
@@ -452,7 +484,11 @@ def register_return(
         ReturnNotAllowedError: BR-05.
         SerialNumberRequiredError: BR-04.
     """
-    product = Product.objects.select_for_update().select_related("category").get(pk=product_id)
+    product = (
+        Product.objects.select_for_update()
+        .select_related("category")
+        .get(pk=product_id)
+    )
     if not _product_allows_returns(product):
         raise ProductNotReturnableError()
     if product.category.requires_serial_number and not (serial_number or "").strip():
@@ -460,7 +496,9 @@ def register_return(
 
     related: Movement | None = None
     if related_movement_id:
-        related = Movement.objects.select_for_update().filter(pk=related_movement_id).first()
+        related = (
+            Movement.objects.select_for_update().filter(pk=related_movement_id).first()
+        )
         if related is None:
             raise ValueError("related_movement_id no existe.")
 
@@ -510,7 +548,9 @@ def register_adjustment(
         AdjustmentJustificationRequiredError: Justificación vacía.
     """
     if getattr(almacenista_user, "role", None) != "almacenista":
-        raise UnauthorizedDomainActionError("Solo el almacenista puede registrar ajustes de inventario.")
+        raise UnauthorizedDomainActionError(
+            "Solo el almacenista puede registrar ajustes de inventario."
+        )
     if not (justification or "").strip():
         raise AdjustmentJustificationRequiredError()
 
@@ -551,7 +591,9 @@ def register_adjustment(
 
 
 @transaction.atomic
-def correct_movement_within_window(user, movement_id: UUID, corrected_data: dict[str, Any]) -> list[Movement]:
+def correct_movement_within_window(
+    user, movement_id: UUID, corrected_data: dict[str, Any]
+) -> list[Movement]:
     """
     BR-06 — Autocorrección de traslado dentro de 5 minutos desde `created_at` (PROMPT FASE LÓGICA).
 
@@ -565,9 +607,13 @@ def correct_movement_within_window(user, movement_id: UUID, corrected_data: dict
     if original.movement_type != MovementType.TRASLADO:
         raise ValueError("Solo se soporta corrección de traslados en esta versión.")
     if original.executed_by_id != user.id:
-        raise UnauthorizedDomainActionError("Solo el autor del movimiento puede corregirlo.")
+        raise UnauthorizedDomainActionError(
+            "Solo el autor del movimiento puede corregirlo."
+        )
     if timezone.now() - original.created_at > timedelta(minutes=5):
-        raise ImmutableRecordError("La ventana de autocorrección (5 minutos) ya cerró para este movimiento.")
+        raise ImmutableRecordError(
+            "La ventana de autocorrección (5 minutos) ya cerró para este movimiento."
+        )
 
     new_origin = UUID(str(corrected_data["origin_id"]))
     new_dest = UUID(str(corrected_data["destination_id"]))
@@ -616,7 +662,10 @@ def ledger_net_quantity_for_location(*, product_id: UUID, location_id: UUID) -> 
     total = 0
     qs = Movement.objects.filter(product_id=product_id).order_by("created_at")
     for m in qs.iterator():
-        if m.movement_type == MovementType.ENTRADA and m.destination_location_id == location_id:
+        if (
+            m.movement_type == MovementType.ENTRADA
+            and m.destination_location_id == location_id
+        ):
             total += m.quantity
         elif m.movement_type in {
             MovementType.SALIDA_VENTA_MAYOR,
@@ -636,6 +685,9 @@ def ledger_net_quantity_for_location(*, product_id: UUID, location_id: UUID) -> 
                 total += m.quantity
             if m.origin_location_id == location_id:
                 total -= m.quantity
-        elif m.movement_type == MovementType.DEVOLUCION and m.destination_location_id == location_id:
+        elif (
+            m.movement_type == MovementType.DEVOLUCION
+            and m.destination_location_id == location_id
+        ):
             total += m.quantity
     return total

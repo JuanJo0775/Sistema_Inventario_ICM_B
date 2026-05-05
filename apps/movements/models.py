@@ -65,7 +65,9 @@ class Movement(models.Model):
     order_sku = models.CharField(max_length=100, null=True, blank=True)  # BR-08
 
     invoice_number = models.CharField(max_length=20, null=True, blank=True)  # BR-13
-    invoice_pdf = models.FileField(upload_to="invoices/%Y/%m/", null=True, blank=True)  # BR-13
+    invoice_pdf = models.FileField(
+        upload_to="invoices/%Y/%m/", null=True, blank=True
+    )  # BR-13
 
     executed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
