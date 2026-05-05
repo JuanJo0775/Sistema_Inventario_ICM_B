@@ -168,12 +168,39 @@ Forma uniforme:
 
 Semántica recomendada:
 
-- `400` validación o regla de negocio.
-- `401` no autenticado.
-- `403` prohibido.
-- `404` no encontrado.
-- `409` conflicto.
-- `5xx` error interno.
+#### Uso correcto de códigos HTTP
+
+##### Respuestas exitosas
+
+- `200 OK`: solicitud exitosa con respuesta estándar.
+- `201 Created`: recurso creado correctamente.
+- `202 Accepted`: solicitud aceptada para procesamiento posterior.
+- `204 No Content`: operación exitosa sin contenido de retorno.
+
+##### Errores del cliente (4xx)
+
+- `400 Bad Request`: solicitud inválida, datos faltantes, formato incorrecto o validación fallida.
+- `401 Unauthorized`: falta autenticación, token ausente, inválido o expirado.
+- `403 Forbidden`: usuario autenticado pero sin permisos.
+- `404 Not Found`: recurso inexistente.
+- `405 Method Not Allowed`: método HTTP no permitido.
+- `406 Not Acceptable`: formato solicitado no soportado.
+- `408 Request Timeout`: timeout de solicitud si aplica.
+- `409 Conflict`: conflicto de negocio o recurso duplicado.
+- `410 Gone`: recurso eliminado permanentemente si aplica.
+- `412 Precondition Failed`: precondiciones incumplidas.
+- `413 Payload Too Large`: carga excede límites permitidos.
+- `415 Unsupported Media Type`: tipo de contenido no soportado.
+- `422 Unprocessable Entity`: validación semántica fallida.
+- `429 Too Many Requests`: límite de solicitudes excedido.
+
+##### Errores del servidor (5xx)
+
+- `500 Internal Server Error`: error inesperado del servidor.
+- `501 Not Implemented`: funcionalidad no implementada.
+- `502 Bad Gateway`: error de gateway/proxy si aplica.
+- `503 Service Unavailable`: servicio temporalmente no disponible.
+- `504 Gateway Timeout`: timeout de gateway si aplica.
 
 ## 8. Paginación, filtros y búsqueda
 

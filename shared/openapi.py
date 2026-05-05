@@ -18,7 +18,12 @@ TAG_AUDIT = "audit"
 
 from typing import Any
 
-def standardize_errors_hook(result: dict[str, Any], generator: Any, request: Any, public: bool) -> dict[str, Any]:
+from drf_spectacular.utils import OpenApiResponse
+
+
+def standardize_errors_hook(
+    result: dict[str, Any], generator: Any, request: Any, public: bool
+) -> dict[str, Any]:
     """
     Hook de post-procesamiento para estandarizar las respuestas de error en Swagger UI.
     Reemplaza los esquemas generados por defecto por DRF con el componente `ErrorResponse`.
@@ -30,9 +35,7 @@ def standardize_errors_hook(result: dict[str, Any], generator: Any, request: Any
             responses = method_data["responses"]
             error_content = {
                 "application/json": {
-                    "schema": {
-                        "$ref": "#/components/schemas/ErrorResponse"
-                    }
+                    "schema": {"$ref": "#/components/schemas/ErrorResponse"}
                 }
             }
             # Sobrescribir el contenido de todos los errores (4xx y 5xx) que el generador haya detectado
@@ -45,6 +48,58 @@ def standardize_errors_hook(result: dict[str, Any], generator: Any, request: Any
                         "content": error_content,
                     }
     return result
+
+
+def standard_error_responses(
+    *,
+    include_400: bool = True,
+    include_401: bool = True,
+    include_403: bool = False,
+    include_404: bool = False,
+    include_405: bool = False,
+    include_409: bool = False,
+    include_422: bool = True,
+    include_429: bool = False,
+    include_500: bool = False,
+) -> dict[int, OpenApiResponse]:
+    """Respuesta estándar para documentar errores uniformes en Swagger.
+
+    Devuelve un mapa de códigos HTTP a `OpenApiResponse` con la misma estructura
+    JSON que produce `config.exception_handler.custom_exception_handler`.
+    """
+    responses: dict[int, OpenApiResponse] = {}
+    if include_400:
+        responses[400] = OpenApiResponse(
+            description="Solicitud inválida o con errores de validación."
+        )
+    if include_401:
+        responses[401] = OpenApiResponse(
+            description="No autenticado o token inválido/expirado."
+        )
+    if include_403:
+        responses[403] = OpenApiResponse(
+            description="Permiso denegado para ejecutar la acción."
+        )
+    if include_404:
+        responses[404] = OpenApiResponse(description="Recurso no encontrado.")
+    if include_405:
+        responses[405] = OpenApiResponse(
+            description="Método no permitido o registro inmutable."
+        )
+    if include_409:
+        responses[409] = OpenApiResponse(
+            description="Conflicto de estado (ej. stock insuficiente, o regla de negocio restrictiva)."
+        )
+    if include_422:
+        responses[422] = OpenApiResponse(
+            description="Entidad no procesable (errores lógicos o de dominio ICM)."
+        )
+    if include_429:
+        responses[429] = OpenApiResponse(description="Límite de peticiones excedido.")
+    if include_500:
+        responses[500] = OpenApiResponse(description="Error interno del servidor.")
+    return responses
+
 
 SPECTACULAR_SETTINGS: dict = {
     "TITLE": "ICM — API de Gestión de Inventario y Operaciones",
@@ -89,7 +144,10 @@ Para probar los endpoints, haga clic en el botón **Authorize**, use el esquema 
         {"name": TAG_SYSTEM, "description": "System availability checks."},
         {"name": TAG_CATALOG, "description": "Categories, products, and combos."},
         {"name": TAG_INVENTORY, "description": "Locations and stock tracking."},
-        {"name": TAG_MOVEMENTS, "description": "Ledger: entries, dispatches, transfers, returns, adjustments."},
+        {
+            "name": TAG_MOVEMENTS,
+            "description": "Ledger: entries, dispatches, transfers, returns, adjustments.",
+        },
         {"name": TAG_REPORTS, "description": "Read-only reports and KPIs."},
         {"name": TAG_ALERTS, "description": "Operational alerts."},
         {"name": TAG_AUDIT, "description": "Audit logs (read-only)."},
@@ -110,7 +168,7 @@ Para probar los endpoints, haga clic en el botón **Authorize**, use el esquema 
                 "properties": {
                     "error": {
                         "type": "string",
-                        "description": "Código de error del sistema o cliente (ej. 'validation_error', 'not_found', 'insufficient_stock').",
+                        "description": "Código de error del sistema o cliente (ej. 'VALIDATION_ERROR', 'NOT_FOUND', 'INSUFFICIENT_STOCK').",
                     },
                     "message": {
                         "type": "string",
@@ -120,10 +178,21 @@ Para probar los endpoints, haga clic en el botón **Authorize**, use el esquema 
                         "type": "object",
                         "description": "Detalles adicionales, comúnmente un diccionario con errores específicos por campo o reglas.",
                         "additionalProperties": True,
-                    }
+                    },
                 },
-                "required": ["error", "message", "detail"]
+                "required": ["error", "message", "detail"],
             }
+        },
+    },
+    # Ejemplo de respuesta de error uniforme para que Swagger muestre ejemplos concretos
+    "examples": {
+        "ErrorResponseExample": {
+            "summary": "Ejemplo de error uniforme",
+            "value": {
+                "error": "INVALID_CREDENTIALS",
+                "message": "El usuario o la contraseña son incorrectos.",
+                "detail": {},
+            },
         }
     },
     "SECURITY": [{"BearerAuth": []}],

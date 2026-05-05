@@ -5,31 +5,29 @@ from __future__ import annotations
 from uuid import UUID
 
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import OpenApiParameter, extend_schema, OpenApiResponse
+from drf_spectacular.utils import (OpenApiParameter, OpenApiResponse,
+                                   extend_schema)
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.inventory.models import Location
-from apps.inventory.selectors import get_full_inventory, get_stock_by_location, get_stock_by_product, search_products
-from apps.inventory.serializers import (
-    LocationSerializer,
-    PaginatedProductListSerializer,
-    PaginatedStockByLocationListSerializer,
-    ProductSerializer,
-    StockByLocationSerializer,
-    StockByProductResponseSerializer,
-    StockReconstructRequestSerializer,
-    StockReconstructResponseSerializer,
-)
-from apps.inventory.services import (
-    create_location,
-    deactivate_location,
-    trigger_stock_reconstruction,
-    update_location,
-)
-from shared.openapi import TAG_INVENTORY
+from apps.inventory.selectors import (get_full_inventory,
+                                      get_stock_by_location,
+                                      get_stock_by_product, search_products)
+from apps.inventory.serializers import (LocationSerializer,
+                                        PaginatedProductListSerializer,
+                                        PaginatedStockByLocationListSerializer,
+                                        ProductSerializer,
+                                        StockByLocationSerializer,
+                                        StockByProductResponseSerializer,
+                                        StockReconstructRequestSerializer,
+                                        StockReconstructResponseSerializer)
+from apps.inventory.services import (create_location, deactivate_location,
+                                     trigger_stock_reconstruction,
+                                     update_location)
+from shared.openapi import TAG_INVENTORY, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenista
 
@@ -41,15 +39,34 @@ class InventoryFullListView(APIView):
 
     @extend_schema(
         parameters=[
-            OpenApiParameter(name="category_id", type=str, location=OpenApiParameter.QUERY, required=False),
-            OpenApiParameter(name="location_id", type=str, location=OpenApiParameter.QUERY, required=False),
-            OpenApiParameter(name="only_in_stock", type=bool, location=OpenApiParameter.QUERY, required=False),
-            OpenApiParameter(name="stock_below_reorder", type=bool, location=OpenApiParameter.QUERY, required=False),
+            OpenApiParameter(
+                name="category_id",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="location_id",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="only_in_stock",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="stock_below_reorder",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
         ],
         responses={
             200: OpenApiResponse(description="Inventario listado exitosamente."),
-            400: OpenApiResponse(description="Parámetros de filtro inválidos."),
-            401: OpenApiResponse(description="No autenticado."),
+            **standard_error_responses(),
         },
         tags=[TAG_INVENTORY],
     )
@@ -59,9 +76,17 @@ class InventoryFullListView(APIView):
             filters["category_id"] = UUID(str(cid))
         if lid := request.query_params.get("location_id"):
             filters["location_id"] = UUID(str(lid))
-        if request.query_params.get("only_in_stock", "").lower() in ("1", "true", "yes"):
+        if request.query_params.get("only_in_stock", "").lower() in (
+            "1",
+            "true",
+            "yes",
+        ):
             filters["only_in_stock"] = True
-        if request.query_params.get("stock_below_reorder", "").lower() in ("1", "true", "yes"):
+        if request.query_params.get("stock_below_reorder", "").lower() in (
+            "1",
+            "true",
+            "yes",
+        ):
             filters["stock_below_reorder"] = True
         data = get_full_inventory(filters)
         paginator = ICMPageNumberPagination()
@@ -80,21 +105,21 @@ class LocationListCreateView(APIView):
     @extend_schema(
         responses={
             200: LocationSerializer(many=True),
-            401: OpenApiResponse(description="No autenticado."),
-        }, 
-        tags=[TAG_INVENTORY]
+            **standard_error_responses(),
+        },
+        tags=[TAG_INVENTORY],
     )
     def get(self, request):
-        data = LocationSerializer(Location.objects.all().order_by("code"), many=True).data
+        data = LocationSerializer(
+            Location.objects.all().order_by("code"), many=True
+        ).data
         return Response(data)
 
     @extend_schema(
         request=LocationSerializer,
         responses={
             201: LocationSerializer,
-            400: OpenApiResponse(description="Datos de ubicación inválidos."),
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado (solo almacenista puede crear)."),
+            **standard_error_responses(include_403=True),
         },
         tags=[TAG_INVENTORY],
     )
@@ -122,25 +147,21 @@ class LocationDetailView(APIView):
     @extend_schema(
         responses={
             200: LocationSerializer,
-            401: OpenApiResponse(description="No autenticado."),
-            404: OpenApiResponse(description="Ubicación no encontrada."),
-        }, 
-        tags=[TAG_INVENTORY]
+            **standard_error_responses(include_404=True),
+        },
+        tags=[TAG_INVENTORY],
     )
     def get(self, request, pk):
         loc = get_object_or_404(Location, pk=pk)
         return Response(LocationSerializer(loc).data)
 
     @extend_schema(
-        request=LocationSerializer, 
+        request=LocationSerializer,
         responses={
             200: LocationSerializer,
-            400: OpenApiResponse(description="Datos de ubicación inválidos."),
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado (solo almacenista puede modificar)."),
-            404: OpenApiResponse(description="Ubicación no encontrada."),
-        }, 
-        tags=[TAG_INVENTORY]
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+        tags=[TAG_INVENTORY],
     )
     def patch(self, request, pk):
         ser = LocationSerializer(data=request.data, partial=True)
@@ -151,11 +172,9 @@ class LocationDetailView(APIView):
     @extend_schema(
         responses={
             204: OpenApiResponse(description="Ubicación desactivada exitosamente."),
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado (solo almacenista puede desactivar)."),
-            404: OpenApiResponse(description="Ubicación no encontrada."),
-        }, 
-        tags=[TAG_INVENTORY]
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+        tags=[TAG_INVENTORY],
     )
     def delete(self, request, pk):
         deactivate_location(request.user, UUID(str(pk)))
@@ -168,9 +187,7 @@ class StockByProductView(APIView):
     @extend_schema(
         responses={
             200: StockByProductResponseSerializer,
-            400: OpenApiResponse(description="Identificador de producto inválido."),
-            401: OpenApiResponse(description="No autenticado."),
-            404: OpenApiResponse(description="Producto no encontrado."),
+            **standard_error_responses(include_404=True),
         },
         tags=[TAG_INVENTORY],
     )
@@ -184,9 +201,7 @@ class StockByLocationView(APIView):
     @extend_schema(
         responses={
             200: PaginatedStockByLocationListSerializer,
-            400: OpenApiResponse(description="Identificador de ubicación inválido."),
-            401: OpenApiResponse(description="No autenticado."),
-            404: OpenApiResponse(description="Ubicación no encontrada."),
+            **standard_error_responses(include_404=True),
         },
         tags=[TAG_INVENTORY],
     )
@@ -207,9 +222,7 @@ class ReconstructStockView(APIView):
         request=StockReconstructRequestSerializer,
         responses={
             200: StockReconstructResponseSerializer,
-            400: OpenApiResponse(description="Parámetros de reconstrucción inválidos."),
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado (solo almacenista)."),
+            **standard_error_responses(include_403=True),
         },
         tags=[TAG_INVENTORY],
     )
@@ -217,7 +230,9 @@ class ReconstructStockView(APIView):
         ser = StockReconstructRequestSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         d = ser.validated_data
-        result = trigger_stock_reconstruction(request.user, d["product_id"], d["location_id"])
+        result = trigger_stock_reconstruction(
+            request.user, d["product_id"], d["location_id"]
+        )
         return Response(result, status=status.HTTP_200_OK)
 
 
@@ -233,13 +248,22 @@ class ProductSearchView(APIView):
                 required=False,
                 description="Texto para SKU, código de barras o nombre.",
             ),
-            OpenApiParameter(name="category", type=str, location=OpenApiParameter.QUERY, required=False),
-            OpenApiParameter(name="subcategory", type=str, location=OpenApiParameter.QUERY, required=False),
+            OpenApiParameter(
+                name="category",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="subcategory",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
         ],
         responses={
             200: PaginatedProductListSerializer,
-            400: OpenApiResponse(description="Parámetros de búsqueda inválidos."),
-            401: OpenApiResponse(description="No autenticado."),
+            **standard_error_responses(),
         },
         tags=[TAG_INVENTORY],
     )

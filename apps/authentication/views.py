@@ -3,25 +3,28 @@
 from __future__ import annotations
 
 from django.contrib.auth import get_user_model
-from drf_spectacular.utils import OpenApiResponse, extend_schema, extend_schema_view
+from drf_spectacular.utils import (OpenApiResponse, extend_schema,
+                                   extend_schema_view)
 from rest_framework import generics, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import (TokenObtainPairView,
+                                            TokenRefreshView)
 
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
-from apps.authentication.serializers import (
-    ICMTokenObtainPairSerializer,
-    ICMTokenRefreshSerializer,
-    LoginRequestSerializer,
-    UserCreateSerializer,
-    UserSerializer,
-)
-from apps.authentication.services import create_user, disable_user, update_user, update_user_password
-from shared.openapi import TAG_AUTH, TAG_SYSTEM
+from apps.authentication.serializers import (ICMTokenObtainPairSerializer,
+                                             ICMTokenRefreshSerializer,
+                                             LoginRequestSerializer,
+                                             UserCreateSerializer,
+                                             UserSerializer)
+from apps.authentication.services import (create_user, disable_user,
+                                          update_user, update_user_password)
+from shared.openapi import TAG_AUTH, TAG_SYSTEM, standard_error_responses
 from shared.permissions import IsAlmacenista
 
 User = get_user_model()
@@ -49,10 +52,7 @@ User = get_user_model()
             },
             description="Tokens JWT y perfil de usuario.",
         ),
-        400: OpenApiResponse(description="Solicitud malformada (ej. falta username/email o password)."),
-        401: OpenApiResponse(description="Credenciales inválidas (usuario/contraseña incorrectos) o cuenta inactiva."),
-        403: OpenApiResponse(description="Acceso denegado (ej. auxiliar de despacho fuera de su horario operativo)."),
-        500: OpenApiResponse(description="Error interno del servidor al procesar el login."),
+        **standard_error_responses(include_403=True, include_500=True),
     },
 )
 class ICMTokenObtainPairView(TokenObtainPairView):
@@ -70,9 +70,7 @@ class ICMTokenObtainPairView(TokenObtainPairView):
     auth=[],
     responses={
         200: OpenApiResponse(description="Nuevo access token generado."),
-        400: OpenApiResponse(description="Solicitud inválida (falta el token de refresh)."),
-        401: OpenApiResponse(description="El token de refresh es inválido, ha expirado o está en blacklist."),
-        403: OpenApiResponse(description="Auxiliar fuera de horario operativo (BR-03)."),
+        **standard_error_responses(include_403=True),
     },
 )
 class ICMTokenRefreshView(TokenRefreshView):
@@ -89,18 +87,21 @@ class LogoutView(APIView):
         request=None,
         responses={
             204: OpenApiResponse(description="Sesión cerrada correctamente."),
-            400: OpenApiResponse(description="Solicitud inválida (falta enviar el refresh token)."),
-            401: OpenApiResponse(description="No autenticado o token inválido."),
+            **standard_error_responses(),
         },
     )
     def post(self, request):
         refresh = request.data.get("refresh")
-        if refresh:
-            try:
-                token = RefreshToken(refresh)
-                token.blacklist()
-            except Exception:
-                pass
+        if not refresh:
+            raise ValidationError({"refresh": ["Debe proporcionar el token refresh."]})
+
+        try:
+            token = RefreshToken(refresh)
+            token.blacklist()
+        except TokenError as exc:
+            raise ValidationError(
+                {"refresh": ["El token refresh es inválido, expiró o ya fue revocado."]}
+            ) from exc
         log_event(
             AuditEventType.LOGOUT,
             description="Cierre de sesión",
@@ -116,7 +117,7 @@ class LogoutView(APIView):
     tags=[TAG_AUTH],
     responses={
         200: UserSerializer,
-        401: OpenApiResponse(description="No autenticado o token inválido."),
+        **standard_error_responses(),
     },
 )
 class MeView(APIView):
@@ -135,8 +136,7 @@ class UserListCreateView(APIView):
         tags=[TAG_AUTH],
         responses={
             200: UserSerializer(many=True),
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado (solo almacenista puede listar)."),
+            **standard_error_responses(include_403=True),
         },
     )
     def get(self, request):
@@ -152,9 +152,7 @@ class UserListCreateView(APIView):
         request=UserCreateSerializer,
         responses={
             201: UserSerializer,
-            400: OpenApiResponse(description="Error de validación (ej. el username o email ya existen)."),
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado (solo almacenista puede crear)."),
+            **standard_error_responses(include_403=True),
         },
     )
     def post(self, request):
@@ -168,14 +166,12 @@ class UserDetailView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
-        summary="Detalle de usuario", 
-        tags=[TAG_AUTH], 
+        summary="Detalle de usuario",
+        tags=[TAG_AUTH],
         responses={
             200: UserSerializer,
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado."),
-            404: OpenApiResponse(description="Usuario no encontrado."),
-        }
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     )
     def get(self, request, pk):
         from apps.authentication.selectors import get_user_by_id
@@ -184,31 +180,25 @@ class UserDetailView(APIView):
         return Response(UserSerializer(user).data)
 
     @extend_schema(
-        summary="Actualizar usuario", 
-        tags=[TAG_AUTH], 
-        request=UserSerializer, 
+        summary="Actualizar usuario",
+        tags=[TAG_AUTH],
+        request=UserSerializer,
         responses={
             200: UserSerializer,
-            400: OpenApiResponse(description="Error de validación en los datos."),
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado."),
-            404: OpenApiResponse(description="Usuario no encontrado."),
-        }
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     )
     def put(self, request, pk):
         return self._update(request, pk, partial=False)
 
     @extend_schema(
-        summary="Actualizar usuario (parcial)", 
-        tags=[TAG_AUTH], 
-        request=UserSerializer, 
+        summary="Actualizar usuario (parcial)",
+        tags=[TAG_AUTH],
+        request=UserSerializer,
         responses={
             200: UserSerializer,
-            400: OpenApiResponse(description="Error de validación en los datos parciales."),
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado."),
-            404: OpenApiResponse(description="Usuario no encontrado."),
-        }
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     )
     def patch(self, request, pk):
         return self._update(request, pk, partial=True)
@@ -226,7 +216,9 @@ class UserDetailView(APIView):
 
         serializer = UserSerializer(instance, data=data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        updated = update_user(request.user, instance.id, serializer.validated_data, request=request)
+        updated = update_user(
+            request.user, instance.id, serializer.validated_data, request=request
+        )
         return Response(UserSerializer(updated).data)
 
 
@@ -239,11 +231,10 @@ class UserDisableView(APIView):
         summary="Deshabilitar usuario",
         description="RF-002 — Revoca sesiones (blacklist) y marca la cuenta inactiva.",
         tags=[TAG_AUTH],
+        request=None,
         responses={
             204: OpenApiResponse(description="Usuario deshabilitado exitosamente."),
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado (solo almacenista)."),
-            404: OpenApiResponse(description="Usuario no encontrado."),
+            **standard_error_responses(include_403=True, include_404=True),
         },
     )
     def post(self, request, pk):
@@ -256,7 +247,12 @@ class UserDisableView(APIView):
     description="Comprobación de disponibilidad del servicio (sin autenticación).",
     tags=[TAG_SYSTEM],
     auth=[],
-    responses={200: {"type": "object", "properties": {"status": {"type": "string", "example": "ok"}}}},
+    responses={
+        200: {
+            "type": "object",
+            "properties": {"status": {"type": "string", "example": "ok"}},
+        }
+    },
 )
 class HealthCheckView(APIView):
     permission_classes = (AllowAny,)

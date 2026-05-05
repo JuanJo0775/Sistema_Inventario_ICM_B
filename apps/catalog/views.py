@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from django.db.models import Q
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema, extend_schema_view
+from drf_spectacular.utils import (OpenApiParameter, OpenApiResponse,
+                                   extend_schema, extend_schema_view)
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -11,40 +12,37 @@ from rest_framework.views import APIView
 
 from apps.catalog.models import Category, Product, ProductCombo, Subcategory
 from apps.catalog.permissions import IsAlmacenistaOrReadOnly
-from apps.catalog.serializers import (
-    CategoryCreateSerializer,
-    CategorySerializer,
-    ComboCreateSerializer,
-    ComboSerializer,
-    ProductCreateSerializer,
-    ProductSerializer,
-    ProductUpdateSerializer,
-    ResolveIdentifierQuerySerializer,
-    SubcategorySerializer,
-)
-from apps.catalog.services import create_category, create_combo, create_product, resolve_identifier, update_product
-from shared.openapi import TAG_CATALOG
+from apps.catalog.serializers import (CategoryCreateSerializer,
+                                      CategorySerializer,
+                                      ComboCreateSerializer, ComboSerializer,
+                                      ProductCreateSerializer,
+                                      ProductSerializer,
+                                      ProductUpdateSerializer,
+                                      ResolveIdentifierQuerySerializer,
+                                      SubcategorySerializer)
+from apps.catalog.services import (create_category, create_combo,
+                                   create_product, resolve_identifier,
+                                   update_product)
+from shared.openapi import TAG_CATALOG, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenista
 
 
 @extend_schema_view(
     get=extend_schema(
-        summary="Listar categorías", 
+        summary="Listar categorías",
         tags=[TAG_CATALOG],
         responses={
             200: CategorySerializer(many=True),
-            401: OpenApiResponse(description="No autenticado."),
-        }
+            **standard_error_responses(),
+        },
     ),
     post=extend_schema(
         summary="Crear categoría",
         request=CategoryCreateSerializer,
         responses={
             201: CategorySerializer,
-            400: OpenApiResponse(description="Datos de categoría inválidos."),
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado (solo almacenista puede crear)."),
+            **standard_error_responses(include_403=True),
         },
         tags=[TAG_CATALOG],
     ),
@@ -72,12 +70,12 @@ class CategoryListCreateView(generics.ListCreateAPIView):
 
 @extend_schema_view(
     get=extend_schema(
-        summary="Listar subcategorías", 
+        summary="Listar subcategorías",
         tags=[TAG_CATALOG],
         responses={
             200: SubcategorySerializer(many=True),
-            401: OpenApiResponse(description="No autenticado."),
-        }
+            **standard_error_responses(),
+        },
     ),
 )
 class SubcategoryListView(generics.ListAPIView):
@@ -89,22 +87,19 @@ class SubcategoryListView(generics.ListAPIView):
 
 @extend_schema_view(
     get=extend_schema(
-        summary="Listar productos", 
+        summary="Listar productos",
         tags=[TAG_CATALOG],
         responses={
             200: ProductSerializer(many=True),
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado."),
-        }
+            **standard_error_responses(include_403=True),
+        },
     ),
     post=extend_schema(
         summary="Crear producto",
         request=ProductCreateSerializer,
         responses={
             201: ProductSerializer,
-            400: OpenApiResponse(description="Error de validación al crear producto (ej. SKU duplicado)."),
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado (solo almacenista puede crear)."),
+            **standard_error_responses(include_403=True),
         },
         tags=[TAG_CATALOG],
     ),
@@ -134,35 +129,28 @@ class ProductListCreateView(generics.ListCreateAPIView):
 
 @extend_schema_view(
     get=extend_schema(
-        summary="Detalle de producto", 
+        summary="Detalle de producto",
         tags=[TAG_CATALOG],
         responses={
             200: ProductSerializer,
-            401: OpenApiResponse(description="No autenticado."),
-            404: OpenApiResponse(description="Producto no encontrado."),
-        }
+            **standard_error_responses(include_404=True),
+        },
     ),
     put=extend_schema(
-        summary="Actualizar producto", 
+        summary="Actualizar producto",
         tags=[TAG_CATALOG],
         responses={
             200: ProductSerializer,
-            400: OpenApiResponse(description="Error de validación."),
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado (solo almacenista puede modificar)."),
-            404: OpenApiResponse(description="Producto no encontrado."),
-        }
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     ),
     patch=extend_schema(
-        summary="Actualizar producto parcialmente", 
+        summary="Actualizar producto parcialmente",
         tags=[TAG_CATALOG],
         responses={
             200: ProductSerializer,
-            400: OpenApiResponse(description="Error de validación."),
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado (solo almacenista puede modificar)."),
-            404: OpenApiResponse(description="Producto no encontrado."),
-        }
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     ),
 )
 class ProductDetailView(generics.RetrieveUpdateAPIView):
@@ -203,9 +191,7 @@ class ResolveIdentifierView(APIView):
         ],
         responses={
             200: ProductSerializer,
-            400: OpenApiResponse(description="Parámetro de búsqueda inválido."),
-            401: OpenApiResponse(description="No autenticado."),
-            404: OpenApiResponse(description="Producto no encontrado para el identificador indicado."),
+            **standard_error_responses(include_404=True),
         },
         tags=[TAG_CATALOG],
     )
@@ -218,21 +204,19 @@ class ResolveIdentifierView(APIView):
 
 @extend_schema_view(
     get=extend_schema(
-        summary="Listar combos", 
+        summary="Listar combos",
         tags=[TAG_CATALOG],
         responses={
             200: ComboSerializer(many=True),
-            401: OpenApiResponse(description="No autenticado."),
-        }
+            **standard_error_responses(),
+        },
     ),
     post=extend_schema(
         summary="Crear combo",
         request=ComboCreateSerializer,
         responses={
             201: ComboSerializer,
-            400: OpenApiResponse(description="Error de validación (ej. ítems repetidos o insuficientes)."),
-            401: OpenApiResponse(description="No autenticado."),
-            403: OpenApiResponse(description="Permiso denegado (solo almacenista puede crear combos)."),
+            **standard_error_responses(include_403=True),
         },
         tags=[TAG_CATALOG],
     ),

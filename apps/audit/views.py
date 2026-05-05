@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from apps.audit.models import AuditLog
 from apps.audit.selectors import get_audit_log
 from apps.audit.serializers import AuditLogSerializer
-from shared.openapi import TAG_AUDIT
+from shared.openapi import TAG_AUDIT, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenistaOrAdministrador
 
@@ -27,16 +27,35 @@ class AuditLogListView(generics.ListAPIView):
             filters["start"] = s
         if e := self.request.query_params.get("end"):
             filters["end"] = e
-        return get_audit_log(filters, executor_role=getattr(self.request.user, "role", ""))
+        return get_audit_log(
+            filters, executor_role=getattr(self.request.user, "role", "")
+        )
 
     @extend_schema(
         parameters=[
-            OpenApiParameter(name="event_type", type=str, location=OpenApiParameter.QUERY, required=False),
-            OpenApiParameter(name="user_id", type=int, location=OpenApiParameter.QUERY, required=False),
-            OpenApiParameter(name="start", type=str, location=OpenApiParameter.QUERY, required=False),
-            OpenApiParameter(name="end", type=str, location=OpenApiParameter.QUERY, required=False),
+            OpenApiParameter(
+                name="event_type",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="user_id",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="start", type=str, location=OpenApiParameter.QUERY, required=False
+            ),
+            OpenApiParameter(
+                name="end", type=str, location=OpenApiParameter.QUERY, required=False
+            ),
         ],
-        responses={200: AuditLogSerializer(many=True)},
+        responses={
+            200: AuditLogSerializer(many=True),
+            **standard_error_responses(include_403=True),
+        },
         tags=[TAG_AUDIT],
     )
     def get(self, request, *args, **kwargs):
@@ -48,3 +67,13 @@ class AuditLogDetailView(generics.RetrieveAPIView):
     serializer_class = AuditLogSerializer
     queryset = AuditLog.objects.select_related("user", "movement").all()
     lookup_field = "pk"
+
+    @extend_schema(
+        responses={
+            200: AuditLogSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+        tags=[TAG_AUDIT],
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)

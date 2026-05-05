@@ -12,7 +12,7 @@ from apps.alerts.models import Alert
 from apps.alerts.selectors import get_active_alerts
 from apps.alerts.serializers import AlertSerializer
 from apps.alerts.services import resolve_alert
-from shared.openapi import TAG_ALERTS
+from shared.openapi import TAG_ALERTS, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenista, IsAlmacenistaOrAdministrador
 
@@ -32,7 +32,12 @@ class AlertListView(generics.ListAPIView):
 
     @extend_schema(
         parameters=[
-            OpenApiParameter(name="alert_type", type=str, location=OpenApiParameter.QUERY, required=False),
+            OpenApiParameter(
+                name="alert_type",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
             OpenApiParameter(
                 name="product_id",
                 type=str,
@@ -41,7 +46,10 @@ class AlertListView(generics.ListAPIView):
                 description="UUID del producto.",
             ),
         ],
-        responses={200: AlertSerializer(many=True)},
+        responses={
+            200: AlertSerializer(many=True),
+            **standard_error_responses(include_403=True),
+        },
         tags=[TAG_ALERTS],
     )
     def get(self, request, *args, **kwargs):
@@ -54,13 +62,30 @@ class AlertDetailView(generics.RetrieveAPIView):
     queryset = Alert.objects.select_related("product", "location").all()
     lookup_field = "pk"
 
+    @extend_schema(
+        responses={
+            200: AlertSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+        tags=[TAG_ALERTS],
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
 
 class AlertResolveView(APIView):
     """POST — Marca alerta como resuelta (solo almacenista, RF-011)."""
 
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
-    @extend_schema(responses={200: AlertSerializer}, tags=[TAG_ALERTS])
+    @extend_schema(
+        request=None,
+        responses={
+            200: AlertSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+        tags=[TAG_ALERTS],
+    )
     def post(self, request, pk):
         alert = resolve_alert(request.user, UUID(str(pk)))
         return Response(AlertSerializer(alert).data, status=status.HTTP_200_OK)
