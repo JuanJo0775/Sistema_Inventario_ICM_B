@@ -41,3 +41,22 @@ def sample_locations(db):
         LocationFactory(code="BODEGA_1", name="Bodega 1"),
         LocationFactory(code="BODEGA_2", name="Bodega 2"),
     ]
+
+
+@pytest.fixture
+def api_client():
+    from rest_framework.test import APIClient
+
+    return APIClient()
+
+
+@pytest.fixture
+def authenticated_almacenista_client(api_client, almacenista_user):
+    api_client.force_authenticate(user=almacenista_user)
+    return api_client
+
+
+@pytest.fixture
+def authenticated_administrador_client(api_client, administrador_user):
+    api_client.force_authenticate(user=administrador_user)
+    return api_client
