@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from django.contrib.auth import get_user_model
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.utils import OpenApiResponse, extend_schema, extend_schema_view
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -11,8 +11,15 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from apps.authentication.serializers import ICMTokenObtainPairSerializer, UserCreateSerializer, UserSerializer
-from apps.authentication.services import create_user, disable_user, update_user_password
+from apps.audit.models import AuditEventType
+from apps.audit.services import log_event
+from apps.authentication.serializers import (
+    ICMTokenObtainPairSerializer,
+    LoginRequestSerializer,
+    UserCreateSerializer,
+    UserSerializer,
+)
+from apps.authentication.services import create_user, disable_user, update_user, update_user_password
 from shared.openapi import TAG_AUTH, TAG_SYSTEM
 from shared.permissions import IsAlmacenista
 
@@ -22,11 +29,30 @@ User = get_user_model()
 @extend_schema(
     summary="Iniciar sesión (JWT)",
     description=(
-        "RF-001, BR-03 — Devuelve `access`, `refresh` y datos básicos del usuario. "
+        "RF-001, BR-03 — Envíe `password` y `username` **o** `email`. "
+        "Respuesta: `access`, `refresh` y objeto `user` (perfil sin contraseña). "
         "Los auxiliares de despacho solo pueden autenticarse en franja operativa."
     ),
     tags=[TAG_AUTH],
     auth=[],
+    request=LoginRequestSerializer,
+    responses={
+        200: OpenApiResponse(
+            response={
+                "type": "object",
+                "properties": {
+                    "access": {"type": "string"},
+                    "refresh": {"type": "string"},
+                    "user": {"type": "object"},
+                },
+            },
+            description="Tokens JWT y perfil de usuario.",
+        ),
+        400: OpenApiResponse(description="Solicitud malformada (ej. falta username/email o password)."),
+        401: OpenApiResponse(description="Credenciales inválidas (usuario/contraseña incorrectos) o cuenta inactiva."),
+        403: OpenApiResponse(description="Acceso denegado (ej. auxiliar de despacho fuera de su horario operativo)."),
+        500: OpenApiResponse(description="Error interno del servidor al procesar el login."),
+    },
 )
 class ICMTokenObtainPairView(TokenObtainPairView):
     serializer_class = ICMTokenObtainPairSerializer
@@ -37,6 +63,11 @@ class ICMTokenObtainPairView(TokenObtainPairView):
     description="Envía el `refresh` emitido en el login para obtener un nuevo `access`.",
     tags=[TAG_AUTH],
     auth=[],
+    responses={
+        200: OpenApiResponse(description="Nuevo access token generado."),
+        400: OpenApiResponse(description="Solicitud inválida (falta el token de refresh)."),
+        401: OpenApiResponse(description="El token de refresh es inválido, ha expirado o está en blacklist."),
+    }
 )
 class ICMTokenRefreshView(TokenRefreshView):
     pass
@@ -50,7 +81,11 @@ class LogoutView(APIView):
         description="RF-002 — Invalida el refresh token enviado en el cuerpo.",
         tags=[TAG_AUTH],
         request=None,
-        responses={204: None},
+        responses={
+            204: OpenApiResponse(description="Sesión cerrada correctamente."),
+            400: OpenApiResponse(description="Solicitud inválida (falta enviar el refresh token)."),
+            401: OpenApiResponse(description="No autenticado o token inválido."),
+        },
     )
     def post(self, request):
         refresh = request.data.get("refresh")
@@ -60,89 +95,153 @@ class LogoutView(APIView):
                 token.blacklist()
             except Exception:
                 pass
+        log_event(
+            AuditEventType.LOGOUT,
+            description="Cierre de sesión",
+            user=request.user,
+            request=request,
+            detail={},
+        )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@extend_schema_view(
-    get=extend_schema(
-        summary="Perfil del usuario autenticado",
-        tags=[TAG_AUTH],
-    ),
+@extend_schema(
+    summary="Perfil del usuario autenticado",
+    tags=[TAG_AUTH],
+    responses={
+        200: UserSerializer,
+        401: OpenApiResponse(description="No autenticado o token inválido."),
+    },
 )
-class MeView(generics.RetrieveAPIView):
+class MeView(APIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = UserSerializer
 
-    def get_object(self):
-        return self.request.user
+    def get(self, request):
+        return Response(UserSerializer(request.user).data)
 
 
-@extend_schema_view(
-    get=extend_schema(
+class UserListCreateView(APIView):
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
         summary="Listar usuarios",
         description="Solo almacenista (RF-002, BR-02).",
         tags=[TAG_AUTH],
-    ),
-    post=extend_schema(
+        responses={
+            200: UserSerializer(many=True),
+            401: OpenApiResponse(description="No autenticado."),
+            403: OpenApiResponse(description="Permiso denegado (solo almacenista puede listar)."),
+        },
+    )
+    def get(self, request):
+        from apps.authentication.selectors import get_all_users
+
+        users = get_all_users(request.user)
+        return Response(UserSerializer(users, many=True).data)
+
+    @extend_schema(
         summary="Crear usuario",
-        description="Solo almacenista. Cuerpo: username, password, role, etc.",
+        description="Solo almacenista. Requiere username, email, password y rol.",
         tags=[TAG_AUTH],
         request=UserCreateSerializer,
-        responses={201: UserSerializer},
-    ),
-)
-class UserListCreateView(generics.ListCreateAPIView):
-    permission_classes = (IsAuthenticated, IsAlmacenista)
-    queryset = User.objects.all().order_by("-created_at")
-    serializer_class = UserSerializer
-
-    def get_serializer_class(self):
-        if self.request.method == "POST":
-            return UserCreateSerializer
-        return UserSerializer
-
-    def create(self, request, *args, **kwargs):
+        responses={
+            201: UserSerializer,
+            400: OpenApiResponse(description="Error de validación (ej. el username o email ya existen)."),
+            401: OpenApiResponse(description="No autenticado."),
+            403: OpenApiResponse(description="Permiso denegado (solo almacenista puede crear)."),
+        },
+    )
+    def post(self, request):
         ser = UserCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         user = create_user(request.user, ser.validated_data, request=request)
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
 
-@extend_schema_view(
-    get=extend_schema(summary="Detalle de usuario", tags=[TAG_AUTH]),
-    put=extend_schema(summary="Actualizar usuario", tags=[TAG_AUTH]),
-    patch=extend_schema(summary="Actualizar usuario (parcial)", tags=[TAG_AUTH]),
-)
-class UserDetailView(generics.RetrieveUpdateAPIView):
+class UserDetailView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
 
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop("partial", False)
-        instance = self.get_object()
+    @extend_schema(
+        summary="Detalle de usuario", 
+        tags=[TAG_AUTH], 
+        responses={
+            200: UserSerializer,
+            401: OpenApiResponse(description="No autenticado."),
+            403: OpenApiResponse(description="Permiso denegado."),
+            404: OpenApiResponse(description="Usuario no encontrado."),
+        }
+    )
+    def get(self, request, pk):
+        from apps.authentication.selectors import get_user_by_id
+
+        user = get_user_by_id(pk)
+        return Response(UserSerializer(user).data)
+
+    @extend_schema(
+        summary="Actualizar usuario", 
+        tags=[TAG_AUTH], 
+        request=UserSerializer, 
+        responses={
+            200: UserSerializer,
+            400: OpenApiResponse(description="Error de validación en los datos."),
+            401: OpenApiResponse(description="No autenticado."),
+            403: OpenApiResponse(description="Permiso denegado."),
+            404: OpenApiResponse(description="Usuario no encontrado."),
+        }
+    )
+    def put(self, request, pk):
+        return self._update(request, pk, partial=False)
+
+    @extend_schema(
+        summary="Actualizar usuario (parcial)", 
+        tags=[TAG_AUTH], 
+        request=UserSerializer, 
+        responses={
+            200: UserSerializer,
+            400: OpenApiResponse(description="Error de validación en los datos parciales."),
+            401: OpenApiResponse(description="No autenticado."),
+            403: OpenApiResponse(description="Permiso denegado."),
+            404: OpenApiResponse(description="Usuario no encontrado."),
+        }
+    )
+    def patch(self, request, pk):
+        return self._update(request, pk, partial=True)
+
+    def _update(self, request, pk, partial: bool):
+        from apps.authentication.selectors import get_user_by_id
+
+        instance = get_user_by_id(pk)
         data = dict(request.data)
         password = data.pop("password", None)
         if password:
+            if isinstance(password, list):
+                password = password[0]
             update_user_password(request.user, instance.id, password, request=request)
-        serializer = self.get_serializer(instance, data=data, partial=partial)
+
+        serializer = UserSerializer(instance, data=data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+        updated = update_user(request.user, instance.id, serializer.validated_data, request=request)
+        return Response(UserSerializer(updated).data)
 
 
 class UserDisableView(APIView):
+    """POST — Deshabilitar usuario (contrato README_API §10.1, RF-002)."""
+
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
         summary="Deshabilitar usuario",
-        description="RF-002 — Revoca tokens y desactiva la cuenta.",
+        description="RF-002 — Revoca sesiones (blacklist) y marca la cuenta inactiva.",
         tags=[TAG_AUTH],
-        request=None,
-        responses={204: None},
+        responses={
+            204: OpenApiResponse(description="Usuario deshabilitado exitosamente."),
+            401: OpenApiResponse(description="No autenticado."),
+            403: OpenApiResponse(description="Permiso denegado (solo almacenista)."),
+            404: OpenApiResponse(description="Usuario no encontrado."),
+        },
     )
-    def post(self, request, pk: int):
-        disable_user(request.user, int(pk), request=request)
+    def post(self, request, pk):
+        disable_user(request.user, pk, request=request)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

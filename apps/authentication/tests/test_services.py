@@ -5,6 +5,8 @@ from unittest.mock import patch
 import pytest
 
 from apps.authentication.models import UserRole
+from rest_framework.exceptions import AuthenticationFailed
+
 from apps.authentication.services import authenticate_user, create_user, is_within_operating_hours
 from apps.audit.models import AuditEventType, AuditLog
 from shared.exceptions import OutsideOperatingHoursError, UnauthorizedCredentialManagementError
@@ -25,7 +27,8 @@ def test_only_almacenista_creates_users(auxiliar_user):
             auxiliar_user,
             {
                 "username": "nuevo_aux",
-                "password": "x",
+                "email": "nuevo_aux@example.com",
+                "password": "secreto123",
                 "role": UserRole.AUXILIAR_DESPACHO,
             },
         )
@@ -34,7 +37,8 @@ def test_only_almacenista_creates_users(auxiliar_user):
 @pytest.mark.django_db
 def test_disabled_user_cannot_login():
     u = UserFactory(is_active=False)
-    assert authenticate_user(u.username, "testpass123") is None
+    with pytest.raises(AuthenticationFailed):
+        authenticate_user(u.username, "testpass123")
 
 
 @pytest.mark.django_db

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import uuid
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -24,8 +26,15 @@ class User(AbstractUser):
 
     `is_active` habilita o deshabilita la cuenta (BR-02).
     `created_by` registra el almacenista que creó la cuenta (BR-01).
+
+    `email` es obligatorio y único (contacto institucional y login alternativo a username).
+    Nota: El campo `password` (y el manejo de hashing seguro) es proveído nativamente
+    al heredar de `AbstractUser`, por lo que no es necesario redeclararlo aquí.
     """
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    email = models.EmailField("correo electrónico", unique=True, blank=False)
     role = models.CharField(max_length=32, choices=RoleChoices.choices)
     created_by = models.ForeignKey(
         "self",

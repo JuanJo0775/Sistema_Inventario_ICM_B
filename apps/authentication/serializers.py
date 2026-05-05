@@ -14,38 +14,101 @@ from apps.authentication.services import OutsideOperatingHoursError, authenticat
 User = get_user_model()
 
 
-class ICMTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """RF-001 — Emite JWT validando reglas ICM (incluye BR-03 para auxiliares)."""
+def user_login_profile(user: User) -> dict:
+    """Perfil público devuelto en login y documentación (RF-001, sin contraseña)."""
+    return {
+        "id": user.id,
+        "username": user.username,
+        "email": user.email or "",
+        "first_name": user.first_name or "",
+        "last_name": user.last_name or "",
+        "phone": getattr(user, "phone", "") or "",
+        "role": getattr(user, "role", ""),
+        "is_active": user.is_active,
+    }
 
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        token["role"] = getattr(user, "role", "")
-        return token
+
+class LoginRequestSerializer(serializers.Serializer):
+    """Cuerpo de login: contraseña obligatoria; usuario o correo (al menos uno)."""
+
+    username = serializers.CharField(required=False, allow_blank=True, help_text="Nombre de usuario único.")
+    email = serializers.EmailField(required=False, allow_blank=True, help_text="Correo registrado (alternativa a username).")
+    password = serializers.CharField(write_only=True)
+
+
+class ICMTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """
+    RF-001 — JWT con reglas ICM (BR-03 auxiliar) y login por `username` o `email`.
+
+    No usa `super().validate()` para conservar auditoría y mensajes de dominio.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields[self.username_field] = serializers.CharField(
+            write_only=True,
+            required=False,
+            allow_blank=True,
+        )
+        self.fields["email"] = serializers.EmailField(write_only=True, required=False, allow_blank=True)
 
     def validate(self, attrs):
         request = self.context.get("request")
+        username = (attrs.get(self.username_field) or "").strip()
+        email = (attrs.get("email") or "").strip()
+        password = attrs["password"]
+
+        if email and not username:
+            lookup = User.objects.filter(email__iexact=email).first()
+            if lookup is None:
+                from apps.audit.models import AuditEventType
+                from apps.audit.services import log_event
+
+                log_event(
+                    AuditEventType.LOGIN_FAILED,
+                    user=None,
+                    request=request,
+                    username_attempted=email,
+                    detail={"reason": "bad_credentials", "via": "email"},
+                )
+                raise AuthenticationFailed("Credenciales inválidas.")
+            username = lookup.username
+
+        if not username:
+            raise serializers.ValidationError(
+                {self.username_field: "Indique nombre de usuario o correo electrónico."},
+                code="required",
+            )
+
         try:
             user = authenticate_user(
-                attrs["username"],
-                attrs["password"],
+                username,
+                password,
                 request=request,
             )
         except OutsideOperatingHoursError as exc:
             raise serializers.ValidationError({"detail": str(exc)}) from exc
-        if user is None:
-            raise AuthenticationFailed()
+        except AuthenticationFailed:
+            raise
+
         refresh = RefreshToken.for_user(user)
-        refresh["role"] = getattr(user, "role", "")
-        data = {
+        access = refresh.access_token
+        for token in (refresh, access):
+            token["user_id"] = str(user.id)
+            token["role"] = getattr(user, "role", "") or ""
+            token["email"] = user.email or ""
+            token["username"] = user.username
+
+        return {
             "refresh": str(refresh),
-            "access": str(refresh.access_token),
-            "user": {"id": user.id, "username": user.username, "role": user.role},
+            "access": str(access),
+            "user": user_login_profile(user),
         }
-        return data
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Perfil de usuario (RF-002) — lectura y actualización parcial por almacenista."""
+
     class Meta:
         model = User
         fields = (
@@ -54,17 +117,33 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "first_name",
             "last_name",
+            "phone",
             "role",
             "is_active",
+            "is_staff",
+            "created_by",
             "created_at",
+            "updated_at",
+            "last_login",
         )
-        read_only_fields = ("id", "created_at")
+        read_only_fields = ("id", "created_at", "updated_at", "last_login", "created_by", "is_staff")
 
 
 class UserCreateSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField()
-    email = serializers.EmailField(required=False, allow_blank=True)
-    first_name = serializers.CharField(required=False, allow_blank=True)
-    last_name = serializers.CharField(required=False, allow_blank=True)
+    username = serializers.CharField(max_length=150)
+    password = serializers.CharField(write_only=True, min_length=8)
+    email = serializers.EmailField()
+    first_name = serializers.CharField(required=False, allow_blank=True, default="")
+    last_name = serializers.CharField(required=False, allow_blank=True, default="")
+    phone = serializers.CharField(required=False, allow_blank=True, max_length=20, default="")
     role = serializers.ChoiceField(choices=UserRole.choices)
+
+    def validate_username(self, value: str) -> str:
+        if User.objects.filter(username__iexact=value.strip()).exists():
+            raise serializers.ValidationError("Ya existe un usuario con ese nombre de usuario.")
+        return value.strip()
+
+    def validate_email(self, value: str) -> str:
+        if User.objects.filter(email__iexact=value.strip()).exists():
+            raise serializers.ValidationError("Ya existe un usuario con ese correo.")
+        return value.strip().lower()

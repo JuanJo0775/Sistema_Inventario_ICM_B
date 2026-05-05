@@ -20,6 +20,6 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="auth-logout"),
     path("me/", MeView.as_view(), name="auth-me"),
     path("users/", UserListCreateView.as_view(), name="auth-users"),
-    path("users/<int:pk>/", UserDetailView.as_view(), name="auth-user-detail"),
-    path("users/<int:pk>/disable/", UserDisableView.as_view(), name="auth-user-disable"),
+    path("users/<uuid:pk>/", UserDetailView.as_view(), name="auth-user-detail"),
+    path("users/<uuid:pk>/disable/", UserDisableView.as_view(), name="auth-user-disable"),
 ]
