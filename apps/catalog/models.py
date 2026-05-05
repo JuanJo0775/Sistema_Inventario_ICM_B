@@ -6,7 +6,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from shared.models import BaseModel
-from shared.utils.validators import normalize_sku, validate_can_sku, validate_sku_format
+from shared.utils.validators import (normalize_sku, validate_can_sku,
+                                     validate_sku_format)
 
 
 class Category(BaseModel):
@@ -54,7 +55,9 @@ class Subcategory(BaseModel):
         verbose_name_plural = "Subcategorías"
         ordering = ("category_id", "name")
         constraints = [
-            models.UniqueConstraint(fields=("category", "slug"), name="uniq_subcategory_slug_per_category"),
+            models.UniqueConstraint(
+                fields=("category", "slug"), name="uniq_subcategory_slug_per_category"
+            ),
         ]
         unique_together = ("category", "name")
 
@@ -138,7 +141,9 @@ class ProductCombo(BaseModel):
     name = models.CharField(max_length=255)
     sku = models.CharField(max_length=100, unique=True)
     is_active = models.BooleanField(default=True)
-    products = models.ManyToManyField(Product, through="ComboItem", related_name="product_combos")
+    products = models.ManyToManyField(
+        Product, through="ComboItem", related_name="product_combos"
+    )
 
     class Meta:
         verbose_name = "Combo de productos"
@@ -168,7 +173,9 @@ class ComboItem(BaseModel):
         verbose_name = "Ítem de combo"
         verbose_name_plural = "Ítems de combo"
         constraints = [
-            models.UniqueConstraint(fields=("combo", "product"), name="uniq_combo_product_item"),
+            models.UniqueConstraint(
+                fields=("combo", "product"), name="uniq_combo_product_item"
+            ),
         ]
 
     def __str__(self) -> str:

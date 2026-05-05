@@ -9,7 +9,8 @@ from django.db import transaction
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
 from apps.catalog.models import Category, ComboItem, Product, ProductCombo
-from shared.exceptions import InvalidSKUFormatError, UnauthorizedCredentialManagementError
+from shared.exceptions import (InvalidSKUFormatError,
+                               UnauthorizedCredentialManagementError)
 from shared.utils.validators import validate_can_sku, validate_sku_format
 
 if TYPE_CHECKING:
@@ -24,7 +25,9 @@ def _require_almacenista(user: User) -> None:
 
 
 @transaction.atomic
-def create_product(user: User, data: dict[str, Any], *, request: HttpRequest | None = None) -> Product:
+def create_product(
+    user: User, data: dict[str, Any], *, request: HttpRequest | None = None
+) -> Product:
     """
     RF-003, BR-04, BR-12 — Crea producto; validaciones de marca y serial por categoría.
     """
@@ -74,7 +77,11 @@ def update_product(
         InvalidSKUFormatError: BR-12.
     """
     _require_almacenista(user)
-    product = Product.objects.select_for_update().select_related("category").get(pk=product_id)
+    product = (
+        Product.objects.select_for_update()
+        .select_related("category")
+        .get(pk=product_id)
+    )
     new_sku = (data.get("sku") or product.sku or "").strip()
     brand = (data.get("brand") or product.brand or "Can").strip() or "Can"
     if new_sku != product.sku or brand != product.brand:
@@ -215,13 +222,27 @@ def resolve_identifier(value: str) -> Product:
     raw = (value or "").strip()
     if not raw:
         raise Product.DoesNotExist("Identificador vacío.")
-    p = Product.objects.filter(sku__iexact=raw, is_active=True).select_related("category").first()
+    p = (
+        Product.objects.filter(sku__iexact=raw, is_active=True)
+        .select_related("category")
+        .first()
+    )
     if p:
         return p
-    p = Product.objects.filter(barcode__iexact=raw, is_active=True).select_related("category").first()
+    p = (
+        Product.objects.filter(barcode__iexact=raw, is_active=True)
+        .select_related("category")
+        .first()
+    )
     if p:
         return p
-    p = Product.objects.filter(name__icontains=raw, is_active=True).select_related("category").first()
+    p = (
+        Product.objects.filter(name__icontains=raw, is_active=True)
+        .select_related("category")
+        .first()
+    )
     if p:
         return p
-    raise Product.DoesNotExist(f"No se encontró producto activo para el identificador «{raw}».")
+    raise Product.DoesNotExist(
+        f"No se encontró producto activo para el identificador «{raw}»."
+    )

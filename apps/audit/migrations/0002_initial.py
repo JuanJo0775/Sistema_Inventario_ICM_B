@@ -6,32 +6,48 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('audit', '0001_initial'),
-        ('movements', '0001_initial'),
+        ("audit", "0001_initial"),
+        ("movements", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='auditlog',
-            name='movement',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='audit_logs', to='movements.movement'),
+            model_name="auditlog",
+            name="movement",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="audit_logs",
+                to="movements.movement",
+            ),
         ),
         migrations.AddField(
-            model_name='auditlog',
-            name='user',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='audit_events', to=settings.AUTH_USER_MODEL),
+            model_name="auditlog",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="audit_events",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddIndex(
-            model_name='auditlog',
-            index=models.Index(fields=['user', 'created_at'], name='audit_audit_user_id_a3c2bc_idx'),
+            model_name="auditlog",
+            index=models.Index(
+                fields=["user", "created_at"], name="audit_audit_user_id_a3c2bc_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='auditlog',
-            index=models.Index(fields=['event_type', 'created_at'], name='audit_audit_event_t_ac78f0_idx'),
+            model_name="auditlog",
+            index=models.Index(
+                fields=["event_type", "created_at"],
+                name="audit_audit_event_t_ac78f0_idx",
+            ),
         ),
     ]

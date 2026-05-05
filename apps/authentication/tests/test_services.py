@@ -3,19 +3,22 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import pytest
-
-from apps.authentication.models import UserRole
 from rest_framework.exceptions import AuthenticationFailed
 
-from apps.authentication.services import authenticate_user, create_user, is_within_operating_hours
 from apps.audit.models import AuditEventType, AuditLog
-from shared.exceptions import OutsideOperatingHoursError, UnauthorizedCredentialManagementError
+from apps.authentication.models import UserRole
+from apps.authentication.services import (authenticate_user, create_user,
+                                          is_within_operating_hours)
+from shared.exceptions import (OutsideOperatingHoursError,
+                               UnauthorizedCredentialManagementError)
 from tests.factories import AlmacenistaFactory, UserFactory
 
 
 @pytest.mark.django_db
 def test_auxiliar_blocked_outside_hours(auxiliar_user):
-    with patch("apps.authentication.services.is_within_operating_hours", return_value=False):
+    with patch(
+        "apps.authentication.services.is_within_operating_hours", return_value=False
+    ):
         with pytest.raises(OutsideOperatingHoursError):
             authenticate_user(auxiliar_user.username, "testpass123")
 
@@ -50,7 +53,11 @@ def test_operating_hours_enforced_per_request(auxiliar_user):
     factory = APIRequestFactory()
     request = factory.get("/dummy")
     request.user = auxiliar_user
-    with patch("apps.authentication.services.is_within_operating_hours", return_value=False):
+    with patch(
+        "apps.authentication.services.is_within_operating_hours", return_value=False
+    ):
         assert IsWithinOperatingHours().has_permission(request, view=None) is False
-    with patch("apps.authentication.services.is_within_operating_hours", return_value=True):
+    with patch(
+        "apps.authentication.services.is_within_operating_hours", return_value=True
+    ):
         assert IsWithinOperatingHours().has_permission(request, view=None) is True

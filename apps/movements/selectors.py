@@ -31,7 +31,9 @@ def get_movement_by_id(movement_id: UUID) -> Movement:
     return _movement_base_qs().get(pk=movement_id)
 
 
-def get_movements_by_product(product_id: UUID, filters: dict[str, Any] | None = None) -> QuerySet[Movement]:
+def get_movements_by_product(
+    product_id: UUID, filters: dict[str, Any] | None = None
+) -> QuerySet[Movement]:
     """
     RF-005–RF-009 — Movimientos de un producto con filtros opcionales.
 
@@ -46,7 +48,9 @@ def get_movements_by_product(product_id: UUID, filters: dict[str, Any] | None = 
     return qs.order_by("-created_at")
 
 
-def get_movements_by_user(user_id: int, filters: dict[str, Any] | None = None) -> QuerySet[Movement]:
+def get_movements_by_user(
+    user_id: int, filters: dict[str, Any] | None = None
+) -> QuerySet[Movement]:
     """
     RF-012 — Movimientos ejecutados por un usuario.
 

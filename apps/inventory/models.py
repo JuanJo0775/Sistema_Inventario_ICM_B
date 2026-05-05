@@ -76,7 +76,9 @@ class StockByLocation(BaseModel):
         verbose_name = "Stock por Ubicación"
         verbose_name_plural = "Stock por ubicación"
         constraints = [
-            models.UniqueConstraint(fields=("product", "location"), name="uniq_product_location_stock"),
+            models.UniqueConstraint(
+                fields=("product", "location"), name="uniq_product_location_stock"
+            ),
             models.CheckConstraint(
                 check=Q(current_stock__gte=0),
                 name="stock_non_negative",

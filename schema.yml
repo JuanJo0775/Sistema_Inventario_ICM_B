@@ -1,0 +1,5091 @@
+openapi: 3.0.3
+info:
+  title: ICM — API de Gestión de Inventario y Operaciones
+  version: 1.0.0
+  description: |-
+    # ICM — API de Gestión de Inventario y Operaciones
+    **Version:** `1.0.0` | **OAS:** `3.0` | **Schema:** [/api/schema/](/api/schema/)
+
+    API REST del sistema **ICM (Import Corporal Medical)**.
+
+    ---
+    ### **Guía de Autenticación**
+    Para probar los endpoints, haga clic en el botón **Authorize**, use el esquema *BearerAuth* e ingrese el token con el prefijo literal:
+    `Bearer <access_token>`
+
+    > *Token obtenido vía `POST /api/v1/auth/login/`*
+
+    ---
+    ### **Control de Acceso (RBAC)**
+    - **Roles:** Almacenista, Auxiliar de Despacho, Administrador.
+    - **Restricción Horaria:** El rol `auxiliar_despacho` está sujeto a la regla **BR-03** (07:00-12:00 / 14:00-17:00).
+
+    ---
+    ### **Documentación Adicional**
+    - **Referencia:** `docs\ERS_ICM_Requisitos.md`
+    - **Arquitectura:** `docs\README_ARQUITECTURA.md`
+    - **Nota:** el stock se maneja como un ledger inmutable con stock derivado.
+  contact:
+    name: ICM / Proyecto Nuclear 3 — Universidad Alexander von Humboldt
+  license:
+    name: Proyecto Formativo / Uso académico — Ley 1581
+paths:
+  /api/v1/alerts/:
+    get:
+      operationId: alerts_list
+      parameters:
+      - in: query
+        name: alert_type
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - in: query
+        name: product_id
+        schema:
+          type: string
+        description: UUID del producto.
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - alerts
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAlertList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/alerts/{id}/:
+    get:
+      operationId: alerts_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - alerts
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alert'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/alerts/{id}/resolve/:
+    post:
+      operationId: alerts_resolve_create
+      description: POST — Marca alerta como resuelta (solo almacenista, RF-011).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - alerts
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alert'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/audit/:
+    get:
+      operationId: audit_list
+      parameters:
+      - in: query
+        name: end
+        schema:
+          type: string
+      - in: query
+        name: event_type
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      - in: query
+        name: start
+        schema:
+          type: string
+      - in: query
+        name: user_id
+        schema:
+          type: integer
+      tags:
+      - audit
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAuditLogList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/audit/{id}/:
+    get:
+      operationId: audit_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - audit
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLog'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/health/:
+    get:
+      operationId: auth_health_retrieve
+      description: Comprobación de disponibilidad del servicio (sin autenticación).
+      summary: Health check
+      tags:
+      - system
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+          description: ''
+  /api/v1/auth/login/:
+    post:
+      operationId: auth_login_create
+      description: 'RF-001, BR-03 — Envíe `password` y `username` **o** `email`. Respuesta:
+        `access`, `refresh` y objeto `user` (perfil sin contraseña). Los auxiliares
+        de despacho solo pueden autenticarse en franja operativa.'
+      summary: Iniciar sesión (JWT)
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequestRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access:
+                    type: string
+                  refresh:
+                    type: string
+                  user:
+                    type: object
+          description: Tokens JWT y perfil de usuario.
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/logout/:
+    post:
+      operationId: auth_logout_create
+      description: RF-002 — Invalida el refresh token enviado en el cuerpo.
+      summary: Cerrar sesión (blacklist refresh)
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: Sesión cerrada correctamente.
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/me/:
+    get:
+      operationId: auth_me_retrieve
+      summary: Perfil del usuario autenticado
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/token/refresh/:
+    post:
+      operationId: auth_token_refresh_create
+      description: 'Envía el `refresh` emitido en el login para obtener un nuevo `access`.
+        RF-001, BR-03 — Auxiliar de despacho: renovación rechazada fuera de franja
+        operativa (07:00–12:00 y 14:00–17:00, America/Bogota).'
+      summary: Renovar access token
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ICMTokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ICMTokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ICMTokenRefreshRequest'
+        required: true
+      responses:
+        '200':
+          description: Nuevo access token generado.
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/users/:
+    get:
+      operationId: auth_users_list
+      description: Solo almacenista (RF-002, BR-02).
+      summary: Listar usuarios
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: auth_users_create
+      description: Solo almacenista. Requiere username, email, password y rol.
+      summary: Crear usuario
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/users/{id}/:
+    get:
+      operationId: auth_users_retrieve
+      summary: Detalle de usuario
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: auth_users_update
+      summary: Actualizar usuario
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: auth_users_partial_update
+      summary: Actualizar usuario (parcial)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/users/{id}/disable/:
+    post:
+      operationId: auth_users_disable_create
+      description: RF-002 — Revoca sesiones (blacklist) y marca la cuenta inactiva.
+      summary: Deshabilitar usuario
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: Usuario deshabilitado exitosamente.
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/categories/:
+    get:
+      operationId: catalog_categories_list
+      summary: Listar categorías
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategoryList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: catalog_categories_create
+      summary: Crear categoría
+      tags:
+      - catalog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CategoryCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CategoryCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/combos/:
+    get:
+      operationId: catalog_combos_list
+      summary: Listar combos
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedComboList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: catalog_combos_create
+      summary: Crear combo
+      tags:
+      - catalog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComboCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ComboCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ComboCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Combo'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/products/:
+    get:
+      operationId: catalog_products_list
+      summary: Listar productos
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProductList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: catalog_products_create
+      summary: Crear producto
+      tags:
+      - catalog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/products/{id}/:
+    get:
+      operationId: catalog_products_retrieve
+      summary: Detalle de producto
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: catalog_products_update
+      summary: Actualizar producto
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: catalog_products_partial_update
+      summary: Actualizar producto parcialmente
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProductRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProductRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProductRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/products/resolve/:
+    get:
+      operationId: catalog_products_resolve_retrieve
+      parameters:
+      - in: query
+        name: identifier
+        schema:
+          type: string
+        description: Alias de `q` (misma semántica).
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: SKU, código de barras o fragmento de nombre.
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/resolve/:
+    get:
+      operationId: catalog_resolve_retrieve
+      parameters:
+      - in: query
+        name: identifier
+        schema:
+          type: string
+        description: Alias de `q` (misma semántica).
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: SKU, código de barras o fragmento de nombre.
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/subcategories/:
+    get:
+      operationId: catalog_subcategories_list
+      summary: Listar subcategorías
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubcategoryList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/inventory/:
+    get:
+      operationId: inventory_retrieve
+      description: GET — Inventario consolidado por producto (RF-004).
+      parameters:
+      - in: query
+        name: category_id
+        schema:
+          type: string
+      - in: query
+        name: location_id
+        schema:
+          type: string
+      - in: query
+        name: only_in_stock
+        schema:
+          type: boolean
+      - in: query
+        name: stock_below_reorder
+        schema:
+          type: boolean
+      tags:
+      - inventory
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Inventario listado exitosamente.
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/inventory/locations/:
+    get:
+      operationId: inventory_locations_list
+      description: GET/POST ubicaciones (RF-004).
+      tags:
+      - inventory
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: inventory_locations_create
+      description: GET/POST ubicaciones (RF-004).
+      tags:
+      - inventory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LocationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LocationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/inventory/locations/{id}/:
+    get:
+      operationId: inventory_locations_retrieve
+      description: GET/PATCH/DELETE(soft) ubicación por id (RF-004).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - inventory
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: inventory_locations_partial_update
+      description: GET/PATCH/DELETE(soft) ubicación por id (RF-004).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - inventory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLocationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLocationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLocationRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: inventory_locations_destroy
+      description: GET/PATCH/DELETE(soft) ubicación por id (RF-004).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - inventory
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: Ubicación desactivada exitosamente.
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/inventory/products/{product_id}/stock/:
+    get:
+      operationId: inventory_products_stock_retrieve
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - inventory
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockByProductResponse'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/inventory/reconstruct/:
+    post:
+      operationId: inventory_reconstruct_create
+      description: POST — Reconstrucción ledger vs stock derivado (solo almacenista).
+      tags:
+      - inventory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockReconstructRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockReconstructRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StockReconstructRequestRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockReconstructResponse'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/inventory/search/:
+    get:
+      operationId: inventory_search_retrieve
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: Texto para SKU, código de barras o nombre.
+      - in: query
+        name: subcategory
+        schema:
+          type: string
+      tags:
+      - inventory
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryPaginatedProductList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/inventory/stock/location/{location_id}/:
+    get:
+      operationId: inventory_stock_location_retrieve
+      parameters:
+      - in: path
+        name: location_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - inventory
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryPaginatedStockByLocationList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/inventory/stock/product/{product_id}/:
+    get:
+      operationId: inventory_stock_product_retrieve
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - inventory
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockByProductResponse'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/movements/:
+    get:
+      operationId: movements_list
+      summary: Listar movimientos
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - movements
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMovementList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/movements/{id}/:
+    get:
+      operationId: movements_retrieve
+      summary: Detalle de movimiento
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - movements
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movement'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/movements/{id}/corrections/:
+    post:
+      operationId: movements_corrections_create
+      description: Corrección por id de movimiento en URL (compatibilidad).
+      summary: Corrección de movimiento (URL)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - movements
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorrectionCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CorrectionCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CorrectionCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movement'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '405':
+          description: Método no permitido o registro inmutable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/movements/adjustments/:
+    get:
+      operationId: movements_adjustments_list
+      summary: Listar ajustes
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - movements
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMovementList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: movements_adjustments_create
+      summary: Registrar ajuste
+      tags:
+      - movements
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdjustmentCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AdjustmentCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AdjustmentCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movement'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/movements/adjustments/correct/:
+    post:
+      operationId: movements_adjustments_correct_create
+      summary: Corregir ajuste dentro de ventana de tiempo
+      tags:
+      - movements
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdjustmentCorrectionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AdjustmentCorrectionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AdjustmentCorrectionRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movement'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '405':
+          description: Método no permitido o registro inmutable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/movements/dispatches/:
+    get:
+      operationId: movements_dispatches_list
+      summary: Listar despachos
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - movements
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMovementList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: movements_dispatches_create
+      summary: Registrar despacho
+      tags:
+      - movements
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DispatchCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DispatchCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DispatchCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movement'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/movements/dispatches/{id}/:
+    get:
+      operationId: movements_dispatches_retrieve
+      summary: Detalle de despacho
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - movements
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movement'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/movements/dispatches/{id}/invoice/:
+    get:
+      operationId: movements_dispatches_invoice_retrieve
+      description: BR-13 — Descarga del PDF de factura asociado al despacho.
+      summary: Descargar PDF de factura
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - movements
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/movements/entries/:
+    get:
+      operationId: movements_entries_list
+      summary: Listar entradas
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - movements
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMovementList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: movements_entries_create
+      summary: Registrar entrada
+      tags:
+      - movements
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntryCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EntryCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EntryCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movement'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/movements/entries/{id}/:
+    get:
+      operationId: movements_entries_retrieve
+      summary: Detalle de entrada
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - movements
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movement'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/movements/returns/:
+    get:
+      operationId: movements_returns_list
+      summary: Listar devoluciones
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - movements
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMovementList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: movements_returns_create
+      summary: Registrar devolución
+      tags:
+      - movements
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReturnCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReturnCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReturnCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movement'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/movements/transfers/:
+    get:
+      operationId: movements_transfers_list
+      summary: Listar traslados
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - movements
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMovementList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: movements_transfers_create
+      summary: Registrar traslado
+      tags:
+      - movements
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransferCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransferCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movement'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/reports/expiring/:
+    get:
+      operationId: reports_expiring_list
+      parameters:
+      - in: query
+        name: days
+        schema:
+          type: integer
+      tags:
+      - reports
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/reports/inventory/summary/:
+    get:
+      operationId: reports_inventory_summary_list
+      tags:
+      - reports
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventorySummaryItem'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/reports/invoices/:
+    get:
+      operationId: reports_invoices_list
+      parameters:
+      - in: query
+        name: end
+        schema:
+          type: string
+      - in: query
+        name: invoice_number
+        schema:
+          type: string
+      - in: query
+        name: product_id
+        schema:
+          type: string
+        description: UUID del producto.
+      - in: query
+        name: start
+        schema:
+          type: string
+      tags:
+      - reports
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movement'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/reports/kpi/:
+    get:
+      operationId: reports_kpi_retrieve
+      tags:
+      - reports
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KpiDashboard'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/reports/movements/history/:
+    get:
+      operationId: reports_movements_history_retrieve
+      parameters:
+      - in: query
+        name: end
+        schema:
+          type: string
+        description: Filtro superior de fecha (ISO-8601).
+      - in: query
+        name: product_id
+        schema:
+          type: string
+        description: UUID del producto.
+      - in: query
+        name: start
+        schema:
+          type: string
+        description: Filtro inferior de fecha (ISO-8601).
+      - in: query
+        name: user_id
+        schema:
+          type: integer
+      tags:
+      - reports
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Historial de movimientos.
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/reports/movements/report/:
+    get:
+      operationId: reports_movements_report_list
+      parameters:
+      - in: query
+        name: end
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: start
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: type
+        schema:
+          type: string
+      tags:
+      - reports
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovementReportItem'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/reports/movements/summary/:
+    get:
+      operationId: reports_movements_summary_retrieve
+      parameters:
+      - in: query
+        name: end
+        schema:
+          type: string
+        description: Fin del rango (ISO-8601).
+        required: true
+      - in: query
+        name: start
+        schema:
+          type: string
+        description: Inicio del rango (ISO-8601).
+        required: true
+      tags:
+      - reports
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovementSummaryResponse'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/reports/sales/summary/:
+    get:
+      operationId: reports_sales_summary_retrieve
+      parameters:
+      - in: query
+        name: end
+        schema:
+          type: string
+        description: Fin del rango (ISO-8601).
+        required: true
+      - in: query
+        name: start
+        schema:
+          type: string
+        description: Inicio del rango (ISO-8601).
+        required: true
+      tags:
+      - reports
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesSummaryResponse'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/reports/top-products/:
+    get:
+      operationId: reports_top_products_list
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          type: integer
+      - in: query
+        name: period_days
+        schema:
+          type: integer
+      tags:
+      - reports
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TopDispatchedProduct'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    AdjustmentCorrectionRequest:
+      type: object
+      description: Cuerpo para `POST .../adjustments/correct/` con id de movimiento.
+      properties:
+        movement_id:
+          type: string
+          format: uuid
+        origin_id:
+          type: string
+          format: uuid
+        destination_id:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+      required:
+      - destination_id
+      - movement_id
+      - origin_id
+      - quantity
+    AdjustmentCreateRequest:
+      type: object
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        location_id:
+          type: string
+          format: uuid
+        new_quantity:
+          type: integer
+          minimum: 0
+        justification:
+          type: string
+      required:
+      - justification
+      - location_id
+      - new_quantity
+      - product_id
+    Alert:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        product:
+          type: string
+          format: uuid
+          readOnly: true
+        product_sku:
+          type: string
+          readOnly: true
+        location:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        alert_type:
+          allOf:
+          - $ref: '#/components/schemas/AlertTypeEnum'
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        is_resolved:
+          type: boolean
+          readOnly: true
+        resolved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        resolved_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - alert_type
+      - created_at
+      - id
+      - is_resolved
+      - location
+      - message
+      - product
+      - product_sku
+      - resolved_at
+      - resolved_by
+    AlertTypeEnum:
+      enum:
+      - LOW_STOCK
+      - EXPIRATION_30
+      - EXPIRATION_60
+      - COLD_CHAIN_MISSING
+      - STOCK_MISMATCH
+      type: string
+      description: |-
+        * `LOW_STOCK` - Stock bajo mínimo
+        * `EXPIRATION_30` - Vencimiento en 30 días
+        * `EXPIRATION_60` - Vencimiento en 60 días
+        * `COLD_CHAIN_MISSING` - Cadena de frío irregular
+        * `STOCK_MISMATCH` - Desincronización stock vs ledger
+    AuditLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        event_type:
+          allOf:
+          - $ref: '#/components/schemas/EventTypeEnum'
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        ip_address:
+          type: string
+          readOnly: true
+          nullable: true
+        movement:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        description:
+          type: string
+          readOnly: true
+        metadata:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - description
+      - event_type
+      - id
+      - ip_address
+      - metadata
+      - movement
+      - user
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        slug:
+          type: string
+          maxLength: 128
+          pattern: ^[-a-zA-Z0-9_]+$
+        requires_serial_number:
+          type: boolean
+          description: 'BR-04: categoría exige número de serie en entradas/salidas.'
+        is_returnable:
+          type: boolean
+          description: 'BR-05: categoría admite devoluciones (Electroterapia / electrónicos).'
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de creación (UTC).
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de última modificación (UTC).
+      required:
+      - created_at
+      - id
+      - name
+      - slug
+      - updated_at
+    CategoryCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          default: ''
+        requires_serial_number:
+          type: boolean
+          default: false
+        is_returnable:
+          type: boolean
+          default: false
+      required:
+      - name
+    CodeEnum:
+      enum:
+      - VITRINA
+      - BODEGA_1
+      - BODEGA_2
+      type: string
+      description: |-
+        * `VITRINA` - Vitrina
+        * `BODEGA_1` - Bodega 1
+        * `BODEGA_2` - Bodega 2
+    Combo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        sku:
+          type: string
+          maxLength: 100
+        is_active:
+          type: boolean
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComboItem'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de creación (UTC).
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de última modificación (UTC).
+      required:
+      - components
+      - created_at
+      - id
+      - name
+      - sku
+      - updated_at
+    ComboCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        sku:
+          type: string
+          minLength: 1
+        is_active:
+          type: boolean
+          default: true
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - items
+      - name
+      - sku
+    ComboItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        product:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+      required:
+      - id
+      - product
+    CorrectionCreateRequest:
+      type: object
+      properties:
+        origin_id:
+          type: string
+          format: uuid
+        destination_id:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+      required:
+      - destination_id
+      - origin_id
+      - quantity
+    DispatchCreateRequest:
+      type: object
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        location_id:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+        movement_type:
+          type: string
+          minLength: 1
+        scanned_code:
+          type: string
+          nullable: true
+        order_sku:
+          type: string
+          nullable: true
+        serial_number:
+          type: string
+          nullable: true
+        customer_data: {}
+        note:
+          type: string
+        cold_chain_acknowledged:
+          type: boolean
+          default: false
+        electrical_safety_acknowledged:
+          type: boolean
+          default: false
+        privacy_notice_acknowledged:
+          type: boolean
+          default: false
+      required:
+      - location_id
+      - movement_type
+      - product_id
+      - quantity
+    EntryCreateRequest:
+      type: object
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        location_id:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+        serial_number:
+          type: string
+          nullable: true
+        qty_invoiced:
+          type: integer
+          nullable: true
+        discrepancy_note:
+          type: string
+          nullable: true
+        cold_chain_acknowledged:
+          type: boolean
+          default: false
+        electrical_safety_acknowledged:
+          type: boolean
+          default: false
+      required:
+      - location_id
+      - product_id
+      - quantity
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Código de error del sistema o cliente (ej. 'VALIDATION_ERROR',
+            'NOT_FOUND', 'INSUFFICIENT_STOCK').
+        message:
+          type: string
+          description: Mensaje legible para el usuario que describe el error.
+        detail:
+          type: object
+          description: Detalles adicionales, comúnmente un diccionario con errores
+            específicos por campo o reglas.
+          additionalProperties: true
+      required:
+      - error
+      - message
+      - detail
+    EventTypeEnum:
+      enum:
+      - LOGIN_SUCCESS
+      - LOGIN_FAILED
+      - LOGOUT
+      - USER_CREATED
+      - USER_UPDATED
+      - USER_DISABLED
+      - MOVEMENT_CREATED
+      - ADJUSTMENT_CREATED
+      - RETURN_CREATED
+      - REPORT_GENERATED
+      - PERMISSION_CHANGED
+      - STOCK_RECONSTRUCTED
+      - PRODUCT_CREATED
+      - PRODUCT_UPDATED
+      - COMBO_CREATED
+      - CATEGORY_CREATED
+      - MOVEMENT_CORRECTED
+      - RETURN_APPROVED
+      - RETURN_REJECTED
+      - ALERT_ACKNOWLEDGED
+      - UNAUTHORIZED_ACCESS_ATTEMPT
+      - MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD
+      type: string
+      description: |-
+        * `LOGIN_SUCCESS` - Login exitoso
+        * `LOGIN_FAILED` - Login fallido
+        * `LOGOUT` - Cierre de sesión
+        * `USER_CREATED` - Usuario creado
+        * `USER_UPDATED` - Usuario actualizado
+        * `USER_DISABLED` - Usuario deshabilitado
+        * `MOVEMENT_CREATED` - Movimiento creado
+        * `ADJUSTMENT_CREATED` - Ajuste creado
+        * `RETURN_CREATED` - Devolución registrada
+        * `REPORT_GENERATED` - Reporte generado
+        * `PERMISSION_CHANGED` - Permisos modificados
+        * `STOCK_RECONSTRUCTED` - Stock reconstruido desde ledger
+        * `PRODUCT_CREATED` - Producto creado
+        * `PRODUCT_UPDATED` - Producto actualizado
+        * `COMBO_CREATED` - Combo de productos creado
+        * `CATEGORY_CREATED` - Categoría de catálogo creada
+        * `MOVEMENT_CORRECTED` - Movimiento corregido (BR-06)
+        * `RETURN_APPROVED` - Devolución aprobada
+        * `RETURN_REJECTED` - Devolución rechazada
+        * `ALERT_ACKNOWLEDGED` - Alerta reconocida
+        * `UNAUTHORIZED_ACCESS_ATTEMPT` - Intento de acceso no autorizado
+        * `MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD` - Intento de modificación sobre registro inmutable
+    ICMTokenRefreshRequest:
+      type: object
+      description: |-
+        RF-001, BR-03 — Renueva access; los auxiliares solo obtienen token en franja operativa.
+
+        Alineado a criterios Gherkin en `docs/ERS_ICM_Requisitos.md` (Feature inicio de sesión,
+        Scenario 3: acceso bloqueado fuera de horario) y a `docs/ICM_Informe_Elicitacion_v2_plus.docx.md`
+        (BR-03: franjas 07:00–12:00 y 14:00–17:00 para auxiliares). La renovación JWT no debe eludir esa regla.
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    InventoryPaginatedProductList:
+      type: object
+      description: Forma estándar DRF `PageNumberPagination` para listas de productos.
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          nullable: true
+        previous:
+          type: string
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+      required:
+      - count
+      - results
+    InventoryPaginatedStockByLocationList:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          nullable: true
+        previous:
+          type: string
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockByLocation'
+      required:
+      - count
+      - results
+    InventorySummaryItem:
+      type: object
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        total_stock:
+          type: integer
+      required:
+      - name
+      - product_id
+      - sku
+      - total_stock
+    KpiDashboard:
+      type: object
+      properties:
+        total_products:
+          type: integer
+        active_alerts:
+          type: integer
+        movements_today:
+          type: integer
+        low_stock_items:
+          type: integer
+      required:
+      - active_alerts
+      - low_stock_items
+      - movements_today
+      - total_products
+    Location:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        code:
+          $ref: '#/components/schemas/CodeEnum'
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        is_retail:
+          type: boolean
+          description: 'BR-11: True solo para Vitrina (punto minorista).'
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de creación (UTC).
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de última modificación (UTC).
+      required:
+      - code
+      - created_at
+      - id
+      - name
+      - updated_at
+    LocationRequest:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/CodeEnum'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+        is_retail:
+          type: boolean
+          description: 'BR-11: True solo para Vitrina (punto minorista).'
+        is_active:
+          type: boolean
+      required:
+      - code
+      - name
+    LoginRequestRequest:
+      type: object
+      description: 'Cuerpo de login: contraseña obligatoria; usuario o correo (al
+        menos uno).'
+      properties:
+        username:
+          type: string
+          description: Nombre de usuario único.
+        email:
+          type: string
+          format: email
+          description: Correo registrado (alternativa a username).
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
+    Movement:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        movement_type:
+          allOf:
+          - $ref: '#/components/schemas/MovementTypeEnum'
+          readOnly: true
+        product:
+          type: string
+          format: uuid
+          readOnly: true
+        product_sku:
+          type: string
+          readOnly: true
+        origin_location:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        destination_location:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        quantity:
+          type: integer
+          readOnly: true
+        stock_previo_origen:
+          type: integer
+          readOnly: true
+          nullable: true
+        stock_resultante_origen:
+          type: integer
+          readOnly: true
+          nullable: true
+        stock_previo_destino:
+          type: integer
+          readOnly: true
+          nullable: true
+        stock_resultante_destino:
+          type: integer
+          readOnly: true
+          nullable: true
+        serial_number:
+          type: string
+          readOnly: true
+          nullable: true
+        quantity_invoiced:
+          type: integer
+          readOnly: true
+          nullable: true
+        discrepancy_note:
+          type: string
+          readOnly: true
+          nullable: true
+        justification:
+          type: string
+          readOnly: true
+          nullable: true
+        scanned_code:
+          type: string
+          readOnly: true
+          nullable: true
+        order_sku:
+          type: string
+          readOnly: true
+          nullable: true
+        invoice_number:
+          type: string
+          readOnly: true
+          nullable: true
+        invoice_pdf:
+          type: string
+          format: uri
+          readOnly: true
+          nullable: true
+        related_movement:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        executed_by:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - destination_location
+      - discrepancy_note
+      - executed_by
+      - id
+      - invoice_number
+      - invoice_pdf
+      - justification
+      - movement_type
+      - order_sku
+      - origin_location
+      - product
+      - product_sku
+      - quantity
+      - quantity_invoiced
+      - related_movement
+      - scanned_code
+      - serial_number
+      - stock_previo_destino
+      - stock_previo_origen
+      - stock_resultante_destino
+      - stock_resultante_origen
+    MovementReportItem:
+      type: object
+      properties:
+        movement_type:
+          type: string
+        count:
+          type: integer
+        total_quantity:
+          type: integer
+      required:
+      - count
+      - movement_type
+      - total_quantity
+    MovementSummaryResponse:
+      type: object
+      properties:
+        counts:
+          type: object
+          additionalProperties:
+            type: integer
+      required:
+      - counts
+    MovementTypeEnum:
+      enum:
+      - ENTRADA
+      - SALIDA_VENTA_MAYOR
+      - SALIDA_VENTA_MENOR
+      - SALIDA_DANO
+      - SALIDA_VENCIMIENTO
+      - TRASLADO
+      - AJUSTE
+      - DEVOLUCION
+      type: string
+      description: |-
+        * `ENTRADA` - Entrada
+        * `SALIDA_VENTA_MAYOR` - Salida venta mayor
+        * `SALIDA_VENTA_MENOR` - Salida venta menor
+        * `SALIDA_DANO` - Salida por daño
+        * `SALIDA_VENCIMIENTO` - Salida por vencimiento
+        * `TRASLADO` - Traslado interno
+        * `AJUSTE` - Ajuste
+        * `DEVOLUCION` - Devolución
+    PaginatedAlertList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Alert'
+    PaginatedAuditLogList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditLog'
+    PaginatedCategoryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+    PaginatedComboList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Combo'
+    PaginatedMovementList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Movement'
+    PaginatedProductList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+    PaginatedSubcategoryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subcategory'
+    PatchedLocationRequest:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/CodeEnum'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+        is_retail:
+          type: boolean
+          description: 'BR-11: True solo para Vitrina (punto minorista).'
+        is_active:
+          type: boolean
+    PatchedProductRequest:
+      type: object
+      properties:
+        sku:
+          type: string
+          minLength: 1
+          maxLength: 100
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        category:
+          type: string
+          format: uuid
+        subcategory:
+          type: string
+          format: uuid
+          nullable: true
+        barcode:
+          type: string
+          nullable: true
+          maxLength: 100
+        brand:
+          type: string
+          minLength: 1
+          maxLength: 100
+        expiration_date:
+          type: string
+          format: date
+          nullable: true
+        weight_grams:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+        requires_cold_chain:
+          type: boolean
+        is_active:
+          type: boolean
+        notes:
+          type: string
+        reorder_point:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+    PatchedUserRequest:
+      type: object
+      description: Perfil de usuario (RF-002) — lectura y actualización parcial por
+        almacenista.
+      properties:
+        username:
+          type: string
+          minLength: 1
+          title: Nombre de usuario
+          description: 'Requerido. 150 carácteres como máximo. Únicamente letras,
+            dígitos y @/./+/-/_ '
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Correo electrónico
+          maxLength: 254
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 150
+        phone:
+          type: string
+          maxLength: 20
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        is_active:
+          type: boolean
+          title: Activo
+          description: Indica si el usuario debe ser tratado como activo. Desmarque
+            esta opción en lugar de borrar la cuenta.
+    PerLocationStockRow:
+      type: object
+      properties:
+        location_id:
+          type: string
+        location_code:
+          type: string
+        location_name:
+          type: string
+        quantity:
+          type: integer
+      required:
+      - location_code
+      - quantity
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        sku:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 255
+        category:
+          type: string
+          format: uuid
+        category_slug:
+          type: string
+          readOnly: true
+        subcategory:
+          type: string
+          format: uuid
+          nullable: true
+        barcode:
+          type: string
+          nullable: true
+          maxLength: 100
+        brand:
+          type: string
+          maxLength: 100
+        expiration_date:
+          type: string
+          format: date
+          nullable: true
+        weight_grams:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+        requires_cold_chain:
+          type: boolean
+        is_active:
+          type: boolean
+        notes:
+          type: string
+        reorder_point:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de creación (UTC).
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de última modificación (UTC).
+      required:
+      - category
+      - category_slug
+      - created_at
+      - id
+      - name
+      - sku
+      - updated_at
+    ProductCreateRequest:
+      type: object
+      properties:
+        sku:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        category_id:
+          type: string
+          format: uuid
+        subcategory_id:
+          type: string
+          format: uuid
+          nullable: true
+        barcode:
+          type: string
+          nullable: true
+        brand:
+          type: string
+          minLength: 1
+          default: Can
+        requires_cold_chain:
+          type: boolean
+          default: false
+        expiration_date:
+          type: string
+          format: date
+          nullable: true
+        expiry_date:
+          type: string
+          format: date
+          nullable: true
+        weight_grams:
+          type: integer
+          minimum: 0
+          nullable: true
+        notes:
+          type: string
+          default: ''
+        reorder_point:
+          type: integer
+          minimum: 0
+          default: 0
+        is_active:
+          type: boolean
+          default: true
+      required:
+      - category_id
+      - name
+      - sku
+    ProductRequest:
+      type: object
+      properties:
+        sku:
+          type: string
+          minLength: 1
+          maxLength: 100
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        category:
+          type: string
+          format: uuid
+        subcategory:
+          type: string
+          format: uuid
+          nullable: true
+        barcode:
+          type: string
+          nullable: true
+          maxLength: 100
+        brand:
+          type: string
+          minLength: 1
+          maxLength: 100
+        expiration_date:
+          type: string
+          format: date
+          nullable: true
+        weight_grams:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+        requires_cold_chain:
+          type: boolean
+        is_active:
+          type: boolean
+        notes:
+          type: string
+        reorder_point:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+      required:
+      - category
+      - name
+      - sku
+    ReturnCreateRequest:
+      type: object
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        location_id:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+        serial_number:
+          type: string
+          nullable: true
+        related_movement_id:
+          type: string
+          format: uuid
+          nullable: true
+      required:
+      - location_id
+      - product_id
+      - quantity
+    RoleEnum:
+      enum:
+      - almacenista
+      - auxiliar_despacho
+      - administrador
+      type: string
+      description: |-
+        * `almacenista` - Almacenista
+        * `auxiliar_despacho` - Auxiliar de despacho
+        * `administrador` - Administrador
+    SalesSummaryResponse:
+      type: object
+      properties:
+        sales:
+          $ref: '#/components/schemas/SalesTotals'
+      required:
+      - sales
+    SalesTotals:
+      type: object
+      properties:
+        mayor:
+          type: integer
+        menor:
+          type: integer
+      required:
+      - mayor
+      - menor
+    StockByLocation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        product:
+          type: string
+          format: uuid
+          readOnly: true
+        product_sku:
+          type: string
+          readOnly: true
+        location:
+          type: string
+          format: uuid
+          readOnly: true
+        current_stock:
+          type: integer
+          readOnly: true
+          description: 'BR-11: stock derivado; debe reconstruirse desde el ledger.'
+        last_movement_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Último movimiento que alteró este registro (auditoría rápida).
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de creación (UTC).
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de última modificación (UTC).
+      required:
+      - created_at
+      - current_stock
+      - id
+      - last_movement_at
+      - location
+      - product
+      - product_sku
+      - updated_at
+    StockByProductResponse:
+      type: object
+      properties:
+        product_id:
+          type: string
+        product_name:
+          type: string
+        sku:
+          type: string
+        by_location:
+          type: array
+          items:
+            $ref: '#/components/schemas/PerLocationStockRow'
+        per_location:
+          type: array
+          items:
+            $ref: '#/components/schemas/PerLocationStockRow'
+        total:
+          type: integer
+      required:
+      - per_location
+      - product_id
+      - total
+    StockReconstructRequestRequest:
+      type: object
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        location_id:
+          type: string
+          format: uuid
+      required:
+      - location_id
+      - product_id
+    StockReconstructResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        reconstructed:
+          type: integer
+        actual:
+          type: integer
+      required:
+      - actual
+      - reconstructed
+      - status
+    Subcategory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        category:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        slug:
+          type: string
+          maxLength: 128
+          pattern: ^[-a-zA-Z0-9_]+$
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de creación (UTC).
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de última modificación (UTC).
+      required:
+      - category
+      - created_at
+      - id
+      - name
+      - slug
+      - updated_at
+    TopDispatchedProduct:
+      type: object
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        dispatched_quantity:
+          type: integer
+      required:
+      - dispatched_quantity
+      - name
+      - product_id
+      - sku
+    TransferCreateRequest:
+      type: object
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        origin_id:
+          type: string
+          format: uuid
+        destination_id:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+        cold_chain_acknowledged:
+          type: boolean
+          default: false
+        electrical_safety_acknowledged:
+          type: boolean
+          default: false
+      required:
+      - destination_id
+      - origin_id
+      - product_id
+      - quantity
+    User:
+      type: object
+      description: Perfil de usuario (RF-002) — lectura y actualización parcial por
+        almacenista.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        username:
+          type: string
+          title: Nombre de usuario
+          description: 'Requerido. 150 carácteres como máximo. Únicamente letras,
+            dígitos y @/./+/-/_ '
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Correo electrónico
+          maxLength: 254
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 150
+        phone:
+          type: string
+          maxLength: 20
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        is_active:
+          type: boolean
+          title: Activo
+          description: Indica si el usuario debe ser tratado como activo. Desmarque
+            esta opción en lugar de borrar la cuenta.
+        is_staff:
+          type: boolean
+          readOnly: true
+          title: Es staff
+          description: Indica si el usuario puede entrar en este sitio de administración.
+        created_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          title: Último inicio de sesión
+      required:
+      - created_at
+      - created_by
+      - email
+      - id
+      - is_staff
+      - last_login
+      - role
+      - updated_at
+      - username
+    UserCreateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        email:
+          type: string
+          format: email
+          minLength: 1
+        first_name:
+          type: string
+          default: ''
+        last_name:
+          type: string
+          default: ''
+        phone:
+          type: string
+          default: ''
+          maxLength: 20
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+      required:
+      - email
+      - password
+      - role
+      - username
+    UserRequest:
+      type: object
+      description: Perfil de usuario (RF-002) — lectura y actualización parcial por
+        almacenista.
+      properties:
+        username:
+          type: string
+          minLength: 1
+          title: Nombre de usuario
+          description: 'Requerido. 150 carácteres como máximo. Únicamente letras,
+            dígitos y @/./+/-/_ '
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Correo electrónico
+          maxLength: 254
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 150
+        phone:
+          type: string
+          maxLength: 20
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        is_active:
+          type: boolean
+          title: Activo
+          description: Indica si el usuario debe ser tratado como activo. Desmarque
+            esta opción en lugar de borrar la cuenta.
+      required:
+      - email
+      - role
+      - username
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'Prefijo literal: Bearer + espacio + access_token (login o refresh).'
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+tags:
+- name: auth
+  description: JWT authentication and user management.
+- name: system
+  description: System availability checks.
+- name: catalog
+  description: Categories, products, and combos.
+- name: inventory
+  description: Locations and stock tracking.
+- name: movements
+  description: 'Ledger: entries, dispatches, transfers, returns, adjustments.'
+- name: reports
+  description: Read-only reports and KPIs.
+- name: alerts
+  description: Operational alerts.
+- name: audit
+  description: Audit logs (read-only).

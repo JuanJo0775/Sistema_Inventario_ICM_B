@@ -344,7 +344,7 @@ def impl_rf005_s02(authenticated_almacenista_client: APIClient, sample_product, 
         _entry_payload(sample_product.id, loc.id, qty_invoiced=5, serial_number="SN-RF005-02"),
         format="json",
     )
-    assert r.status_code == status.HTTP_400_BAD_REQUEST
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 def impl_rf005_s03(authenticated_almacenista_client: APIClient, sample_product, sample_locations):
@@ -377,7 +377,7 @@ def impl_rf005_s04(authenticated_almacenista_client: APIClient, sample_locations
         _entry_payload(p.id, loc.id),
         format="json",
     )
-    assert r.status_code == status.HTTP_400_BAD_REQUEST
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 def impl_rf005_s05(authenticated_almacenista_client: APIClient, sample_locations, db):
@@ -461,7 +461,7 @@ def impl_rf006_s02(authenticated_almacenista_client: APIClient, sample_product, 
         },
         format="json",
     )
-    assert r.status_code == status.HTTP_400_BAD_REQUEST
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 def impl_rf006_s03(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
@@ -573,7 +573,7 @@ def impl_rf007_s02(authenticated_almacenista_client: APIClient, sample_product, 
         },
         format="json",
     )
-    assert r.status_code == status.HTTP_400_BAD_REQUEST
+    assert r.status_code == status.HTTP_409_CONFLICT
 
 
 def impl_rf007_s03(almacenista_user, sample_product, sample_locations, db):
@@ -635,7 +635,7 @@ def impl_rf008_s02(authenticated_almacenista_client: APIClient, sample_product, 
         },
         format="json",
     )
-    assert r.status_code == status.HTTP_400_BAD_REQUEST
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 def impl_rf009_s01(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
@@ -673,7 +673,7 @@ def impl_rf009_s02(authenticated_almacenista_client: APIClient, sample_product, 
         },
         format="json",
     )
-    assert r.status_code == status.HTTP_400_BAD_REQUEST
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 def impl_rf009_s03(api_client: APIClient, auxiliar_user, sample_product, sample_locations, db):
@@ -880,7 +880,7 @@ def impl_rnf006_s01(authenticated_almacenista_client: APIClient, sample_product,
         },
         format="json",
     )
-    assert r.status_code == status.HTTP_400_BAD_REQUEST
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 IMPLEMENTATIONS: dict[str, object] = {

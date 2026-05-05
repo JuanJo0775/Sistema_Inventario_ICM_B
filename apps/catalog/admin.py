@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from apps.catalog.models import Category, ComboItem, Product, ProductCombo, Subcategory
+from apps.catalog.models import (Category, ComboItem, Product, ProductCombo,
+                                 Subcategory)
 
 
 @admin.register(Category)

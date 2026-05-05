@@ -6,22 +6,30 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('alerts', '0001_initial'),
+        ("alerts", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='alert',
-            name='resolved_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='alerts_resolved', to=settings.AUTH_USER_MODEL),
+            model_name="alert",
+            name="resolved_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="alerts_resolved",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddIndex(
-            model_name='alert',
-            index=models.Index(fields=['is_resolved', 'alert_type'], name='alerts_aler_is_reso_8e4612_idx'),
+            model_name="alert",
+            index=models.Index(
+                fields=["is_resolved", "alert_type"],
+                name="alerts_aler_is_reso_8e4612_idx",
+            ),
         ),
     ]

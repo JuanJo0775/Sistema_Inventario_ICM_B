@@ -43,9 +43,13 @@ class EntryCreateSerializer(serializers.Serializer):
     product_id = serializers.UUIDField()
     location_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
-    serial_number = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    serial_number = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
     qty_invoiced = serializers.IntegerField(required=False, allow_null=True)
-    discrepancy_note = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    discrepancy_note = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
     cold_chain_acknowledged = serializers.BooleanField(default=False)
     electrical_safety_acknowledged = serializers.BooleanField(default=False)
 
@@ -55,9 +59,13 @@ class DispatchCreateSerializer(serializers.Serializer):
     location_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
     movement_type = serializers.CharField()
-    scanned_code = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    scanned_code = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
     order_sku = serializers.CharField(required=False, allow_blank=True, allow_null=True)
-    serial_number = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    serial_number = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
     customer_data = serializers.JSONField(required=False)
     note = serializers.CharField(required=False, allow_blank=True)
     cold_chain_acknowledged = serializers.BooleanField(default=False)
@@ -78,7 +86,9 @@ class ReturnCreateSerializer(serializers.Serializer):
     product_id = serializers.UUIDField()
     location_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
-    serial_number = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    serial_number = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
     related_movement_id = serializers.UUIDField(required=False, allow_null=True)
 
 
@@ -86,7 +96,7 @@ class AdjustmentCreateSerializer(serializers.Serializer):
     product_id = serializers.UUIDField()
     location_id = serializers.UUIDField()
     new_quantity = serializers.IntegerField(min_value=0)
-    justification = serializers.CharField()
+    justification = serializers.CharField(allow_blank=True)
 
 
 class CorrectionCreateSerializer(serializers.Serializer):

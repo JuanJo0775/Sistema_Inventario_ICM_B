@@ -3,13 +3,16 @@ from __future__ import annotations
 import pytest
 from django.db import IntegrityError
 
-from apps.inventory.selectors import get_stock_by_product, search_products_duration_seconds
+from apps.inventory.selectors import (get_stock_by_product,
+                                      search_products_duration_seconds)
 from apps.movements.services import register_entry
 from tests.factories import ManoCategoryFactory, ProductFactory
 
 
 @pytest.mark.django_db
-def test_stock_query_returns_per_location_and_total(almacenista_user, sample_product, sample_locations):
+def test_stock_query_returns_per_location_and_total(
+    almacenista_user, sample_product, sample_locations
+):
     loc = sample_locations[0]
     register_entry(
         almacenista_user,
@@ -30,7 +33,9 @@ def test_negative_stock_constraint_enforced(sample_product, sample_locations):
 
     loc = sample_locations[0]
     with pytest.raises(IntegrityError):
-        StockByLocation.objects.create(product=sample_product, location=loc, current_stock=-1)
+        StockByLocation.objects.create(
+            product=sample_product, location=loc, current_stock=-1
+        )
 
 
 @pytest.mark.django_db

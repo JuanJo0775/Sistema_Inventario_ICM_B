@@ -16,8 +16,22 @@ class StockByLocationAdmin(admin.ModelAdmin):
     La mutación del inventario ocurre únicamente vía movimientos (`Movement`), no editando caché.
     """
 
-    list_display = ("product", "location", "current_stock", "last_movement_at", "created_at")
-    readonly_fields = ("id", "product", "location", "current_stock", "last_movement_at", "created_at", "updated_at")
+    list_display = (
+        "product",
+        "location",
+        "current_stock",
+        "last_movement_at",
+        "created_at",
+    )
+    readonly_fields = (
+        "id",
+        "product",
+        "location",
+        "current_stock",
+        "last_movement_at",
+        "created_at",
+        "updated_at",
+    )
 
     def has_add_permission(self, request):  # noqa: ANN001 — firma Django Admin API
         return False

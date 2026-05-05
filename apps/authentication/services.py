@@ -11,11 +11,14 @@ from django.contrib.auth import authenticate
 from django.db import transaction
 from django.utils import timezone
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+from rest_framework_simplejwt.token_blacklist.models import (BlacklistedToken,
+                                                             OutstandingToken)
 
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
-from shared.exceptions import DomainValidationError, OutsideOperatingHoursError, UnauthorizedCredentialManagementError
+from shared.exceptions import (DomainValidationError,
+                               OutsideOperatingHoursError,
+                               UnauthorizedCredentialManagementError)
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
@@ -100,7 +103,9 @@ def authenticate_user(
 
 
 @transaction.atomic
-def create_user(almacenista_user: User, data: dict[str, Any], *, request: HttpRequest | None = None) -> User:
+def create_user(
+    almacenista_user: User, data: dict[str, Any], *, request: HttpRequest | None = None
+) -> User:
     """
     RF-002, BR-02 — Crea usuario; solo almacenista.
     """
@@ -133,7 +138,12 @@ def create_user(almacenista_user: User, data: dict[str, Any], *, request: HttpRe
 
 
 @transaction.atomic
-def disable_user(almacenista_user: User, target_user_id: UUID | str, *, request: HttpRequest | None = None) -> User:
+def disable_user(
+    almacenista_user: User,
+    target_user_id: UUID | str,
+    *,
+    request: HttpRequest | None = None,
+) -> User:
     """
     RF-002, BR-02 — Deshabilita usuario y revoca tokens JWT en lista negra.
 
@@ -176,7 +186,11 @@ def update_user(
 
     _require_almacenista(executor)
     target = User.objects.select_for_update().get(pk=user_id)
-    if target.pk == executor.pk and "role" in update_data and update_data["role"] != getattr(executor, "role", None):
+    if (
+        target.pk == executor.pk
+        and "role" in update_data
+        and update_data["role"] != getattr(executor, "role", None)
+    ):
         raise UnauthorizedCredentialManagementError("No puede modificar su propio rol.")
 
     allowed = {"email", "first_name", "last_name", "phone", "role", "username"}

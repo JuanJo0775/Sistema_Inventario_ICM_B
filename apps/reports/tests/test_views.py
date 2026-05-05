@@ -1,14 +1,11 @@
-from apps.reports.views import (
-    ExpiringProductsReportView,
-    InventorySummaryReportView,
-    InvoiceHistoryReportView,
-    KpiDashboardReportView,
-    MovementHistoryReportView,
-    MovementReportView,
-    MovementSummaryReportView,
-    SalesSummaryReportView,
-    TopDispatchedProductsReportView,
-)
+from apps.reports.views import (ExpiringProductsReportView,
+                                InventorySummaryReportView,
+                                InvoiceHistoryReportView,
+                                KpiDashboardReportView,
+                                MovementHistoryReportView, MovementReportView,
+                                MovementSummaryReportView,
+                                SalesSummaryReportView,
+                                TopDispatchedProductsReportView)
 
 
 def test_reports_views_are_available():

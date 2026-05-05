@@ -39,7 +39,11 @@ def get_all_products(filters: dict[str, Any] | None = None) -> QuerySet[Product]
     if filters.get("is_active") is not None:
         qs = qs.filter(is_active=bool(filters["is_active"]))
     if search := (filters.get("search") or "").strip():
-        qs = qs.filter(Q(name__icontains=search) | Q(sku__icontains=search) | Q(barcode__icontains=search))
+        qs = qs.filter(
+            Q(name__icontains=search)
+            | Q(sku__icontains=search)
+            | Q(barcode__icontains=search)
+        )
     return qs.order_by("sku")
 
 

@@ -2,16 +2,10 @@
 
 from django.urls import path
 
-from apps.authentication.views import (
-    HealthCheckView,
-    ICMTokenObtainPairView,
-    ICMTokenRefreshView,
-    LogoutView,
-    MeView,
-    UserDetailView,
-    UserDisableView,
-    UserListCreateView,
-)
+from apps.authentication.views import (HealthCheckView, ICMTokenObtainPairView,
+                                       ICMTokenRefreshView, LogoutView, MeView,
+                                       UserDetailView, UserDisableView,
+                                       UserListCreateView)
 
 urlpatterns = [
     path("health/", HealthCheckView.as_view(), name="auth-health"),
@@ -21,5 +15,7 @@ urlpatterns = [
     path("me/", MeView.as_view(), name="auth-me"),
     path("users/", UserListCreateView.as_view(), name="auth-users"),
     path("users/<uuid:pk>/", UserDetailView.as_view(), name="auth-user-detail"),
-    path("users/<uuid:pk>/disable/", UserDisableView.as_view(), name="auth-user-disable"),
+    path(
+        "users/<uuid:pk>/disable/", UserDisableView.as_view(), name="auth-user-disable"
+    ),
 ]

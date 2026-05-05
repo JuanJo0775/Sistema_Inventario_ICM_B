@@ -1,4 +1,5 @@
-from apps.catalog.views import CategoryListCreateView, ProductListCreateView, ResolveIdentifierView
+from apps.catalog.views import (CategoryListCreateView, ProductListCreateView,
+                                ResolveIdentifierView)
 
 
 def test_catalog_views_are_available():
