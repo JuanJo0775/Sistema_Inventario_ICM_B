@@ -2,14 +2,21 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 from uuid import UUID
 
+from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 
 from apps.alerts.models import Alert, AlertType
+from apps.authentication.models import RoleChoices
 from apps.catalog.models import Product
-from apps.inventory.models import StockByLocation
+from apps.inventory.models import Location, StockByLocation
+from shared.exceptions import UnauthorizedDomainActionError
+
+if TYPE_CHECKING:
+    from apps.authentication.models import User
 
 
 def sync_stock_alerts_for_product(product_id: UUID, *, user=None) -> None:
@@ -80,3 +87,59 @@ def sync_expiry_alerts_for_product(product_id: UUID, *, user=None) -> None:
             alert.resolved_at = None
             alert.resolved_by = None
             alert.save(update_fields=["message", "is_resolved", "resolved_at", "resolved_by"])
+
+
+def check_and_create_minimum_stock_alert(product: Product, location: Location) -> Alert | None:
+    """
+    RF-011, BR-11 — Alerta de stock bajo por producto y ubicación (sin duplicados activos).
+
+    Usa `reorder_point` del producto como umbral mínimo.
+    """
+    threshold = int(getattr(product, "reorder_point", 0) or 0)
+    row = StockByLocation.objects.filter(product_id=product.id, location_id=location.id).first()
+    qty = int(row.current_stock) if row else 0
+    if qty > threshold:
+        return None
+    if Alert.objects.filter(
+        product_id=product.id,
+        location_id=location.id,
+        alert_type=AlertType.LOW_STOCK,
+        is_resolved=False,
+    ).exists():
+        return None
+    return Alert.objects.create(
+        product_id=product.id,
+        location_id=location.id,
+        alert_type=AlertType.LOW_STOCK,
+        message=f"Stock en {location.code} ({qty}) en o por debajo del umbral {threshold}.",
+    )
+
+
+def check_and_create_expiration_alerts() -> list[Alert]:
+    """
+    RF-011 — Recorre productos con fecha de vencimiento y genera alertas 30/60 días.
+
+    Returns:
+        Lista vacía reservada para extensiones que retornen instancias creadas.
+    """
+    for pid in Product.objects.filter(expiration_date__isnull=False, is_active=True).values_list("id", flat=True):
+        sync_expiry_alerts_for_product(pid)
+    return []
+
+
+@transaction.atomic
+def resolve_alert(executor: User, alert_id: UUID) -> Alert:
+    """
+    RF-011 — Marca alerta como resuelta (solo almacenista).
+
+    Raises:
+        UnauthorizedDomainActionError: Rol distinto de almacenista.
+    """
+    if getattr(executor, "role", None) != RoleChoices.ALMACENISTA:
+        raise UnauthorizedDomainActionError("Solo el almacenista puede resolver alertas.")
+    alert = Alert.objects.select_for_update().get(pk=alert_id)
+    alert.is_resolved = True
+    alert.resolved_at = timezone.now()
+    alert.resolved_by = executor
+    alert.save(update_fields=["is_resolved", "resolved_at", "resolved_by"])
+    return alert

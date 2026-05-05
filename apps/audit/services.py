@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Any
 
 from django.http import HttpRequest
@@ -11,6 +12,8 @@ from apps.audit.models import AuditEventType, AuditLog
 if TYPE_CHECKING:
     from apps.authentication.models import User
     from apps.movements.models import Movement
+
+logger = logging.getLogger(__name__)
 
 
 def _client_ip(request: HttpRequest | None) -> str | None:
@@ -54,6 +57,45 @@ def log_event(
         metadata=meta,
         ip_address=_client_ip(request),
     )
+
+
+def audit_log_event(
+    event_type: str,
+    user: User | None,
+    movement: Movement | None = None,
+    description: str = "",
+    metadata: dict | None = None,
+    ip_address: str | None = None,
+    *,
+    request: HttpRequest | None = None,
+) -> AuditLog | None:
+    """
+    RF-012 — Alias orientado al contrato PROMPT FASE LÓGICA; no interrumpe el flujo principal si falla.
+
+    Args:
+        event_type: Valor de `AuditEventType`.
+        user: Usuario asociado al evento.
+        movement: Movimiento opcional.
+        description: Texto libre; si vacío se usa el tipo de evento.
+        metadata: Metadatos JSON.
+        ip_address: IP explícita (si no, se toma de `request`).
+        request: Petición HTTP opcional (IP y contexto).
+
+    Returns:
+        `AuditLog` creado o `None` si el guardado falló.
+    """
+    try:
+        return log_event(
+            event_type,
+            description=description or str(event_type),
+            user=user,
+            request=request,
+            movement=movement,
+            detail=metadata or {},
+        )
+    except Exception:
+        logger.exception("audit_log_event: no se pudo persistir el log (event_type=%s)", event_type)
+        return None
 
 
 def log_unauthorized_access_attempt(*, user: User | None, request: HttpRequest | None, detail: dict | None) -> AuditLog:

@@ -4,6 +4,8 @@ import pytest
 
 from apps.audit.models import AuditEventType, AuditLog
 from apps.audit.services import log_event
+from rest_framework.exceptions import AuthenticationFailed
+
 from apps.authentication.services import authenticate_user
 from tests.factories import UserFactory
 
@@ -17,7 +19,8 @@ def test_login_success_logged(almacenista_user):
 
 @pytest.mark.django_db
 def test_login_failure_logged():
-    authenticate_user("no_existe", "bad")
+    with pytest.raises(AuthenticationFailed):
+        authenticate_user("no_existe", "bad")
     assert AuditLog.objects.filter(event_type=AuditEventType.LOGIN_FAILED).exists()
 
 

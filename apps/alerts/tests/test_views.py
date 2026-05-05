@@ -1,5 +1,7 @@
-from apps.alerts.views import AlertListView
+from apps.alerts.views import AlertDetailView, AlertListView, AlertResolveView
 
 
-def test_alerts_view_is_available():
+def test_alerts_views_are_available():
     assert AlertListView is not None
+    assert AlertDetailView is not None
+    assert AlertResolveView is not None

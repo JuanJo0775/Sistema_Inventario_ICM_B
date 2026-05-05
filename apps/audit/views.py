@@ -1,29 +1,50 @@
 from __future__ import annotations
 
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
 from apps.audit.models import AuditLog
+from apps.audit.selectors import get_audit_log
 from apps.audit.serializers import AuditLogSerializer
 from shared.openapi import TAG_AUDIT
 from shared.pagination import ICMPageNumberPagination
-from shared.permissions import IsAlmacenista
+from shared.permissions import IsAlmacenistaOrAdministrador
 
 
 class AuditLogListView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated, IsAlmacenista)
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
     serializer_class = AuditLogSerializer
     pagination_class = ICMPageNumberPagination
 
     def get_queryset(self):
-        qs = AuditLog.objects.select_related("user", "movement").all()
-        event_type = self.request.query_params.get("event_type")
-        if event_type:
-            qs = qs.filter(event_type=event_type)
-        return qs.order_by("-created_at")
+        filters: dict = {}
+        if et := self.request.query_params.get("event_type"):
+            filters["event_type"] = et
+        if uid := self.request.query_params.get("user_id"):
+            filters["user_id"] = uid
+        if s := self.request.query_params.get("start"):
+            filters["start"] = s
+        if e := self.request.query_params.get("end"):
+            filters["end"] = e
+        return get_audit_log(filters, executor_role=getattr(self.request.user, "role", ""))
 
-    @extend_schema(responses={200: AuditLogSerializer(many=True)}, tags=[TAG_AUDIT])
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name="event_type", type=str, location=OpenApiParameter.QUERY, required=False),
+            OpenApiParameter(name="user_id", type=int, location=OpenApiParameter.QUERY, required=False),
+            OpenApiParameter(name="start", type=str, location=OpenApiParameter.QUERY, required=False),
+            OpenApiParameter(name="end", type=str, location=OpenApiParameter.QUERY, required=False),
+        ],
+        responses={200: AuditLogSerializer(many=True)},
+        tags=[TAG_AUDIT],
+    )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
+
+
+class AuditLogDetailView(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
+    serializer_class = AuditLogSerializer
+    queryset = AuditLog.objects.select_related("user", "movement").all()
+    lookup_field = "pk"
