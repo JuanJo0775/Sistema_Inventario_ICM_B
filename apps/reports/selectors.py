@@ -32,11 +32,20 @@ def sales_dispatch_totals(*, start: datetime, end: datetime) -> dict[str, Any]:
     filt = Movement.objects.filter(
         created_at__gte=start,
         created_at__lte=end,
-        movement_type__in=[MovementType.SALIDA_VENTA_MAYOR, MovementType.SALIDA_VENTA_MENOR],
+        movement_type__in=[
+            MovementType.SALIDA_VENTA_MAYOR,
+            MovementType.SALIDA_VENTA_MENOR,
+        ],
     )
     return {
-        "mayor": filt.filter(movement_type=MovementType.SALIDA_VENTA_MAYOR).aggregate(q=Sum("quantity"))["q"] or 0,
-        "menor": filt.filter(movement_type=MovementType.SALIDA_VENTA_MENOR).aggregate(q=Sum("quantity"))["q"] or 0,
+        "mayor": filt.filter(movement_type=MovementType.SALIDA_VENTA_MAYOR).aggregate(
+            q=Sum("quantity")
+        )["q"]
+        or 0,
+        "menor": filt.filter(movement_type=MovementType.SALIDA_VENTA_MENOR).aggregate(
+            q=Sum("quantity")
+        )["q"]
+        or 0,
     }
 
 
@@ -78,11 +87,16 @@ def rotation_by_category(*, start: datetime, end: datetime) -> list[dict[str, An
 
 def discrepancies_summary(*, start: datetime, end: datetime) -> int:
     """RF-010 — Movimientos con nota de discrepancia en recepción."""
-    return Movement.objects.filter(
-        created_at__gte=start,
-        created_at__lte=end,
-        movement_type=MovementType.ENTRADA,
-    ).exclude(discrepancy_note__isnull=True).exclude(discrepancy_note__exact="").count()
+    return (
+        Movement.objects.filter(
+            created_at__gte=start,
+            created_at__lte=end,
+            movement_type=MovementType.ENTRADA,
+        )
+        .exclude(discrepancy_note__isnull=True)
+        .exclude(discrepancy_note__exact="")
+        .count()
+    )
 
 
 def get_inventory_summary() -> dict[str, Any]:
@@ -96,9 +110,18 @@ def get_inventory_summary() -> dict[str, Any]:
     by_category: list[dict[str, Any]] = []
     for cat in Category.objects.all():
         total = (
-            StockByLocation.objects.filter(product__category=cat).aggregate(s=Sum("current_stock"))["s"] or 0
+            StockByLocation.objects.filter(product__category=cat).aggregate(
+                s=Sum("current_stock")
+            )["s"]
+            or 0
         )
-        by_category.append({"category_id": str(cat.id), "category": cat.name, "total_units": int(total)})
+        by_category.append(
+            {
+                "category_id": str(cat.id),
+                "category": cat.name,
+                "total_units": int(total),
+            }
+        )
     zero_stock = (
         Product.objects.filter(is_active=True)
         .annotate(t=Sum("stock_by_location__current_stock"))
@@ -130,13 +153,20 @@ def get_movement_report(
     qs = Movement.objects.filter(created_at__gte=start, created_at__lte=end)
     if mtype := filters.get("type"):
         qs = qs.filter(movement_type=mtype)
-    counts = {row["movement_type"]: row["c"] for row in qs.values("movement_type").annotate(c=Count("id"))}
+    counts = {
+        row["movement_type"]: row["c"]
+        for row in qs.values("movement_type").annotate(c=Count("id"))
+    }
     by_product = list(
         qs.values("product__sku", "product__name")
         .annotate(total_qty=Sum("quantity"))
         .order_by("-total_qty")[:100]
     )
-    by_user = list(qs.values("executed_by__username").annotate(movements=Count("id")).order_by("-movements")[:50])
+    by_user = list(
+        qs.values("executed_by__username")
+        .annotate(movements=Count("id"))
+        .order_by("-movements")[:50]
+    )
     return {
         "counts": counts,
         "by_product": by_product,
@@ -145,7 +175,9 @@ def get_movement_report(
     }
 
 
-def get_top_dispatched_products(limit: int = 10, period_days: int = 30) -> list[dict[str, Any]]:
+def get_top_dispatched_products(
+    limit: int = 10, period_days: int = 30
+) -> list[dict[str, Any]]:
     """RF-010 — Productos más despachados (salidas) en ventana de días."""
     end = timezone.now()
     start = end - timedelta(days=period_days)
@@ -156,7 +188,9 @@ def get_top_dispatched_products(limit: int = 10, period_days: int = 30) -> list[
         MovementType.SALIDA_VENCIMIENTO,
     )
     return list(
-        Movement.objects.filter(created_at__gte=start, created_at__lte=end, movement_type__in=salidas)
+        Movement.objects.filter(
+            created_at__gte=start, created_at__lte=end, movement_type__in=salidas
+        )
         .values("product_id", "product__sku", "product__name")
         .annotate(units=Sum("quantity"))
         .order_by("-units")[:limit]
@@ -184,7 +218,9 @@ def get_invoice_history(
     """
     del include_customer_metadata  # API estable; enlace a auditoría en capa de vista si aplica.
     filters = filters or {}
-    qs = get_dispatches_with_invoices().select_related("product", "executed_by", "origin_location")
+    qs = get_dispatches_with_invoices().select_related(
+        "product", "executed_by", "origin_location"
+    )
     if start := filters.get("start"):
         qs = qs.filter(created_at__gte=start)
     if end := filters.get("end"):
@@ -205,7 +241,7 @@ def get_kpi_dashboard() -> dict[str, Any]:
     """RF-010 — KPIs operativos para panel administrativo."""
     now = timezone.now()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    month_start = (now.replace(day=1, hour=0, minute=0, second=0, microsecond=0))
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     salidas = (
         MovementType.SALIDA_VENTA_MAYOR,
         MovementType.SALIDA_VENTA_MENOR,
