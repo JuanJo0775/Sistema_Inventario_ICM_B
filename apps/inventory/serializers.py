@@ -43,15 +43,30 @@ class StockByLocationSerializer(serializers.ModelSerializer):
 
 
 class PerLocationStockRowSerializer(serializers.Serializer):
-    location_id = serializers.CharField()
+    location_id = serializers.CharField(required=False)
     location_code = serializers.CharField()
+    location_name = serializers.CharField(required=False)
     quantity = serializers.IntegerField()
 
 
 class StockByProductResponseSerializer(serializers.Serializer):
     product_id = serializers.CharField()
+    product_name = serializers.CharField(required=False)
+    sku = serializers.CharField(required=False)
+    by_location = PerLocationStockRowSerializer(many=True, required=False)
     per_location = PerLocationStockRowSerializer(many=True)
     total = serializers.IntegerField()
+
+
+class StockReconstructRequestSerializer(serializers.Serializer):
+    product_id = serializers.UUIDField()
+    location_id = serializers.UUIDField()
+
+
+class StockReconstructResponseSerializer(serializers.Serializer):
+    status = serializers.CharField()
+    reconstructed = serializers.IntegerField()
+    actual = serializers.IntegerField()
 
 
 @extend_schema_serializer(component_name="InventoryPaginatedProductList")
