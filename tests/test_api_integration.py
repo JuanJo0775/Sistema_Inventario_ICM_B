@@ -2,8 +2,14 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+from unittest.mock import patch
+from zoneinfo import ZoneInfo
+
 import pytest
 from django.urls import reverse
+
+_BOGOTA = ZoneInfo("America/Bogota")
 
 
 @pytest.mark.django_db
@@ -62,6 +68,59 @@ def test_auth_login_with_email_returns_jwt(api_client, almacenista_user):
     )
     assert r.status_code == 200
     assert r.data["user"]["id"] == almacenista_user.id
+
+
+@pytest.mark.django_db
+def test_auth_token_refresh_auxiliar_outside_hours_forbidden(api_client, auxiliar_user):
+    """
+    RF-001, BR-03 — Sesión renovada: auxiliar sin acceso fuera de franja.
+
+    Extiende el criterio Gherkin del ERS (`docs/ERS_ICM_Requisitos.md`):
+    Feature «Inicio de sesión…», Scenario 3 (acceso bloqueado fuera de horario).
+    La renovación con `refresh` debe aplicar la misma restricción que el login,
+    para no eludir BR-03 manteniendo una sesión larga (coherente con informe de elicitación, restricción horaria auxiliar).
+    """
+    inner = datetime(2026, 5, 5, 10, 0, 0, tzinfo=_BOGOTA)
+    outer = datetime(2026, 5, 5, 13, 0, 0, tzinfo=_BOGOTA)
+    login_url = reverse("token_obtain_pair")
+    refresh_url = reverse("token_refresh")
+    with patch("django.utils.timezone.now", return_value=inner):
+        r = api_client.post(
+            login_url,
+            {"username": auxiliar_user.username, "password": "testpass123"},
+            format="json",
+        )
+    assert r.status_code == 200, r.data
+    token = r.data["refresh"]
+    with patch("django.utils.timezone.now", return_value=outer):
+        r2 = api_client.post(refresh_url, {"refresh": token}, format="json")
+    assert r2.status_code == 403
+
+
+@pytest.mark.django_db
+def test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window(api_client, almacenista_user):
+    """
+    RF-001 — Contraste con Scenario 3 (solo aplica a auxiliar).
+
+    ERS Scenario 1 (login almacenista) y Scenario 5 (administrador sin restricción horaria «laboral»):
+    roles distintos de auxiliar no quedan bloqueados por BR-03 al renovar token.
+    """
+    inner = datetime(2026, 5, 5, 10, 0, 0, tzinfo=_BOGOTA)
+    outer = datetime(2026, 5, 5, 13, 0, 0, tzinfo=_BOGOTA)
+    login_url = reverse("token_obtain_pair")
+    refresh_url = reverse("token_refresh")
+    with patch("django.utils.timezone.now", return_value=inner):
+        r = api_client.post(
+            login_url,
+            {"username": almacenista_user.username, "password": "testpass123"},
+            format="json",
+        )
+    assert r.status_code == 200
+    token = r.data["refresh"]
+    with patch("django.utils.timezone.now", return_value=outer):
+        r2 = api_client.post(refresh_url, {"refresh": token}, format="json")
+    assert r2.status_code == 200
+    assert "access" in r2.data
 
 
 @pytest.mark.django_db
