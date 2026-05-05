@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Git metadata
+.git/
+
 # Virtual env
 .venv/
 env/
