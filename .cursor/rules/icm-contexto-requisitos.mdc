@@ -16,4 +16,5 @@ Antes de cambiar comportamiento o contratos, alinea con la especificación y la 
 
 - En cambios de lógica de dominio, menciona en docstrings o comentarios de PR los **RF/BR/RNF** impactados cuando aplique.
 - Roles: `almacenista`, `auxiliar_despacho`, `administrador`. Zona horaria negocio auxiliar: **America/Bogota** (07:00–12:00 y 14:00–17:00).
+- En desarrollo se usa la app local de PostgreSQL; no asumir Docker salvo que se mencione explícitamente en la solicitud o en la tarea.
 - No simplificar BR críticas (validación cruzada despacho BR-08, inmutabilidad BR-10, ledger BR-11, Ley 1581 / datos cliente).

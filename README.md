@@ -65,6 +65,25 @@ Esto permite que cada integrante use credenciales distintas (usuario, contraseñ
 
 ### Variables mínimas importantes
 
+## Inicio rápido
+
+Para iniciar el servidor de desarrollo y consultar la documentación localmente, asegúrate de tener el entorno virtual activado y las dependencias instaladas, luego ejecuta:
+
+```bash
+# 1. Aplicar migraciones si es necesario
+python manage.py migrate
+
+# 2. (Opcional) Cargar datos semilla
+python manage.py shell < scripts/seed.py
+
+# 3. Iniciar el servidor
+python manage.py runserver
+```
+
+Una vez que el servidor esté corriendo, puedes acceder a:
+- **Swagger UI:** [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
+- **ReDoc:** [http://localhost:8000/api/redoc/](http://localhost:8000/api/redoc/)
+
 ### API REST (OpenAPI y Swagger)
 
 La documentación completa de la API, sus estándares de codificación, contrato REST, autenticación JWT, reglas de versión y checklist de validación quedó separada en [README_API.md](README_API.md).

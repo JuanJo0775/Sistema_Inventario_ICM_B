@@ -32,6 +32,10 @@ python manage.py shell < scripts/seed.py  # opcional
 # Desarrollo local
 python manage.py runserver 0.0.0.0:8000  # acceso en http://localhost:8000/
 
+# Base de datos en desarrollo
+Usar la instancia o app local de PostgreSQL.
+No usar Docker en desarrollo salvo que el usuario lo pida o la tarea lo mencione explícitamente.
+
 # Tests
 pytest                          # Todos los tests
 pytest apps/movements/tests/    # Tests de un app
@@ -42,7 +46,7 @@ pytest --cov=apps               # Con cobertura
 black apps/ shared/ config/
 isort apps/ shared/ config/
 
-# Docker (producción local)
+# Docker (solo si se solicita o se menciona explícitamente)
 docker-compose up -d web db    # Web + PostgreSQL
 docker-compose exec web python manage.py migrate
 docker-compose logs -f web
