@@ -15,6 +15,7 @@ from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
 from apps.authentication.serializers import (
     ICMTokenObtainPairSerializer,
+    ICMTokenRefreshSerializer,
     LoginRequestSerializer,
     UserCreateSerializer,
     UserSerializer,
@@ -60,17 +61,22 @@ class ICMTokenObtainPairView(TokenObtainPairView):
 
 @extend_schema(
     summary="Renovar access token",
-    description="Envía el `refresh` emitido en el login para obtener un nuevo `access`.",
+    description=(
+        "Envía el `refresh` emitido en el login para obtener un nuevo `access`. "
+        "RF-001, BR-03 — Auxiliar de despacho: renovación rechazada fuera de franja operativa "
+        "(07:00–12:00 y 14:00–17:00, America/Bogota)."
+    ),
     tags=[TAG_AUTH],
     auth=[],
     responses={
         200: OpenApiResponse(description="Nuevo access token generado."),
         400: OpenApiResponse(description="Solicitud inválida (falta el token de refresh)."),
         401: OpenApiResponse(description="El token de refresh es inválido, ha expirado o está en blacklist."),
-    }
+        403: OpenApiResponse(description="Auxiliar fuera de horario operativo (BR-03)."),
+    },
 )
 class ICMTokenRefreshView(TokenRefreshView):
-    pass
+    serializer_class = ICMTokenRefreshSerializer
 
 
 class LogoutView(APIView):

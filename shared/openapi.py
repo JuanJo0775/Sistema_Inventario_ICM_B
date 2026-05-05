@@ -69,7 +69,8 @@ Para probar los endpoints, haga clic en el botón **Authorize**, use el esquema 
 ---
 ### **Documentación Adicional**
 - **Referencia:** `ERS_ICM_Requisitos.md v1.0`
-- **Arquitectura:** Ledger inmutable + Stock derivado.
+- **Arquitectura:** ver [docs/README_ARQUITECTURA.md](docs/README_ARQUITECTURA.md)
+- **Nota:** el stock se maneja como un ledger inmutable con stock derivado.
     """.strip(),
     "VERSION": "1.0.0",
     "CONTACT": {
