@@ -5,11 +5,12 @@ from __future__ import annotations
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.exceptions import PermissionDenied
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.authentication.models import UserRole
-from apps.authentication.services import OutsideOperatingHoursError, authenticate_user
+from apps.authentication.services import OutsideOperatingHoursError, authenticate_user, is_within_operating_hours
 
 User = get_user_model()
 
@@ -104,6 +105,26 @@ class ICMTokenObtainPairSerializer(TokenObtainPairSerializer):
             "access": str(access),
             "user": user_login_profile(user),
         }
+
+
+class ICMTokenRefreshSerializer(TokenRefreshSerializer):
+    """
+    RF-001, BR-03 — Renueva access; los auxiliares solo obtienen token en franja operativa.
+
+    Alineado a criterios Gherkin en `docs/ERS_ICM_Requisitos.md` (Feature inicio de sesión,
+    Scenario 3: acceso bloqueado fuera de horario) y a `docs/ICM_Informe_Elicitacion_v2_plus.docx.md`
+    (BR-03: franjas 07:00–12:00 y 14:00–17:00 para auxiliares). La renovación JWT no debe eludir esa regla.
+    """
+
+    def validate(self, attrs: dict) -> dict:
+        refresh = RefreshToken(attrs["refresh"])
+        user_id = refresh.get("user_id")
+        if user_id is not None:
+            user = User.objects.filter(pk=user_id).only("id", "role", "is_active").first()
+            if user is not None and user.is_active and getattr(user, "role", None) == UserRole.AUXILIAR_DESPACHO:
+                if not is_within_operating_hours():
+                    raise PermissionDenied(detail="Acceso no permitido fuera del horario operativo del auxiliar de despacho.")
+        return super().validate(attrs)
 
 
 class UserSerializer(serializers.ModelSerializer):

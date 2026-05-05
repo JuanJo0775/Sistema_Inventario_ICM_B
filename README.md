@@ -36,7 +36,7 @@ Documentación funcional y arquitectónica disponible en el repositorio:
 - [ERS_ICM_Requisitos.md](docs/ERS_ICM_Requisitos.md): requisitos funcionales, no funcionales y reglas de negocio.
 - [ICM_Informe_Elicitacion_v2_plus.docx.md](docs/ICM_Informe_Elicitacion_v2_plus.docx.md): contexto de levantamiento y análisis del dominio.
 - [AGENTS.md](AGENTS.md): instrucciones y reglas para asistentes de código del proyecto.
-
+- [README_TEST.md](docs/test/README_TEST.md): estrategia de testing, tipos de pruebas, convenciones y ejemplos de escenarios Gherkin automatizados.
 
 ## Stack tecnológico
 
