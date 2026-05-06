@@ -19,10 +19,11 @@ from apps.catalog.serializers import (CategoryCreateSerializer,
                                       ProductSerializer,
                                       ProductUpdateSerializer,
                                       ResolveIdentifierQuerySerializer,
+                                      SubcategoryCreateSerializer,
                                       SubcategorySerializer)
 from apps.catalog.services import (create_category, create_combo,
-                                   create_product, resolve_identifier,
-                                   update_product)
+                                   create_product, create_subcategory,
+                                   resolve_identifier, update_product)
 from shared.openapi import TAG_CATALOG, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenista
@@ -77,12 +78,33 @@ class CategoryListCreateView(generics.ListCreateAPIView):
             **standard_error_responses(),
         },
     ),
+    post=extend_schema(
+        summary="Crear subcategoría",
+        request=SubcategoryCreateSerializer,
+        responses={
+            201: SubcategorySerializer,
+            **standard_error_responses(include_403=True),
+        },
+        tags=[TAG_CATALOG],
+    ),
 )
-class SubcategoryListView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)
+class SubcategoryListCreateView(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrReadOnly)
     queryset = Subcategory.objects.select_related("category").all()
     serializer_class = SubcategorySerializer
     pagination_class = ICMPageNumberPagination
+
+    def create(self, request, *args, **kwargs):
+        ser = SubcategoryCreateSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        subcat = create_subcategory(
+            request.user,
+            category_id=d["category_id"],
+            name=d["name"],
+            request=request,
+        )
+        return Response(SubcategorySerializer(subcat).data, status=status.HTTP_201_CREATED)
 
 
 @extend_schema_view(

@@ -162,3 +162,8 @@ class CategoryCreateSerializer(serializers.Serializer):
     description = serializers.CharField(required=False, allow_blank=True, default="")
     requires_serial_number = serializers.BooleanField(required=False, default=False)
     is_returnable = serializers.BooleanField(required=False, default=False)
+
+
+class SubcategoryCreateSerializer(serializers.Serializer):
+    category_id = serializers.UUIDField()
+    name = serializers.CharField()

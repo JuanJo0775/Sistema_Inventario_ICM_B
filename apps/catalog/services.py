@@ -8,7 +8,7 @@ from django.db import transaction
 
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
-from apps.catalog.models import Category, ComboItem, Product, ProductCombo
+from apps.catalog.models import Category, ComboItem, Product, ProductCombo, Subcategory
 from shared.exceptions import (InvalidSKUFormatError,
                                UnauthorizedCredentialManagementError)
 from shared.utils.validators import validate_can_sku, validate_sku_format
@@ -246,3 +246,38 @@ def resolve_identifier(value: str) -> Product:
     raise Product.DoesNotExist(
         f"No se encontró producto activo para el identificador «{raw}»."
     )
+
+
+@transaction.atomic
+def create_subcategory(
+    user: User,
+    *,
+    category_id: Any,
+    name: str,
+    request: HttpRequest | None = None,
+) -> Subcategory:
+    """RF-003 — Crea subcategoría (solo almacenista)."""
+    from django.utils.text import slugify
+
+    _require_almacenista(user)
+    category = Category.objects.get(pk=category_id)
+    base = slugify(name) or "subcategoria"
+    slug = base
+    n = 0
+    while Subcategory.objects.filter(category=category, slug=slug).exists():
+        n += 1
+        slug = f"{base}-{n}"
+    
+    subcat = Subcategory.objects.create(
+        category=category,
+        name=name.strip(),
+        slug=slug,
+    )
+    log_event(
+        AuditEventType.SUBCATEGORY_CREATED,
+        description=f"Subcategoría creada: {subcat.name} en {category.name}",
+        user=user,
+        request=request,
+        detail={"subcategory_id": str(subcat.id), "category_id": str(category.id)},
+    )
+    return subcat
