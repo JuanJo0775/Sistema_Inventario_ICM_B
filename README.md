@@ -1,20 +1,22 @@
 # Sistema Inventario ICM — Backend
 
+> **🚀 ¿Eres nuevo en el proyecto?** Empieza por aquí: **[Guía de Onboarding](docs/GUIA_ONBOARDING.md)** para levantar el entorno y conocer los comandos principales.
+
 Backend del sistema de gestión de inventario y operaciones de Import Corporal Medical (ICM), construido con Django y Django REST Framework.
 
 Este repositorio contiene la estructura del proyecto (arquitectura, configuración, dependencias y contenedorización), preparada para evolucionar la API de forma consistente y documentada.
 
 ## Contenido
 
-1. [Propósito del proyecto](#proposito-del-proyecto)
-2. [Índice de documentación](#indice-de-documentacion)
-3. [Stack tecnológico](#stack-tecnologico)
-4. [Configuración por variables de entorno](#configuracion-por-variables-de-entorno)
-5. [Inicio rápido](#inicio-rapido)
-6. [API REST (OpenAPI y Swagger)](#api-rest-openapi-y-swagger)
-7. [README de API](README_API.md)
-8. [Trabajo en equipo y buenas prácticas](#trabajo-en-equipo-y-buenas-practicas)
-9. [Estado actual](#estado-actual)
+- [Guía de Onboarding](docs/GUIA_ONBOARDING.md)
+- [Propósito del proyecto](#proposito-del-proyecto)
+- [Índice de documentación](#indice-de-documentacion)
+- [Stack tecnológico](#stack-tecnologico)
+- [Configuración por variables de entorno](#configuracion-por-variables-de-entorno)
+- [Inicio rápido](#inicio-rapido)
+- [API REST (OpenAPI y Swagger)](#api-rest-openapi-y-swagger)
+- [Trabajo en equipo y buenas prácticas](#trabajo-en-equipo-y-buenas-practicas)
+- [Estado actual](#estado-actual)
 
 ## Propósito del proyecto
 
@@ -31,6 +33,7 @@ En esta fase, el objetivo principal es tener una base técnica completa:
 
 Documentación funcional y arquitectónica disponible en el repositorio:
 
+- [GUIA_ONBOARDING.md](docs/GUIA_ONBOARDING.md): comandos rápidos y paso a paso para configurar tu entorno local y levantar el proyecto.
 - [README_API.md](docs/README_API.md): especificación y checklist de la API (OpenAPI, endpoints, tags y estándares).
 - [README_ARQUITECTURA.md](docs/README_ARQUITECTURA.md): arquitectura técnica consolidada (estructura, desacoplamiento, inventario, Docker, testing, SOLID y patrones).
 - [ERS_ICM_Requisitos.md](docs/ERS_ICM_Requisitos.md): requisitos funcionales, no funcionales y reglas de negocio.
@@ -84,9 +87,9 @@ Una vez que el servidor esté corriendo, puedes acceder a:
 - **Swagger UI:** [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
 - **ReDoc:** [http://localhost:8000/api/redoc/](http://localhost:8000/api/redoc/)
 
-### API REST (OpenAPI y Swagger)
+## API REST (OpenAPI y Swagger)
 
-La documentación completa de la API, sus estándares de codificación, contrato REST, autenticación JWT, reglas de versión y checklist de validación quedó separada en [README_API.md](README_API.md).
+La documentación completa de la API, sus estándares de codificación, contrato REST, autenticación JWT, reglas de versión y checklist de validación quedó separada en [README_API.md](docs/README_API.md).
 
 Resumen:
 
@@ -136,12 +139,12 @@ La lista exhaustiva de operaciones, parámetros y esquemas JSON está en **`/api
 - `.env.example` sí se versiona y define el contrato compartido de variables.
 - Si se agrega una nueva variable en settings, también debe agregarse en `.env.example` y documentarse.
 - No guardar secretos reales en el repositorio.
-- Cualquier cambio en la API debe cumplir lo definido en [README_API.md](README_API.md).
+- Cualquier cambio en la API debe cumplir lo definido en [README_API.md](docs/README_API.md).
 
 ## Estado actual
 
 - Estructura modular de apps y carpeta `shared`.
 - Settings por entorno (`base`, `development`, `production`, `test`).
 - Configuración por variables de entorno.
-- API bajo `/api/v1/` con documentación **OpenAPI 3** y **Swagger UI**; el contrato detallado vive en [README_API.md](README_API.md).
+- API bajo `/api/v1/` con documentación **OpenAPI 3** y **Swagger UI**; el contrato detallado vive en [README_API.md](docs/README_API.md).
 - Setup de Docker y dependencias; tests automatizados con pytest.
