@@ -25,7 +25,7 @@ from apps.authentication.serializers import (ICMTokenObtainPairSerializer,
 from apps.authentication.services import (create_user, disable_user,
                                           update_user, update_user_password)
 from shared.openapi import TAG_AUTH, TAG_SYSTEM, standard_error_responses
-from shared.permissions import IsAlmacenista
+from shared.permissions import IsAlmacenista, IsAlmacenistaOrAdministrador
 
 User = get_user_model()
 
@@ -128,7 +128,7 @@ class MeView(APIView):
 
 
 class UserListCreateView(APIView):
-    permission_classes = (IsAuthenticated, IsAlmacenista)
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
         summary="Listar usuarios",
@@ -163,7 +163,7 @@ class UserListCreateView(APIView):
 
 
 class UserDetailView(APIView):
-    permission_classes = (IsAuthenticated, IsAlmacenista)
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
         summary="Detalle de usuario",

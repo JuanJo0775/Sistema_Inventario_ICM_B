@@ -7,10 +7,8 @@ from rest_framework.exceptions import AuthenticationFailed
 
 from apps.audit.models import AuditEventType, AuditLog
 from apps.authentication.models import UserRole
-from apps.authentication.services import (authenticate_user, create_user,
-                                          is_within_operating_hours)
-from shared.exceptions import (OutsideOperatingHoursError,
-                               UnauthorizedCredentialManagementError)
+from apps.authentication.services import (authenticate_user, create_user,is_within_operating_hours)
+from shared.exceptions import (OutsideOperatingHoursError,UnauthorizedCredentialManagementError)
 from tests.factories import AlmacenistaFactory, UserFactory
 
 

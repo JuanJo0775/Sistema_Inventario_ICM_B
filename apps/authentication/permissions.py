@@ -9,3 +9,4 @@ class IsAlmacenista(BasePermission):
 class IsAuxiliarDespacho(BasePermission):
     def has_permission(self, request, view):
         return False
+
