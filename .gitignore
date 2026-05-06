@@ -20,9 +20,8 @@ staticfiles/
 static/
 *.pot
 
-# Docker / env
-.env
-.env.*
+# Docker
+.dockerignore
 
 # Coverage / pytest
 .coverage
@@ -35,6 +34,7 @@ htmlcov/
 # Env
 .env
 .env.*
+!.env.example
 
 # Pytest
 .pytest_cache/
