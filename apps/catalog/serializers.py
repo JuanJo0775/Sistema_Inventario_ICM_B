@@ -132,29 +132,16 @@ class ResolveIdentifierQuerySerializer(serializers.Serializer):
         return attrs
 
 
+class ComboCreateItemSerializer(serializers.Serializer):
+    product_id = serializers.UUIDField(help_text="UUID del producto")
+    quantity = serializers.IntegerField(default=1, min_value=1, help_text="Cantidad del producto en el combo")
+
+
 class ComboCreateSerializer(serializers.Serializer):
     name = serializers.CharField()
     sku = serializers.CharField()
     is_active = serializers.BooleanField(required=False, default=True)
-    items = serializers.ListField(
-        child=serializers.DictField(),
-        allow_empty=False,
-    )
-
-    def validate_items(self, value: list) -> list:
-        out = []
-        for row in value:
-            pid = row.get("product_id")
-            if not pid:
-                raise serializers.ValidationError("Cada ítem requiere product_id.")
-            try:
-                uid = UUID(str(pid))
-            except ValueError as exc:
-                raise serializers.ValidationError(
-                    "product_id debe ser UUID válido."
-                ) from exc
-            out.append({"product_id": uid, "quantity": int(row.get("quantity", 1))})
-        return out
+    items = ComboCreateItemSerializer(many=True, allow_empty=False)
 
 
 class CategoryCreateSerializer(serializers.Serializer):
