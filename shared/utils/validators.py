@@ -8,8 +8,8 @@ import re
 def validate_can_sku(
     sku: str, *, brand: str | None = None, is_own_brand: bool | None = None
 ) -> None:
-    """BR-12: SKU de marca propia Can debe usar prefijo CAN- (DESHABILITADA)."""
-    pass  # Regla deshabilitada a petición. Ahora cualquier marca (incluida Can) puede usar cualquier prefijo.
+    """BR-12: SKU de marca propia Can puede tener cualquier prefijo."""
+    pass
 
 
 def normalize_sku(value: str) -> str:
