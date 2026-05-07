@@ -672,6 +672,7 @@ def ledger_net_quantity_for_location(*, product_id: UUID, location_id: UUID) -> 
             MovementType.SALIDA_VENTA_MENOR,
             MovementType.SALIDA_DANO,
             MovementType.SALIDA_VENCIMIENTO,
+            MovementType.SALIDA_COMBO,
         }:
             if m.origin_location_id == location_id:
                 total -= m.quantity
@@ -691,3 +692,93 @@ def ledger_net_quantity_for_location(*, product_id: UUID, location_id: UUID) -> 
         ):
             total += m.quantity
     return total
+
+
+@transaction.atomic
+def dispatch_combo(
+    user,
+    combo_id: UUID,
+    location_id: UUID,
+    *,
+    request=None,
+) -> list[Movement]:
+    """
+    RF-003, BR-11 — Despacha un combo (Opción B: plantilla virtual).
+
+    Lee la receta del combo y por cada ítem genera un movimiento SALIDA_COMBO
+    descontando el stock del producto en la ubicación indicada.
+
+    Args:
+        user: Ejecutor (almacenista o auxiliar).
+        combo_id: UUID del combo a despachar.
+        location_id: UUID de la ubicación desde donde se sacan los productos.
+
+    Returns:
+        Lista de Movements creados (uno por ítem del combo).
+
+    Raises:
+        InsufficientStockError: Si no hay stock suficiente de algún ítem.
+        ProductCombo.DoesNotExist: Si el combo no existe o está inactivo.
+    """
+    from apps.catalog.models import ComboItem, ProductCombo
+
+    combo = (
+        ProductCombo.objects.prefetch_related("combo_items__product__category")
+        .get(pk=combo_id, is_active=True)
+    )
+    items = list(combo.combo_items.all())
+    if not items:
+        raise ValueError(f"El combo {combo.sku} no tiene ítems registrados.")
+
+    location = Location.objects.get(pk=location_id)
+    movements_created: list[Movement] = []
+
+    for item in items:
+        product = item.product
+        qty_needed = item.quantity
+
+        stock_row = _lock_stock(product.id, location_id)
+        if stock_row.current_stock < qty_needed:
+            raise InsufficientStockError(
+                f"Stock insuficiente para '{product.sku}' en '{location.name}'. "
+                f"Solicitado: {qty_needed}, Disponible: {stock_row.current_stock}.",
+                detail={
+                    "product_id": str(product.id),
+                    "sku": product.sku,
+                    "location_id": str(location_id),
+                    "available": stock_row.current_stock,
+                    "requested": qty_needed,
+                },
+            )
+
+        before = stock_row.current_stock
+        after = before - qty_needed
+        stock_row.current_stock = after
+        stock_row.last_movement_at = timezone.now()
+        stock_row.save(update_fields=["current_stock", "last_movement_at", "updated_at"])
+
+        movement = Movement.objects.create(
+            movement_type=MovementType.SALIDA_COMBO,
+            product=product,
+            origin_location_id=location_id,
+            quantity=qty_needed,
+            stock_previo_origen=before,
+            stock_resultante_origen=after,
+            justification=f"Salida por combo: {combo.sku} ({combo.name})",
+            executed_by=user,
+        )
+        movements_created.append(movement)
+        check_and_create_alerts(product, location)
+
+    log_event(
+        AuditEventType.MOVEMENT_CREATED,
+        description=f"Despacho de combo: {combo.sku}",
+        user=user,
+        detail={
+            "combo_id": str(combo_id),
+            "combo_sku": combo.sku,
+            "location_id": str(location_id),
+            "movements": [str(m.id) for m in movements_created],
+        },
+    )
+    return movements_created

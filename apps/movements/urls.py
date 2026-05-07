@@ -1,7 +1,8 @@
 from django.urls import path
 
 from apps.movements.views import (AdjustmentCorrectView,
-                                  AdjustmentListCreateView, DispatchDetailView,
+                                  AdjustmentListCreateView, ComboDispatchView,
+                                  DispatchDetailView,
                                   DispatchInvoiceDownloadView,
                                   DispatchListCreateView, EntryDetailView,
                                   EntryListCreateView, MovementCorrectionView,
@@ -9,6 +10,7 @@ from apps.movements.views import (AdjustmentCorrectView,
                                   ReturnListCreateView, TransferListCreateView)
 
 urlpatterns = [
+    path("combo-dispatch/", ComboDispatchView.as_view(), name="movements-combo-dispatch"),
     path("entries/", EntryListCreateView.as_view(), name="movements-entries"),
     path(
         "entries/<uuid:pk>/", EntryDetailView.as_view(), name="movements-entry-detail"

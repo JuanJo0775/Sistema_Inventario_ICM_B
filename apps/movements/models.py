@@ -18,6 +18,7 @@ class MovementType(models.TextChoices):
     TRASLADO = "TRASLADO", "Traslado interno"
     AJUSTE = "AJUSTE", "Ajuste"
     DEVOLUCION = "DEVOLUCION", "Devolución"
+    SALIDA_COMBO = "SALIDA_COMBO", "Salida por combo"
 
 
 class Movement(models.Model):
