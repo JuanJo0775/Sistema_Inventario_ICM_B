@@ -8,7 +8,7 @@ from factory.django import DjangoModelFactory
 
 from apps.authentication.models import UserRole
 from apps.catalog.models import Category, Product
-from apps.inventory.models import Location, LocationChoices
+from apps.inventory.models import Location
 
 User = get_user_model()
 
@@ -81,11 +81,9 @@ class ProductFactory(DjangoModelFactory):
 class LocationFactory(DjangoModelFactory):
     class Meta:
         model = Location
-        django_get_or_create = ("code",)
+        django_get_or_create = ("name",)
 
-    code = factory.Iterator(
-        [LocationChoices.VITRINA, LocationChoices.BODEGA_1, LocationChoices.BODEGA_2]
-    )
-    name = factory.LazyAttribute(lambda o: o.code.replace("_", " ").title())
+    name = factory.Iterator(["Vitrina", "Bodega 1", "Bodega 2"])
+    code = factory.LazyAttribute(lambda o: o.name.lower().replace(" ", "-"))
     description = ""
-    is_retail = factory.LazyAttribute(lambda o: o.code == LocationChoices.VITRINA)
+    is_retail = factory.LazyAttribute(lambda o: "vitrina" in o.name.lower())

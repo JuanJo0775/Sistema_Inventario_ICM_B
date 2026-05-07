@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from apps.movements.models import Movement, MovementType
 from apps.movements.serializers import (AdjustmentCorrectionSerializer,
                                         AdjustmentCreateSerializer,
+                                        ComboDispatchSerializer,
                                         CorrectionCreateSerializer,
                                         DispatchCreateSerializer,
                                         EntryCreateSerializer,
@@ -20,11 +21,11 @@ from apps.movements.serializers import (AdjustmentCorrectionSerializer,
                                         ReturnCreateSerializer,
                                         TransferCreateSerializer)
 from apps.movements.services import (correct_movement_within_window,
-                                     register_adjustment, register_dispatch,
-                                     register_entry,
+                                     dispatch_combo, register_adjustment,
+                                     register_dispatch, register_entry,
                                      register_internal_transfer,
                                      register_return)
-from shared.openapi import standard_error_responses
+from shared.openapi import TAG_MOVEMENTS, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenista, IsAlmacenistaOrAuxiliar
 
@@ -468,6 +469,36 @@ class MovementCorrectionView(APIView):
         ser = CorrectionCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         movements = correct_movement_within_window(request.user, pk, ser.validated_data)
+        return Response(
+            MovementSerializer(movements, many=True).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class ComboDispatchView(APIView):
+    """RF-003, Opción B — Despacha un combo completo descontando stock por ítem."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+
+    @extend_schema(
+        summary="Despachar combo (descuenta stock por ítem)",
+        request=ComboDispatchSerializer,
+        tags=[TAG_MOVEMENTS],
+        responses={
+            201: MovementSerializer(many=True),
+            **standard_error_responses(include_403=True, include_404=True, include_409=True),
+        },
+    )
+    def post(self, request):
+        ser = ComboDispatchSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        movements = dispatch_combo(
+            request.user,
+            d["combo_id"],
+            d["location_id"],
+            request=request,
+        )
         return Response(
             MovementSerializer(movements, many=True).data,
             status=status.HTTP_201_CREATED,

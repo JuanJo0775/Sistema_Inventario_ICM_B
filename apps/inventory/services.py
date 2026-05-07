@@ -6,11 +6,12 @@ from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from django.db import transaction
+from django.utils.text import slugify
 
 from apps.alerts.models import Alert, AlertType
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
-from apps.inventory.models import Location, LocationChoices
+from apps.inventory.models import Location, _is_retail_by_name
 from apps.inventory.selectors import reconstruct_stock_from_ledger
 from shared.exceptions import (DomainValidationError,
                                UnauthorizedDomainActionError)
@@ -88,38 +89,56 @@ def ensure_stock_row_for_tests(
     return row
 
 
+def _generate_unique_code(name: str) -> str:
+    """Genera un slug único para el `code` basado en el nombre de la ubicación."""
+    base = slugify(name) or "ubicacion"
+    code = base
+    n = 0
+    while Location.objects.filter(code=code).exists():
+        n += 1
+        code = f"{base}-{n}"
+    return code
+
+
 @transaction.atomic
 def create_location(
     executor: Any,
     *,
-    code: str,
     name: str,
     description: str = "",
-    is_retail: bool = False,
+    max_capacity: int | None = None,
+    is_retail: bool | None = None,
 ) -> Location:
     """
     RF-004 — Alta de ubicación física (solo almacenista).
 
-    `code` debe ser uno de los códigos ICM (`LocationChoices`).
+    El `code` se genera automáticamente desde el nombre usando slugify.
+    `is_retail` se auto-detecta si el nombre contiene palabras clave como
+    'vitrina', 'mostrador', etc. Puede forzarse manualmente.
+    `max_capacity` es opcional; se recomienda para vitrinas.
     """
     if getattr(executor, "role", None) != "almacenista":
         raise UnauthorizedDomainActionError(
             "Solo el almacenista puede crear ubicaciones."
         )
-    code = (code or "").strip().upper()
-    if code not in LocationChoices.values:
-        raise DomainValidationError(f"Código de ubicación no válido: {code}.")
-    if Location.objects.filter(code=code).exists():
-        raise DomainValidationError(f"Ya existe una ubicación con código {code}.")
-    if is_retail and code != LocationChoices.VITRINA:
-        raise DomainValidationError(
-            "is_retail=True solo aplica a la ubicación VITRINA (BR-11)."
-        )
+    name = (name or "").strip()
+    if not name:
+        raise DomainValidationError("El nombre de la ubicación es obligatorio.")
+    if Location.objects.filter(name__iexact=name).exists():
+        raise DomainValidationError(f"Ya existe una ubicación con el nombre '{name}'.")
+
+    # Auto-detectar is_retail si no se especifica explícitamente
+    detected_retail = _is_retail_by_name(name)
+    final_is_retail = is_retail if is_retail is not None else detected_retail
+
+    code = _generate_unique_code(name)
+
     return Location.objects.create(
         code=code,
-        name=name.strip(),
+        name=name,
         description=description or "",
-        is_retail=is_retail,
+        is_retail=final_is_retail,
+        max_capacity=max_capacity,
         is_active=True,
     )
 
@@ -137,12 +156,9 @@ def update_location(executor: Any, location_id: UUID, data: dict[str, Any]) -> L
     if "description" in data:
         loc.description = str(data.get("description") or "")
     if "is_retail" in data:
-        is_retail = bool(data["is_retail"])
-        if is_retail and loc.code != LocationChoices.VITRINA:
-            raise DomainValidationError(
-                "Solo la vitrina puede marcarse como punto minorista (is_retail)."
-            )
-        loc.is_retail = is_retail
+        loc.is_retail = bool(data["is_retail"])
+    if "max_capacity" in data:
+        loc.max_capacity = data["max_capacity"]
     if "is_active" in data:
         loc.is_active = bool(data["is_active"])
     loc.save()

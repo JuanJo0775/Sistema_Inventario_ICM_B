@@ -8,7 +8,7 @@ from django.db import transaction
 
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
-from apps.catalog.models import Category, ComboItem, Product, ProductCombo
+from apps.catalog.models import Category, ComboItem, Product, ProductCombo, Subcategory
 from shared.exceptions import (InvalidSKUFormatError,
                                UnauthorizedCredentialManagementError)
 from shared.utils.validators import validate_can_sku, validate_sku_format
@@ -148,10 +148,24 @@ def create_combo(
     products = {str(p.id): p for p in Product.objects.filter(id__in=product_ids)}
     if len(products) != len(set(product_ids)):
         raise ValueError("Uno o más product_id no existen.")
-    for pid in product_ids:
-        p = products[str(pid)]
+    from apps.inventory.selectors import consolidated_stock_total
+
+    for row in items:
+        pid = str(row["product_id"])
+        p = products[pid]
+        qty_needed = int(row.get("quantity", 1))
+
         if not p.is_active:
-            raise ValueError(f"Producto {p.sku} no está activo.")
+            from shared.exceptions import DomainValidationError
+            raise DomainValidationError(f"Producto {p.sku} no está activo.")
+
+        current_stock = consolidated_stock_total(p.id)
+        if current_stock <= 0:
+            from shared.exceptions import InsufficientStockError
+            raise InsufficientStockError(f"El producto {p.sku} no tiene stock disponible (Stock: {current_stock}). No se puede incluir en el combo.")
+        if qty_needed > current_stock:
+            from shared.exceptions import InsufficientStockError
+            raise InsufficientStockError(f"No hay suficiente stock para el producto {p.sku}. Solicitado: {qty_needed}, Disponible: {current_stock}.")
     combo = ProductCombo.objects.create(
         name=name,
         sku=sku,
@@ -246,3 +260,38 @@ def resolve_identifier(value: str) -> Product:
     raise Product.DoesNotExist(
         f"No se encontró producto activo para el identificador «{raw}»."
     )
+
+
+@transaction.atomic
+def create_subcategory(
+    user: User,
+    *,
+    category_id: Any,
+    name: str,
+    request: HttpRequest | None = None,
+) -> Subcategory:
+    """RF-003 — Crea subcategoría (solo almacenista)."""
+    from django.utils.text import slugify
+
+    _require_almacenista(user)
+    category = Category.objects.get(pk=category_id)
+    base = slugify(name) or "subcategoria"
+    slug = base
+    n = 0
+    while Subcategory.objects.filter(category=category, slug=slug).exists():
+        n += 1
+        slug = f"{base}-{n}"
+    
+    subcat = Subcategory.objects.create(
+        category=category,
+        name=name.strip(),
+        slug=slug,
+    )
+    log_event(
+        AuditEventType.SUBCATEGORY_CREATED,
+        description=f"Subcategoría creada: {subcat.name} en {category.name}",
+        user=user,
+        request=request,
+        detail={"subcategory_id": str(subcat.id), "category_id": str(category.id)},
+    )
+    return subcat

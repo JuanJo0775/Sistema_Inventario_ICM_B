@@ -28,6 +28,7 @@ class AuditEventType(models.TextChoices):
     PRODUCT_UPDATED = "PRODUCT_UPDATED", "Producto actualizado"
     COMBO_CREATED = "COMBO_CREATED", "Combo de productos creado"
     CATEGORY_CREATED = "CATEGORY_CREATED", "Categoría de catálogo creada"
+    SUBCATEGORY_CREATED = "SUBCATEGORY_CREATED", "Subcategoría de catálogo creada"
     MOVEMENT_CORRECTED = "MOVEMENT_CORRECTED", "Movimiento corregido (BR-06)"
     RETURN_APPROVED = "RETURN_APPROVED", "Devolución aprobada"
     RETURN_REJECTED = "RETURN_REJECTED", "Devolución rechazada"

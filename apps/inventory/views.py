@@ -124,14 +124,16 @@ class LocationListCreateView(APIView):
         tags=[TAG_INVENTORY],
     )
     def post(self, request):
-        ser = LocationSerializer(data=request.data)
+        from apps.inventory.serializers import LocationCreateSerializer
+        ser = LocationCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
+        d = ser.validated_data
         loc = create_location(
             request.user,
-            code=ser.validated_data["code"],
-            name=ser.validated_data["name"],
-            description=ser.validated_data.get("description", ""),
-            is_retail=ser.validated_data.get("is_retail", False),
+            name=d["name"],
+            description=d.get("description", ""),
+            is_retail=d.get("is_retail", None),
+            max_capacity=d.get("max_capacity", None),
         )
         return Response(LocationSerializer(loc).data, status=status.HTTP_201_CREATED)
 
@@ -153,6 +155,20 @@ class LocationDetailView(APIView):
     )
     def get(self, request, pk):
         loc = get_object_or_404(Location, pk=pk)
+        return Response(LocationSerializer(loc).data)
+
+    @extend_schema(
+        request=LocationSerializer,
+        responses={
+            200: LocationSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+        tags=[TAG_INVENTORY],
+    )
+    def put(self, request, pk):
+        ser = LocationSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        loc = update_location(request.user, UUID(str(pk)), ser.validated_data)
         return Response(LocationSerializer(loc).data)
 
     @extend_schema(

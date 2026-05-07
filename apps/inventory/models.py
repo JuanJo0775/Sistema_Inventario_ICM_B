@@ -12,27 +12,36 @@ from django.db.models import Q
 from shared.models import BaseModel
 
 
-class LocationChoices(models.TextChoices):
-    """Códigos de ubicación física ICM."""
+# Palabras clave para detectar automáticamente si una ubicación es de tipo vitrina (minorista)
+_VITRINA_KEYWORDS = {"vitrina", "mostrador", "exhibición", "exhibicion", "display", "tienda", "punto de venta"}
 
-    VITRINA = "VITRINA", "Vitrina"
-    BODEGA_1 = "BODEGA_1", "Bodega 1"
-    BODEGA_2 = "BODEGA_2", "Bodega 2"
+
+def _is_retail_by_name(name: str) -> bool:
+    """Detecta si una ubicación es minorista según palabras clave en el nombre."""
+    normalized = (name or "").lower().strip()
+    return any(kw in normalized for kw in _VITRINA_KEYWORDS)
 
 
 class Location(BaseModel):
     """
     Ubicación física de almacenamiento (RF-004, BR-11).
 
-    `is_retail`: True solo en Vitrina (venta minorista).
+    `code`: identificador corto auto-generado con slugify del nombre (único).
+    `is_retail`: se detecta automáticamente si el nombre contiene palabras clave de vitrina.
+    `max_capacity`: capacidad máxima de productos (útil para vitrinas o espacios limitados).
     """
 
-    code = models.CharField(max_length=50, unique=True, choices=LocationChoices.choices)
+    code = models.SlugField(max_length=100, unique=True)
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     is_retail = models.BooleanField(
         default=False,
-        help_text="BR-11: True solo para Vitrina (punto minorista).",
+        help_text="True si la ubicación es un punto de venta minorista (vitrina, mostrador, etc.).",
+    )
+    max_capacity = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Capacidad máxima de productos. Aplica principalmente a vitrinas.",
     )
     is_active = models.BooleanField(default=True)
 

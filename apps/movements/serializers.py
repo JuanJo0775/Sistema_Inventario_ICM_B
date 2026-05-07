@@ -112,3 +112,12 @@ class AdjustmentCorrectionSerializer(serializers.Serializer):
     origin_id = serializers.UUIDField()
     destination_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
+
+
+class ComboDispatchSerializer(serializers.Serializer):
+    """Despacho de un combo completo desde una ubicación (RF-003, Opción B)."""
+
+    combo_id = serializers.UUIDField(help_text="UUID del combo a despachar.")
+    location_id = serializers.UUIDField(
+        help_text="UUID de la ubicación desde donde se descuentan los productos."
+    )

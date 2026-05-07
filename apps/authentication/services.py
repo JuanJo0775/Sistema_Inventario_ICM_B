@@ -46,7 +46,7 @@ def is_within_operating_hours(*, now: datetime | None = None) -> bool:
 
 
 def _require_almacenista(user: User) -> None:
-    if getattr(user, "role", None) != "almacenista":
+    if getattr(user, "role", None) not in ("almacenista", "administrador"):
         raise UnauthorizedCredentialManagementError()
 
 
