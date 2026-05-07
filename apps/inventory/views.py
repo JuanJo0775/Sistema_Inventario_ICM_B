@@ -165,6 +165,20 @@ class LocationDetailView(APIView):
         },
         tags=[TAG_INVENTORY],
     )
+    def put(self, request, pk):
+        ser = LocationSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        loc = update_location(request.user, UUID(str(pk)), ser.validated_data)
+        return Response(LocationSerializer(loc).data)
+
+    @extend_schema(
+        request=LocationSerializer,
+        responses={
+            200: LocationSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+        tags=[TAG_INVENTORY],
+    )
     def patch(self, request, pk):
         ser = LocationSerializer(data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
