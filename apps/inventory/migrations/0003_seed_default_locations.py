@@ -2,7 +2,7 @@ from django.db import migrations
 
 def create_default_locations(apps, schema_editor):
     Location = apps.get_model('inventory', 'Location')
-    
+
     # Crear Vitrina
     if not Location.objects.filter(code='vitrina').exists():
         Location.objects.create(
@@ -10,10 +10,10 @@ def create_default_locations(apps, schema_editor):
             name='Vitrina',
             description='Punto de venta y exhibición principal.',
             is_retail=True,
-            max_capacity=100, # Valor sugerido por defecto
+            max_capacity=100,  # Valor sugerido por defecto
             is_active=True
         )
-    
+
     # Crear Bodega
     if not Location.objects.filter(code='bodega').exists():
         Location.objects.create(
@@ -21,7 +21,7 @@ def create_default_locations(apps, schema_editor):
             name='Bodega',
             description='Almacén principal de mercancía.',
             is_retail=False,
-            max_capacity=None, # Sin límite de capacidad
+            max_capacity=None,  # Sin límite de capacidad
             is_active=True
         )
 

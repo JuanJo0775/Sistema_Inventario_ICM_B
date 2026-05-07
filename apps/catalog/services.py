@@ -281,7 +281,7 @@ def create_subcategory(
     while Subcategory.objects.filter(category=category, slug=slug).exists():
         n += 1
         slug = f"{base}-{n}"
-    
+
     subcat = Subcategory.objects.create(
         category=category,
         name=name.strip(),
