@@ -124,14 +124,16 @@ class LocationListCreateView(APIView):
         tags=[TAG_INVENTORY],
     )
     def post(self, request):
-        ser = LocationSerializer(data=request.data)
+        from apps.inventory.serializers import LocationCreateSerializer
+        ser = LocationCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
+        d = ser.validated_data
         loc = create_location(
             request.user,
-            code=ser.validated_data["code"],
-            name=ser.validated_data["name"],
-            description=ser.validated_data.get("description", ""),
-            is_retail=ser.validated_data.get("is_retail", False),
+            name=d["name"],
+            description=d.get("description", ""),
+            is_retail=d.get("is_retail", None),
+            max_capacity=d.get("max_capacity", None),
         )
         return Response(LocationSerializer(loc).data, status=status.HTTP_201_CREATED)
 
