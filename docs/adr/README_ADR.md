@@ -1,0 +1,55 @@
+# Indice de Architectural Decision Records (ADRs)
+
+## Resumen
+
+Este directorio contiene las decisiones arquitectonicas del Sistema Inventario ICM. Cada ADR documenta una decision significativa, su contexto, las alternativas consideradas y sus consecuencias.
+
+## Indice
+
+| ID | Titulo | Estado |
+|----|--------|--------|
+| [ADR-001](ADR-001.md) | Adoptar monolito modular por dominio en lugar de microservicios | Aceptado |
+| [ADR-002](ADR-002.md) | Implementar separacion estricta de responsabilidades en capas | Aceptado |
+| [ADR-003](ADR-003.md) | Usar PostgreSQL como base de datos relacional unica del sistema | Aceptado |
+| [ADR-004](ADR-004.md) | Implementar autenticacion con JWT (access + refresh tokens) | Aceptado |
+| [ADR-005](ADR-005.md) | Modelar el inventario como ledger inmutable con stock derivado sincronizado | Aceptado |
+| [ADR-006](ADR-006.md) | Exponer toda la funcionalidad mediante API REST versionada bajo /api/v1/ | Aceptado |
+| [ADR-007](ADR-007.md) | Implementar RBAC con permisos DRF componibles por endpoint | Aceptado |
+| [ADR-008](ADR-008.md) | Contenerizar el sistema completo con Docker Compose | Aceptado |
+| [ADR-009](ADR-009.md) | Separar configuraciones de settings en base/development/production con secretos por env vars | Aceptado |
+| [ADR-010](ADR-010.md) | Generar facturas digitales en PDF con numeracion secuencial atomica en cada despacho | Aceptado |
+| [ADR-011](ADR-011.md) | Estrategia de testing en tres niveles con pytest y factory-boy | Aceptado |
+
+## Resumen de Decisiones Clave
+
+### Core Architectural
+
+- **ADR-001**: Monolito modular con apps Django separadas por dominio.
+- **ADR-002**: Separacion estricta de responsabilidades (models/serializers/views/services/selectors/permissions).
+- **ADR-005**: Modelo dual ledger inmutable + stock derivado sincronizado.
+
+### Data & Infrastructure
+
+- **ADR-003**: PostgreSQL 15 con transacciones ACID y select_for_update.
+- **ADR-008**: Docker Compose para paridad de entornos.
+- **ADR-009**: Settings jerarquicos con gestion de secretos por variables de entorno.
+
+### Security & Access
+
+- **ADR-004**: JWT con access token (60 min) y refresh token (7 dias) con blacklist.
+- **DR-007**: RBAC con permisos DRF componibles + restriccion horaria por endpoint.
+
+### API & Integration
+
+- **ADR-006**: API REST versionada /api/v1/ con OpenAPI/Swagger via drf-spectacular.
+
+### Business Logic
+
+- **ADR-010**: Generacion de facturas PDF con numeracion secuencial atomica.
+- **ADR-011**: Testing en tres niveles (60% unitario, 25% integracion, 15% invariantes).
+
+## Notas sobre decisiones interrelacionadas
+
+- **ADR-005** es el nucleo arquitectonico mas relevante del proyecto. El modelo ledger + stock derivado tiene implicaciones directas en casi todos los demas modulos.
+- **ADR-004** y **ADR-007** estan intimamente acoplados: el JWT lleva el role en el payload, lo que hace que IsWithinOperatingHours no necesite consultar BD, pero introduce el riesgo del desfase de hasta 60 minutos si un rol cambia.
+- **ADR-010** tiene una trampa de concurrencia importante: si se usa MAX(invoice_number) + 1 en lugar de una secuencia atomica de PostgreSQL, habra duplicados bajo carga concurrente.
