@@ -43,6 +43,8 @@ Abre el archivo `.env` recién creado en tu editor. Asegúrate de tener PostgreS
 Con la base de datos PostgreSQL creada localmente y el entorno virtual activado, aplica las migraciones de Django:
 
 ```bash
+python manage.py makemigrations
+
 python manage.py migrate
 ```
 
