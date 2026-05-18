@@ -61,7 +61,7 @@ El producto es la entidad central del sistema. Cada ítem del catálogo de ICM d
 | Nota de cadena de frío | Alerta visual persistente en la interfaz de picking cuando el producto requiere refrigeración. | Condicional |
 | Peso unitario | En gramos o kilogramos. Usado para calcular capacidad de transporte por despacho. | Sí |
 
-Los productos de la marca propia deben incluir el prefijo "CAN-" en su código de SKU para diferenciarlos de cualquier importación de terceros. El sistema debe soportar además la agrupación de múltiples SKUs bajo un identificador de "Combo" o Kit, permitiendo el despacho simultáneo de paquetes de terapia como una sola unidad de salida.
+Los productos de la marca propia no requieren un prefijo específico en su SKU. El SKU lo define el usuario y el sistema exige que cumpla el patrón de formato: 1–4 letras, un guion y 1–4 dígitos (por ejemplo PRD-0001). El sistema debe soportar además la agrupación de múltiples SKUs bajo un identificador de "Combo" o Kit, permitiendo el despacho simultáneo de paquetes de terapia como una sola unidad de salida.
 
 ## 4.2 Almacén / Ubicación
 
@@ -200,7 +200,7 @@ A continuación se listan todas las reglas de negocio identificadas durante la e
 * BR-09 (Nota de discrepancia en recepción): Si la cantidad recibida difiere de la facturada, el operario debe registrar una nota de discrepancia antes de confirmar la entrada.
 * BR-10 (Inmutabilidad del log): Los registros históricos de movimientos, ajustes, devoluciones y auditorías no pueden ser eliminados ni modificados por ningún usuario.
 * BR-11 (Stock por ubicación): El stock total es la sumatoria dinámica de las cantidades en Vitrina, Bodega 1 y Bodega 2. Los traslados internos no modifican el stock total global.
-* BR-12 (Prefijo de marca propia): Los productos de la marca "Can" deben llevar el prefijo "CAN-" en su código SKU.
+* BR-12 (SKU definido por usuario): El SKU debe ser asignado por el usuario y seguir el patrón 1–4 letras, un guion y 1–4 dígitos. No es obligatorio un prefijo especial para la marca propia.
 * BR-13 (Código de barras como alias de escaneo y factura digital): Cada producto del catálogo puede tener registrado un código de barras físico como atributo adicional en su ficha (junto al SKU, código serial y demás identificadores). Este código actúa como alias de escaneo: cuando un lector HID lo captura, el sistema lo resuelve internamente al SKU correspondiente y autocompleta el formulario. El operario también puede ingresarlo de forma manual, junto con el SKU, el nombre u otros códigos asociados, como vías de entrada equivalentes que no rompen el modelo de datos existente. La ausencia del lector físico no debe bloquear ningún flujo del sistema. Adicionalmente, todo despacho confirmado debe generar automáticamente una factura o remisión digital con numeración secuencial, almacenarla de forma persistente y ponerla a disposición del usuario para su descarga en formato PDF. El historial de facturas debe ser consultable desde el módulo de reportes.
 
 # 8. Hoja de Ruta de Implementación

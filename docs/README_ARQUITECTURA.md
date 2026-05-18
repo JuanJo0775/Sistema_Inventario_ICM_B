@@ -333,25 +333,24 @@ register_entry(product=manoterapia_product, serial_number=None) → Movement cre
 
 ---
 
-#### BR-12: Prefijo de SKU (Marca Can)
+#### BR-12: Formato de SKU definido por el usuario
 
-**Descripción**: Los productos con marca propia "Can" deben llevar un prefijo obligatorio `CAN-` en su SKU para identificación uniforme y control de inventario.
+**Descripción**: El SKU lo define el usuario y debe seguir el patrón 1–4 letras, un guion y 1–4 dígitos (por ejemplo `PRD-0001`, `A-1` o `ELEC-123`). No se exige un prefijo obligatorio para la marca propia.
 
 **Implementación**:
-- Validador en `catalog.models.Product.sku` o en `catalog.services.create_product()`.
-- Si `product.brand == 'Can'` y `not product.sku.startswith('CAN-')`: lanza `InvalidSKUFormatError`.
-- El prefijo es verificado en la admisión de productos al catálogo.
+- Validación en `shared.utils.validators.validate_sku_format` y aplicable desde `catalog.models.Product` y `catalog.services.create_product()`.
+- Si el SKU no cumple el patrón definido: lanza `InvalidSKUFormatError` o `ValueError` según el contexto.
 
 **Verificación en tests**:
 ```python
-# Debe fallar: producto Can sin prefijo
+# Debe fallar: SKU con formato inválido (sin guion)
 create_product(sku="ELECTRO001", brand="Can") → InvalidSKUFormatError
 
-# Debe pasar: producto Can con prefijo
-create_product(sku="CAN-ELECTRO001", brand="Can") → Product created
+# Debe pasar: SKU con formato válido
+create_product(sku="ELEC-0001", brand="Can") → Product created
 
-# Debe pasar: producto de otra marca sin necesidad de prefijo
-create_product(sku="ELECTRO001", brand="OtraMarca") → Product created
+# Debe pasar: producto de otra marca con formato válido
+create_product(sku="OTR-1", brand="OtraMarca") → Product created
 ```
 
 **Referencia**: RF-003
@@ -468,17 +467,17 @@ Si **no coinciden**, el despacho es **rechazado** con excepción `CrossValidatio
 **Verificación en tests**:
 ```python
 # Escenario: auxiliar intenta despachar producto erróneo
-order_sku = "CAN-ELECTRO001"  # esperado
-scanned_code = "CAN-ELECTRO002"  # escaneado (producto similar)
+order_sku = "ELEC-0001"  # esperado
+scanned_code = "ELEC-0002"  # escaneado (producto similar)
 
 register_dispatch(user=auxiliar, product_id=..., location_id=1, quantity=10,
                   movement_type='SALIDA_VENTA_MAYOR', scanned_code=scanned_code, 
                   order_sku=order_sku)
-→ CrossValidationFailedError: Producto escaneado (CAN-ELECTRO002) no coincide con SKU de orden (CAN-ELECTRO001)
+→ CrossValidationFailedError: Producto escaneado (ELEC-0002) no coincide con SKU de orden (ELEC-0001)
 
 # Escenario correcto
-order_sku = "CAN-ELECTRO001"
-scanned_code = "CAN-ELECTRO001"
+order_sku = "ELEC-0001"
+scanned_code = "ELEC-0001"
 
 register_dispatch(user=auxiliar, product_id=..., location_id=1, quantity=10,
                   movement_type='SALIDA_VENTA_MAYOR', scanned_code=scanned_code, 
@@ -677,7 +676,7 @@ assert product.sku in pdf_content
 | BR-09 | Nota Discrepancia Recepción | Movements | `register_entry` exige nota si qty != qty_facturada | Tests: discrepancia sin nota rechazada |
 | BR-10 | Inmutabilidad Ledger | Movements/Audit | SIN PUT/PATCH/DELETE en viewsets + guardas de permisos | Tests: intento PUT rechazado con 405/403 |
 | BR-11 | Stock por Ubicación + Ledger | Inventory | `StockByLocation` + `Movement` atómico + `reconstruct_stock_from_ledger` | Tests: sincronización y reconstrucción correcta |
-| BR-12 | Prefijo CAN | Catalog | Validador en `Product.sku` | Tests: rechazo "ELECTRO001", aceptación "CAN-ELECTRO001" |
+| BR-12 | SKU patrón | Catalog | Validador en `Product.sku` (`validate_sku_format`) | Tests: rechazo "ELECTRO001", aceptación "ELEC-0001" |
 | BR-13 | Factura PDF + Numeración | Movements | `generate_invoice_pdf` + secuencia atómica | Tests: PDF existe, numeración correcta |
 
 ---
@@ -1028,7 +1027,7 @@ def custom_exception_handler(exc, context):
 ```python
 # tests/factories.py
 class ProductFactory(factory.django.DjangoModelFactory):
-    sku = factory.Sequence(lambda n: f"CAN-PROD{n:04d}")
+    sku = factory.Sequence(lambda n: f"PRD-{n%9999+1:04d}")
     category = factory.SubFactory(CategoryFactory)
     
     class Meta:
@@ -1772,7 +1771,7 @@ Acceso: `GET /api/v1/docs/` → Swagger UI.
 - [ ] BR-09: Nota obligatoria si hay discrepancia en recepción.
 - [ ] BR-10: **Movimientos e AuditLog son inmutables** (sin PUT/PATCH/DELETE).
 - [ ] BR-11: Stock derivado sincronizado + reconstruible desde ledger.
-- [ ] BR-12: SKU con prefijo CAN- validado.
+- [ ] BR-12: SKU validado contra el patrón 1–4 letras, guion, 1–4 dígitos.
 - [ ] BR-13: Facturas numeradas secuencialmente + PDF generado.
 
 ### Transacciones y Consistencia

@@ -28,7 +28,7 @@ Antes de cambiar comportamiento o contratos, alinea el trabajo con la documentac
 - Arquitectura: el negocio vive en `services.py`; las lecturas complejas viven en `selectors.py`; `models.py`, `serializers.py` y `views.py` no deben contener reglas de dominio.
 - Inventario: `Movement` es la fuente de verdad; `StockByLocation` es derivado y solo se actualiza en la misma transacción del movimiento; no se permite stock negativo.
 - API: el contrato REST usa `/api/v1/`, JSON, JWT Bearer y errores uniformes con `{ error, message, detail }`; los endpoints nuevos o modificados deben documentarse con `@extend_schema` y usar solo los tags oficiales definidos en `shared/openapi.py`.
-- Negocio crítico: mantener inmutabilidad de movimientos y auditoría, validación cruzada de despacho (`scanned_code` vs `order_sku`), serial obligatorio para Electroterapia, prefijo `CAN-` para la marca Can y la ventana horaria de `auxiliar_despacho` en `America/Bogota`.
+-- Negocio crítico: mantener inmutabilidad de movimientos y auditoría, validación cruzada de despacho (`scanned_code` vs `order_sku`), serial obligatorio para Electroterapia, SKU definido por usuario (patrón 1–4 letras, guion, 1–4 dígitos) y la ventana horaria de `auxiliar_despacho` en `America/Bogota`.
 - Desarrollo: en local se usa PostgreSQL; no asumir Docker salvo que la tarea o el usuario lo pidan de forma explícita.
 - Validación: para cambios de lógica, prioriza tests del dominio afectado y cubre los casos críticos del ERS y la arquitectura antes de ampliar el alcance.
 - Pruebas: usa `docs/test/README_TEST.md` como guía operativa; si cambias escenarios Gherkin o tests no Gherkin, regenera la documentación correspondiente y revisa `docs/test/TRAZABILIDAD_ERS_GHERKIN.md`.
@@ -76,9 +76,9 @@ Crear `.env` en raíz con variables clave (o pasarlas al entorno) se puede utili
 
 **Nota:** `python-decouple` usa defaults en `config/settings/base.py` si no se define la variable. Ver `config("VAR_NAME", default=...)` en el código.
 
-## Dominio breve
+# Dominio breve
 
-- **ICM**: inventario insumos médicos; marca propia **Can** → SKU con prefijo **CAN-** (BR-12).
+-- **ICM**: inventario insumos médicos; SKU definido por el usuario siguiendo el patrón 1–4 letras, un guion y 1–4 dígitos (ej: `AB-1234`) — ya no es obligatorio aplicar un prefijo específico (BR-12).
 - **Ubicaciones**: Vitrina, Bodega 1, Bodega 2; stock total = suma por ubicación; traslados no cambian total global (BR-11).
 - **Roles**: `almacenista` (24/7, credenciales, ajustes), `auxiliar_despacho` (movimientos; solo **07:00–12:00** y **14:00–17:00** en **America/Bogota**), `administrador` (reportes/KPI, sin escritura).
 - **Crítico**: validación cruzada escaneado vs SKU de orden en despacho (BR-08); movimientos/auditoría **inmutables** (BR-10); serial obligatorio Electroterapia en entradas/salidas según catálogo (BR-04); datos personales cliente mayorista y Ley 1581 (RNF-006).
@@ -101,7 +101,7 @@ Disponibles en todo el proyecto:
 almacenista_user(db)           # User con role=ALMACENISTA
 auxiliar_user(db)              # User con role=AUXILIAR_DESPACHO
 administrador_user(db)         # User con role=ADMINISTRADOR
-sample_product(db)             # Product (SKU CAN-00000)
+    sample_product(db)             # Product (SKU PRD-0001)
 sample_locations(db)           # [VITRINA, BODEGA_1, BODEGA_2] pre-creadas
 ```
 
@@ -127,7 +127,7 @@ def test_register_entry(almacenista_user, sample_product):
 
 **Factories especiales:**
 - `ElectroCategoryFactory` → `requires_serial_number=True`, `is_returnable=True`
-- `ProductFactory` → SKU con prefijo `CAN-{n:05d}` automático
+- `ProductFactory` → SKU generado siguiendo el patrón `PRD-0001` (1-4 letras + guion + 1-4 dígitos)
 
 ### Casos críticos a testear
 

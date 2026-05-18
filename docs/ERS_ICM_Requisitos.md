@@ -51,7 +51,7 @@ Las siguientes reglas de negocio fueron identificadas durante las sesiones de el
 * BR-09 (Nota de discrepancia en recepción): Si la cantidad recibida difiere de la facturada, el operario debe registrar una nota de discrepancia antes de confirmar la entrada.
 * BR-10 (Inmutabilidad del log): Los registros históricos de movimientos, ajustes, devoluciones y auditorías no pueden ser eliminados ni modificados por ningún usuario.
 * BR-11 (Stock por ubicación): El stock total es la sumatoria dinámica de las cantidades en Vitrina, Bodega 1 y Bodega 2. Los traslados internos no modifican el stock total global.
-* BR-12 (Prefijo de marca propia): Los productos de la marca "Can" deben llevar el prefijo "CAN-" en su código SKU.
+* BR-12 (SKU definido por usuario): El SKU es asignado por el usuario y debe seguir el patrón 1–4 letras, un guion, y 1–4 dígitos (ej: `AB-1234`). No es obligatorio aplicar un prefijo específico.
 * BR-13 (Código de barras como alias de escaneo y factura digital): Cada producto puede tener registrado un código de barras físico como alias de escaneo. La ausencia del lector físico no debe bloquear ningún flujo del sistema. Todo despacho confirmado genera automáticamente una factura digital con numeración secuencial, almacenada de forma persistente y descargable en PDF.
 
 # **5. Requisitos Funcionales**
@@ -254,13 +254,13 @@ Feature: Gestión de credenciales de usuario
 
 **Descripción**
 
-El sistema debe permitir al Almacenista crear nuevos productos en el catálogo del sistema, registrando todos los atributos necesarios para su gestión logística, de calidad y de trazabilidad. Cada producto queda identificado de forma unívoca por un SKU generado o asignado en el momento de su creación. Los productos de la marca propia "Can" deben llevar obligatoriamente el prefijo "CAN-" en su código SKU. El sistema debe soportar además la agrupación de múltiples SKUs bajo un identificador de Combo o Kit para el despacho simultáneo de paquetes de terapia como una sola unidad de salida.
+  El sistema debe permitir al Almacenista crear nuevos productos en el catálogo del sistema, registrando todos los atributos necesarios para su gestión logística, de calidad y de trazabilidad. Cada producto queda identificado de forma unívoca por un SKU generado o asignado en el momento de su creación. El SKU debe ser definido por el usuario y cumplir el patrón 1–4 letras, un guion y 1–4 dígitos. El sistema debe soportar además la agrupación de múltiples SKUs bajo un identificador de Combo o Kit para el despacho simultáneo de paquetes de terapia como una sola unidad de salida.
 
 **Reglas de Negocio Aplicables**
 
 * BR-04: El campo "Número de Serie" es mandatorio para toda entrada de productos de la categoría Electroterapia, por lo que debe existir como atributo registrable desde la creación del producto.
 * BR-11: El stock se gestiona por ubicación (Vitrina, Bodega 1, Bodega 2). El stock total es la sumatoria dinámica de los tres puntos.
-* BR-12: Los productos de la marca "Can" deben llevar el prefijo "CAN-" en su código SKU.
+* BR-12: El SKU debe ser definido por el usuario y seguir el patrón 1–4 letras, un guion y 1–4 dígitos. No es obligatorio aplicar un prefijo específico.
 * BR-13: Cada producto puede tener registrado un código de barras físico como atributo adicional que actúa como alias de escaneo, sin reemplazar al SKU ni a ningún otro identificador.
 
 **Criterios de Aceptación (Formato Gherkin)**
@@ -293,8 +293,8 @@ Feature: Registro de producto en el catálogo
 - Registra un producto indicando que pertenece a la marca propia "Can"
 
 **Then (Entonces):**
-- El sistema asigna automáticamente el prefijo "CAN-" al código SKU del producto
-- No permite guardar el producto si el prefijo fue removido manualmente
+- El sistema acepta el SKU proporcionado por el usuario siempre que cumpla el patrón 1–4 letras, un guion y 1–4 dígitos
+- No permite guardar el producto si el SKU no cumple el formato requerido
 
 ---
 
@@ -670,7 +670,7 @@ Feature: Despacho y salidas de inventario
 
 **Given (Dado que):**
 - El usuario autenticado tiene rol "Auxiliar de Despacho" o "Almacenista"
-- Existe una orden de despacho para el SKU "CAN-001"
+- Existe una orden de despacho para el SKU "ELEC-0001"
 
 **When (Cuando):**
 - Escanea físicamente un producto cuyo código corresponde a un SKU diferente
