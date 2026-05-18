@@ -639,8 +639,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 - Registra un producto indicando que pertenece a la marca propia "Can"
 
 **Then (Entonces):**
-- El sistema asigna automáticamente el prefijo "CAN-" al código SKU del producto
-- No permite guardar el producto si el prefijo fue removido manualmente
+- El sistema acepta el SKU proporcionado por el usuario siempre que cumpla el patrón 1–4 letras, un guion y 1–4 dígitos
+- No permite guardar el producto si el SKU no cumple el formato requerido
 
 ---
 
@@ -1800,7 +1800,7 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF006** — escena
 
 **Given (Dado que):**
 - El usuario autenticado tiene rol "Auxiliar de Despacho" o "Almacenista"
-- Existe una orden de despacho para el SKU "CAN-001"
+- Existe una orden de despacho para el SKU "ELEC-0001"
 
 **When (Cuando):**
 - Escanea físicamente un producto cuyo código corresponde a un SKU diferente
