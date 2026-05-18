@@ -44,7 +44,7 @@ def test_entry_increments_stock_and_creates_ledger_record(
 @pytest.mark.django_db
 def test_entry_electroterapia_without_serial_fails(almacenista_user, sample_locations):
     cat = ElectroCategoryFactory()
-    p = ProductFactory(category=cat, sku="CAN-ELEC-00001")
+    p = ProductFactory(category=cat, sku="ELEC-0001")
     loc = sample_locations[0]
     with pytest.raises(SerialNumberRequiredError):
         register_entry(

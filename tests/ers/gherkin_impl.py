@@ -164,12 +164,12 @@ def impl_rf003_s01(almacenista_user, db):
     p = create_product(
         almacenista_user,
         {
-            "sku": "CAN-RF003S01-001",
+            "sku": "RFS-0001",
             "name": "Producto RF003 S1",
             "category_id": cat.id,
         },
     )
-    assert p.sku.startswith("CAN-")
+    assert p.sku == "RFS-0001"
 
 
 def impl_rf003_s02(almacenista_user, db):
@@ -179,7 +179,7 @@ def impl_rf003_s02(almacenista_user, db):
     cat = CategoryFactory(name="Cat RF003 S2", slug="cat-rf003-s2")
     p = create_product(
         almacenista_user,
-        {"sku": "CAN-RF003S02-001", "name": "Marca Can", "category_id": cat.id, "brand": "Can"},
+        {"sku": "RFS-0002", "name": "Marca Can", "category_id": cat.id, "brand": "Can"},
     )
     assert p.brand.lower() == "can"
 
@@ -191,11 +191,7 @@ def impl_rf003_s03(almacenista_user, db):
     cat = ElectroCategoryFactory()
     p = create_product(
         almacenista_user,
-        {
-            "sku": "CAN-RF003S03-001",
-            "name": "Electro item",
-            "category_id": cat.id,
-        },
+        {"sku": "RFE-0003", "name": "Electro item", "category_id": cat.id},
     )
     assert p.category.requires_serial_number is True
 
@@ -207,12 +203,7 @@ def impl_rf003_s04(almacenista_user, db):
     cat = CategoryFactory(name="Cat RF003 S4", slug="cat-rf003-s4")
     p = create_product(
         almacenista_user,
-        {
-            "sku": "CAN-RF003S04-001",
-            "name": "Con barcode",
-            "category_id": cat.id,
-            "barcode": "8710999000001",
-        },
+        {"sku": "RFB-0004", "name": "Con barcode", "category_id": cat.id, "barcode": "8710999000001"},
     )
     assert p.barcode == "8710999000001"
 
@@ -224,12 +215,7 @@ def impl_rf003_s05(almacenista_user, db):
     cat = CategoryFactory(name="Cat RF003 S5", slug="cat-rf003-s5")
     p = create_product(
         almacenista_user,
-        {
-            "sku": "CAN-RF003S05-001",
-            "name": "Frío",
-            "category_id": cat.id,
-            "requires_cold_chain": True,
-        },
+        {"sku": "RFF-0005", "name": "Frío", "category_id": cat.id, "requires_cold_chain": True},
     )
     assert p.requires_cold_chain is True
 
@@ -241,17 +227,24 @@ def impl_rf003_s06(almacenista_user, db):
     cat = CategoryFactory(name="Cat RF003 S6", slug="cat-rf003-s6")
     p1 = create_product(
         almacenista_user,
-        {"sku": "CAN-RF003S6A-001", "name": "A", "category_id": cat.id},
+        {"sku": "RFA-0006", "name": "A", "category_id": cat.id},
     )
     p2 = create_product(
         almacenista_user,
-        {"sku": "CAN-RF003S6B-001", "name": "B", "category_id": cat.id},
+        {"sku": "RFB-0007", "name": "B", "category_id": cat.id},
     )
+    # Asegurar stock disponible para incluir en el combo
+    from tests.factories import LocationFactory
+    from apps.inventory.models import StockByLocation
+
+    loc = LocationFactory()
+    StockByLocation.objects.create(product=p1, location=loc, current_stock=1)
+    StockByLocation.objects.create(product=p2, location=loc, current_stock=2)
     combo = create_combo(
         almacenista_user,
         {
             "name": "Kit RF003",
-            "sku": "CAN-KIT-RF003S06",
+            "sku": "KIT-0001",
             "items": [
                 {"product_id": str(p1.id), "quantity": 1},
                 {"product_id": str(p2.id), "quantity": 2},
@@ -264,7 +257,7 @@ def impl_rf003_s06(almacenista_user, db):
 def impl_rf003_s07(api_client: APIClient, almacenista_user):
     api_client.force_authenticate(user=almacenista_user)
     url = reverse("catalog-products")
-    r = api_client.post(url, {"sku": "CAN-X"}, format="json")
+    r = api_client.post(url, {"sku": "X-1"}, format="json")
     assert r.status_code == status.HTTP_400_BAD_REQUEST
 
 
@@ -369,7 +362,7 @@ def impl_rf005_s04(authenticated_almacenista_client: APIClient, sample_locations
     from tests.factories import ElectroCategoryFactory, ProductFactory
 
     cat = ElectroCategoryFactory()
-    p = ProductFactory(category=cat, sku="CAN-RF005S04-001")
+    p = ProductFactory(category=cat, sku="P-0004")
     loc = sample_locations[0]
     url = reverse("movements-entries")
     r = authenticated_almacenista_client.post(
@@ -384,7 +377,7 @@ def impl_rf005_s05(authenticated_almacenista_client: APIClient, sample_locations
     from tests.factories import ElectroCategoryFactory, ProductFactory
 
     cat = ElectroCategoryFactory()
-    p = ProductFactory(category=cat, sku="CAN-RF005S05-001")
+    p = ProductFactory(category=cat, sku="P-0005")
     loc = sample_locations[0]
     url = reverse("movements-entries")
     r = authenticated_almacenista_client.post(
@@ -600,7 +593,7 @@ def impl_rf008_s01(authenticated_almacenista_client: APIClient, sample_locations
     from tests.factories import ElectroCategoryFactory, ProductFactory
 
     cat = ElectroCategoryFactory()
-    p = ProductFactory(category=cat, sku="CAN-RF008S01-001")
+    p = ProductFactory(category=cat, sku="P-0001")
     loc = sample_locations[0]
     from apps.inventory.models import StockByLocation
 

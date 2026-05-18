@@ -16,12 +16,20 @@ User = get_user_model()
 class UserFactory(DjangoModelFactory):
     class Meta:
         model = User
+        skip_postgeneration_save = True
 
     username = factory.Sequence(lambda n: f"user_{n}")
     email = factory.LazyAttribute(lambda o: f"{o.username}@example.com")
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
-    password = factory.PostGenerationMethodCall("set_password", "testpass123")
+    # Set password via explicit post_generation hook to control save behavior
+
+    @factory.post_generation
+    def password(obj, create, extracted, **kwargs):
+        pwd = extracted or "testpass123"
+        obj.set_password(pwd)
+        if create:
+            obj.save()
     role = UserRole.AUXILIAR_DESPACHO
     is_active = True
 
@@ -70,7 +78,8 @@ class ProductFactory(DjangoModelFactory):
     class Meta:
         model = Product
 
-    sku = factory.Sequence(lambda n: f"CAN-{n:05d}")
+    # Generar SKUs válidos según el nuevo patrón: 1-4 letras, guion, 1-4 dígitos
+    sku = factory.Sequence(lambda n: f"PRD-{n%9999+1:04d}")
     name = factory.Faker("word")
     category = factory.SubFactory(ManoCategoryFactory)
     barcode = factory.Sequence(lambda n: f"BAR{n:08d}")

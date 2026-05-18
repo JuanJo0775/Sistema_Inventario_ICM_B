@@ -69,7 +69,7 @@ class Product(BaseModel):
     """
     Producto/SKU central del dominio (RF-003, BR-12, BR-13).
 
-    # BR-12: prefijo CAN- para marca propia; validado en catalog/services.py::create_product.
+    # BR-12: SKU definido por usuario; formato validado por shared.utils.validators.validate_sku_format.
     `barcode`: alias de escaneo (BR-13).
     `expiration_date`: base para alertas RF-011 a 30/60 días.
     """
@@ -116,18 +116,16 @@ class Product(BaseModel):
 
     def clean(self) -> None:
         """
-        RF-003, BR-12 — Validación SKU marca Can (prefijo CAN-) y formato seguro.
+        RF-003, BR-12 — Validación de formato de SKU definido por el usuario.
 
-        Criterios alineados a `docs/ERS_ICM_Requisitos.md` (RF-003, BR-12) e informe de elicitación
-        (marca Can, prefijo CAN-). Se ejecuta en Admin y ModelForm; la API sigue validando en
-        `catalog.services`.
+        Criterio: el SKU debe seguir el patrón 1–4 letras, guion, 1–4 dígitos. Se
+        ejecuta en Admin y ModelForm; la API también valida en `catalog.services`.
         """
         sku = normalize_sku(self.sku or "")
         if not sku:
             raise ValidationError({"sku": "El SKU es obligatorio."})
         try:
             validate_sku_format(sku)
-            validate_can_sku(sku, brand=self.brand)
         except ValueError as exc:
             raise ValidationError({"sku": str(exc)}) from exc
 

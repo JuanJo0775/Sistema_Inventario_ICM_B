@@ -109,9 +109,9 @@ class ProductNotReturnableError(ReturnNotAllowedError):
 
 
 class InvalidSKUFormatError(DomainValidationError):
-    """BR-12: SKU inválido para marca Can (prefijo CAN-)."""
+    """BR-12: Formato de SKU inválido según la nueva política (usuario definido)."""
 
-    default_message = "El SKU debe usar el prefijo CAN- para productos de marca Can."
+    default_message = "Formato SKU inválido. Debe ser 1-4 letras, guion, 1-4 dígitos."
     default_code = "INVALID_SKU_FORMAT"
 
 

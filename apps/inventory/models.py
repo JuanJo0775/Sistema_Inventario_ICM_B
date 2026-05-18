@@ -89,7 +89,7 @@ class StockByLocation(BaseModel):
                 fields=("product", "location"), name="uniq_product_location_stock"
             ),
             models.CheckConstraint(
-                check=Q(current_stock__gte=0),
+                condition=Q(current_stock__gte=0),
                 name="stock_non_negative",
             ),
         ]

@@ -11,7 +11,7 @@ from apps.audit.services import log_event
 from apps.catalog.models import Category, ComboItem, Product, ProductCombo, Subcategory
 from shared.exceptions import (InvalidSKUFormatError,
                                UnauthorizedCredentialManagementError)
-from shared.utils.validators import validate_can_sku, validate_sku_format
+from shared.utils.validators import validate_sku_format
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
@@ -29,13 +29,12 @@ def create_product(
     user: User, data: dict[str, Any], *, request: HttpRequest | None = None
 ) -> Product:
     """
-    RF-003, BR-04, BR-12 — Crea producto; validaciones de marca y serial por categoría.
+    RF-003, BR-04, BR-12 — Crea producto; validaciones de formato de SKU y serial por categoría.
     """
     _require_almacenista(user)
     sku = (data.get("sku") or "").strip()
     validate_sku_format(sku)
     brand = (data.get("brand") or "Can").strip() or "Can"
-    validate_can_sku(sku, brand=brand)
     category = Category.objects.get(pk=data["category_id"])
     product = Product.objects.create(
         sku=sku,
@@ -70,7 +69,7 @@ def update_product(
     request: HttpRequest | None = None,
 ) -> Product:
     """
-    RF-003, BR-12 — Actualiza producto; valida SKU CAN- si cambia marca Can.
+    RF-003, BR-12 — Actualiza producto; valida formato de SKU si cambia.
 
     Raises:
         UnauthorizedCredentialManagementError: Si el ejecutor no es almacenista.
@@ -85,9 +84,8 @@ def update_product(
     new_sku = (data.get("sku") or product.sku or "").strip()
     brand = (data.get("brand") or product.brand or "Can").strip() or "Can"
     if new_sku != product.sku or brand != product.brand:
-        validate_sku_format(new_sku)
         try:
-            validate_can_sku(new_sku, brand=brand)
+            validate_sku_format(new_sku)
         except Exception as exc:
             raise InvalidSKUFormatError(str(exc)) from exc
     for field in (
@@ -139,7 +137,6 @@ def create_combo(
     _require_almacenista(user)
     sku = (data.get("sku") or "").strip()
     validate_sku_format(sku)
-    validate_can_sku(sku, brand="Can")
     name = (data.get("name") or "").strip()
     items = data.get("items") or []
     if not name or not items:
