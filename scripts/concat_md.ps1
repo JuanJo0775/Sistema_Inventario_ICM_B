@@ -17,9 +17,9 @@
     - Sobrescribe los archivos de salida si ya existen.
 #>
 
-# --- Escenarios (docs/test/scenarios -> tests/all_scenarios.md)
+# --- Escenarios (docs/test/scenarios -> docs/test/all_scenarios.md)
 $scenarios = Get-ChildItem -Path "docs/test/scenarios" -Filter *.md | Sort-Object Name
-$out1 = 'tests/all_scenarios.md'
+$out1 = 'docs/test/all_scenarios.md'
 if (Test-Path $out1) { Remove-Item $out1 }
 foreach ($f in $scenarios) {
   # Marca el origen antes de cada bloque para trazabilidad

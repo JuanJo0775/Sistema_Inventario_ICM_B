@@ -1,6 +1,5 @@
-
-
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__alerts__tests__test_models.py__test_alert_type_low_stock.md -->
+<!-- UNIT-0001.md -->
+**Código:** UNIT-0001
 
 # test_alert_type_low_stock
 
@@ -10,7 +9,7 @@
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -33,7 +32,10 @@ pytest apps/alerts/tests/test_models.py::test_alert_type_low_stock -v
 Código: [`apps/alerts/tests/test_models.py`](../../apps/alerts/tests/test_models.py) (aprox. línea 4)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__alerts__tests__test_services.py__test_resolve_alert_almacenista.md -->
+---
+
+<!-- UNIT-0002.md -->
+**Código:** UNIT-0002
 
 # test_resolve_alert_almacenista
 
@@ -43,7 +45,7 @@ Código: [`apps/alerts/tests/test_models.py`](../../apps/alerts/tests/test_model
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -66,7 +68,10 @@ pytest apps/alerts/tests/test_services.py::test_resolve_alert_almacenista -v
 Código: [`apps/alerts/tests/test_services.py`](../../apps/alerts/tests/test_services.py) (aprox. línea 12)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__alerts__tests__test_services.py__test_resolve_alert_rejects_auxiliar.md -->
+---
+
+<!-- UNIT-0003.md -->
+**Código:** UNIT-0003
 
 # test_resolve_alert_rejects_auxiliar
 
@@ -76,7 +81,7 @@ Código: [`apps/alerts/tests/test_services.py`](../../apps/alerts/tests/test_ser
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -99,7 +104,10 @@ pytest apps/alerts/tests/test_services.py::test_resolve_alert_rejects_auxiliar -
 Código: [`apps/alerts/tests/test_services.py`](../../apps/alerts/tests/test_services.py) (aprox. línea 25)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__alerts__tests__test_views.py__test_alerts_views_are_available.md -->
+---
+
+<!-- UNIT-0004.md -->
+**Código:** UNIT-0004
 
 # test_alerts_views_are_available
 
@@ -109,7 +117,7 @@ Código: [`apps/alerts/tests/test_services.py`](../../apps/alerts/tests/test_ser
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -132,7 +140,10 @@ pytest apps/alerts/tests/test_views.py::test_alerts_views_are_available -v
 Código: [`apps/alerts/tests/test_views.py`](../../apps/alerts/tests/test_views.py) (aprox. línea 4)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__audit__tests__test_models.py__test_audit_model_exposes_event_types.md -->
+---
+
+<!-- UNIT-0005.md -->
+**Código:** UNIT-0005
 
 # test_audit_model_exposes_event_types
 
@@ -142,7 +153,7 @@ Código: [`apps/alerts/tests/test_views.py`](../../apps/alerts/tests/test_views.
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -165,7 +176,10 @@ pytest apps/audit/tests/test_models.py::test_audit_model_exposes_event_types -v
 Código: [`apps/audit/tests/test_models.py`](../../apps/audit/tests/test_models.py) (aprox. línea 4)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__audit__tests__test_services.py__test_audit_log_metadata_mutable_in_memory.md -->
+---
+
+<!-- UNIT-0006.md -->
+**Código:** UNIT-0006
 
 # test_audit_log_metadata_mutable_in_memory
 
@@ -175,7 +189,7 @@ Código: [`apps/audit/tests/test_models.py`](../../apps/audit/tests/test_models.
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -195,10 +209,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/audit/tests/test_services.py::test_audit_log_metadata_mutable_in_memory -v
 ```
 
-Código: [`apps/audit/tests/test_services.py`](../../apps/audit/tests/test_services.py) (aprox. línea 44)
+Código: [`apps/audit/tests/test_services.py`](../../apps/audit/tests/test_services.py) (aprox. línea 48)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__audit__tests__test_services.py__test_login_failure_logged.md -->
+---
+
+<!-- UNIT-0007.md -->
+**Código:** UNIT-0007
 
 # test_login_failure_logged
 
@@ -208,7 +225,7 @@ Código: [`apps/audit/tests/test_services.py`](../../apps/audit/tests/test_servi
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -228,10 +245,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/audit/tests/test_services.py::test_login_failure_logged -v
 ```
 
-Código: [`apps/audit/tests/test_services.py`](../../apps/audit/tests/test_services.py) (aprox. línea 21)
+Código: [`apps/audit/tests/test_services.py`](../../apps/audit/tests/test_services.py) (aprox. línea 23)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__audit__tests__test_services.py__test_login_success_logged.md -->
+---
+
+<!-- UNIT-0008.md -->
+**Código:** UNIT-0008
 
 # test_login_success_logged
 
@@ -241,7 +261,7 @@ Código: [`apps/audit/tests/test_services.py`](../../apps/audit/tests/test_servi
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -261,10 +281,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/audit/tests/test_services.py::test_login_success_logged -v
 ```
 
-Código: [`apps/audit/tests/test_services.py`](../../apps/audit/tests/test_services.py) (aprox. línea 14)
+Código: [`apps/audit/tests/test_services.py`](../../apps/audit/tests/test_services.py) (aprox. línea 13)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__audit__tests__test_services.py__test_movement_creation_logged.md -->
+---
+
+<!-- UNIT-0009.md -->
+**Código:** UNIT-0009
 
 # test_movement_creation_logged
 
@@ -274,7 +297,7 @@ Código: [`apps/audit/tests/test_services.py`](../../apps/audit/tests/test_servi
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -294,10 +317,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/audit/tests/test_services.py::test_movement_creation_logged -v
 ```
 
-Código: [`apps/audit/tests/test_services.py`](../../apps/audit/tests/test_services.py) (aprox. línea 28)
+Código: [`apps/audit/tests/test_services.py`](../../apps/audit/tests/test_services.py) (aprox. línea 30)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__audit__tests__test_views.py__test_audit_views_are_available.md -->
+---
+
+<!-- UNIT-0010.md -->
+**Código:** UNIT-0010
 
 # test_audit_views_are_available
 
@@ -307,7 +333,7 @@ Código: [`apps/audit/tests/test_services.py`](../../apps/audit/tests/test_servi
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -330,7 +356,10 @@ pytest apps/audit/tests/test_views.py::test_audit_views_are_available -v
 Código: [`apps/audit/tests/test_views.py`](../../apps/audit/tests/test_views.py) (aprox. línea 4)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__authentication__tests__test_models.py__test_user_model_exposes_role_choices.md -->
+---
+
+<!-- UNIT-0011.md -->
+**Código:** UNIT-0011
 
 # test_user_model_exposes_role_choices
 
@@ -340,7 +369,7 @@ Código: [`apps/audit/tests/test_views.py`](../../apps/audit/tests/test_views.py
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -363,7 +392,10 @@ pytest apps/authentication/tests/test_models.py::test_user_model_exposes_role_ch
 Código: [`apps/authentication/tests/test_models.py`](../../apps/authentication/tests/test_models.py) (aprox. línea 4)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__authentication__tests__test_services.py__test_auxiliar_blocked_outside_hours.md -->
+---
+
+<!-- UNIT-0012.md -->
+**Código:** UNIT-0012
 
 # test_auxiliar_blocked_outside_hours
 
@@ -373,7 +405,7 @@ Código: [`apps/authentication/tests/test_models.py`](../../apps/authentication/
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -393,10 +425,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_services.py::test_auxiliar_blocked_outside_hours -v
 ```
 
-Código: [`apps/authentication/tests/test_services.py`](../../apps/authentication/tests/test_services.py) (aprox. línea 17)
+Código: [`apps/authentication/tests/test_services.py`](../../apps/authentication/tests/test_services.py) (aprox. línea 16)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__authentication__tests__test_services.py__test_disabled_user_cannot_login.md -->
+---
+
+<!-- UNIT-0013.md -->
+**Código:** UNIT-0013
 
 # test_disabled_user_cannot_login
 
@@ -406,7 +441,7 @@ Código: [`apps/authentication/tests/test_services.py`](../../apps/authenticatio
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -426,10 +461,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_services.py::test_disabled_user_cannot_login -v
 ```
 
-Código: [`apps/authentication/tests/test_services.py`](../../apps/authentication/tests/test_services.py) (aprox. línea 38)
+Código: [`apps/authentication/tests/test_services.py`](../../apps/authentication/tests/test_services.py) (aprox. línea 39)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__authentication__tests__test_services.py__test_only_almacenista_creates_users.md -->
+---
+
+<!-- UNIT-0014.md -->
+**Código:** UNIT-0014
 
 # test_only_almacenista_creates_users
 
@@ -439,7 +477,7 @@ Código: [`apps/authentication/tests/test_services.py`](../../apps/authenticatio
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -459,10 +497,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_services.py::test_only_almacenista_creates_users -v
 ```
 
-Código: [`apps/authentication/tests/test_services.py`](../../apps/authentication/tests/test_services.py) (aprox. línea 24)
+Código: [`apps/authentication/tests/test_services.py`](../../apps/authentication/tests/test_services.py) (aprox. línea 25)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__authentication__tests__test_services.py__test_operating_hours_enforced_per_request.md -->
+---
+
+<!-- UNIT-0015.md -->
+**Código:** UNIT-0015
 
 # test_operating_hours_enforced_per_request
 
@@ -472,7 +513,7 @@ Código: [`apps/authentication/tests/test_services.py`](../../apps/authenticatio
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -492,10 +533,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_services.py::test_operating_hours_enforced_per_request -v
 ```
 
-Código: [`apps/authentication/tests/test_services.py`](../../apps/authentication/tests/test_services.py) (aprox. línea 45)
+Código: [`apps/authentication/tests/test_services.py`](../../apps/authentication/tests/test_services.py) (aprox. línea 46)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__authentication__tests__test_views.py__test_auth_views_are_exposed.md -->
+---
+
+<!-- UNIT-0016.md -->
+**Código:** UNIT-0016
 
 # test_auth_views_are_exposed
 
@@ -505,7 +549,7 @@ Código: [`apps/authentication/tests/test_services.py`](../../apps/authenticatio
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -525,10 +569,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_views.py::test_auth_views_are_exposed -v
 ```
 
-Código: [`apps/authentication/tests/test_views.py`](../../apps/authentication/tests/test_views.py) (aprox. línea 4)
+Código: [`apps/authentication/tests/test_views.py`](../../apps/authentication/tests/test_views.py) (aprox. línea 5)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__catalog__tests__test_models.py__test_category_slug_unique.md -->
+---
+
+<!-- UNIT-0017.md -->
+**Código:** UNIT-0017
 
 # test_category_slug_unique
 
@@ -538,7 +585,7 @@ Código: [`apps/authentication/tests/test_views.py`](../../apps/authentication/t
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -561,7 +608,10 @@ pytest apps/catalog/tests/test_models.py::test_category_slug_unique -v
 Código: [`apps/catalog/tests/test_models.py`](../../apps/catalog/tests/test_models.py) (aprox. línea 12)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__catalog__tests__test_models.py__test_product_full_clean_requires_can_prefix_for_can_brand.md -->
+---
+
+<!-- UNIT-0018.md -->
+**Código:** UNIT-0018
 
 # test_product_full_clean_requires_can_prefix_for_can_brand
 
@@ -571,7 +621,7 @@ Código: [`apps/catalog/tests/test_models.py`](../../apps/catalog/tests/test_mod
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -594,7 +644,10 @@ pytest apps/catalog/tests/test_models.py::test_product_full_clean_requires_can_p
 Código: [`apps/catalog/tests/test_models.py`](../../apps/catalog/tests/test_models.py) (aprox. línea 17)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__catalog__tests__test_models.py__test_product_sku_field.md -->
+---
+
+<!-- UNIT-0019.md -->
+**Código:** UNIT-0019
 
 # test_product_sku_field
 
@@ -604,7 +657,7 @@ Código: [`apps/catalog/tests/test_models.py`](../../apps/catalog/tests/test_mod
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -627,7 +680,10 @@ pytest apps/catalog/tests/test_models.py::test_product_sku_field -v
 Código: [`apps/catalog/tests/test_models.py`](../../apps/catalog/tests/test_models.py) (aprox. línea 8)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__catalog__tests__test_services.py__test_catalog_service_exports_identifier_resolver.md -->
+---
+
+<!-- UNIT-0020.md -->
+**Código:** UNIT-0020
 
 # test_catalog_service_exports_identifier_resolver
 
@@ -637,7 +693,7 @@ Código: [`apps/catalog/tests/test_models.py`](../../apps/catalog/tests/test_mod
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -660,7 +716,10 @@ pytest apps/catalog/tests/test_services.py::test_catalog_service_exports_identif
 Código: [`apps/catalog/tests/test_services.py`](../../apps/catalog/tests/test_services.py) (aprox. línea 4)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__catalog__tests__test_views.py__test_catalog_views_are_available.md -->
+---
+
+<!-- UNIT-0021.md -->
+**Código:** UNIT-0021
 
 # test_catalog_views_are_available
 
@@ -670,7 +729,7 @@ Código: [`apps/catalog/tests/test_services.py`](../../apps/catalog/tests/test_s
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -690,10 +749,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_views.py::test_catalog_views_are_available -v
 ```
 
-Código: [`apps/catalog/tests/test_views.py`](../../apps/catalog/tests/test_views.py) (aprox. línea 4)
+Código: [`apps/catalog/tests/test_views.py`](../../apps/catalog/tests/test_views.py) (aprox. línea 5)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__inventory__tests__test_admin.py__test_stock_by_location_admin_is_least_privilege_derived_stock.md -->
+---
+
+<!-- UNIT-0022.md -->
+**Código:** UNIT-0022
 
 # test_stock_by_location_admin_is_least_privilege_derived_stock
 
@@ -703,7 +765,7 @@ Código: [`apps/catalog/tests/test_views.py`](../../apps/catalog/tests/test_view
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -726,7 +788,10 @@ pytest apps/inventory/tests/test_admin.py::test_stock_by_location_admin_is_least
 Código: [`apps/inventory/tests/test_admin.py`](../../apps/inventory/tests/test_admin.py) (aprox. línea 15)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__inventory__tests__test_models.py__test_inventory_models_define_location_and_stock_cache.md -->
+---
+
+<!-- UNIT-0023.md -->
+**Código:** UNIT-0023
 
 # test_inventory_models_define_location_and_stock_cache
 
@@ -736,7 +801,7 @@ Código: [`apps/inventory/tests/test_admin.py`](../../apps/inventory/tests/test_
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -759,7 +824,10 @@ pytest apps/inventory/tests/test_models.py::test_inventory_models_define_locatio
 Código: [`apps/inventory/tests/test_models.py`](../../apps/inventory/tests/test_models.py) (aprox. línea 4)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__inventory__tests__test_selectors.py__test_negative_stock_constraint_enforced.md -->
+---
+
+<!-- UNIT-0024.md -->
+**Código:** UNIT-0024
 
 # test_negative_stock_constraint_enforced
 
@@ -769,7 +837,7 @@ Código: [`apps/inventory/tests/test_models.py`](../../apps/inventory/tests/test
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -789,10 +857,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_selectors.py::test_negative_stock_constraint_enforced -v
 ```
 
-Código: [`apps/inventory/tests/test_selectors.py`](../../apps/inventory/tests/test_selectors.py) (aprox. línea 28)
+Código: [`apps/inventory/tests/test_selectors.py`](../../apps/inventory/tests/test_selectors.py) (aprox. línea 31)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__inventory__tests__test_selectors.py__test_search_products_performance_under_2s.md -->
+---
+
+<!-- UNIT-0025.md -->
+**Código:** UNIT-0025
 
 # test_search_products_performance_under_2s
 
@@ -802,7 +873,7 @@ Código: [`apps/inventory/tests/test_selectors.py`](../../apps/inventory/tests/t
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -822,10 +893,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_selectors.py::test_search_products_performance_under_2s -v
 ```
 
-Código: [`apps/inventory/tests/test_selectors.py`](../../apps/inventory/tests/test_selectors.py) (aprox. línea 37)
+Código: [`apps/inventory/tests/test_selectors.py`](../../apps/inventory/tests/test_selectors.py) (aprox. línea 42)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__inventory__tests__test_selectors.py__test_stock_query_returns_per_location_and_total.md -->
+---
+
+<!-- UNIT-0026.md -->
+**Código:** UNIT-0026
 
 # test_stock_query_returns_per_location_and_total
 
@@ -835,7 +909,7 @@ Código: [`apps/inventory/tests/test_selectors.py`](../../apps/inventory/tests/t
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -855,10 +929,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_selectors.py::test_stock_query_returns_per_location_and_total -v
 ```
 
-Código: [`apps/inventory/tests/test_selectors.py`](../../apps/inventory/tests/test_selectors.py) (aprox. línea 12)
+Código: [`apps/inventory/tests/test_selectors.py`](../../apps/inventory/tests/test_selectors.py) (aprox. línea 13)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__inventory__tests__test_services.py__test_inventory_service_exports_current_stock_reader.md -->
+---
+
+<!-- UNIT-0027.md -->
+**Código:** UNIT-0027
 
 # test_inventory_service_exports_current_stock_reader
 
@@ -868,7 +945,7 @@ Código: [`apps/inventory/tests/test_selectors.py`](../../apps/inventory/tests/t
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -891,7 +968,10 @@ pytest apps/inventory/tests/test_services.py::test_inventory_service_exports_cur
 Código: [`apps/inventory/tests/test_services.py`](../../apps/inventory/tests/test_services.py) (aprox. línea 4)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__inventory__tests__test_views.py__test_inventory_views_are_available.md -->
+---
+
+<!-- UNIT-0028.md -->
+**Código:** UNIT-0028
 
 # test_inventory_views_are_available
 
@@ -901,7 +981,7 @@ Código: [`apps/inventory/tests/test_services.py`](../../apps/inventory/tests/te
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -921,10 +1001,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_views.py::test_inventory_views_are_available -v
 ```
 
-Código: [`apps/inventory/tests/test_views.py`](../../apps/inventory/tests/test_views.py) (aprox. línea 11)
+Código: [`apps/inventory/tests/test_views.py`](../../apps/inventory/tests/test_views.py) (aprox. línea 6)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__movements__tests__test_models.py__test_movement_type_labels.md -->
+---
+
+<!-- UNIT-0029.md -->
+**Código:** UNIT-0029
 
 # test_movement_type_labels
 
@@ -934,7 +1017,7 @@ Código: [`apps/inventory/tests/test_views.py`](../../apps/inventory/tests/test_
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -957,7 +1040,10 @@ pytest apps/movements/tests/test_models.py::test_movement_type_labels -v
 Código: [`apps/movements/tests/test_models.py`](../../apps/movements/tests/test_models.py) (aprox. línea 4)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__movements__tests__test_services.py__test_adjustment_requires_justification.md -->
+---
+
+<!-- UNIT-0030.md -->
+**Código:** UNIT-0030
 
 # test_adjustment_requires_justification
 
@@ -967,7 +1053,7 @@ Código: [`apps/movements/tests/test_models.py`](../../apps/movements/tests/test
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -987,10 +1073,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_adjustment_requires_justification -v
 ```
 
-Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 127)
+Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 140)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__movements__tests__test_services.py__test_correction_within_window_creates_reversal_and_fixed.md -->
+---
+
+<!-- UNIT-0031.md -->
+**Código:** UNIT-0031
 
 # test_correction_within_window_creates_reversal_and_fixed
 
@@ -1000,7 +1089,7 @@ Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/te
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -1020,10 +1109,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_correction_within_window_creates_reversal_and_fixed -v
 ```
 
-Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 151)
+Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 174)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__movements__tests__test_services.py__test_dispatch_cross_validation_fails_wrong_sku.md -->
+---
+
+<!-- UNIT-0032.md -->
+**Código:** UNIT-0032
 
 # test_dispatch_cross_validation_fails_wrong_sku
 
@@ -1033,7 +1125,7 @@ Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/te
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -1053,10 +1145,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_cross_validation_fails_wrong_sku -v
 ```
 
-Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 79)
+Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 78)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__movements__tests__test_services.py__test_entry_discrepancy_note_required_when_qty_mismatch.md -->
+---
+
+<!-- UNIT-0033.md -->
+**Código:** UNIT-0033
 
 # test_entry_discrepancy_note_required_when_qty_mismatch
 
@@ -1066,7 +1161,7 @@ Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/te
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -1086,10 +1181,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_discrepancy_note_required_when_qty_mismatch -v
 ```
 
-Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 64)
+Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 61)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__movements__tests__test_services.py__test_entry_electroterapia_without_serial_fails.md -->
+---
+
+<!-- UNIT-0034.md -->
+**Código:** UNIT-0034
 
 # test_entry_electroterapia_without_serial_fails
 
@@ -1099,7 +1197,7 @@ Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/te
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -1119,10 +1217,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_electroterapia_without_serial_fails -v
 ```
 
-Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 48)
+Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 45)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__movements__tests__test_services.py__test_entry_increments_stock_and_creates_ledger_record.md -->
+---
+
+<!-- UNIT-0035.md -->
+**Código:** UNIT-0035
 
 # test_entry_increments_stock_and_creates_ledger_record
 
@@ -1132,7 +1233,7 @@ Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/te
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -1152,10 +1253,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_increments_stock_and_creates_ledger_record -v
 ```
 
-Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 31)
+Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 26)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__movements__tests__test_services.py__test_internal_transfer_does_not_change_global_stock.md -->
+---
+
+<!-- UNIT-0036.md -->
+**Código:** UNIT-0036
 
 # test_internal_transfer_does_not_change_global_stock
 
@@ -1165,7 +1269,7 @@ Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/te
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -1185,10 +1289,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_internal_transfer_does_not_change_global_stock -v
 ```
 
-Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 97)
+Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 100)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__movements__tests__test_services.py__test_return_blocked_for_non_returnable_category.md -->
+---
+
+<!-- UNIT-0037.md -->
+**Código:** UNIT-0037
 
 # test_return_blocked_for_non_returnable_category
 
@@ -1198,7 +1305,7 @@ Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/te
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -1218,10 +1325,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_return_blocked_for_non_returnable_category -v
 ```
 
-Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 119)
+Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 128)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__movements__tests__test_services.py__test_stock_can_be_reconstructed_from_ledger.md -->
+---
+
+<!-- UNIT-0038.md -->
+**Código:** UNIT-0038
 
 # test_stock_can_be_reconstructed_from_ledger
 
@@ -1231,7 +1341,7 @@ Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/te
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -1251,10 +1361,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_stock_can_be_reconstructed_from_ledger -v
 ```
 
-Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 135)
+Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/test_services.py) (aprox. línea 152)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__movements__tests__test_views.py__test_movement_views_are_available.md -->
+---
+
+<!-- UNIT-0039.md -->
+**Código:** UNIT-0039
 
 # test_movement_views_are_available
 
@@ -1264,7 +1377,7 @@ Código: [`apps/movements/tests/test_services.py`](../../apps/movements/tests/te
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -1284,10 +1397,13 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_views.py::test_movement_views_are_available -v
 ```
 
-Código: [`apps/movements/tests/test_views.py`](../../apps/movements/tests/test_views.py) (aprox. línea 9)
+Código: [`apps/movements/tests/test_views.py`](../../apps/movements/tests/test_views.py) (aprox. línea 6)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__reports__tests__test_models.py__test_reports_app_has_no_domain_models.md -->
+---
+
+<!-- UNIT-0040.md -->
+**Código:** UNIT-0040
 
 # test_reports_app_has_no_domain_models
 
@@ -1297,7 +1413,7 @@ Código: [`apps/movements/tests/test_views.py`](../../apps/movements/tests/test_
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -1320,7 +1436,10 @@ pytest apps/reports/tests/test_models.py::test_reports_app_has_no_domain_models 
 Código: [`apps/reports/tests/test_models.py`](../../apps/reports/tests/test_models.py) (aprox. línea 1)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__reports__tests__test_services.py__test_generate_kpis_returns_dashboard_keys.md -->
+---
+
+<!-- UNIT-0041.md -->
+**Código:** UNIT-0041
 
 # test_generate_kpis_returns_dashboard_keys
 
@@ -1330,7 +1449,7 @@ Código: [`apps/reports/tests/test_models.py`](../../apps/reports/tests/test_mod
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -1353,7 +1472,10 @@ pytest apps/reports/tests/test_services.py::test_generate_kpis_returns_dashboard
 Código: [`apps/reports/tests/test_services.py`](../../apps/reports/tests/test_services.py) (aprox. línea 4)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\unit\apps__reports__tests__test_views.py__test_reports_views_are_available.md -->
+---
+
+<!-- UNIT-0042.md -->
+**Código:** UNIT-0042
 
 # test_reports_views_are_available
 
@@ -1363,7 +1485,7 @@ Código: [`apps/reports/tests/test_services.py`](../../apps/reports/tests/test_s
 
 ## Propósito
 
-Prueba unitaria o de integración del backend ICM (fuera del mapeo 1:1 ERS Gherkin en `tests/ers/test_gherkin_dynamic.py`). Consultar docstring en el código fuente para el detalle del caso.
+Prueba unitaria del backend ICM.
 
 ## Requisito o caso de negocio asociado
 
@@ -1383,4 +1505,8 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_views.py::test_reports_views_are_available -v
 ```
 
-Código: [`apps/reports/tests/test_views.py`](../../apps/reports/tests/test_views.py) (aprox. línea 14)
+Código: [`apps/reports/tests/test_views.py`](../../apps/reports/tests/test_views.py) (aprox. línea 11)
+
+
+---
+

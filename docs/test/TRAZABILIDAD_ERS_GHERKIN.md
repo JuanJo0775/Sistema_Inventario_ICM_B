@@ -28,7 +28,7 @@ Este documento enlaza pruebas automatizadas con **requisitos** y **criterios de 
 
 | Criterio | Cobertura |
 |----------|-----------|
-| SKU marca Can con prefijo `CAN-` (BR-12, informe marca Can) | `apps/catalog/tests/test_models.py::test_product_full_clean_requires_can_prefix_for_can_brand` (`Product.clean()` / Admin) |
+| SKU con patrón 1–4 letras + guion + 1–4 dígitos (BR-12) | `apps/catalog/tests/test_models.py::test_product_full_clean_requires_can_prefix_for_can_brand` (`Product.clean()` / Admin) |
 
 ---
 

@@ -10,14 +10,14 @@ Ejecutar desde la raíz del repo:
 
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
+from typing import List
 
 ROOT = Path(__file__).resolve().parents[1]
 ERS_PATH = ROOT / "docs" / "ERS_ICM_Requisitos.md"
-OUT_JSON = ROOT / "docs" / "test" / "gherkin_scenarios.json"
-OUT_DIR = ROOT / "docs" / "test" / "scenarios"
+# write logic delegated to utils
+from scripts.generate_docs import utils
 
 # IDs con implementación en tests/ers/gherkin_impl.py (sincronizar al añadir escenarios)
 _IMPL_IDS = {
@@ -147,68 +147,11 @@ def parse_ers() -> list[dict]:
     return scenarios
 
 
-def write_markdown(sc: dict) -> None:
-    sid = sc["id"]
-    pytest_node = f"tests/ers/test_gherkin_dynamic.py::test_{sid.replace('-', '_')}"
-    auto = sid in _IMPL_IDS
-    auto_txt = (
-        "Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS)."
-        if auto
-        else "Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación."
-    )
-    md = f"""# {sc["title"]}
-
-## Nombre del test
-
-`{pytest_node}`
-
-## Propósito
-
-Validar el criterio de aceptación Gherkin del ERS ICM para **{sc["rf"]}** — escenario {sc["scenario_number"]}.
-
-## Requisito o caso de negocio asociado
-
-- **Requisito:** `{sc["rf"]}` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
-
-## Inputs (Given / When — extracto ERS)
-
-{sc["given_when_then"][:4000]}{"…" if len(sc["given_when_then"]) > 4000 else ""}
-
-## Resultado esperado (Then)
-
-Ver sección **Then** en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
-
-## Link directo al test
-
-Ejecutar:
-
-```bash
-pytest {pytest_node} -v
-```
-
-Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
-
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
----
-
-## Estado de automatización backend
-
-{auto_txt}
-"""
-    (OUT_DIR / f"{sid}.md").write_text(md, encoding="utf-8")
-
-
 def main() -> None:
-    scenarios = parse_ers()
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    OUT_JSON.write_text(json.dumps(scenarios, ensure_ascii=False, indent=2), encoding="utf-8")
-    for sc in scenarios:
-        write_markdown(sc)
+    scenarios: List[dict] = parse_ers()
+    # delegate writing to shared utils to centralize formatting
+    utils.write_gherkin_docs(scenarios)
     print(f"Escenarios: {len(scenarios)}")
-    print(f"JSON: {OUT_JSON}")
-    print(f"Markdown: {OUT_DIR}/*.md")
 
 
 if __name__ == "__main__":

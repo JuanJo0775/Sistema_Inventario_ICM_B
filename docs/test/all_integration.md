@@ -1,297 +1,360 @@
-
-
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\tests__test_api_integration.py__test_alerts_list_uses_is_resolved_filter.md -->
+<!-- INT-0001.md -->
+**Código:** INT-0001
 
 # test_alerts_list_uses_is_resolved_filter
 
 ## Nombre del test
 
-`tests/test_api_integration.py::test_alerts_list_uses_is_resolved_filter`
+`tests/integration/test_api_integration.py::test_alerts_list_uses_is_resolved_filter`
 
 ## Propósito
 
-Comprobar que el listado de `alerts` devuelve elementos y que el filtro `is_resolved` se aplica correctamente.
+Prueba de integración HTTP (API) — validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
 
 ## Inputs
 
-- Fixtures: `authenticated_almacenista_client`, `sample_product`
-- Crea una `Alert` con `is_resolved=False` antes de la petición.
+Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Código 200 y `len(r.data["results"]) >= 1`.
+Aserciones del test (`assert`); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
 ```bash
-pytest tests/test_api_integration.py::test_alerts_list_uses_is_resolved_filter -v
+pytest tests/integration/test_api_integration.py::test_alerts_list_uses_is_resolved_filter -v
 ```
 
-Código: [tests/test_api_integration.py](tests/test_api_integration.py)
+Código: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. línea 137)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\tests__test_api_integration.py__test_auth_login_with_email_returns_jwt.md -->
+---
+
+<!-- INT-0002.md -->
+**Código:** INT-0002
 
 # test_auth_login_with_email_returns_jwt
 
 ## Nombre del test
 
-`tests/test_api_integration.py::test_auth_login_with_email_returns_jwt`
+`tests/integration/test_api_integration.py::test_auth_login_with_email_returns_jwt`
 
 ## Propósito
 
-Verificar que el login por `email` devuelve tokens JWT y el ID de usuario.
+Prueba de integración HTTP (API) — validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
 
 ## Inputs
 
-- Fixtures: `api_client`, `almacenista_user`
+Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Código 200 y `r.data["user"]["id"] == almacenista_user.id`.
+Aserciones del test (`assert`); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
 ```bash
-pytest tests/test_api_integration.py::test_auth_login_with_email_returns_jwt -v
+pytest tests/integration/test_api_integration.py::test_auth_login_with_email_returns_jwt -v
 ```
 
-Código: [tests/test_api_integration.py](tests/test_api_integration.py)
+Código: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. línea 62)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\tests__test_api_integration.py__test_auth_login_with_username_returns_jwt_and_profile.md -->
+---
+
+<!-- INT-0003.md -->
+**Código:** INT-0003
 
 # test_auth_login_with_username_returns_jwt_and_profile
 
 ## Nombre del test
 
-`tests/test_api_integration.py::test_auth_login_with_username_returns_jwt_and_profile`
+`tests/integration/test_api_integration.py::test_auth_login_with_username_returns_jwt_and_profile`
 
 ## Propósito
 
-Verificar que el login por `username` devuelve `access` y `refresh` y el perfil de usuario en la respuesta.
+Prueba de integración HTTP (API) — validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
 
 ## Inputs
 
-- Fixtures: `api_client`, `almacenista_user`
+Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Código 200, contiene `access`, `refresh` y campos de `user` (username, email, phone, role).
+Aserciones del test (`assert`); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
 ```bash
-pytest tests/test_api_integration.py::test_auth_login_with_username_returns_jwt_and_profile -v
+pytest tests/integration/test_api_integration.py::test_auth_login_with_username_returns_jwt_and_profile -v
 ```
 
-Código: [tests/test_api_integration.py](tests/test_api_integration.py)
+Código: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. línea 46)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\tests__test_api_integration.py__test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window.md -->
+---
+
+<!-- INT-0004.md -->
+**Código:** INT-0004
 
 # test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window
 
 ## Nombre del test
 
-`tests/test_api_integration.py::test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window`
+`tests/integration/test_api_integration.py::test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window`
 
 ## Propósito
 
-RF-001 — Contrastar con el caso auxiliar: un `almacenista` puede renovar token fuera de la ventana auxiliar y obtener `access`.
+Prueba de integración HTTP (API) — validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
 
 ## Inputs
 
-- Fixtures: `api_client`, `almacenista_user`
-- Uso de `patch` para simular tiempos (dentro y fuera de franja Bogotá).
+Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Renovación exitosa (200) y contiene `access` en la respuesta.
+Aserciones del test (`assert`); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
 ```bash
-pytest tests/test_api_integration.py::test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window -v
+pytest tests/integration/test_api_integration.py::test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window -v
 ```
 
-Código: [tests/test_api_integration.py](tests/test_api_integration.py)
+Código: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. línea 101)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\tests__test_api_integration.py__test_auth_token_refresh_auxiliar_outside_hours_forbidden.md -->
+---
+
+<!-- INT-0005.md -->
+**Código:** INT-0005
 
 # test_auth_token_refresh_auxiliar_outside_hours_forbidden
 
 ## Nombre del test
 
-`tests/test_api_integration.py::test_auth_token_refresh_auxiliar_outside_hours_forbidden`
+`tests/integration/test_api_integration.py::test_auth_token_refresh_auxiliar_outside_hours_forbidden`
 
 ## Propósito
 
-RF-001, BR-03 — Asegurar que un `auxiliar` no puede renovar token fuera de la franja horaria permitida; la renovación debe aplicar la misma restricción que el login.
+Prueba de integración HTTP (API) — validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
 
 ## Inputs
 
-- Fixtures: `api_client`, `auxiliar_user`
-- Uso de `patch` para simular tiempos (dentro y fuera de franja Bogotá).
+Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-La renovación con `refresh` devuelve 403 cuando la hora actual está fuera de la franja permitida.
+Aserciones del test (`assert`); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
 ```bash
-pytest tests/test_api_integration.py::test_auth_token_refresh_auxiliar_outside_hours_forbidden -v
+pytest tests/integration/test_api_integration.py::test_auth_token_refresh_auxiliar_outside_hours_forbidden -v
 ```
 
-Código: [tests/test_api_integration.py](tests/test_api_integration.py)
+Código: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. línea 74)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\tests__test_api_integration.py__test_auth_user_disable_route.md -->
+---
+
+<!-- INT-0006.md -->
+**Código:** INT-0006
 
 # test_auth_user_disable_route
 
 ## Nombre del test
 
-`tests/test_api_integration.py::test_auth_user_disable_route`
+`tests/integration/test_api_integration.py::test_auth_user_disable_route`
 
 ## Propósito
 
-Verificar que la ruta `auth-user-disable` permite a un `almacenista` desactivar a otro usuario (`auxiliar`) y que el cambio persiste en la BD.
+Prueba de integración HTTP (API) — validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
 
 ## Inputs
 
-- Fixtures: `api_client`, `almacenista_user`, `auxiliar_user`
+Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Código 204, y `auxiliar_user.is_active` pasa a `False` tras `refresh_from_db()`.
+Aserciones del test (`assert`); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
 ```bash
-pytest tests/test_api_integration.py::test_auth_user_disable_route -v
+pytest tests/integration/test_api_integration.py::test_auth_user_disable_route -v
 ```
 
-Código: [tests/test_api_integration.py](tests/test_api_integration.py)
+Código: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. línea 127)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\tests__test_api_integration.py__test_catalog_resolve_identifier_param.md -->
+---
+
+<!-- INT-0007.md -->
+**Código:** INT-0007
 
 # test_catalog_resolve_identifier_param
 
 ## Nombre del test
 
-`tests/test_api_integration.py::test_catalog_resolve_identifier_param`
+`tests/integration/test_api_integration.py::test_catalog_resolve_identifier_param`
 
 ## Propósito
 
-Comprobar que la consulta `catalog-resolve` acepta el parámetro `identifier` y devuelve el SKU correspondiente.
+Prueba de integración HTTP (API) — validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
 
 ## Inputs
 
-- Fixtures: `authenticated_almacenista_client`, `sample_product`
+Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Código 200 y `r.data["sku"] == sample_product.sku`.
+Aserciones del test (`assert`); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
 ```bash
-pytest tests/test_api_integration.py::test_catalog_resolve_identifier_param -v
+pytest tests/integration/test_api_integration.py::test_catalog_resolve_identifier_param -v
 ```
 
-Código: [tests/test_api_integration.py](tests/test_api_integration.py)
+Código: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. línea 38)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\tests__test_api_integration.py__test_inventory_full_list_authenticated.md -->
+---
+
+<!-- INT-0008.md -->
+**Código:** INT-0008
 
 # test_inventory_full_list_authenticated
 
 ## Nombre del test
 
-`tests/test_api_integration.py::test_inventory_full_list_authenticated`
+`tests/integration/test_api_integration.py::test_inventory_full_list_authenticated`
 
 ## Propósito
 
-Validar que el endpoint `inventory-full` está disponible para un cliente autenticado y devuelve `results`.
+Prueba de integración HTTP (API) — validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
 
 ## Inputs
 
-- Fixtures: `authenticated_almacenista_client`, `sample_product`
+Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Código 200 y la respuesta contiene `results`.
+Aserciones del test (`assert`); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
 ```bash
-pytest tests/test_api_integration.py::test_inventory_full_list_authenticated -v
+pytest tests/integration/test_api_integration.py::test_inventory_full_list_authenticated -v
 ```
 
-Código: [tests/test_api_integration.py](tests/test_api_integration.py)
+Código: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. línea 30)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\tests__test_api_integration.py__test_reports_kpi_almacenista_200.md -->
+---
+
+<!-- INT-0009.md -->
+**Código:** INT-0009
 
 # test_reports_kpi_almacenista_200
 
 ## Nombre del test
 
-`tests/test_api_integration.py::test_reports_kpi_almacenista_200`
+`tests/integration/test_api_integration.py::test_reports_kpi_almacenista_200`
 
 ## Propósito
 
-Comprobar que un usuario con rol `almacenista` obtiene 200 y el payload incluye `movements_today`.
+Prueba de integración HTTP (API) — validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
 
 ## Inputs
 
-- Fixture: `authenticated_almacenista_client`
+Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Código 200 y campo `movements_today` presente en la respuesta.
+Aserciones del test (`assert`); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
 ```bash
-pytest tests/test_api_integration.py::test_reports_kpi_almacenista_200 -v
+pytest tests/integration/test_api_integration.py::test_reports_kpi_almacenista_200 -v
 ```
 
-Código: [tests/test_api_integration.py](tests/test_api_integration.py)
+Código: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. línea 22)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\tests__test_api_integration.py__test_reports_kpi_requires_auth.md -->
+---
 
-"""
-Documento generado: descripción del test de integración
-"""
+<!-- INT-0010.md -->
+**Código:** INT-0010
 
 # test_reports_kpi_requires_auth
 
 ## Nombre del test
 
-`tests/test_api_integration.py::test_reports_kpi_requires_auth`
+`tests/integration/test_api_integration.py::test_reports_kpi_requires_auth`
 
 ## Propósito
 
-Verificar que el endpoint `reports-kpi` requiere autenticación y devuelve 401 cuando no hay credenciales.
+Prueba de integración HTTP (API) — validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
 
 ## Inputs
 
-- Fixture: `api_client`
+Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Respuesta HTTP 401 Unauthorized.
+Aserciones del test (`assert`); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
 ```bash
-pytest tests/test_api_integration.py::test_reports_kpi_requires_auth -v
+pytest tests/integration/test_api_integration.py::test_reports_kpi_requires_auth -v
 ```
 
-Código: [tests/test_api_integration.py](tests/test_api_integration.py)
+Código: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. línea 16)
+
+
+---
+

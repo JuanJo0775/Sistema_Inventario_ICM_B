@@ -125,10 +125,10 @@
     "rf": "RF003",
     "scenario_number": 2,
     "title": "Registro de producto de marca propia \"Can\"",
-    "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Registra un producto indicando que pertenece a la marca propia \"Can\"\n\n**Then (Entonces):**\n- El sistema asigna automáticamente el prefijo \"CAN-\" al código SKU del producto\n- No permite guardar el producto si el prefijo fue removido manualmente\n\n---",
+    "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Registra un producto indicando que pertenece a la marca propia \"Can\"\n\n**Then (Entonces):**\n- El sistema acepta el SKU proporcionado por el usuario siempre que cumpla el patrón 1–4 letras, un guion y 1–4 dígitos\n- No permite guardar el producto si el SKU no cumple el formato requerido\n\n---",
     "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"",
     "when": "**When (Cuando):**\n- Registra un producto indicando que pertenece a la marca propia \"Can\"",
-    "then": "**Then (Entonces):**\n- El sistema asigna automáticamente el prefijo \"CAN-\" al código SKU del producto\n- No permite guardar el producto si el prefijo fue removido manualmente\n\n---",
+    "then": "**Then (Entonces):**\n- El sistema acepta el SKU proporcionado por el usuario siempre que cumpla el patrón 1–4 letras, un guion y 1–4 dígitos\n- No permite guardar el producto si el SKU no cumple el formato requerido\n\n---",
     "source": "docs/ERS_ICM_Requisitos.md"
   },
   {
@@ -356,8 +356,8 @@
     "rf": "RF006",
     "scenario_number": 2,
     "title": "Validación cruzada falla por código escaneado incorrecto",
-    "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- Existe una orden de despacho para el SKU \"CAN-001\"\n\n**When (Cuando):**\n- Escanea físicamente un producto cuyo código corresponde a un SKU diferente\n\n**Then (Entonces):**\n- El sistema bloquea la confirmación del despacho\n- Muestra un mensaje de error descriptivo indicando que el producto escaneado no corresponde al producto de la orden\n- No genera ningún movimiento ni descuento de stock\n- No genera factura hasta que la validación sea superada\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- Existe una orden de despacho para el SKU \"CAN-001\"",
+    "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- Existe una orden de despacho para el SKU \"ELEC-0001\"\n\n**When (Cuando):**\n- Escanea físicamente un producto cuyo código corresponde a un SKU diferente\n\n**Then (Entonces):**\n- El sistema bloquea la confirmación del despacho\n- Muestra un mensaje de error descriptivo indicando que el producto escaneado no corresponde al producto de la orden\n- No genera ningún movimiento ni descuento de stock\n- No genera factura hasta que la validación sea superada\n\n---",
+    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- Existe una orden de despacho para el SKU \"ELEC-0001\"",
     "when": "**When (Cuando):**\n- Escanea físicamente un producto cuyo código corresponde a un SKU diferente",
     "then": "**Then (Entonces):**\n- El sistema bloquea la confirmación del despacho\n- Muestra un mensaje de error descriptivo indicando que el producto escaneado no corresponde al producto de la orden\n- No genera ningún movimiento ni descuento de stock\n- No genera factura hasta que la validación sea superada\n\n---",
     "source": "docs/ERS_ICM_Requisitos.md"

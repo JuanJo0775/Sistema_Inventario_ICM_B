@@ -1,7 +1,4 @@
-
-
-<!-- file: RF001-S01.md -->
-
+<!-- RF001-S01.md -->
 # Inicio de sesión exitoso como Almacenista
 
 ## Nombre del test
@@ -15,7 +12,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF001** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -48,8 +44,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF001_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -57,8 +51,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF001-S02.md -->
+---
 
+<!-- RF001-S02.md -->
 # Inicio de sesión exitoso como Auxiliar de Despacho dentro del horario permitido
 
 ## Nombre del test
@@ -72,7 +67,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF001** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -103,8 +97,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF001_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -112,8 +104,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF001-S03.md -->
+---
 
+<!-- RF001-S03.md -->
 # Intento de inicio de sesión de Auxiliar fuera del horario permitido
 
 ## Nombre del test
@@ -127,7 +120,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF001** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -159,8 +151,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF001_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -168,8 +158,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF001-S04.md -->
+---
 
+<!-- RF001-S04.md -->
 # Intento de inicio de sesión con credenciales incorrectas
 
 ## Nombre del test
@@ -183,7 +174,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF001** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -214,8 +204,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF001_S04 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -223,8 +211,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF001-S05.md -->
+---
 
+<!-- RF001-S05.md -->
 # Inicio de sesión como Administrador fuera del horario laboral
 
 ## Nombre del test
@@ -238,7 +227,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF001** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -267,8 +255,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF001_S05 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -276,8 +262,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF002-S01.md -->
+---
 
+<!-- RF002-S01.md -->
 # Almacenista crea una nueva cuenta de usuario
 
 ## Nombre del test
@@ -291,7 +278,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF002** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -324,8 +310,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF002_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -333,8 +317,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF002-S02.md -->
+---
 
+<!-- RF002-S02.md -->
 # Almacenista modifica la contraseña de un usuario existente
 
 ## Nombre del test
@@ -348,7 +333,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF002** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -380,8 +364,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF002_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -389,8 +371,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF002-S03.md -->
+---
 
+<!-- RF002-S03.md -->
 # Almacenista deshabilita una cuenta activa
 
 ## Nombre del test
@@ -404,7 +387,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF002** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -438,8 +420,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF002_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -447,8 +427,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF002-S04.md -->
+---
 
+<!-- RF002-S04.md -->
 # Auxiliar de Despacho intenta modificar su propio perfil
 
 ## Nombre del test
@@ -462,7 +443,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF002** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -493,8 +473,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF002_S04 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -502,8 +480,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF002-S05.md -->
+---
 
+<!-- RF002-S05.md -->
 # Intento de crear una cuenta con un nombre de usuario ya existente
 
 ## Nombre del test
@@ -517,7 +496,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF002** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -547,8 +525,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF002_S05 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -556,8 +532,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF003-S01.md -->
+---
 
+<!-- RF003-S01.md -->
 # Almacenista registra un producto nuevo con todos los atributos obligatorios
 
 ## Nombre del test
@@ -571,7 +548,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -604,8 +580,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF003_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -613,8 +587,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF003-S02.md -->
+---
 
+<!-- RF003-S02.md -->
 # Registro de producto de marca propia "Can"
 
 ## Nombre del test
@@ -628,7 +603,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -639,8 +613,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 - Registra un producto indicando que pertenece a la marca propia "Can"
 
 **Then (Entonces):**
-- El sistema asigna automáticamente el prefijo "CAN-" al código SKU del producto
-- No permite guardar el producto si el prefijo fue removido manualmente
+- El sistema acepta el SKU proporcionado por el usuario siempre que cumpla el patrón 1–4 letras, un guion y 1–4 dígitos
+- No permite guardar el producto si el SKU no cumple el formato requerido
 
 ---
 
@@ -658,8 +632,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF003_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -667,8 +639,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF003-S03.md -->
+---
 
+<!-- RF003-S03.md -->
 # Registro de producto de categoría Electroterapia
 
 ## Nombre del test
@@ -682,7 +655,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -712,8 +684,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF003_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -721,8 +691,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF003-S04.md -->
+---
 
+<!-- RF003-S04.md -->
 # Registro de producto con código de barras como alias de escaneo
 
 ## Nombre del test
@@ -736,7 +707,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -767,8 +737,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF003_S04 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -776,8 +744,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF003-S05.md -->
+---
 
+<!-- RF003-S05.md -->
 # Registro de producto que requiere cadena de frío
 
 ## Nombre del test
@@ -791,7 +760,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -821,8 +789,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF003_S05 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -830,8 +796,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF003-S06.md -->
+---
 
+<!-- RF003-S06.md -->
 # Creación de un Combo o Kit con múltiples SKUs
 
 ## Nombre del test
@@ -845,7 +812,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -877,8 +843,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF003_S06 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -886,8 +850,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF003-S07.md -->
+---
 
+<!-- RF003-S07.md -->
 # Intento de guardar un producto sin completar campos obligatorios
 
 ## Nombre del test
@@ -901,7 +866,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -930,8 +894,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF003_S07 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -939,8 +901,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF004-S01.md -->
+---
 
+<!-- RF004-S01.md -->
 # Consulta de stock navegando por filtros multinivel
 
 ## Nombre del test
@@ -954,7 +917,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF004** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -985,8 +947,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -994,8 +954,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF004-S02.md -->
+---
 
+<!-- RF004-S02.md -->
 # Búsqueda de producto por nombre con autocompletado
 
 ## Nombre del test
@@ -1009,7 +970,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF004** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1039,8 +999,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1048,8 +1006,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF004-S03.md -->
+---
 
+<!-- RF004-S03.md -->
 # Búsqueda de producto por código de barras escaneado
 
 ## Nombre del test
@@ -1063,7 +1022,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF004** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1094,8 +1052,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1103,8 +1059,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF004-S04.md -->
+---
 
+<!-- RF004-S04.md -->
 # Búsqueda de producto por código de barras ingresado manualmente
 
 ## Nombre del test
@@ -1118,7 +1075,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF004** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1149,8 +1105,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S04 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1158,8 +1112,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF004-S05.md -->
+---
 
+<!-- RF004-S05.md -->
 # Consulta de producto con alerta de cadena de frío
 
 ## Nombre del test
@@ -1173,7 +1128,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF004** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1203,8 +1157,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S05 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1212,8 +1164,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF004-S06.md -->
+---
 
+<!-- RF004-S06.md -->
 # Consulta de producto con alerta de seguridad eléctrica
 
 ## Nombre del test
@@ -1227,7 +1180,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF004** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1256,8 +1208,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S06 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1265,8 +1215,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF004-S07.md -->
+---
 
+<!-- RF004-S07.md -->
 # Búsqueda de un producto inexistente en el catálogo
 
 ## Nombre del test
@@ -1280,7 +1231,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF004** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1308,8 +1258,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S07 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1317,8 +1265,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF005-S01.md -->
+---
 
+<!-- RF005-S01.md -->
 # Recepción exitosa de producto estándar sin discrepancia
 
 ## Nombre del test
@@ -1332,7 +1281,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF005** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1369,8 +1317,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF005_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1378,8 +1324,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF005-S02.md -->
+---
 
+<!-- RF005-S02.md -->
 # Recepción con discrepancia entre cantidad recibida y facturada
 
 ## Nombre del test
@@ -1393,7 +1340,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF005** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1426,8 +1372,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF005_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1435,8 +1379,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF005-S03.md -->
+---
 
+<!-- RF005-S03.md -->
 # Recepción exitosa con discrepancia documentada
 
 ## Nombre del test
@@ -1450,7 +1395,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF005** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1483,8 +1427,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF005_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1492,8 +1434,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF005-S04.md -->
+---
 
+<!-- RF005-S04.md -->
 # Recepción de producto de categoría Electroterapia sin número de serie
 
 ## Nombre del test
@@ -1507,7 +1450,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF005** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1540,8 +1482,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF005_S04 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1549,8 +1489,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF005-S05.md -->
+---
 
+<!-- RF005-S05.md -->
 # Recepción exitosa de producto de Electroterapia con número de serie
 
 ## Nombre del test
@@ -1564,7 +1505,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF005** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1597,8 +1537,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF005_S05 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1606,8 +1544,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF005-S06.md -->
+---
 
+<!-- RF005-S06.md -->
 # Identificación del producto por código de barras escaneado durante recepción
 
 ## Nombre del test
@@ -1621,7 +1560,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF005** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1653,8 +1591,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF005_S06 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1662,8 +1598,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF005-S07.md -->
+---
 
+<!-- RF005-S07.md -->
 # Recepción cuando el lector de código de barras no está disponible
 
 ## Nombre del test
@@ -1677,7 +1614,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF005** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1707,8 +1643,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF005_S07 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1716,8 +1650,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF006-S01.md -->
+---
 
+<!-- RF006-S01.md -->
 # Despacho exitoso de venta al por mayor con validación cruzada
 
 ## Nombre del test
@@ -1731,7 +1666,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF006** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1770,8 +1704,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF006_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1779,8 +1711,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF006-S02.md -->
+---
 
+<!-- RF006-S02.md -->
 # Validación cruzada falla por código escaneado incorrecto
 
 ## Nombre del test
@@ -1794,13 +1727,12 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF006** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
 **Given (Dado que):**
 - El usuario autenticado tiene rol "Auxiliar de Despacho" o "Almacenista"
-- Existe una orden de despacho para el SKU "CAN-001"
+- Existe una orden de despacho para el SKU "ELEC-0001"
 
 **When (Cuando):**
 - Escanea físicamente un producto cuyo código corresponde a un SKU diferente
@@ -1827,8 +1759,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF006_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1836,8 +1766,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF006-S03.md -->
+---
 
+<!-- RF006-S03.md -->
 # Despacho de venta al por menor sin registro obligatorio de cliente
 
 ## Nombre del test
@@ -1851,7 +1782,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF006** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1885,8 +1815,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF006_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1894,8 +1822,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF006-S04.md -->
+---
 
+<!-- RF006-S04.md -->
 # Registro de baja por daño
 
 ## Nombre del test
@@ -1909,7 +1838,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF006** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1944,8 +1872,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF006_S04 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -1953,8 +1879,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF006-S05.md -->
+---
 
+<!-- RF006-S05.md -->
 # Registro de baja por vencimiento
 
 ## Nombre del test
@@ -1968,7 +1895,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF006** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2003,8 +1929,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF006_S05 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -2012,8 +1936,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF006-S06.md -->
+---
 
+<!-- RF006-S06.md -->
 # Advertencia por peso total del despacho excede capacidad del vehículo
 
 ## Nombre del test
@@ -2027,7 +1952,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF006** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2060,17 +1984,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF006_S06 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF006-S07.md -->
+---
 
+<!-- RF006-S07.md -->
 # Despacho cuando el lector de código de barras no está disponible
 
 ## Nombre del test
@@ -2084,7 +2007,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF006** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2114,17 +2036,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF006_S07 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF007-S01.md -->
+---
 
+<!-- RF007-S01.md -->
 # Traslado exitoso de producto entre ubicaciones con stock suficiente
 
 ## Nombre del test
@@ -2138,7 +2059,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF007** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF007` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2174,8 +2094,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF007_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -2183,8 +2101,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF007-S02.md -->
+---
 
+<!-- RF007-S02.md -->
 # Intento de traslado con stock insuficiente en la ubicación de origen
 
 ## Nombre del test
@@ -2198,7 +2117,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF007** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF007` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2230,8 +2148,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF007_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -2239,8 +2155,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF007-S03.md -->
+---
 
+<!-- RF007-S03.md -->
 # Intento de traslado hacia la misma ubicación de origen
 
 ## Nombre del test
@@ -2254,7 +2171,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF007** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF007` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2285,8 +2201,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF007_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -2294,8 +2208,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF007-S04.md -->
+---
 
+<!-- RF007-S04.md -->
 # Auxiliar corrige un traslado dentro de la misma franja horaria activa
 
 ## Nombre del test
@@ -2309,7 +2224,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF007** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF007` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2343,17 +2257,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF007_S04 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF007-S05.md -->
+---
 
+<!-- RF007-S05.md -->
 # Auxiliar intenta corregir un traslado después de cerrada la franja horaria
 
 ## Nombre del test
@@ -2367,7 +2280,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF007** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF007` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2397,17 +2309,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF007_S05 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF008-S01.md -->
+---
 
+<!-- RF008-S01.md -->
 # Registro exitoso de devolución de producto de Electroterapia
 
 ## Nombre del test
@@ -2421,7 +2332,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF008** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF008` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2457,8 +2367,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF008_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -2466,8 +2374,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF008-S02.md -->
+---
 
+<!-- RF008-S02.md -->
 # Intento de devolución de producto que no es Electroterapia ni Electrónico
 
 ## Nombre del test
@@ -2481,7 +2390,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF008** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF008` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2513,8 +2421,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF008_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -2522,8 +2428,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF008-S03.md -->
+---
 
+<!-- RF008-S03.md -->
 # Almacenista aprueba la reincorporación al stock de un producto devuelto
 
 ## Nombre del test
@@ -2537,7 +2444,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF008** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF008` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2573,17 +2479,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF008_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF008-S04.md -->
+---
 
+<!-- RF008-S04.md -->
 # Almacenista rechaza la reincorporación de un producto devuelto
 
 ## Nombre del test
@@ -2597,7 +2502,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF008** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF008` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2632,17 +2536,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF008_S04 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF008-S05.md -->
+---
 
+<!-- RF008-S05.md -->
 # Consulta del historial de devoluciones por el Almacenista
 
 ## Nombre del test
@@ -2656,7 +2559,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF008** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF008` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2685,17 +2587,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF008_S05 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF009-S01.md -->
+---
 
+<!-- RF009-S01.md -->
 # Almacenista registra un ajuste de inventario con justificación
 
 ## Nombre del test
@@ -2709,7 +2610,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF009** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF009` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2745,8 +2645,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF009_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -2754,8 +2652,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF009-S02.md -->
+---
 
+<!-- RF009-S02.md -->
 # Intento de registrar un ajuste sin justificación
 
 ## Nombre del test
@@ -2769,7 +2668,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF009** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF009` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2801,8 +2699,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF009_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -2810,8 +2706,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF009-S03.md -->
+---
 
+<!-- RF009-S03.md -->
 # Auxiliar de Despacho intenta ejecutar un ajuste formal
 
 ## Nombre del test
@@ -2825,7 +2722,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF009** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF009` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2856,8 +2752,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF009_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -2865,8 +2759,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF009-S04.md -->
+---
 
+<!-- RF009-S04.md -->
 # Corrección de un ajuste registrado incorrectamente
 
 ## Nombre del test
@@ -2880,7 +2775,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF009** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF009` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2916,8 +2810,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF009_S04 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -2925,8 +2817,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF009-S05.md -->
+---
 
+<!-- RF009-S05.md -->
 # Auxiliar corrige su propio movimiento dentro de la franja horaria activa
 
 ## Nombre del test
@@ -2940,7 +2833,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF009** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF009` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2974,17 +2866,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF009_S05 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF009-S06.md -->
+---
 
+<!-- RF009-S06.md -->
 # Consulta del historial completo de ajustes por el Almacenista
 
 ## Nombre del test
@@ -2998,7 +2889,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF009** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF009` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3028,8 +2918,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF009_S06 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -3037,8 +2925,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF010-S01.md -->
+---
 
+<!-- RF010-S01.md -->
 # Almacenista consulta el reporte de ventas por período
 
 ## Nombre del test
@@ -3052,7 +2941,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF010** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF010` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3086,8 +2974,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF010_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -3095,8 +2981,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF010-S02.md -->
+---
 
+<!-- RF010-S02.md -->
 # Administrador consulta el dashboard de KPIs operativos
 
 ## Nombre del test
@@ -3110,7 +2997,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF010** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF010` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3144,8 +3030,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF010_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -3153,8 +3037,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF010-S03.md -->
+---
 
+<!-- RF010-S03.md -->
 # Exportación de reporte en formato Excel o CSV
 
 ## Nombre del test
@@ -3168,7 +3053,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF010** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF010` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3200,17 +3084,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF010_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF010-S04.md -->
+---
 
+<!-- RF010-S04.md -->
 # Consulta del historial de movimientos por operario
 
 ## Nombre del test
@@ -3224,7 +3107,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF010** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF010` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3256,8 +3138,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF010_S04 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -3265,8 +3145,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF010-S05.md -->
+---
 
+<!-- RF010-S05.md -->
 # Consulta del reporte de productos próximos a vencer
 
 ## Nombre del test
@@ -3280,7 +3161,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF010** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF010` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3311,8 +3191,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF010_S05 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -3320,8 +3198,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF010-S06.md -->
+---
 
+<!-- RF010-S06.md -->
 # Consulta y descarga de factura individual desde el historial
 
 ## Nombre del test
@@ -3335,7 +3214,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF010** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF010` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3368,17 +3246,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF010_S06 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF010-S07.md -->
+---
 
+<!-- RF010-S07.md -->
 # Usuario sin permisos intenta acceder al módulo de reportes
 
 ## Nombre del test
@@ -3392,7 +3269,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF010** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF010` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3421,8 +3297,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF010_S07 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -3430,8 +3304,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF011-S01.md -->
+---
 
+<!-- RF011-S01.md -->
 # Alerta de stock mínimo cuando el inventario cae bajo el punto de reorden
 
 ## Nombre del test
@@ -3445,7 +3320,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF011** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF011` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3478,8 +3352,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF011_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -3487,8 +3359,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF011-S02.md -->
+---
 
+<!-- RF011-S02.md -->
 # Alerta de vencimiento próximo a 60 días
 
 ## Nombre del test
@@ -3502,7 +3375,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF011** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF011` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3533,17 +3405,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF011_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF011-S03.md -->
+---
 
+<!-- RF011-S03.md -->
 # Alerta de vencimiento próximo a 30 días
 
 ## Nombre del test
@@ -3557,7 +3428,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF011** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF011` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3589,17 +3459,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF011_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF011-S04.md -->
+---
 
+<!-- RF011-S04.md -->
 # Alerta de cadena de frío al registrar movimiento de producto refrigerado
 
 ## Nombre del test
@@ -3613,7 +3482,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF011** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF011` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3644,17 +3512,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF011_S04 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF011-S05.md -->
+---
 
+<!-- RF011-S05.md -->
 # Alerta de seguridad eléctrica al registrar movimiento de equipo eléctrico
 
 ## Nombre del test
@@ -3668,7 +3535,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF011** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF011` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3700,17 +3566,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF011_S05 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF011-S06.md -->
+---
 
+<!-- RF011-S06.md -->
 # Panel de alertas activas en el dashboard
 
 ## Nombre del test
@@ -3724,7 +3589,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF011** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF011` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3755,17 +3619,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF011_S06 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF011-S07.md -->
+---
 
+<!-- RF011-S07.md -->
 # Resolución automática de una alerta de stock mínimo
 
 ## Nombre del test
@@ -3779,7 +3642,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF011** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF011` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3808,17 +3670,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF011_S07 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF012-S01.md -->
+---
 
+<!-- RF012-S01.md -->
 # El sistema genera automáticamente un registro de auditoría al confirmar cualquier movimiento de inventario
 
 ## Nombre del test
@@ -3832,7 +3693,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3872,8 +3732,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF012_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -3881,8 +3739,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF012-S02.md -->
+---
 
+<!-- RF012-S02.md -->
 # El sistema registra en el log los eventos de autenticación
 
 ## Nombre del test
@@ -3896,7 +3755,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3926,8 +3784,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF012_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -3935,8 +3791,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF012-S03.md -->
+---
 
+<!-- RF012-S03.md -->
 # El sistema registra en el log los eventos de gestión de credenciales
 
 ## Nombre del test
@@ -3950,7 +3807,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3980,17 +3836,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF012_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF012-S04.md -->
+---
 
+<!-- RF012-S04.md -->
 # El sistema registra el reconocimiento de alertas de cadena de frío y seguridad eléctrica
 
 ## Nombre del test
@@ -4004,7 +3859,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4034,17 +3888,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF012_S04 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF012-S05.md -->
+---
 
+<!-- RF012-S05.md -->
 # Almacenista consulta el log completo de auditoría con filtros
 
 ## Nombre del test
@@ -4058,7 +3911,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4090,8 +3942,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF012_S05 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -4099,8 +3949,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF012-S06.md -->
+---
 
+<!-- RF012-S06.md -->
 # Auxiliar de Despacho intenta acceder al log de auditoría
 
 ## Nombre del test
@@ -4114,7 +3965,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4145,8 +3995,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF012_S06 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -4154,8 +4002,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF012-S07.md -->
+---
 
+<!-- RF012-S07.md -->
 # El log registra tanto el movimiento original como la corrección del Auxiliar
 
 ## Nombre del test
@@ -4169,7 +4018,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4201,17 +4049,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF012_S07 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RF012-S08.md -->
+---
 
+<!-- RF012-S08.md -->
 # Intento de eliminación o modificación de un registro del log
 
 ## Nombre del test
@@ -4225,7 +4072,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4258,17 +4104,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RF012_S08 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF001-S01.md -->
+---
 
+<!-- RNF001-S01.md -->
 # Operario completa un flujo de despacho sin formación técnica previa
 
 ## Nombre del test
@@ -4282,7 +4127,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF001** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4312,17 +4156,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF001_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF001-S02.md -->
+---
 
+<!-- RNF001-S02.md -->
 # La interfaz responde correctamente en dispositivos móviles y tabletas
 
 ## Nombre del test
@@ -4336,7 +4179,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF001** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4367,17 +4209,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF001_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF001-S03.md -->
+---
 
+<!-- RNF001-S03.md -->
 # La búsqueda de productos es igualmente eficiente por cualquier vía
 
 ## Nombre del test
@@ -4391,7 +4232,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF001** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4419,17 +4259,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF001_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF002-S01.md -->
+---
 
+<!-- RNF002-S01.md -->
 # El sistema permanece disponible durante las franjas críticas de operación
 
 ## Nombre del test
@@ -4443,7 +4282,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF002** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4473,17 +4311,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF002_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF002-S02.md -->
+---
 
+<!-- RNF002-S02.md -->
 # El Almacenista puede acceder al sistema en cualquier momento del día
 
 ## Nombre del test
@@ -4497,7 +4334,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF002** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4527,17 +4363,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF002_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF002-S03.md -->
+---
 
+<!-- RNF002-S03.md -->
 # El sistema notifica adecuadamente ante una interrupción no planificada
 
 ## Nombre del test
@@ -4551,7 +4386,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF002** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4579,17 +4413,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF002_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF003-S01.md -->
+---
 
+<!-- RNF003-S01.md -->
 # Los datos sensibles viajan cifrados entre el cliente y el servidor
 
 ## Nombre del test
@@ -4603,7 +4436,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF003** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4633,17 +4465,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF003_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF003-S02.md -->
+---
 
+<!-- RNF003-S02.md -->
 # Un usuario no puede acceder a funcionalidades fuera de su rol
 
 ## Nombre del test
@@ -4657,7 +4488,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF003** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4688,8 +4518,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF003_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -4697,8 +4525,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF003-S03.md -->
+---
 
+<!-- RNF003-S03.md -->
 # Las contraseñas de los usuarios se almacenan de forma segura
 
 ## Nombre del test
@@ -4712,7 +4541,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF003** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4742,8 +4570,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF003_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -4751,8 +4577,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF003-S04.md -->
+---
 
+<!-- RNF003-S04.md -->
 # Ningún usuario puede modificar ni eliminar un registro histórico
 
 ## Nombre del test
@@ -4766,7 +4593,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF003** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4795,17 +4621,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF003_S04 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF004-S01.md -->
+---
 
+<!-- RNF004-S01.md -->
 # Consulta de stock de un producto responde dentro del umbral definido
 
 ## Nombre del test
@@ -4819,7 +4644,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF004** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4849,8 +4673,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF004_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -4858,8 +4680,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF004-S02.md -->
+---
 
+<!-- RNF004-S02.md -->
 # El registro de un movimiento de inventario se confirma dentro de un tiempo razonable
 
 ## Nombre del test
@@ -4873,7 +4696,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF004** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4902,17 +4724,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF004_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF004-S03.md -->
+---
 
+<!-- RNF004-S03.md -->
 # El sistema mantiene el rendimiento bajo uso simultáneo de los tres roles
 
 ## Nombre del test
@@ -4926,7 +4747,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF004** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4954,17 +4774,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF004_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF005-S01.md -->
+---
 
+<!-- RNF005-S01.md -->
 # La arquitectura del sistema separa frontend y backend con APIs REST
 
 ## Nombre del test
@@ -4978,7 +4797,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF005** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -5009,8 +4827,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF005_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -5018,8 +4834,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF005-S02.md -->
+---
 
+<!-- RNF005-S02.md -->
 # Los endpoints del backend están documentados con Swagger
 
 ## Nombre del test
@@ -5033,7 +4850,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF005** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -5063,17 +4879,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF005_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF005-S03.md -->
+---
 
+<!-- RNF005-S03.md -->
 # El código cumple con los principios SOLID verificables
 
 ## Nombre del test
@@ -5087,7 +4902,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF005** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -5117,17 +4931,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF005_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF006-S01.md -->
+---
 
+<!-- RNF006-S01.md -->
 # El sistema captura datos personales de clientes mayoristas con aviso de privacidad
 
 ## Nombre del test
@@ -5141,7 +4954,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF006** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -5171,8 +4983,6 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF006_S01 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
@@ -5180,8 +4990,9 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF006-S02.md -->
+---
 
+<!-- RNF006-S02.md -->
 # Los datos personales de clientes no son accesibles para el Auxiliar de Despacho fuera del contexto de su operación
 
 ## Nombre del test
@@ -5195,7 +5006,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF006** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -5225,17 +5035,16 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF006_S02 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
 
 
-<!-- file: RNF006-S03.md -->
+---
 
+<!-- RNF006-S03.md -->
 # El equipo documenta la autorización de ICM antes de usar datos reales en pruebas
 
 ## Nombre del test
@@ -5249,7 +5058,6 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF006** — escen
 ## Requisito o caso de negocio asociado
 
 - **Requisito:** `RNF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -5312,10 +5120,12 @@ pytest tests/ers/test_gherkin_dynamic.py::test_RNF006_S03 -v
 
 Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../tests/ers/test_gherkin_dynamic.py)
 
-Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `tests/ers/impl/`.
-
 ---
 
 ## Estado de automatización backend
 
-Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
