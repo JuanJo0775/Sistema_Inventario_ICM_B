@@ -141,6 +141,33 @@ La lista exhaustiva de operaciones, parámetros y esquemas JSON está en **`/api
 - No guardar secretos reales en el repositorio.
 - Cualquier cambio en la API debe cumplir lo definido en [README_API.md](docs/README_API.md).
 
+### Gestión de issues y cambios
+
+Para mantener el historial limpio y fácil de revisar, el trabajo debe organizarse así:
+
+1. **Issue**: se usa para describir un problema, mejora o tarea pendiente. Debe ser específico y tener un alcance claro.
+2. **Rama de trabajo**: cada issue relevante se implementa en una rama dedicada cuando el cambio merece seguimiento propio. La rama debe ser corta, clara y relacionada con el objetivo del issue.
+3. **Commits**: cada commit debe representar un paso lógico del cambio. Usar Conventional Commits en inglés, con alcance explícito, por ejemplo `fix(test-docs): reorganize test documentation indexes`.
+4. **Pull Request**: el PR debe enlazar el issue correspondiente. Si el cambio resuelve el issue, usar la referencia automática en la descripción o el cierre explícito de GitHub para que quede trazado.
+5. **Documentación**: si el issue afecta comportamiento, contrato, arquitectura o pruebas, debe quedar reflejado en la documentación del repo. El lugar correcto depende del tema:
+   - Cambios de arquitectura: [docs/README_ARQUITECTURA.md](docs/README_ARQUITECTURA.md)
+   - Cambios de API: [docs/README_API.md](docs/README_API.md)
+   - Cambios de pruebas: [docs/test/README_TEST.md](docs/test/README_TEST.md)
+   - Decisiones técnicas importantes: [docs/adr/README_ADR.md](docs/adr/README_ADR.md)
+
+### Qué sí documentar
+
+- Bugs que afecten funcionalidad, validación o contratos de API.
+- Decisiones que cambien comportamiento del negocio o la arquitectura.
+- Cambios que requieran trazabilidad entre issue, PR, tests y documentación.
+- Reglas nuevas o ajustadas que otro integrante deba entender sin revisar el código completo.
+
+### Qué no documentar de forma extensa
+
+- Tareas muy pequeñas o transitorias que ya quedan cubiertas por el PR.
+- Ajustes puramente internos sin impacto visible en el comportamiento o en el contrato técnico.
+- Conversaciones informales que no cambian el estado funcional del proyecto.
+
 ## Estado actual
 
 - Estructura modular de apps y carpeta `shared`.
