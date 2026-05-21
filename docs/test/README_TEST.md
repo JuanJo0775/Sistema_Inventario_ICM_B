@@ -101,6 +101,7 @@ python scripts/generate_docs/generate_integration_test_docs.py
 
 - **Código:** `tests/ers/test_gherkin_dynamic.py` genera **95** funciones `test_RFxxx_Sxx` / `test_RNFxxx_Sxx`.
 - **Implementación:** `tests/ers/gherkin_impl.py` — diccionario `IMPLEMENTATIONS` enlaza escenario → función Python. Si un escenario no está en el diccionario, el test hace **`pytest.skip`** con motivo (UI pura, exportación Excel, concurrencia multi-hilo, aprobación de devoluciones no modelada, etc.).
+- **Escenarios fuera de alcance backend:** la lista persistente vive en `docs/test/gherkin_out_of_scope.json`. El generador la incorpora en `docs/test/scenarios/*.md`, `docs/test/gherkin_scenarios.json` y `docs/test/scenarios/index.md`, de modo que el estado sobreviva a cualquier regeneración.
 - **Regenerar escenarios y MD** tras cambios en el ERS:
 
 ```bash
@@ -138,8 +139,20 @@ python scripts/generate_docs/generate_integration_test_docs.py
 ```bash
 pytest -q
 ```
+```bash
+pytest -v
+```
+
+pytest -q : salida concisa (recomendado en docs/CI).
+pytest -v : salida detallada por test (útil para depurar y reportar).
 
 Este comando ejecuta toda la suite del proyecto: unitarios, integración y Gherkin.
+
+Nota de fidelidad del entorno de pruebas:
+
+- `config.settings.test` usa SQLite in-memory.
+- `config.settings.test` desactiva `DEFAULT_THROTTLE_CLASSES`.
+- La suite valida contratos y reglas de dominio, pero no reproduce la semantica exacta de PostgreSQL ni el throttling de produccion.
 
 ### Sólo escenarios ERS / Gherkin
 

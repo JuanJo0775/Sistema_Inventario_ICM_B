@@ -9,11 +9,13 @@ e índices por carpeta.
 from __future__ import annotations
 
 import ast
+import json
 import re
 from pathlib import Path
 from typing import List, Tuple
 
 ROOT = Path(__file__).resolve().parents[2]
+GHERKIN_SCOPE_FILE = ROOT / "docs" / "test" / "gherkin_out_of_scope.json"
 
 
 def clear_markdown_dir(dir_path: Path) -> None:
@@ -189,22 +191,47 @@ def write_gherkin_docs(scenarios: list[dict]) -> None:
     root = ROOT
     out_json = root / "docs" / "test" / "gherkin_scenarios.json"
     out_dir = root / "docs" / "test" / "scenarios"
-    import json
+
+    out_of_scope: dict[str, dict[str, str]] = {}
+    if GHERKIN_SCOPE_FILE.exists():
+        raw = json.loads(GHERKIN_SCOPE_FILE.read_text(encoding="utf-8"))
+        if isinstance(raw, dict):
+            out_of_scope = {
+                str(key): {
+                    "reason": str(value.get("reason", "")),
+                    "scope": str(value.get("scope", "backend")),
+                }
+                for key, value in raw.items()
+                if isinstance(value, dict)
+            }
 
     out_dir.mkdir(parents=True, exist_ok=True)
     clear_markdown_dir(out_dir)
+    for sc in scenarios:
+        scope_note = out_of_scope.get(sc["id"])
+        if scope_note:
+            sc["automation_scope"] = scope_note
+        else:
+            sc["automation_scope"] = {"reason": "", "scope": "backend"}
+
     out_json.write_text(json.dumps(scenarios, ensure_ascii=False, indent=2), encoding="utf-8")
-    index_lines = ["# Índice de escenarios Gherkin\n", "| Código | Escenario | Archivo |\n", "|---|---|---|\n"]
+    index_lines = [
+        "# Índice de escenarios Gherkin\n",
+        "| Código | Escenario | Estado | Archivo |\n",
+        "|---|---|---|---|\n",
+    ]
 
     # escribir por escenario usando el contenido ya parseado
     for sc in scenarios:
         sid = sc["id"]
         pytest_node = f"tests/ers/test_gherkin_dynamic.py::test_{sid.replace('-', '_')}"
-        auto = bool(sc.get("id")) and sc.get("id") in (sc.get("id") for sc in scenarios)
+        scope_note = sc.get("automation_scope", {})
+        is_out_of_scope = bool(scope_note.get("reason"))
         auto_txt = (
-            "Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS)."
-            if auto
-            else "Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación."
+            "Fuera de alcance del backend/pytest; debe validarse en frontend o E2E. "
+            f"Motivo: {scope_note.get('reason')}"
+            if is_out_of_scope
+            else "Implementada en `tests/ers/gherkin_impl.py` (comprueba API/servicios equivalentes al Then del ERS)."
         )
         md = f"""# {sc['title']}
 
@@ -243,6 +270,7 @@ Archivo de definición dinámica: [`tests/ers/test_gherkin_dynamic.py`](../../te
 {auto_txt}
 """
         (out_dir / f"{sid}.md").write_text(md, encoding="utf-8")
-        index_lines.append(f"| {sid} | {sc['title']} | [{sid}.md](./{sid}.md) |\n")
+    state = "Fuera de alcance" if is_out_of_scope else "Implementado"
+    index_lines.append(f"| {sid} | {sc['title']} | {state} | [{sid}.md](./{sid}.md) |\n")
 
     (out_dir / "index.md").write_text("".join(index_lines), encoding="utf-8")

@@ -1527,6 +1527,16 @@ REDIS_URL=redis://redis:6379/0
 - HTTPS: Forzado
 - Security headers: Aplicados
 
+### 10.5 Restricción actual de empaquetado de producción
+
+La imagen de produccion no es equivalente a la de desarrollo: `docker-compose.prod.yml` arranca `gunicorn`, pero `docker/Dockerfile` instala solo `requirements/base.txt`. Como `gunicorn` vive en `requirements/production.txt`, cualquier despliegue productivo debe incorporar esa dependencia o una capa equivalente antes del arranque.
+
+Impacto:
+
+- No se debe asumir que la imagen base sirva para produccion sin una construccion adicional.
+- Si cambian las dependencias de runtime, el Dockerfile y los requirements deben mantenerse sincronizados.
+- La validacion de despliegue requiere revisar el binario de arranque, no solo la compilacion de Django.
+
 ---
 
 ## 11. Testing y Aseguramiento de Calidad
@@ -1582,6 +1592,16 @@ addopts = --cov=apps --cov-report=html --tb=short
 - `factory-boy`: Fixtures de datos.
 - `pytest-cov`: Cobertura.
 - `freeze-gun`: Mocking de tiempo (para BR-03, BR-06).
+
+### 11.5 Restricción actual de fidelidad de pruebas
+
+La configuracion de pruebas usa `config.settings.test`, que ejecuta la suite sobre SQLite in-memory y desactiva `DEFAULT_THROTTLE_CLASSES`. Esto acelera la ejecucion y reduce friccion local, pero no reproduce la semantica de PostgreSQL ni valida throttling de produccion.
+
+Impacto:
+
+- Las pruebas automatizadas no ejercitan `select_for_update()` ni bloqueos reales de PostgreSQL.
+- Los limites de peticiones se validan a nivel logico, no con el throttler activo.
+- Para concurrencia real o limites de produccion, hacen falta pruebas especificas contra PostgreSQL.
 
 ### 11.4 CI/CD (GitHub Actions - Preparación)
 
@@ -1827,6 +1847,11 @@ Esta arquitectura prepara el sistema para:
 - Integraciones futuras (sin romper el nucleo de inventario).
 
 No se adopta microservicios en esta fase para evitar complejidad operacional innecesaria.
+
+Documentacion complementaria de este analisis:
+
+- [docs/README_RESTRICCIONES.md](README_RESTRICCIONES.md)
+- [docs/README_ATRIBUTOS_CALIDAD.md](README_ATRIBUTOS_CALIDAD.md)
 
 ## 15. Matriz de Trazabilidad Completa (RF -> Arquitectura)
 

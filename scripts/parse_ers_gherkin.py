@@ -11,11 +11,14 @@ Ejecutar desde la raíz del repo:
 from __future__ import annotations
 
 import re
+import sys
 from pathlib import Path
 from typing import List
 
 ROOT = Path(__file__).resolve().parents[1]
 ERS_PATH = ROOT / "docs" / "ERS_ICM_Requisitos.md"
+# Asegura que el script funcione al ejecutarse directo desde la raíz del repo.
+sys.path.insert(0, str(ROOT))
 # write logic delegated to utils
 from scripts.generate_docs import utils
 
@@ -57,31 +60,59 @@ _IMPL_IDS = {
     "RF006-S03",
     "RF006-S04",
     "RF006-S05",
+    "RF006-S06",
+    "RF006-S07",
     "RF007-S01",
     "RF007-S02",
     "RF007-S03",
+    "RF007-S04",
+    "RF007-S05",
     "RF008-S01",
     "RF008-S02",
+    "RF008-S03",
+    "RF008-S04",
+    "RF008-S05",
     "RF009-S01",
     "RF009-S02",
     "RF009-S03",
     "RF009-S04",
+    "RF009-S05",
     "RF009-S06",
     "RF010-S01",
     "RF010-S02",
+    "RF010-S03",
     "RF010-S04",
     "RF010-S05",
+    "RF010-S06",
     "RF010-S07",
     "RF011-S01",
+    "RF011-S02",
+    "RF011-S03",
+    "RF011-S04",
+    "RF011-S05",
+    "RF011-S06",
+    "RF011-S07",
     "RF012-S01",
     "RF012-S02",
+    "RF012-S03",
+    "RF012-S04",
     "RF012-S05",
     "RF012-S06",
+    "RF012-S07",
+    "RF012-S08",
+    "RNF003-S01",
     "RNF003-S02",
     "RNF003-S03",
+    "RNF003-S04",
     "RNF004-S01",
+    "RNF004-S02",
+    "RNF004-S03",
     "RNF005-S01",
+    "RNF005-S02",
+    "RNF005-S03",
     "RNF006-S01",
+    "RNF006-S02",
+    "RNF006-S03",
 }
 
 

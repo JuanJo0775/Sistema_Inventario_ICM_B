@@ -36,9 +36,12 @@ Documentación funcional y arquitectónica disponible en el repositorio:
 - [GUIA_ONBOARDING.md](docs/GUIA_ONBOARDING.md): comandos rápidos y paso a paso para configurar tu entorno local y levantar el proyecto.
 - [README_API.md](docs/README_API.md): especificación y checklist de la API (OpenAPI, endpoints, tags y estándares).
 - [README_ARQUITECTURA.md](docs/README_ARQUITECTURA.md): arquitectura técnica consolidada (estructura, desacoplamiento, inventario, Docker, testing, SOLID y patrones).
+- [README_RESTRICCIONES.md](docs/README_RESTRICCIONES.md): catálogo consolidado de restricciones arquitectónicas, operativas, tecnológicas y de despliegue.
+- [README_ATRIBUTOS_CALIDAD.md](docs/README_ATRIBUTOS_CALIDAD.md): inventario de atributos de calidad, evidencia y recomendaciones.
 - [ERS_ICM_Requisitos.md](docs/ERS_ICM_Requisitos.md): requisitos funcionales, no funcionales y reglas de negocio.
 - [ICM_Informe_Elicitacion_v2_plus.docx.md](docs/ICM_Informe_Elicitacion_v2_plus.docx.md): contexto de levantamiento y análisis del dominio.
 - [AGENTS.md](AGENTS.md): instrucciones y reglas para asistentes de código del proyecto.
+- [README_ADR.md](docs/adr/README_ADR.md): índice y trazabilidad de decisiones arquitectónicas.
 - [README_TEST.md](docs/test/README_TEST.md): estrategia de testing, tipos de pruebas, convenciones y ejemplos de escenarios Gherkin automatizados.
 
 ## Stack tecnológico
