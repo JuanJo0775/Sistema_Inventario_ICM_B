@@ -146,6 +146,29 @@ def _requires_ack_flags(product: Product) -> tuple[bool, bool]:
     return cold, electric
 
 
+def _log_alert_acknowledgement(
+    *,
+    user,
+    movement: Movement,
+    cold_chain_acknowledged: bool,
+    electrical_safety_acknowledged: bool,
+) -> None:
+    acknowledged: list[str] = []
+    if cold_chain_acknowledged:
+        acknowledged.append("cold_chain")
+    if electrical_safety_acknowledged:
+        acknowledged.append("electrical_safety")
+    if not acknowledged:
+        return
+    log_event(
+        AuditEventType.ALERT_ACKNOWLEDGED,
+        description="Reconocimiento de alertas operativas",
+        user=user,
+        movement=movement,
+        detail={"acknowledged": acknowledged, "movement_type": movement.movement_type},
+    )
+
+
 @transaction.atomic
 def register_entry(
     user,
@@ -217,6 +240,12 @@ def register_entry(
         user=user,
         movement=movement,
         detail={"type": MovementType.ENTRADA},
+    )
+    _log_alert_acknowledgement(
+        user=user,
+        movement=movement,
+        cold_chain_acknowledged=cold,
+        electrical_safety_acknowledged=electric,
     )
     loc = Location.objects.get(pk=location_id)
     check_and_create_alerts(product, loc)
@@ -370,6 +399,12 @@ def register_dispatch(
         movement=movement,
         detail={"type": movement_type, **extra_audit},
     )
+    _log_alert_acknowledgement(
+        user=user,
+        movement=movement,
+        cold_chain_acknowledged=cold,
+        electrical_safety_acknowledged=electric,
+    )
     loc = Location.objects.get(pk=location_id)
     check_and_create_alerts(product, loc)
     movement.refresh_from_db()
@@ -463,6 +498,12 @@ def register_internal_transfer(
         user=user,
         movement=movement,
         detail={"type": MovementType.TRASLADO},
+    )
+    _log_alert_acknowledgement(
+        user=user,
+        movement=movement,
+        cold_chain_acknowledged=cold,
+        electrical_safety_acknowledged=electric,
     )
     return movement
 

@@ -25,6 +25,8 @@ from apps.movements.services import (correct_movement_within_window,
                                      register_dispatch, register_entry,
                                      register_internal_transfer,
                                      register_return)
+from apps.audit.services import log_immutable_modification_attempt
+from shared.exceptions import ImmutableRecordError
 from shared.openapi import TAG_MOVEMENTS, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenista, IsAlmacenistaOrAuxiliar
@@ -448,6 +450,14 @@ class MovementDetailView(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = Movement.objects.select_related("product", "executed_by")
     serializer_class = MovementSerializer
+
+    def http_method_not_allowed(self, request, *args, **kwargs):
+        log_immutable_modification_attempt(
+            user=request.user if getattr(request.user, "is_authenticated", False) else None,
+            request=request,
+            detail={"resource": "movement", "movement_id": str(kwargs.get("pk") or "")},
+        )
+        raise ImmutableRecordError()
 
 
 class MovementCorrectionView(APIView):

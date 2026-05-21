@@ -5,6 +5,7 @@ from apps.reports.views import (ExpiringProductsReportView,
                                 InvoiceHistoryReportView,
                                 KpiDashboardReportView,
                                 MovementHistoryReportView, MovementReportView,
+                                ReportDatasetView,
                                 MovementSummaryReportView,
                                 SalesSummaryReportView,
                                 TopDispatchedProductsReportView)
@@ -30,6 +31,7 @@ urlpatterns = [
         MovementHistoryReportView.as_view(),
         name="reports-movements-history",
     ),
+    path("data/", ReportDatasetView.as_view(), name="reports-data"),
     path(
         "sales/summary/", SalesSummaryReportView.as_view(), name="reports-sales-summary"
     ),
