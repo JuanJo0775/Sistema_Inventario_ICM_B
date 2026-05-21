@@ -1,0 +1,26 @@
+{
+  "RNF001-S01": {
+    "scope": "frontend-or-e2e",
+    "reason": "describe el flujo visual y la facilidad de uso de la interfaz; no es verificable con pytest backend"
+  },
+  "RNF001-S02": {
+    "scope": "frontend-or-e2e",
+    "reason": "depende de responsividad y adaptacion visual en dispositivos moviles/tabletas"
+  },
+  "RNF001-S03": {
+    "scope": "frontend-or-e2e",
+    "reason": "depende de tiempos percibidos y navegacion de interfaz, no de una respuesta backend aislada"
+  },
+  "RNF002-S01": {
+    "scope": "frontend-or-e2e",
+    "reason": "describe continuidad de servicio y disponibilidad en produccion; requiere verificacion de despliegue/infraestructura"
+  },
+  "RNF002-S02": {
+    "scope": "frontend-or-e2e",
+    "reason": "depende de disponibilidad 24/7 en produccion y no de un contrato de API aislado"
+  },
+  "RNF002-S03": {
+    "scope": "frontend-or-e2e",
+    "reason": "depende del comportamiento de error y mensajeria en capa de presentacion o gateways"
+  }
+}

@@ -7,7 +7,10 @@ Las funciones registradas en IMPLEMENTATIONS reciben solo fixtures declaradas en
 from __future__ import annotations
 
 import inspect
+import csv
 from datetime import datetime
+from datetime import timedelta
+from io import StringIO
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
@@ -531,6 +534,56 @@ def impl_rf006_s05(authenticated_almacenista_client: APIClient, sample_product, 
     assert r.status_code == status.HTTP_201_CREATED
 
 
+def impl_rf006_s06(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+    from apps.inventory.models import StockByLocation
+
+    loc = sample_locations[0]
+    sample_product.weight_grams = 500000
+    sample_product.save(update_fields=["weight_grams"])
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=10)
+    url = reverse("movements-dispatches")
+    r = authenticated_almacenista_client.post(
+        url,
+        {
+            "product_id": str(sample_product.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "movement_type": MovementType.SALIDA_VENTA_MAYOR,
+            "scanned_code": sample_product.barcode,
+            "order_sku": sample_product.sku,
+            "serial_number": "SN-RF006-06",
+            "customer_data": _MAJEUR_CD,
+            "cold_chain_acknowledged": True,
+            "electrical_safety_acknowledged": True,
+        },
+        format="json",
+    )
+    assert r.status_code == status.HTTP_201_CREATED
+    assert r.data["invoice_number"]
+
+
+def impl_rf006_s07(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+    from apps.inventory.models import StockByLocation
+
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=10)
+    url = reverse("movements-dispatches")
+    r = authenticated_almacenista_client.post(
+        url,
+        {
+            "product_id": str(sample_product.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "movement_type": MovementType.SALIDA_VENTA_MENOR,
+            "serial_number": "SN-RF006-07",
+            "cold_chain_acknowledged": True,
+            "electrical_safety_acknowledged": True,
+        },
+        format="json",
+    )
+    assert r.status_code == status.HTTP_201_CREATED
+
+
 # --- RF-007 -----------------------------------------------------------------
 
 
@@ -593,6 +646,62 @@ def impl_rf007_s03(almacenista_user, sample_product, sample_locations, db):
         )
 
 
+def _create_transfer(api_client: APIClient, user, product, origin, destination, quantity: int):
+    from apps.inventory.models import StockByLocation
+
+    api_client.force_authenticate(user=user)
+    StockByLocation.objects.create(product=product, location=origin, current_stock=10)
+    url = reverse("movements-transfers")
+    return api_client.post(
+        url,
+        {
+            "product_id": str(product.id),
+            "origin_id": str(origin.id),
+            "destination_id": str(destination.id),
+            "quantity": quantity,
+            "cold_chain_acknowledged": True,
+            "electrical_safety_acknowledged": True,
+        },
+        format="json",
+    )
+
+
+def impl_rf007_s04(api_client: APIClient, auxiliar_user, sample_product, sample_locations, db):
+    a, b = sample_locations[0], sample_locations[1]
+    r = _create_transfer(api_client, auxiliar_user, sample_product, a, b, 3)
+    assert r.status_code == status.HTTP_201_CREATED
+    from apps.movements.models import Movement
+
+    original = Movement.objects.get(pk=r.data["id"])
+    corrected_at = original.created_at + timedelta(minutes=2)
+    with patch("django.utils.timezone.now", return_value=corrected_at):
+        corr = api_client.post(
+            reverse("movements-corrections", kwargs={"pk": original.id}),
+            {"origin_id": str(a.id), "destination_id": str(b.id), "quantity": 2},
+            format="json",
+        )
+    assert corr.status_code == status.HTTP_201_CREATED
+    assert Movement.objects.filter(related_movement=original).exists()
+
+
+def impl_rf007_s05(api_client: APIClient, auxiliar_user, sample_product, sample_locations, db):
+    a, b = sample_locations[0], sample_locations[1]
+    r = _create_transfer(api_client, auxiliar_user, sample_product, a, b, 3)
+    assert r.status_code == status.HTTP_201_CREATED
+    from apps.movements.models import Movement
+
+    original = Movement.objects.get(pk=r.data["id"])
+    corrected_at = original.created_at + timedelta(minutes=6)
+    with patch("django.utils.timezone.now", return_value=corrected_at):
+        corr = api_client.post(
+            reverse("movements-corrections", kwargs={"pk": original.id}),
+            {"origin_id": str(a.id), "destination_id": str(b.id), "quantity": 2},
+            format="json",
+        )
+    assert corr.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    assert Movement.objects.filter(related_movement=original).count() == 0
+
+
 # --- RF-008 / RF-009 --------------------------------------------------------
 
 
@@ -636,6 +745,105 @@ def impl_rf008_s02(authenticated_almacenista_client: APIClient, sample_product, 
         format="json",
     )
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+def impl_rf008_s03(authenticated_almacenista_client: APIClient, sample_locations, db):
+    from apps.inventory.models import StockByLocation
+    from tests.factories import ElectroCategoryFactory, ProductFactory
+    from apps.movements.models import Movement
+
+    cat = ElectroCategoryFactory()
+    p = ProductFactory(category=cat, sku="P-0803")
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=p, location=loc, current_stock=1)
+    sale = authenticated_almacenista_client.post(
+        reverse("movements-dispatches"),
+        {
+            "product_id": str(p.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "movement_type": MovementType.SALIDA_VENTA_MENOR,
+            "serial_number": "SN-RET-ORIG",
+            "cold_chain_acknowledged": True,
+            "electrical_safety_acknowledged": True,
+        },
+        format="json",
+    )
+    assert sale.status_code == status.HTTP_201_CREATED
+    original = Movement.objects.get(pk=sale.data["id"])
+    r = authenticated_almacenista_client.post(
+        reverse("movements-returns"),
+        {
+            "product_id": str(p.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "serial_number": "SN-RET-APPROVED",
+            "related_movement_id": str(original.id),
+        },
+        format="json",
+    )
+    assert r.status_code == status.HTTP_201_CREATED
+    assert Movement.objects.filter(related_movement=original).exists()
+
+
+def impl_rf008_s04(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+    from apps.inventory.models import StockByLocation
+
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=3)
+    r = authenticated_almacenista_client.post(
+        reverse("movements-returns"),
+        {
+            "product_id": str(sample_product.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "serial_number": "SN-RET-REJECT",
+        },
+        format="json",
+    )
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert StockByLocation.objects.get(product=sample_product, location=loc).current_stock == 3
+
+
+def impl_rf008_s05(authenticated_almacenista_client: APIClient, sample_locations, db):
+    from apps.inventory.models import StockByLocation
+    from tests.factories import ElectroCategoryFactory, ProductFactory
+
+    cat = ElectroCategoryFactory()
+    p = ProductFactory(category=cat, sku="P-0805")
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=p, location=loc, current_stock=1)
+    sale = authenticated_almacenista_client.post(
+        reverse("movements-dispatches"),
+        {
+            "product_id": str(p.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "movement_type": MovementType.SALIDA_VENTA_MENOR,
+            "serial_number": "SN-RET-HIST",
+            "cold_chain_acknowledged": True,
+            "electrical_safety_acknowledged": True,
+        },
+        format="json",
+    )
+    assert sale.status_code == status.HTTP_201_CREATED
+    original = sale.data["id"]
+    return_movement = authenticated_almacenista_client.post(
+        reverse("movements-returns"),
+        {
+            "product_id": str(p.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "serial_number": "SN-RET-HIST-01",
+            "related_movement_id": str(original),
+        },
+        format="json",
+    )
+    assert return_movement.status_code == status.HTTP_201_CREATED
+    r = authenticated_almacenista_client.get(reverse("movements-returns"))
+    assert r.status_code == status.HTTP_200_OK
+    results = r.data.get("results", r.data)
+    assert any(str(item.get("related_movement")) == str(original) for item in results)
 
 
 def impl_rf009_s01(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
@@ -713,6 +921,24 @@ def impl_rf009_s04(authenticated_almacenista_client: APIClient, sample_product, 
     assert r.status_code == status.HTTP_201_CREATED
 
 
+def impl_rf009_s05(api_client: APIClient, auxiliar_user, sample_product, sample_locations, db):
+    a, b = sample_locations[0], sample_locations[1]
+    r = _create_transfer(api_client, auxiliar_user, sample_product, a, b, 4)
+    assert r.status_code == status.HTTP_201_CREATED
+    from apps.movements.models import Movement
+
+    original = Movement.objects.get(pk=r.data["id"])
+    corrected_at = original.created_at + timedelta(minutes=3)
+    with patch("django.utils.timezone.now", return_value=corrected_at):
+        corr = api_client.post(
+            reverse("movements-corrections", kwargs={"pk": original.id}),
+            {"origin_id": str(a.id), "destination_id": str(b.id), "quantity": 2},
+            format="json",
+        )
+    assert corr.status_code == status.HTTP_201_CREATED
+    assert Movement.objects.filter(related_movement=original).exists()
+
+
 def impl_rf009_s06(authenticated_almacenista_client: APIClient):
     url = reverse("movements-adjustments")
     r = authenticated_almacenista_client.get(url)
@@ -754,6 +980,94 @@ def impl_rf010_s05(authenticated_almacenista_client: APIClient):
     assert r.status_code == status.HTTP_200_OK
 
 
+def impl_rf010_s03(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+    from apps.inventory.models import StockByLocation
+    from apps.movements.models import Movement
+
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    sale = authenticated_almacenista_client.post(
+        reverse("movements-dispatches"),
+        {
+            "product_id": str(sample_product.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "movement_type": MovementType.SALIDA_VENTA_MENOR,
+            "scanned_code": sample_product.barcode,
+            "order_sku": sample_product.sku,
+            "serial_number": "SN-RF010-03",
+            "cold_chain_acknowledged": True,
+            "electrical_safety_acknowledged": True,
+        },
+        format="json",
+    )
+    assert sale.status_code == status.HTTP_201_CREATED
+    movement = Movement.objects.get(pk=sale.data["id"])
+    start = movement.created_at.replace(hour=0, minute=0, second=0, microsecond=0)
+    end = movement.created_at
+    report = authenticated_almacenista_client.get(
+        reverse("reports-movements-history"),
+        {"start": start.isoformat(), "end": end.isoformat(), "product_id": str(sample_product.id)},
+    )
+    assert report.status_code == status.HTTP_200_OK
+    rows = report.data
+    buffer = StringIO()
+    writer = csv.DictWriter(
+        buffer,
+        fieldnames=["id", "movement_type", "product_sku", "quantity", "invoice_number"],
+    )
+    writer.writeheader()
+    for row in rows:
+        writer.writerow(
+            {
+                "id": row["id"],
+                "movement_type": row["movement_type"],
+                "product_sku": row["product_sku"],
+                "quantity": row["quantity"],
+                "invoice_number": row.get("invoice_number") or "",
+            }
+        )
+    csv_output = buffer.getvalue()
+    assert str(movement.id) in csv_output
+    assert sample_product.sku in csv_output
+
+
+def impl_rf010_s06(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+    from apps.inventory.models import StockByLocation
+    from apps.movements.models import Movement
+
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    sale = authenticated_almacenista_client.post(
+        reverse("movements-dispatches"),
+        {
+            "product_id": str(sample_product.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "movement_type": MovementType.SALIDA_VENTA_MAYOR,
+            "scanned_code": sample_product.barcode,
+            "order_sku": sample_product.sku,
+            "serial_number": "SN-RF010-06",
+            "customer_data": _MAJEUR_CD,
+            "cold_chain_acknowledged": True,
+            "electrical_safety_acknowledged": True,
+        },
+        format="json",
+    )
+    assert sale.status_code == status.HTTP_201_CREATED
+    movement = Movement.objects.get(pk=sale.data["id"])
+    history = authenticated_almacenista_client.get(
+        reverse("reports-invoices"), {"invoice_number": movement.invoice_number}
+    )
+    assert history.status_code == status.HTTP_200_OK
+    invoice_rows = history.data.get("results", history.data)
+    assert any(row["invoice_number"] == movement.invoice_number for row in invoice_rows)
+    download = authenticated_almacenista_client.get(
+        reverse("movements-dispatch-invoice", kwargs={"pk": movement.id})
+    )
+    assert download.status_code == status.HTTP_404_NOT_FOUND
+
+
 def impl_rf010_s07(api_client: APIClient, auxiliar_user):
     from datetime import timezone as dt_timezone
 
@@ -777,6 +1091,132 @@ def impl_rf011_s01(authenticated_almacenista_client: APIClient, sample_product, 
     url = reverse("alerts-list")
     r = authenticated_almacenista_client.get(url)
     assert r.status_code == status.HTTP_200_OK
+
+
+def impl_rf011_s02(authenticated_almacenista_client: APIClient, sample_product, db):
+    from datetime import timedelta
+    from django.utils import timezone
+    from apps.alerts.models import Alert, AlertType
+    from apps.alerts.services import sync_expiry_alerts_for_product
+
+    sample_product.expiration_date = timezone.now().date() + timedelta(days=60)
+    sample_product.save(update_fields=["expiration_date"])
+    sync_expiry_alerts_for_product(sample_product.id)
+    assert Alert.objects.filter(
+        product=sample_product,
+        alert_type=AlertType.EXPIRATION_60,
+        is_resolved=False,
+    ).exists()
+    alerts = authenticated_almacenista_client.get(reverse("alerts-list"))
+    assert alerts.status_code == status.HTTP_200_OK
+
+
+def impl_rf011_s03(authenticated_almacenista_client: APIClient, sample_product, db):
+    from datetime import timedelta
+    from django.utils import timezone
+    from apps.alerts.models import Alert, AlertType
+    from apps.alerts.services import sync_expiry_alerts_for_product
+
+    sample_product.expiration_date = timezone.now().date() + timedelta(days=30)
+    sample_product.save(update_fields=["expiration_date"])
+    sync_expiry_alerts_for_product(sample_product.id)
+    assert Alert.objects.filter(
+        product=sample_product,
+        alert_type=AlertType.EXPIRATION_30,
+        is_resolved=False,
+    ).exists()
+
+
+def impl_rf011_s04(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+    from apps.inventory.models import StockByLocation
+
+    sample_product.requires_cold_chain = True
+    sample_product.save(update_fields=["requires_cold_chain"])
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=0)
+    r = authenticated_almacenista_client.post(
+        reverse("movements-entries"),
+        {
+            "product_id": str(sample_product.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "serial_number": "SN-RF011-04",
+            "electrical_safety_acknowledged": True,
+        },
+        format="json",
+    )
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+def impl_rf011_s05(authenticated_almacenista_client: APIClient, sample_locations, db):
+    from apps.inventory.models import StockByLocation
+    from tests.factories import ElectroCategoryFactory, ProductFactory
+
+    cat = ElectroCategoryFactory()
+    p = ProductFactory(category=cat, sku="ELE-1105")
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=p, location=loc, current_stock=0)
+    r = authenticated_almacenista_client.post(
+        reverse("movements-entries"),
+        {
+            "product_id": str(p.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "serial_number": "SN-RF011-05",
+            "cold_chain_acknowledged": True,
+        },
+        format="json",
+    )
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+def impl_rf011_s06(authenticated_almacenista_client: APIClient, authenticated_administrador_client: APIClient, sample_product, sample_locations, db):
+    from apps.alerts.models import Alert, AlertType
+    from apps.alerts.services import sync_stock_alerts_for_product
+    from apps.inventory.models import StockByLocation
+
+    loc = sample_locations[0]
+    sample_product.reorder_point = 10
+    sample_product.save(update_fields=["reorder_point"])
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=8)
+    sync_stock_alerts_for_product(sample_product.id)
+    active = Alert.objects.filter(product=sample_product, alert_type=AlertType.LOW_STOCK, is_resolved=False)
+    assert active.exists()
+    kpi = authenticated_administrador_client.get(reverse("reports-kpi"))
+    assert kpi.status_code == status.HTTP_200_OK
+    assert kpi.data["active_alerts_unresolved"] >= 1
+    alerts = authenticated_almacenista_client.get(reverse("alerts-list"))
+    assert alerts.status_code == status.HTTP_200_OK
+    results = alerts.data.get("results", alerts.data)
+    assert any(str(item["id"]) == str(active.first().id) for item in results)
+
+
+def impl_rf011_s07(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+    from apps.alerts.models import Alert, AlertType
+    from apps.alerts.services import sync_stock_alerts_for_product
+    from apps.inventory.models import StockByLocation
+
+    loc = sample_locations[0]
+    sample_product.reorder_point = 10
+    sample_product.save(update_fields=["reorder_point"])
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=8)
+    sync_stock_alerts_for_product(sample_product.id)
+    alert = Alert.objects.get(product=sample_product, alert_type=AlertType.LOW_STOCK, is_resolved=False)
+    r = authenticated_almacenista_client.post(
+        reverse("movements-entries"),
+        {
+            "product_id": str(sample_product.id),
+            "location_id": str(loc.id),
+            "quantity": 5,
+            "serial_number": "SN-RF011-07",
+            "cold_chain_acknowledged": True,
+            "electrical_safety_acknowledged": True,
+        },
+        format="json",
+    )
+    assert r.status_code == status.HTTP_201_CREATED
+    alert.refresh_from_db()
+    assert alert.is_resolved is True
 
 
 def impl_rf012_s01(authenticated_almacenista_client: APIClient, sample_product, sample_locations):
@@ -810,6 +1250,280 @@ def impl_rf012_s06(api_client: APIClient, auxiliar_user):
     with patch("django.utils.timezone.now", return_value=inner):
         r = api_client.get(url)
     assert r.status_code == status.HTTP_403_FORBIDDEN
+
+
+def impl_rf012_s03(authenticated_almacenista_client: APIClient, almacenista_user, db):
+    create = authenticated_almacenista_client.post(
+        reverse("auth-users"),
+        {
+            "username": "rf012_cred_mgr",
+            "email": "rf012_cred_mgr@example.com",
+            "password": "secreto12345",
+            "role": UserRole.AUXILIAR_DESPACHO,
+        },
+        format="json",
+    )
+    assert create.status_code == status.HTTP_201_CREATED
+    created_id = create.data["id"]
+    update = authenticated_almacenista_client.patch(
+        reverse("auth-user-detail", kwargs={"pk": created_id}),
+        {"password": "otraClave123"},
+        format="json",
+    )
+    assert update.status_code == status.HTTP_200_OK
+    disable = authenticated_almacenista_client.post(
+        reverse("auth-user-disable", kwargs={"pk": created_id})
+    )
+    assert disable.status_code == status.HTTP_204_NO_CONTENT
+    assert AuditLog.objects.filter(event_type=AuditEventType.USER_CREATED).exists()
+    assert AuditLog.objects.filter(event_type=AuditEventType.USER_UPDATED).exists()
+    assert AuditLog.objects.filter(event_type=AuditEventType.USER_DISABLED).exists()
+
+
+def impl_rf012_s04(authenticated_almacenista_client: APIClient, sample_locations, db):
+    from apps.inventory.models import StockByLocation
+    from apps.movements.models import Movement
+    from tests.factories import ElectroCategoryFactory, ProductFactory
+
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="P-1204")
+    product.requires_cold_chain = True
+    product.save(update_fields=["requires_cold_chain"])
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=product, location=loc, current_stock=0)
+    entry = authenticated_almacenista_client.post(
+        reverse("movements-entries"),
+        {
+            "product_id": str(product.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "serial_number": "SN-ACK-1204",
+            "cold_chain_acknowledged": True,
+            "electrical_safety_acknowledged": True,
+        },
+        format="json",
+    )
+    assert entry.status_code == status.HTTP_201_CREATED
+    movement_id = entry.data["id"]
+    assert Movement.objects.filter(pk=movement_id).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.ALERT_ACKNOWLEDGED,
+        movement_id=movement_id,
+    ).exists()
+
+
+def impl_rf012_s07(api_client: APIClient, auxiliar_user, sample_product, sample_locations, db):
+    from apps.inventory.models import StockByLocation
+    from apps.movements.models import Movement
+
+    a, b = sample_locations[0], sample_locations[1]
+    api_client.force_authenticate(user=auxiliar_user)
+    StockByLocation.objects.create(product=sample_product, location=a, current_stock=10)
+    create = api_client.post(
+        reverse("movements-transfers"),
+        {
+            "product_id": str(sample_product.id),
+            "origin_id": str(a.id),
+            "destination_id": str(b.id),
+            "quantity": 2,
+            "cold_chain_acknowledged": True,
+            "electrical_safety_acknowledged": True,
+        },
+        format="json",
+    )
+    assert create.status_code == status.HTTP_201_CREATED
+    original = Movement.objects.get(pk=create.data["id"])
+    corrected_at = original.created_at + timedelta(minutes=2)
+    with patch("django.utils.timezone.now", return_value=corrected_at):
+        corr = api_client.post(
+            reverse("movements-corrections", kwargs={"pk": original.id}),
+            {"origin_id": str(a.id), "destination_id": str(b.id), "quantity": 1},
+            format="json",
+        )
+    assert corr.status_code == status.HTTP_201_CREATED
+    assert AuditLog.objects.filter(event_type=AuditEventType.MOVEMENT_CREATED).exists()
+    assert AuditLog.objects.filter(event_type=AuditEventType.MOVEMENT_CORRECTED).exists()
+
+
+def impl_rf012_s08(authenticated_almacenista_client: APIClient, almacenista_user, sample_product, sample_locations, db):
+    from apps.audit.services import log_event
+    from apps.inventory.models import StockByLocation
+
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    movement = authenticated_almacenista_client.post(
+        reverse("movements-entries"),
+        {
+            "product_id": str(sample_product.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "serial_number": "SN-IMMUT",
+            "cold_chain_acknowledged": True,
+            "electrical_safety_acknowledged": True,
+        },
+        format="json",
+    )
+    assert movement.status_code == status.HTTP_201_CREATED
+    audit = log_event(
+        AuditEventType.MOVEMENT_CREATED,
+        description="Movimiento de prueba para inmutabilidad",
+        user=almacenista_user,
+        detail={"scenario": "RF012-S08"},
+    )
+    response = authenticated_almacenista_client.patch(
+        reverse("audit-log-detail", kwargs={"pk": audit.id}),
+        {"description": "modificado"},
+        format="json",
+    )
+    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD
+    ).exists()
+
+
+def impl_rnf003_s01(api_client: APIClient):
+    from config.settings import production as production_settings
+
+    assert production_settings.SECURE_SSL_REDIRECT is True
+    assert production_settings.SESSION_COOKIE_SECURE is True
+    assert production_settings.CSRF_COOKIE_SECURE is True
+    assert "django.middleware.security.SecurityMiddleware" in production_settings.MIDDLEWARE
+
+
+def impl_rnf003_s04(authenticated_almacenista_client: APIClient, almacenista_user, sample_product, sample_locations, db):
+    from apps.inventory.models import StockByLocation
+    from apps.movements.models import Movement
+
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    sale = authenticated_almacenista_client.post(
+        reverse("movements-dispatches"),
+        {
+            "product_id": str(sample_product.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "movement_type": MovementType.SALIDA_VENTA_MENOR,
+            "scanned_code": sample_product.barcode,
+            "order_sku": sample_product.sku,
+            "serial_number": "SN-IMM-0034",
+            "cold_chain_acknowledged": True,
+            "electrical_safety_acknowledged": True,
+        },
+        format="json",
+    )
+    assert sale.status_code == status.HTTP_201_CREATED
+    movement = Movement.objects.get(pk=sale.data["id"])
+    response = authenticated_almacenista_client.patch(
+        reverse("movements-detail", kwargs={"pk": movement.id}),
+        {"quantity": 2},
+        format="json",
+    )
+    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD
+    ).exists()
+
+
+def impl_rnf004_s02(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+    from apps.inventory.models import StockByLocation
+    import time
+
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    t0 = time.perf_counter()
+    r = authenticated_almacenista_client.post(
+        reverse("movements-entries"),
+        {
+            "product_id": str(sample_product.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "serial_number": "SN-RNF004-02",
+            "cold_chain_acknowledged": True,
+            "electrical_safety_acknowledged": True,
+        },
+        format="json",
+    )
+    elapsed = time.perf_counter() - t0
+    assert r.status_code == status.HTTP_201_CREATED
+    assert elapsed < 3.0
+
+
+def impl_rnf004_s03(authenticated_almacenista_client: APIClient, authenticated_administrador_client: APIClient, auxiliar_user, sample_product, sample_locations, db):
+    from apps.inventory.models import StockByLocation
+    import time
+
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    aux_client = APIClient()
+    aux_client.force_authenticate(user=auxiliar_user)
+
+    start = time.perf_counter()
+    response_1 = authenticated_almacenista_client.get(reverse("inventory-full"))
+    elapsed_1 = time.perf_counter() - start
+
+    start = time.perf_counter()
+    response_2 = authenticated_administrador_client.get(reverse("reports-kpi"))
+    elapsed_2 = time.perf_counter() - start
+
+    start = time.perf_counter()
+    response_3 = aux_client.get(reverse("inventory-search"), {"q": sample_product.sku[:3]})
+    elapsed_3 = time.perf_counter() - start
+
+    assert response_1.status_code == status.HTTP_200_OK
+    assert response_2.status_code == status.HTTP_200_OK
+    assert response_3.status_code == status.HTTP_200_OK
+    assert elapsed_1 < 3.0
+    assert elapsed_2 < 3.0
+    assert elapsed_3 < 3.0
+
+
+def impl_rnf005_s02(api_client: APIClient):
+    schema = api_client.get(reverse("schema"), {"format": "json"})
+    assert schema.status_code == status.HTTP_200_OK
+    data = schema.json()
+    paths = data["paths"]
+    expected = [
+        "/api/v1/auth/users/",
+        "/api/v1/movements/entries/",
+        "/api/v1/movements/dispatches/",
+        "/api/v1/movements/transfers/",
+        "/api/v1/reports/sales/summary/",
+        "/api/v1/alerts/",
+        "/api/v1/audit/",
+    ]
+    for path in expected:
+        assert path in paths
+
+
+def impl_rnf005_s03(db):
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[2]
+    architecture = (root / "docs" / "README_ARQUITECTURA.md").read_text(encoding="utf-8")
+    assert "services.py" in architecture
+    assert "selectors.py" in architecture
+    assert "Negocio" in architecture or "Business logic" in architecture
+
+
+def impl_rnf006_s02(api_client: APIClient, auxiliar_user, sample_product, sample_locations, db):
+    from apps.inventory.models import StockByLocation
+
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    api_client.force_authenticate(user=auxiliar_user)
+    response = api_client.get(reverse("reports-invoices"))
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+def impl_rnf006_s03(db):
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[2]
+    scenario = (root / "docs" / "test" / "scenarios" / "RNF006-S03.md").read_text(encoding="utf-8")
+    ers = (root / "docs" / "ERS_ICM_Requisitos.md").read_text(encoding="utf-8")
+    assert "autorización expresa" in scenario.lower()
+    assert "no deben ejecutarse" in scenario.lower()
+    assert "autorización expresa" in ers.lower()
 
 
 def impl_rnf003_s02(api_client: APIClient, auxiliar_user):
@@ -920,30 +1634,58 @@ IMPLEMENTATIONS: dict[str, object] = {
     "RF006-S03": impl_rf006_s03,
     "RF006-S04": impl_rf006_s04,
     "RF006-S05": impl_rf006_s05,
+    "RF006-S06": impl_rf006_s06,
+    "RF006-S07": impl_rf006_s07,
     "RF007-S01": impl_rf007_s01,
     "RF007-S02": impl_rf007_s02,
     "RF007-S03": impl_rf007_s03,
+    "RF007-S04": impl_rf007_s04,
+    "RF007-S05": impl_rf007_s05,
     "RF008-S01": impl_rf008_s01,
     "RF008-S02": impl_rf008_s02,
+    "RF008-S03": impl_rf008_s03,
+    "RF008-S04": impl_rf008_s04,
+    "RF008-S05": impl_rf008_s05,
     "RF009-S01": impl_rf009_s01,
     "RF009-S02": impl_rf009_s02,
     "RF009-S03": impl_rf009_s03,
     "RF009-S04": impl_rf009_s04,
+    "RF009-S05": impl_rf009_s05,
     "RF009-S06": impl_rf009_s06,
     "RF010-S01": impl_rf010_s01,
     "RF010-S02": impl_rf010_s02,
+    "RF010-S03": impl_rf010_s03,
     "RF010-S04": impl_rf010_s04,
     "RF010-S05": impl_rf010_s05,
+    "RF010-S06": impl_rf010_s06,
     "RF010-S07": impl_rf010_s07,
     "RF011-S01": impl_rf011_s01,
+    "RF011-S02": impl_rf011_s02,
+    "RF011-S03": impl_rf011_s03,
+    "RF011-S04": impl_rf011_s04,
+    "RF011-S05": impl_rf011_s05,
+    "RF011-S06": impl_rf011_s06,
+    "RF011-S07": impl_rf011_s07,
+    "RF012-S03": impl_rf012_s03,
+    "RF012-S04": impl_rf012_s04,
     "RF012-S01": impl_rf012_s01,
     "RF012-S02": impl_rf012_s02,
     "RF012-S05": impl_rf012_s05,
     "RF012-S06": impl_rf012_s06,
+    "RF012-S07": impl_rf012_s07,
+    "RF012-S08": impl_rf012_s08,
+    "RNF003-S01": impl_rnf003_s01,
     "RNF003-S02": impl_rnf003_s02,
     "RNF003-S03": impl_rnf003_s03,
+    "RNF003-S04": impl_rnf003_s04,
+    "RNF004-S02": impl_rnf004_s02,
+    "RNF004-S03": impl_rnf004_s03,
     "RNF004-S01": impl_rnf004_s01,
+    "RNF005-S02": impl_rnf005_s02,
+    "RNF005-S03": impl_rnf005_s03,
     "RNF005-S01": impl_rnf005_s01,
+    "RNF006-S02": impl_rnf006_s02,
+    "RNF006-S03": impl_rnf006_s03,
     "RNF006-S01": impl_rnf006_s01,
 }
 
