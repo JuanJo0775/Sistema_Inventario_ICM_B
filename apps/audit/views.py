@@ -7,6 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from apps.audit.models import AuditLog
 from apps.audit.selectors import get_audit_log
 from apps.audit.serializers import AuditLogSerializer
+from apps.audit.services import log_immutable_modification_attempt
+from shared.exceptions import ImmutableRecordError
 from shared.openapi import TAG_AUDIT, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenistaOrAdministrador
@@ -67,6 +69,14 @@ class AuditLogDetailView(generics.RetrieveAPIView):
     serializer_class = AuditLogSerializer
     queryset = AuditLog.objects.select_related("user", "movement").all()
     lookup_field = "pk"
+
+    def http_method_not_allowed(self, request, *args, **kwargs):
+        log_immutable_modification_attempt(
+            user=request.user if getattr(request.user, "is_authenticated", False) else None,
+            request=request,
+            detail={"resource": "audit_log", "audit_log_id": str(kwargs.get("pk") or "")},
+        )
+        raise ImmutableRecordError()
 
     @extend_schema(
         responses={

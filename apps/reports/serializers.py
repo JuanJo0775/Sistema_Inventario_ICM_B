@@ -46,3 +46,11 @@ class KpiDashboardSerializer(serializers.Serializer):
     active_alerts = serializers.IntegerField()
     movements_today = serializers.IntegerField()
     low_stock_items = serializers.IntegerField()
+
+
+class ReportDatasetSerializer(serializers.Serializer):
+    report = serializers.CharField()
+    generated_at = serializers.DateTimeField()
+    filters = serializers.JSONField()
+    data = serializers.JSONField()
+    suggested_filename = serializers.CharField()
