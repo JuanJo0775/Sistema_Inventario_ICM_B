@@ -10,7 +10,17 @@ from django.db import models
 from django.db.models import Q
 
 from shared.models import BaseModel
+# Determinar el nombre de argumento correcto para CheckConstraint
+from inspect import signature as _inspect_signature
 
+_cc_params = _inspect_signature(models.CheckConstraint.__init__).parameters
+if "condition" in _cc_params:
+    _cc_kw = {"condition": Q(current_stock__gte=0)}
+else:
+    _cc_kw = {"check": Q(current_stock__gte=0)}
+
+# Constraint reutilizable para Meta
+_STOCK_NON_NEGATIVE_CC = models.CheckConstraint(name="stock_non_negative", **_cc_kw)
 
 # Palabras clave para detectar automáticamente si una ubicación es de tipo vitrina (minorista)
 _VITRINA_KEYWORDS = {"vitrina", "mostrador", "exhibición", "exhibicion", "display", "tienda", "punto de venta"}
@@ -88,10 +98,7 @@ class StockByLocation(BaseModel):
             models.UniqueConstraint(
                 fields=("product", "location"), name="uniq_product_location_stock"
             ),
-            models.CheckConstraint(
-                condition=Q(current_stock__gte=0),
-                name="stock_non_negative",
-            ),
+            _STOCK_NON_NEGATIVE_CC,
         ]
         indexes = [
             models.Index(fields=("product", "location")),
