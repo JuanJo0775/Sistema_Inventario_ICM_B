@@ -7,11 +7,11 @@ Instrucciones para asistentes de código (GitHub Copilot, Cursor, Antigravity, W
 | Documento | Propósito |
 |-----------|-----------|
 | `docs/README_ARQUITECTURA.md` | Arquitectura modular, ledger + stock derivado, BR-01…BR-13, SOLID, testing, Docker |
-| `docs/ERS_ICM_Requisitos.md` | RF-001…RF-012, RNF-001…RNF-006, criterios Gherkin, tabla de trazabilidad |
-| `docs/README_API.md` | Especificación `/api/v1/`, JWT, tags OpenAPI, checklist de publicación |
+| `docs/requisitos/ERS_ICM_Requisitos.md` | RF-001…RF-012, RNF-001…RNF-006, criterios Gherkin, tabla de trazabilidad |
+| `docs/api/README_API.md` | Especificación `/api/v1/`, JWT, tags OpenAPI, checklist de publicación |
 | `docs/test/README_TEST.md` | Guía oficial de pruebas: suite Gherkin dinámica, unit/integration docs y comandos de regeneración |
 | `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` | Matriz viva RF ↔ tests con cobertura y brechas documentadas |
-| `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` | Contexto de negocio ICM, marca Can, 3 ubicaciones, clientes mayoristas |
+| `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` | Contexto de negocio ICM, marca Can, 3 ubicaciones, clientes mayoristas |
 
 ## Cursor rules vinculados
 
@@ -212,7 +212,7 @@ Ver [`.cursor/rules/icm-capas-django.mdc`](.cursor/rules/icm-capas-django.mdc) p
 ### Contexto y trazabilidad
 
 Ver [`.cursor/rules/icm-contexto-requisitos.mdc`](.cursor/rules/icm-contexto-requisitos.mdc) para:
-- Antes de cambiar comportamiento o contratos, alinear con `docs/README_ARQUITECTURA.md`, `docs/ERS_ICM_Requisitos.md` y `docs/README_API.md`.
+- Antes de cambiar comportamiento o contratos, alinear con `docs/README_ARQUITECTURA.md`, `docs/requisitos/ERS_ICM_Requisitos.md` y `docs/api/README_API.md`.
 - En cambios de lógica de dominio, referenciar RF/BR/RNF impactados en docstrings/PRs.
 - Recordar horario y roles del negocio (`auxiliar_despacho` en America/Bogota: 07:00–12:00 y 14:00–17:00).
 

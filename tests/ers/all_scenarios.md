@@ -14,8 +14,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF001** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF001` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -71,8 +71,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF001** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF001` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -126,8 +126,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF001** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF001` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -182,8 +182,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF001** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF001` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -237,8 +237,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF001** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF001` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -290,8 +290,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF002** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF002` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -347,8 +347,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF002** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF002` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -403,8 +403,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF002** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF002` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -461,8 +461,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF002** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF002` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -516,8 +516,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF002** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF002` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -570,8 +570,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF003` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -627,8 +627,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF003` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -681,8 +681,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF003` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -735,8 +735,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF003` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -790,8 +790,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF003` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -844,8 +844,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF003` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -900,8 +900,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF003** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF003` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -953,8 +953,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF004** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF004` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1008,8 +1008,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF004** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF004` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1062,8 +1062,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF004** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF004` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1117,8 +1117,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF004** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF004` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1172,8 +1172,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF004** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF004` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1226,8 +1226,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF004** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF004` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1279,8 +1279,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF004** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF004` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1331,8 +1331,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF005** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF005` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1392,8 +1392,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF005** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF005` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1449,8 +1449,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF005** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF005` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1506,8 +1506,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF005** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF005` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1563,8 +1563,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF005** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF005` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1620,8 +1620,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF005** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF005` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1676,8 +1676,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF005** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF005` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1730,8 +1730,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF006** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF006` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1793,8 +1793,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF006** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF006` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1850,8 +1850,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF006** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF006` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1908,8 +1908,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF006** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF006` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -1967,8 +1967,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF006** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF006` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2026,8 +2026,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF006** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF006` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2083,8 +2083,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF006** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF006` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2137,8 +2137,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF007** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF007` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF007` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2197,8 +2197,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF007** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF007` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF007` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2253,8 +2253,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF007** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF007` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF007` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2308,8 +2308,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF007** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF007` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF007` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2366,8 +2366,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF007** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF007` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF007` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2420,8 +2420,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF008** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF008` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF008` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2480,8 +2480,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF008** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF008` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF008` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2536,8 +2536,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF008** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF008` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF008` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2596,8 +2596,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF008** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF008` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF008` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2655,8 +2655,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF008** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF008` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF008` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2708,8 +2708,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF009** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF009` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF009` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2768,8 +2768,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF009** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF009` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF009` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2824,8 +2824,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF009** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF009` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF009` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2879,8 +2879,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF009** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF009` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF009` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2939,8 +2939,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF009** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF009` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF009` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -2997,8 +2997,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF009** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF009` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF009` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3051,8 +3051,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF010** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF010` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF010` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3109,8 +3109,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF010** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF010` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF010` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3167,8 +3167,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF010** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF010` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF010` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3223,8 +3223,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF010** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF010` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF010` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3279,8 +3279,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF010** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF010` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF010` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3334,8 +3334,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF010** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF010` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF010` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3391,8 +3391,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF010** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF010` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF010` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3444,8 +3444,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF011** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF011` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF011` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3501,8 +3501,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF011** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF011` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF011` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3556,8 +3556,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF011** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF011` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF011` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3612,8 +3612,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF011** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF011` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF011` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3667,8 +3667,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF011** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF011` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF011` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3723,8 +3723,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF011** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF011` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF011` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3778,8 +3778,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF011** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF011` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF011` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3831,8 +3831,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF012` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3895,8 +3895,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF012` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -3949,8 +3949,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF012` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4003,8 +4003,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF012` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4057,8 +4057,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF012` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4113,8 +4113,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF012` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4168,8 +4168,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF012` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4224,8 +4224,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RF012** — escena
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RF012` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RF012` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4281,8 +4281,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF001** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF001` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4335,8 +4335,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF001** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF001` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4390,8 +4390,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF001** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF001` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF001` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4442,8 +4442,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF002** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF002` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4496,8 +4496,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF002** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF002` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4550,8 +4550,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF002** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF002` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF002` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4602,8 +4602,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF003** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF003` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4656,8 +4656,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF003** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF003` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4711,8 +4711,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF003** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF003` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4765,8 +4765,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF003** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF003` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF003` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4818,8 +4818,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF004** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF004` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4872,8 +4872,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF004** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF004` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4925,8 +4925,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF004** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF004` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF004` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -4977,8 +4977,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF005** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF005` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -5032,8 +5032,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF005** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF005` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -5086,8 +5086,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF005** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF005` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF005` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -5140,8 +5140,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF006** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF006` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -5194,8 +5194,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF006** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF006` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 
@@ -5248,8 +5248,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para **RNF006** — escen
 
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `RNF006` (ver `docs/ERS_ICM_Requisitos.md`).
-- **Fuente complementaria:** `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
+- **Requisito:** `RNF006` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).
+- **Fuente complementaria:** `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (contexto de negocio y BR cuando aplica).
 
 ## Inputs (Given / When — extracto ERS)
 

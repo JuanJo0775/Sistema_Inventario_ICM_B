@@ -78,7 +78,7 @@ def render_doc(nodeid: str, rel: str, line: int, kind: str = "unit") -> str:
     if kind == "integration":
         purpose = "Prueba de integración HTTP (API) — validar flujos y contratos entre capas."
     elif kind == "gherkin":
-        purpose = "Escenario Gherkin derivado del ERS; ver `docs/ERS_ICM_Requisitos.md`."
+        purpose = "Escenario Gherkin derivado del ERS; ver `docs/requisitos/ERS_ICM_Requisitos.md`."
     else:
         purpose = "Prueba unitaria del backend ICM."
     return f"""# {short}
@@ -244,7 +244,7 @@ def write_gherkin_docs(scenarios: list[dict]) -> None:
 Validar el criterio de aceptación Gherkin del ERS ICM para **{sc['rf']}** — escenario {sc['scenario_number']}.\n
 ## Requisito o caso de negocio asociado
 
-- **Requisito:** `{sc['rf']}` (ver `docs/ERS_ICM_Requisitos.md`).\n
+- **Requisito:** `{sc['rf']}` (ver `docs/requisitos/ERS_ICM_Requisitos.md`).\n
 ## Inputs (Given / When — extracto ERS)
 
 {sc['given_when_then'][:4000]}{"…" if len(sc['given_when_then']) > 4000 else ""}

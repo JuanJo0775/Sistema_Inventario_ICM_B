@@ -123,8 +123,8 @@ class ICMTokenRefreshSerializer(TokenRefreshSerializer):
     """
     RF-001, BR-03 — Renueva access; los auxiliares solo obtienen token en franja operativa.
 
-    Alineado a criterios Gherkin en `docs/ERS_ICM_Requisitos.md` (Feature inicio de sesión,
-    Scenario 3: acceso bloqueado fuera de horario) y a `docs/ICM_Informe_Elicitacion_v2_plus.docx.md`
+    Alineado a criterios Gherkin en `docs/requisitos/ERS_ICM_Requisitos.md` (Feature inicio de sesión,
+    Scenario 3: acceso bloqueado fuera de horario) y a `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md`
     (BR-03: franjas 07:00–12:00 y 14:00–17:00 para auxiliares). La renovación JWT no debe eludir esa regla.
     """
 

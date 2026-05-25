@@ -2,9 +2,9 @@
 
 ## Fuentes de verdad
 
-1. **`docs/ERS_ICM_Requisitos.md`** — RF/RNF y criterios **Gherkin** (Given / When / Then).
-2. **`docs/ICM_Informe_Elicitacion_v2_plus.docx.md`** — contexto de negocio ICM.
-3. **`docs/README_ARQUITECTURA.md`**, **`docs/README_API.md`**.
+1. **`docs/requisitos/ERS_ICM_Requisitos.md`** — RF/RNF y criterios **Gherkin** (Given / When / Then).
+2. **`docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md`** — contexto de negocio ICM.
+3. **`docs/README_ARQUITECTURA.md`**, **`docs/api/README_API.md`**.
 
 ## Estructura de documentación por test
 
@@ -20,7 +20,7 @@
 
 La documentación de pruebas se construye desde los tests reales del repositorio y se organiza en tres bloques:
 
-1. **Gherkin/ERS**: escenarios derivados de `docs/ERS_ICM_Requisitos.md`.
+1. **Gherkin/ERS**: escenarios derivados de `docs/requisitos/ERS_ICM_Requisitos.md`.
 2. **Unitarios**: tests bajo `apps/*/tests/` y otros tests no clasificados como integración.
 3. **Integración**: tests HTTP/API y otros casos marcados como integración por convención.
 

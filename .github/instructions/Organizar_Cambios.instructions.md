@@ -58,6 +58,13 @@ Usar nomenclatura clara y consistente:
 * Asegurar sincronización entre local y remoto.
 * No dejar ramas relevantes solo en local.
 
+### Pull Requests
+* Abrir un PR cuando el cambio lógico esté completo, la rama ya esté publicada y los tests relevantes hayan pasado.
+* Usar un PR por cambio funcional o refactor relevante; evitar agrupar temas no relacionados.
+* Elegir como base la rama principal de integración del flujo actual del repositorio y como head la rama publicada del trabajo.
+* Antes de crear el PR, revisar si ya existe uno abierto para la misma rama o tema y reutilizarlo si corresponde.
+* Describir en el PR qué cambió, por qué cambió y cómo se validó, con referencia al alcance afectado.
+
 ### Integración
 * Integrar las ramas secundarias hacia la rama principal de trabajo.
 * Mantener la rama principal:

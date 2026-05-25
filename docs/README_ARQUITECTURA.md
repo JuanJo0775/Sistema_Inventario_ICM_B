@@ -1878,8 +1878,8 @@ No se adopta microservicios en esta fase para evitar complejidad operacional inn
 
 Documentacion complementaria de este analisis:
 
-- [docs/README_RESTRICCIONES.md](README_RESTRICCIONES.md)
-- [docs/README_ATRIBUTOS_CALIDAD.md](README_ATRIBUTOS_CALIDAD.md)
+- [docs/calidad_restricciones/README_RESTRICCIONES.md](calidad_restricciones/README_RESTRICCIONES.md)
+- [docs/calidad_restricciones/README_ATRIBUTOS_CALIDAD.md](calidad_restricciones/README_ATRIBUTOS_CALIDAD.md)
 
 ## 15. Matriz de Trazabilidad Completa (RF -> Arquitectura)
 

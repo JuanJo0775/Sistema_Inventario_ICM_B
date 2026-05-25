@@ -34,12 +34,12 @@ En esta fase, el objetivo principal es tener una base técnica completa:
 Documentación funcional y arquitectónica disponible en el repositorio:
 
 - [GUIA_ONBOARDING.md](docs/GUIA_ONBOARDING.md): comandos rápidos y paso a paso para configurar tu entorno local y levantar el proyecto.
-- [README_API.md](docs/README_API.md): especificación y checklist de la API (OpenAPI, endpoints, tags y estándares).
+- [README_API.md](docs/api/README_API.md): especificación y checklist de la API (OpenAPI, endpoints, tags y estándares).
 - [README_ARQUITECTURA.md](docs/README_ARQUITECTURA.md): arquitectura técnica consolidada (estructura, desacoplamiento, inventario, Docker, testing, SOLID y patrones).
-- [README_RESTRICCIONES.md](docs/README_RESTRICCIONES.md): catálogo consolidado de restricciones arquitectónicas, operativas, tecnológicas y de despliegue.
-- [README_ATRIBUTOS_CALIDAD.md](docs/README_ATRIBUTOS_CALIDAD.md): inventario de atributos de calidad, evidencia y recomendaciones.
-- [ERS_ICM_Requisitos.md](docs/ERS_ICM_Requisitos.md): requisitos funcionales, no funcionales y reglas de negocio.
-- [ICM_Informe_Elicitacion_v2_plus.docx.md](docs/ICM_Informe_Elicitacion_v2_plus.docx.md): contexto de levantamiento y análisis del dominio.
+- [README_RESTRICCIONES.md](docs/calidad_restricciones/README_RESTRICCIONES.md): catálogo consolidado de restricciones arquitectónicas, operativas, tecnológicas y de despliegue.
+- [README_ATRIBUTOS_CALIDAD.md](docs/calidad_restricciones/README_ATRIBUTOS_CALIDAD.md): inventario de atributos de calidad, evidencia y recomendaciones.
+- [ERS_ICM_Requisitos.md](docs/requisitos/ERS_ICM_Requisitos.md): requisitos funcionales, no funcionales y reglas de negocio.
+- [ICM_Informe_Elicitacion_v2_plus.docx.md](docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md): contexto de levantamiento y análisis del dominio.
 - [AGENTS.md](AGENTS.md): instrucciones y reglas para asistentes de código del proyecto.
 - [README_ADR.md](docs/adr/README_ADR.md): índice y trazabilidad de decisiones arquitectónicas.
 - [README_TEST.md](docs/test/README_TEST.md): estrategia de testing, tipos de pruebas, convenciones y ejemplos de escenarios Gherkin automatizados.
@@ -92,7 +92,7 @@ Una vez que el servidor esté corriendo, puedes acceder a:
 
 ## API REST (OpenAPI y Swagger)
 
-La documentación completa de la API, sus estándares de codificación, contrato REST, autenticación JWT, reglas de versión y checklist de validación quedó separada en [README_API.md](docs/README_API.md).
+La documentación completa de la API, sus estándares de codificación, contrato REST, autenticación JWT, reglas de versión y checklist de validación quedó separada en [README_API.md](docs/api/README_API.md).
 
 Resumen:
 
@@ -142,7 +142,7 @@ La lista exhaustiva de operaciones, parámetros y esquemas JSON está en **`/api
 - `.env.example` sí se versiona y define el contrato compartido de variables.
 - Si se agrega una nueva variable en settings, también debe agregarse en `.env.example` y documentarse.
 - No guardar secretos reales en el repositorio.
-- Cualquier cambio en la API debe cumplir lo definido en [README_API.md](docs/README_API.md).
+- Cualquier cambio en la API debe cumplir lo definido en [README_API.md](docs/api/README_API.md).
 
 ### Gestión de issues y cambios
 
@@ -154,7 +154,7 @@ Para mantener el historial limpio y fácil de revisar, el trabajo debe organizar
 4. **Pull Request**: el PR debe enlazar el issue correspondiente. Si el cambio resuelve el issue, usar la referencia automática en la descripción o el cierre explícito de GitHub para que quede trazado.
 5. **Documentación**: si el issue afecta comportamiento, contrato, arquitectura o pruebas, debe quedar reflejado en la documentación del repo. El lugar correcto depende del tema:
    - Cambios de arquitectura: [docs/README_ARQUITECTURA.md](docs/README_ARQUITECTURA.md)
-   - Cambios de API: [docs/README_API.md](docs/README_API.md)
+   - Cambios de API: [docs/api/README_API.md](docs/api/README_API.md)
    - Cambios de pruebas: [docs/test/README_TEST.md](docs/test/README_TEST.md)
    - Decisiones técnicas importantes: [docs/adr/README_ADR.md](docs/adr/README_ADR.md)
 
@@ -176,5 +176,5 @@ Para mantener el historial limpio y fácil de revisar, el trabajo debe organizar
 - Estructura modular de apps y carpeta `shared`.
 - Settings por entorno (`base`, `development`, `production`, `test`).
 - Configuración por variables de entorno.
-- API bajo `/api/v1/` con documentación **OpenAPI 3** y **Swagger UI**; el contrato detallado vive en [README_API.md](docs/README_API.md).
+- API bajo `/api/v1/` con documentación **OpenAPI 3** y **Swagger UI**; el contrato detallado vive en [README_API.md](docs/api/README_API.md).
 - Setup de Docker y dependencias; tests automatizados con pytest.

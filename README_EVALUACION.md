@@ -58,7 +58,7 @@ Plan de ejecución concreto y secuencial
 Supuestos, inconsistencias y decisiones cuestionables
 ---------------------------------------------------
 - Supuesto: entorno local de CI usa PostgreSQL; los tests se configuran con `config.settings.test` (SQLite in-memory) — confirmar que los tests críticos no dependen de Postgres-only behavior.
-- Inconsistencia menor: `docs/README_API.md` usa tags en español (p. ej. `Autenticación`) mientras `shared/openapi.py` define tags en inglés (`TAG_AUTH = "auth"`). Recomiendo unificar (usar las constantes `TAG_*` como fuente única).
+- Inconsistencia menor: `docs/api/README_API.md` usa tags en español (p. ej. `Autenticación`) mientras `shared/openapi.py` define tags en inglés (`TAG_AUTH = "auth"`). Recomiendo unificar (usar las constantes `TAG_*` como fuente única).
 - Decisión pendiente: política de idempotencia para `correct_movement_within_window` y generación de facturas duplicadas; hay issues documentadas que requieren decisión (ver `.github/ISSUES/*`).
 
 Datos críticos faltantes para decidir con más exactitud
@@ -70,7 +70,7 @@ Datos críticos faltantes para decidir con más exactitud
 Archivos y pruebas relevantes que verifiqué (evidencia)
 ---------------------------------------------------
 - docs/README_ARQUITECTURA.md — implementación y reglas BR-01..BR-13.
-- docs/README_API.md — contrato API y checklist.
+- docs/api/README_API.md — contrato API y checklist.
 - docs/test/README_TEST.md — estrategia de tests y generación de docs.
 - apps/movements/services.py — núcleo de lógica de inventario y facturación.
 - apps/movements/models.py — `Movement`, `InvoiceCounter`.

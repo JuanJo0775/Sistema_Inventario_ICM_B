@@ -1,6 +1,6 @@
 # Trazabilidad tests ↔ ERS (Gherkin) e informe de elicitación
 
-Este documento enlaza pruebas automatizadas con **requisitos** y **criterios de aceptación en estilo Gherkin** del `docs/ERS_ICM_Requisitos.md`, complementados con el contexto de negocio del `docs/ICM_Informe_Elicitacion_v2_plus.docx.md` (BR, roles, ubicaciones).
+Este documento enlaza pruebas automatizadas con **requisitos** y **criterios de aceptación en estilo Gherkin** del `docs/requisitos/ERS_ICM_Requisitos.md`, complementados con el contexto de negocio del `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (BR, roles, ubicaciones).
 
 **Cobertura 1:1 ERS:** la suite `tests/ers/test_gherkin_dynamic.py` (95 nodos) y `tests/ers/gherkin_impl.py` son la fuente principal; cada escenario tiene su ficha en `docs/test/scenarios/<ID>.md`.
 

@@ -44,8 +44,8 @@ Este documento consolida el estado de los atributos de calidad observables en el
 
 ## Relacion con la documentacion existente
 
-- [docs/README_RESTRICCIONES.md](README_RESTRICCIONES.md) contiene las restricciones que condicionan estos atributos.
-- [docs/README_ARQUITECTURA.md](README_ARQUITECTURA.md) describe el marco tecnico que sostiene la mayoria de ellos.
+- [docs/calidad_restricciones/README_RESTRICCIONES.md](README_RESTRICCIONES.md) contiene las restricciones que condicionan estos atributos.
+- [docs/README_ARQUITECTURA.md](../README_ARQUITECTURA.md) describe el marco tecnico que sostiene la mayoria de ellos.
 
 ## Escenarios de Calidad (ISO 25010)
 

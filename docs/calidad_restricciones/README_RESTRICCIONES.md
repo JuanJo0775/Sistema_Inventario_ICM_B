@@ -4,9 +4,9 @@ Este documento consolida las restricciones reales del backend ICM derivadas del 
 
 ## Fuentes de verdad
 
-- [docs/README_ARQUITECTURA.md](README_ARQUITECTURA.md)
-- [docs/README_API.md](README_API.md)
-- [docs/adr/README_ADR.md](adr/README_ADR.md)
+- [docs/README_ARQUITECTURA.md](../README_ARQUITECTURA.md)
+- [docs/api/README_API.md](../api/README_API.md)
+- [docs/adr/README_ADR.md](../adr/README_ADR.md)
 - [config/settings/base.py](../config/settings/base.py)
 - [config/settings/development.py](../config/settings/development.py)
 - [config/settings/production.py](../config/settings/production.py)
@@ -22,7 +22,7 @@ Este documento consolida las restricciones reales del backend ICM derivadas del 
 | Monolito modular por dominio, no microservicios | Tecnológica | ADR-001, docs/README_ARQUITECTURA.md | Define el límite del sistema y evita orquestación distribuida prematura | Acoplamiento interno si no se respeta la frontera por app | Menor complejidad operacional a cambio de escalado horizontal limitado | `apps/*`, `config/` |
 | La lógica de negocio vive en `services.py` | Tecnológica | ADR-002, docs/README_ARQUITECTURA.md | Impide reglas de dominio en `models.py`, `serializers.py` o `views.py` | Mezclar capas rompe testabilidad y trazabilidad | Más disciplina de diseño a cambio de mantenimiento más simple | `services.py`, `views.py`, `serializers.py`, `models.py` |
 | El stock se deriva del ledger | Tecnológica | ADR-005, docs/README_ARQUITECTURA.md | No se permite actualizar stock directamente fuera del movimiento | Inconsistencias si alguien salta el flujo de movimiento | Consistencia fuerte a cambio de más transacciones | `movements`, `inventory` |
-| La API pública vive solo en `/api/v1/` | Tecnológica | ADR-006, docs/README_API.md | Cualquier cambio incompatible obliga a versionar | Romper consumidores si se publican cambios sin nueva versión | Evolución controlada a cambio de más mantenimiento de versiones | `config/urls.py`, vistas API |
+| La API pública vive solo en `/api/v1/` | Tecnológica | ADR-006, docs/api/README_API.md | Cualquier cambio incompatible obliga a versionar | Romper consumidores si se publican cambios sin nueva versión | Evolución controlada a cambio de más mantenimiento de versiones | `config/urls.py`, vistas API |
 
 ## 2. Restricciones tecnologicas
 
@@ -70,7 +70,7 @@ Este documento consolida las restricciones reales del backend ICM derivadas del 
 
 | Restricción | Clasificación | Evidencia | Impacto | Riesgo | Trade-off | Componentes afectados |
 |---|---|---|---|---|---|---|
-| Consultas complejas deben optimizarse con `select_related`/`prefetch_related` | Tecnológica | docs/README_API.md, docs/README_ARQUITECTURA.md | Limita la forma de implementar listados | N+1 y latencia alta si se ignora | Consultas mas eficientes a cambio de mas complejidad en selectores | `selectors.py`, `views.py` |
+| Consultas complejas deben optimizarse con `select_related`/`prefetch_related` | Tecnológica | docs/api/README_API.md, docs/README_ARQUITECTURA.md | Limita la forma de implementar listados | N+1 y latencia alta si se ignora | Consultas mas eficientes a cambio de mas complejidad en selectores | `selectors.py`, `views.py` |
 | El frontend consume la API y no accede a la BD | Tecnológica | README.md, README_API.md | La integracion queda encapsulada por REST | Acoplamiento accidental si se salta la API | Desacoplamiento limpio a cambio de mayor esfuerzo de API | Frontend, backend |
 | Los endpoints deben documentarse con `@extend_schema` | Tecnológica | README_API.md | La documentacion OpenAPI es obligatoria | Swagger incompleto si falta metadata | Contrato claro a cambio de mas trabajo por endpoint | `views.py`, `serializers.py` |
 
@@ -80,7 +80,7 @@ Este documento consolida las restricciones reales del backend ICM derivadas del 
 |---|---|---|---|---|---|---|
 | La suite de test usa SQLite in-memory y sin throttling | Organizacional | ADR-011, `config/settings/test.py`, docs/test/README_TEST.md | No reproduce la semantica de produccion al 100% | Falsa sensacion de cobertura en locks y limits | Ejecucion rapida a cambio de menor fidelidad | Tests, settings, validaciones de concurrencia |
 | El objetivo de testing mezcla unitarios, integracion e invariantes | Organizacional | ADR-011 | Fija la distribucion esperada de cobertura | Desbalance si se concentra todo en un solo nivel | Mejor diagnosibilidad a cambio de mas disciplina | `apps/*/tests`, `tests/ers` |
-| La evolucion funcional debe preservar trazabilidad RF/BR/RNF | Organizacional | docs/README_ARQUITECTURA.md, docs/ERS_ICM_Requisitos.md | Cambios sin trazabilidad quedan fuera del contrato | Brechas entre codigo y documentacion | Auditoria fuerte a cambio de menos libertad de cambio rapido | Docs, PRs, tests |
+| La evolucion funcional debe preservar trazabilidad RF/BR/RNF | Organizacional | docs/README_ARQUITECTURA.md, docs/requisitos/ERS_ICM_Requisitos.md | Cambios sin trazabilidad quedan fuera del contrato | Brechas entre codigo y documentacion | Auditoria fuerte a cambio de menos libertad de cambio rapido | Docs, PRs, tests |
 
 ## 9. Restricciones de mayor impacto
 

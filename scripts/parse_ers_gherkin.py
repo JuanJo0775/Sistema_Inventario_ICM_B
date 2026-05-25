@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Parsea docs/ERS_ICM_Requisitos.md y genera:
+Parsea docs/requisitos/ERS_ICM_Requisitos.md y genera:
 - docs/test/gherkin_scenarios.json (metadatos por escenario)
 - docs/test/scenarios/<ID>.md (uno por escenario, formato ICM)
 
@@ -170,7 +170,7 @@ def parse_ers() -> list[dict]:
                     "given": given or body[:500],
                     "when": when,
                     "then": then or "",
-                    "source": "docs/ERS_ICM_Requisitos.md",
+                    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
                 }
             )
             continue

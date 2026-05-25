@@ -75,7 +75,7 @@ def test_auth_token_refresh_auxiliar_outside_hours_forbidden(api_client, auxilia
     """
     RF-001, BR-03 — Sesión renovada: auxiliar sin acceso fuera de franja.
 
-    Extiende el criterio Gherkin del ERS (`docs/ERS_ICM_Requisitos.md`):
+    Extiende el criterio Gherkin del ERS (`docs/requisitos/ERS_ICM_Requisitos.md`):
     Feature «Inicio de sesión…», Scenario 3 (acceso bloqueado fuera de horario).
     La renovación con `refresh` debe aplicar la misma restricción que el login,
     para no eludir BR-03 manteniendo una sesión larga (coherente con informe de elicitación, restricción horaria auxiliar).

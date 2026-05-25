@@ -1,8 +1,8 @@
 """
 Administración Django alineada a BR-11 (stock derivado solo vía ledger).
 
-Criterio de negocio alineado con `docs/ERS_ICM_Requisitos.md` RF-004 / BR-11 y
-`docs/ICM_Informe_Elicitacion_v2_plus.docx.md`: el stock por ubicación es derivado
+Criterio de negocio alineado con `docs/requisitos/ERS_ICM_Requisitos.md` RF-004 / BR-11 y
+`docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md`: el stock por ubicación es derivado
 del ledger; no debe alterarse manualmente como si fuera fuente de verdad.
 """
 
