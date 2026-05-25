@@ -18,7 +18,7 @@
 | UNIT-0015 | test_operating_hours_enforced_per_request | [UNIT-0015.md](./UNIT-0015.md) |
 | UNIT-0016 | test_auth_views_are_exposed | [UNIT-0016.md](./UNIT-0016.md) |
 | UNIT-0017 | test_category_slug_unique | [UNIT-0017.md](./UNIT-0017.md) |
-| UNIT-0018 | test_product_full_clean_requires_can_prefix_for_can_brand | [UNIT-0018.md](./UNIT-0018.md) |
+| UNIT-0018 | test_product_full_clean_rejects_invalid_sku_format | [UNIT-0018.md](./UNIT-0018.md) |
 | UNIT-0019 | test_product_sku_field | [UNIT-0019.md](./UNIT-0019.md) |
 | UNIT-0020 | test_catalog_service_exports_identifier_resolver | [UNIT-0020.md](./UNIT-0020.md) |
 | UNIT-0021 | test_catalog_views_are_available | [UNIT-0021.md](./UNIT-0021.md) |

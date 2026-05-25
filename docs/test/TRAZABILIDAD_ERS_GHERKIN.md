@@ -28,7 +28,7 @@ Este documento enlaza pruebas automatizadas con **requisitos** y **criterios de 
 
 | Criterio | Cobertura |
 |----------|-----------|
-| SKU con patrón 1–4 letras + guion + 1–4 dígitos (BR-12) | `apps/catalog/tests/test_models.py::test_product_full_clean_requires_can_prefix_for_can_brand` (`Product.clean()` / Admin) |
+| SKU con patrón 1–4 letras + guion + 1–4 dígitos (BR-12) | `apps/catalog/tests/test_models.py::test_product_full_clean_rejects_invalid_sku_format` (`Product.clean()` / Admin) |
 
 ---
 
@@ -83,7 +83,7 @@ pytest -q
 pytest tests/test_api_integration.py -k "token_refresh" -v
 
 # RF-003 BR-12
-pytest apps/catalog/tests/test_models.py::test_product_full_clean_requires_can_prefix_for_can_brand -v
+pytest apps/catalog/tests/test_models.py::test_product_full_clean_rejects_invalid_sku_format -v
 
 # RF-004 Admin stock
 pytest apps/inventory/tests/test_admin.py -v

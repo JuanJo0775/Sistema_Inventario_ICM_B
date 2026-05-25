@@ -1148,6 +1148,11 @@ SIMPLE_JWT = {
 
 **Regla**: Solo almacenista puede crear/modificar/deshabilitar usuarios.
 
+**Seguridad de contraseñas**:
+- El modelo de usuario hereda de `AbstractUser`, por lo que el campo `password` y su manejo seguro ya vienen provistos por Django.
+- La creación y el cambio de contraseña usan `set_password()`, así que la contraseña nunca se persiste en texto plano.
+- En desarrollo y producción se conserva el hashing seguro de Django; en la suite de pruebas se usa un hasher más liviano solo para acelerar la ejecución.
+
 **Implementación**:
 ```python
 # apps/authentication/services.py
@@ -1233,6 +1238,29 @@ def register_dispatch(user, ..., customer_data=None):
                 "Debe reconocer aviso de privacidad para despacho mayorista"
             )
 ```
+
+### 8.6 Seguridad de Datos y Superficie de Exposición
+
+La seguridad en ICM no depende de una sola capa; se aplica de forma transversal en autenticación, autorización, persistencia y auditoría.
+
+**Controles principales**:
+- Autenticación sin sesiones de servidor: el acceso a la API usa JWT con `Bearer`.
+- Contraseñas almacenadas solo como hash seguro administrado por Django.
+- Permisos por rol en backend y validaciones adicionales por caso de uso.
+- Tokens `refresh` revocables mediante blacklist al cerrar sesión o deshabilitar usuarios.
+- Respuestas de autenticación y perfil sin exponer el campo `password`.
+- Auditoría de eventos sensibles como login, logout, creación de usuarios, cambios de credenciales y deshabilitación de cuentas.
+- Uso de consultas y serializers controlados para evitar exponer campos no previstos en el contrato.
+
+**Datos sensibles**:
+- Los datos personales se manejan bajo el principio de mínimo privilegio.
+- Los reportes y consultas deben devolver solo lo necesario para el contexto funcional.
+- Cuando un flujo requiere datos personales de cliente, la validación de consentimiento o aviso de privacidad se realiza en la capa de servicio.
+
+**Notas operativas**:
+- En local y producción se recomienda transporte cifrado a nivel de infraestructura o proxy inverso.
+- La política de hashing de contraseñas no debe redefinirse para debilitar la seguridad fuera de pruebas.
+- La suite de pruebas puede usar hashers más rápidos, pero eso no cambia el comportamiento del sistema en ejecución real.
 
 **Consultas con control de acceso**:
 ```python
@@ -1885,7 +1913,7 @@ Documentacion complementaria de este analisis:
 | BR-09 Nota de discrepancia recepcion | `register_entry` exige nota cuando qty recibida != facturada | Tests de discrepancia sin nota |
 | BR-10 Inmutabilidad de log | Sin PUT/DELETE de movimientos/auditoria + guardas de inmutabilidad en modelos | Tests de intentos de modificacion |
 | BR-11 Stock por ubicacion | `StockByLocation` + traslados sin cambio global + ledger como fuente de verdad | Tests de consolidado y reconstruccion |
-| BR-12 Prefijo CAN | Validadores y reglas en `catalog/services.py` y `catalog/models.py` | Tests de SKU invalido |
+| BR-12 SKU definido por usuario | Validadores y reglas en `catalog/services.py` y `catalog/models.py` | Tests de SKU inválido |
 | BR-13 Barcode alias + factura PDF | `resolve_identifier`, flujo fallback manual, numeracion secuencial y PDF en despacho | Tests de identificacion y facturacion |
 
 ## 17. Matriz de Trazabilidad Completa (RNF -> Decisiones tecnicas)

@@ -613,11 +613,11 @@ Código: [`apps/catalog/tests/test_models.py`](../../apps/catalog/tests/test_mod
 <!-- UNIT-0018.md -->
 **Código:** UNIT-0018
 
-# test_product_full_clean_requires_can_prefix_for_can_brand
+# test_product_full_clean_rejects_invalid_sku_format
 
 ## Nombre del test
 
-`apps/catalog/tests/test_models.py::test_product_full_clean_requires_can_prefix_for_can_brand`
+`apps/catalog/tests/test_models.py::test_product_full_clean_rejects_invalid_sku_format`
 
 ## Propósito
 
@@ -638,7 +638,7 @@ Aserciones del test (`assert`); ver código en la línea indicada abajo.
 ## Link directo al test
 
 ```bash
-pytest apps/catalog/tests/test_models.py::test_product_full_clean_requires_can_prefix_for_can_brand -v
+pytest apps/catalog/tests/test_models.py::test_product_full_clean_rejects_invalid_sku_format -v
 ```
 
 Código: [`apps/catalog/tests/test_models.py`](../../apps/catalog/tests/test_models.py) (aprox. línea 17)
