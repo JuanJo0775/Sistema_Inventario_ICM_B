@@ -86,130 +86,155 @@ Objetivo de esta decision:
 Estructura de Directorios del Proyecto:
 
 
-```
+```text
 icm_backend/
-├── config/                     # Configuración central del proyecto Django
-│   ├── __init__.py
-│   ├── settings/
-│   │   ├── __init__.py
-│   │   ├── base.py             # Configuración base compartida
-│   │   ├── development.py      # Sobreescrituras para desarrollo local
-│   │   └── production.py       # Sobreescrituras para producción
-│   ├── urls.py                 # URL root con inclusión por módulo
-│   ├── wsgi.py
-│   └── asgi.py
-├── apps/                       # Todas las Django apps del dominio aquí
-│   ├── __init__.py
-│   ├── authentication/         # RF-001, RF-002 — JWT, RBAC, restricción horaria
-│   │   ├── __init__.py
-│   │   ├── models.py
-│   │   ├── serializers.py
-│   │   ├── views.py
-│   │   ├── urls.py
-│   │   ├── services.py
-│   │   ├── selectors.py
-│   │   ├── permissions.py
-│   │   ├── exceptions.py
-│   │   ├── signals.py
-│   │   ├── admin.py
-│   │   └── tests/
-│   │       ├── __init__.py
-│   │       ├── test_models.py
-│   │       ├── test_services.py
-│   │       └── test_views.py
-│   ├── catalog/                # RF-003 — Productos, SKUs, categorías, combos/kits
-│   │   ├── __init__.py
-│   │   ├── models.py
-│   │   ├── serializers.py
-│   │   ├── views.py
-│   │   ├── urls.py
-│   │   ├── services.py
-│   │   ├── selectors.py
-│   │   ├── permissions.py
-│   │   ├── admin.py
-│   │   └── tests/
-│   ├── inventory/              # RF-004 — Consulta de stock en tiempo real
-│   │   ├── __init__.py
-│   │   ├── models.py
-│   │   ├── serializers.py
-│   │   ├── views.py
-│   │   ├── urls.py
-│   │   ├── services.py
-│   │   ├── selectors.py
-│   │   ├── permissions.py
-│   │   ├── admin.py
-│   │   └── tests/
-│   ├── movements/              # RF-005 a RF-009 — Ledger central (NÚCLEO)
-│   │   ├── __init__.py
-│   │   ├── models.py
-│   │   ├── serializers.py
-│   │   ├── views.py
-│   │   ├── urls.py
-│   │   ├── services.py         # ⭐ Lógica crítica aquí
-│   │   ├── selectors.py
-│   │   ├── permissions.py
-│   │   ├── exceptions.py
-│   │   ├── admin.py
-│   │   └── tests/
-│   ├── reports/                # RF-010 — Reportes e indicadores operativos
-│   │   ├── __init__.py
-│   │   ├── models.py
-│   │   ├── serializers.py
-│   │   ├── views.py
-│   │   ├── urls.py
-│   │   ├── selectors.py        # Solo lectura
-│   │   ├── permissions.py
-│   │   ├── admin.py
-│   │   └── tests/
-│   ├── alerts/                 # RF-011 — Alertas proactivas del sistema
-│   │   ├── __init__.py
-│   │   ├── models.py
-│   │   ├── serializers.py
-│   │   ├── views.py
-│   │   ├── urls.py
-│   │   ├── services.py
-│   │   ├── permissions.py
-│   │   ├── admin.py
-│   │   └── tests/
-│   └── audit/                  # RF-012 — Log de auditoría y trazabilidad
-│       ├── __init__.py
-│       ├── models.py
-│       ├── serializers.py
-│       ├── views.py
-│       ├── urls.py
-│       ├── services.py
-│       ├── selectors.py
-│       ├── permissions.py
-│       ├── admin.py
-│       └── tests/
-├── shared/                     # Código compartido entre apps (sin lógica de dominio)
-│   ├── __init__.py
-│   ├── models.py               # BaseModel con created_at, updated_at, etc.
-│   ├── permissions.py          # Permisos RBAC base
-│   ├── exceptions.py           # Excepciones base del sistema
-│   ├── mixins.py               # Mixins reutilizables para views
-│   ├── pagination.py           # Configuración de paginación
-│   └── utils/
-│       ├── __init__.py
-│       └── validators.py       # Validadores reutilizables
-├── tests/                      # Tests de integración cross-módulo
-│   ├── __init__.py
-│   └── conftest.py             # Fixtures compartidas de pytest
-├── manage.py
-├── requirements/
+├── apps/                                                       # Todas las apps del dominio del backend
+│   ├── authentication/                                         # RF-001, RF-002 — JWT, RBAC, restricción horaria
+│   │   ├── tests/
+│   │   ├── models.py                                           # BaseModel con created_at, updated_at, etc.
+│   │   ├── serializers.py                                      # Validación y transformación de entrada/salida
+│   │   ├── views.py                                            # Adaptador HTTP sin reglas de negocio
+│   │   ├── urls.py                                             # URL root con inclusión por módulo
+│   │   ├── services.py                                         # ⭐ Lógica crítica aquí
+│   │   ├── selectors.py                                        # Solo lectura
+│   │   ├── permissions.py                                      # Permisos RBAC base
+│   │   ├── exceptions.py                                       # Excepciones base del sistema
+│   │   ├── signals.py                                          # Sincronización de eventos de identidad
+│   │   └── admin.py                                            # Registro administrativo del módulo
+│   ├── catalog/                                                # RF-003 — Productos, SKUs, categorías y validadores
+│   │   ├── tests/
+│   │   ├── models.py                                           # BaseModel con created_at, updated_at, etc.
+│   │   ├── serializers.py                                      # Validación y transformación de entrada/salida
+│   │   ├── views.py                                            # Adaptador HTTP sin reglas de negocio
+│   │   ├── urls.py                                             # URL root con inclusión por módulo
+│   │   ├── services.py                                         # ⭐ Lógica crítica aquí
+│   │   ├── selectors.py                                        # Solo lectura
+│   │   ├── permissions.py                                      # Permisos RBAC base
+│   │   ├── exceptions.py                                       # Excepciones base del sistema
+│   │   └── admin.py                                            # Registro administrativo del módulo
+│   ├── inventory/                                              # RF-004 — Consulta de stock en tiempo real
+│   │   ├── tests/
+│   │   ├── models.py                                           # BaseModel con created_at, updated_at, etc.
+│   │   ├── serializers.py                                      # Validación y transformación de entrada/salida
+│   │   ├── views.py                                            # Adaptador HTTP sin reglas de negocio
+│   │   ├── urls.py                                             # URL root con inclusión por módulo
+│   │   ├── services.py                                         # ⭐ Lógica crítica aquí
+│   │   ├── selectors.py                                        # Solo lectura
+│   │   ├── permissions.py                                      # Permisos RBAC base
+│   │   ├── exceptions.py                                       # Excepciones base del sistema
+│   │   └── admin.py                                            # Registro administrativo del módulo
+│   ├── movements/                                              # RF-005 a RF-009 — Ledger central e invariantes de inventario
+│   │   ├── tests/
+│   │   ├── models.py                                           # BaseModel con created_at, updated_at, etc.
+│   │   ├── serializers.py                                      # Validación y transformación de entrada/salida
+│   │   ├── views.py                                            # Adaptador HTTP sin reglas de negocio
+│   │   ├── urls.py                                             # URL root con inclusión por módulo
+│   │   ├── services.py                                         # ⭐ Lógica crítica aquí
+│   │   ├── selectors.py                                        # Solo lectura
+│   │   ├── permissions.py                                      # Permisos RBAC base
+│   │   ├── exceptions.py                                       # Excepciones base del sistema
+│   │   └── admin.py                                            # Registro administrativo del módulo
+│   ├── reports/                                                # RF-010 — Reportes e indicadores operativos
+│   │   ├── tests/
+│   │   ├── models.py                                           # BaseModel con created_at, updated_at, etc.
+│   │   ├── serializers.py                                      # Validación y transformación de entrada/salida
+│   │   ├── views.py                                            # Adaptador HTTP sin reglas de negocio
+│   │   ├── urls.py                                             # URL root con inclusión por módulo
+│   │   ├── services.py                                         # ⭐ Lógica crítica aquí
+│   │   ├── selectors.py                                        # Solo lectura
+│   │   ├── permissions.py                                      # Permisos RBAC base
+│   │   └── admin.py                                            # Registro administrativo del módulo
+│   ├── alerts/                                                 # RF-011 — Alertas proactivas del sistema
+│   │   ├── tests/
+│   │   ├── models.py                                           # BaseModel con created_at, updated_at, etc.
+│   │   ├── serializers.py                                      # Validación y transformación de entrada/salida
+│   │   ├── views.py                                            # Adaptador HTTP sin reglas de negocio
+│   │   ├── urls.py                                             # URL root con inclusión por módulo
+│   │   ├── services.py                                         # ⭐ Lógica crítica aquí
+│   │   ├── selectors.py                                        # Solo lectura
+│   │   ├── permissions.py                                      # Permisos RBAC base
+│   │   └── admin.py                                            # Registro administrativo del módulo
+│   └── audit/                                                  # RF-012 — Log de auditoría y trazabilidad
+│       ├── tests/
+│       ├── models.py                                           # BaseModel con created_at, updated_at, etc.
+│       ├── serializers.py                                      # Validación y transformación de entrada/salida
+│       ├── views.py                                            # Adaptador HTTP sin reglas de negocio
+│       ├── urls.py                                             # URL root con inclusión por módulo
+│       ├── services.py                                         # ⭐ Lógica crítica aquí
+│       ├── selectors.py                                        # Solo lectura
+│       ├── permissions.py                                      # Permisos RBAC base
+│       └── admin.py                                            # Registro administrativo del módulo
+├── config/                                                     # Configuración central del proyecto Django
+│   ├── settings/                                               # Configuración compartida y sobreescrituras por entorno
+│   │   ├── base.py                                             # Configuración base compartida
+│   │   ├── development.py                                      # Sobreescrituras para desarrollo local
+│   │   ├── production.py                                       # Sobreescrituras para producción
+│   │   └── test.py                                             # Configuración aislada para la suite de pruebas
+│   ├── urls.py                                                 # URL root con inclusión por módulo
+│   ├── wsgi.py                                                 # Punto de entrada WSGI
+│   └── asgi.py                                                 # Punto de entrada ASGI
+├── docker/                                                     # Infraestructura de contenedores y arranque
+│   ├── Dockerfile                                              # Imagen base del contenedor de despliegue
+│   └── entrypoint.sh                                           # Script de inicialización del contenedor
+├── docs/                                                       # Documentación técnica viva del proyecto
+│   ├── README_ARQUITECTURA.md                                  # Documento vivo de arquitectura
+│   ├── api/                                                    # Contratos OpenAPI, seguridad y permisos
+│   │   ├── README_API.md                                       # Contratos OpenAPI, seguridad y permisos
+│   │   └── README_MATRIZ_PERMISOS.md
+│   ├── requisitos/                                             # Requisitos funcionales y contexto de negocio
+│   │   ├── ERS_ICM_Requisitos.md
+│   │   └── ICM_Informe_Elicitacion_v2_plus.docx.md
+│   ├── test/                                                   # Trazabilidad y documentación de pruebas
+│   │   ├── README_TEST.md                                      # Trazabilidad y documentación de pruebas
+│   │   ├── TRAZABILIDAD_ERS_GHERKIN.md                         # Trazabilidad y documentación de pruebas
+│   │   ├── gherkin_scenarios.json
+│   │   ├── gherkin_out_of_scope.json
+│   │   ├── all_unit.md
+│   │   ├── all_integration.md
+│   │   ├── all_scenarios.md
+│   │   ├── unit/
+│   │   ├── integration/
+│   │   └── scenarios/
+│   ├── calidad_restricciones/                                  # Atributos de calidad y restricciones
+│   │   ├── README_ATRIBUTOS_CALIDAD.md
+│   │   └── README_RESTRICCIONES.md
+│   └── adr/                                                    # Architecture Decision Records
+├── requirements/                                               # Dependencias por entorno
 │   ├── base.txt
 │   ├── development.txt
 │   └── production.txt
-├── docker/
-│   ├── Dockerfile
-│   └── entrypoint.sh           # Script de inicialización del contenedor
-├── docker-compose.yml
-├── docker-compose.prod.yml
-├── .env.example                # Plantilla de variables de entorno
-├── .env                        # Variables reales (en .gitignore)
-├── .gitignore
-├── pytest.ini
-└── README.md
+├── scripts/                                                    # Automatizaciones reutilizables del repositorio
+│   ├── README_SCRIPTS.md                                       # Indice y contexto de las automatizaciones
+│   ├── generate_project_structure.py
+│   ├── generate_all_test_docs.py
+│   ├── parse_ers_gherkin.py
+│   └── generate_docs/                                          # Generadores compartidos de documentación
+│       ├── generate_gherkin_test_docs.py                       # Wrapper para escenarios Gherkin
+│       ├── generate_integration_test_docs.py                   # Generación de documentación de integración
+│       ├── generate_unit_test_docs.py                          # Generación de documentación de tests unitarios
+│       ├── menu.py                                             # Orquestador interactivo de documentación
+│       └── utils.py                                            # Utilidades compartidas para generación documental
+├── shared/                                                     # Código compartido entre apps sin lógica de dominio
+│   ├── models.py                                               # BaseModel con timestamps y metadatos comunes
+│   ├── permissions.py                                          # Permisos RBAC base
+│   ├── exceptions.py                                           # Excepciones base del sistema
+│   ├── mixins.py                                               # Mixins reutilizables para views
+│   ├── pagination.py                                           # Configuración de paginación
+│   ├── openapi.py                                              # Tags OpenAPI y contratos compartidos
+│   └── utils/                                                  # Utilidades transversales
+│       └── validators.py                                       # Validadores reutilizables
+├── tests/                                                      # Tests de integración cross-módulo
+│   ├── factories.py                                            # Factories de datos de prueba
+│   ├── ers/                                                    # Suite Gherkin dinámica alineada al ERS
+│   │   ├── gherkin_impl.py
+│   │   └── test_gherkin_dynamic.py
+│   └── integration/                                            # Pruebas HTTP/API de integración
+├── docker-compose.prod.yml                                     # Orquestación de producción
+├── docker-compose.yml                                          # Orquestación local del stack
+├── manage.py                                                   # Punto de entrada de comandos Django
+├── pytest.ini                                                  # Configuración de pytest
+├── README.md                                                   # Resumen general del repositorio
+└── schema.yml                                                  # Esquema OpenAPI consolidado
 ```
 
 Principio clave: shared contiene componentes transversales reutilizables, no logica de dominio especifica.
