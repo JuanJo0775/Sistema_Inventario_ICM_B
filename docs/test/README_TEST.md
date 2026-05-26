@@ -136,15 +136,25 @@ python scripts/generate_docs/generate_integration_test_docs.py
 
 ### Suite completa
 
-```bash
+En Windows, usa una de estas dos formas. La primera es la recomendada porque deja claro que se está usando el entorno del proyecto.
+
+1. Activar el entorno virtual y ejecutar la suite:
+
+```powershell
+. .venv\Scripts\Activate.ps1
 pytest -q
 ```
-```bash
-pytest -v
+
+2. Ejecutar directamente con el Python del entorno virtual, sin activarlo:
+
+```powershell
+& .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-pytest -q : salida concisa (recomendado en docs/CI).
-pytest -v : salida detallada por test (útil para depurar y reportar).
+Si quieres ver más detalle por test, cambia `-q` por `-v` en cualquiera de las dos opciones.
+
+`pytest -q` muestra salida concisa y es la opción recomendada para uso diario y CI.
+`pytest -v` muestra salida detallada y sirve mejor para depurar.
 
 Este comando ejecuta toda la suite del proyecto: unitarios, integración y Gherkin.
 

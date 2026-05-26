@@ -1513,7 +1513,7 @@ def impl_rnf006_s03(db):
 
     root = Path(__file__).resolve().parents[2]
     scenario = (root / "docs" / "test" / "scenarios" / "RNF006-S03.md").read_text(encoding="utf-8")
-    ers = (root / "docs" / "ERS_ICM_Requisitos.md").read_text(encoding="utf-8")
+    ers = (root / "docs" / "requisitos" / "ERS_ICM_Requisitos.md").read_text(encoding="utf-8")
     assert "autorización expresa" in scenario.lower()
     assert "no deben ejecutarse" in scenario.lower()
     assert "autorización expresa" in ers.lower()

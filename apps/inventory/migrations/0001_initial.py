@@ -140,7 +140,7 @@ class Migration(migrations.Migration):
                         name="uniq_product_location_stock",
                     ),
                     models.CheckConstraint(
-                        condition=models.Q(("current_stock__gte", 0)),
+                        check=models.Q(("current_stock__gte", 0)),
                         name="stock_non_negative",
                     ),
                 ],

@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="stockbylocation",
             constraint=models.CheckConstraint(
-                condition=Q(current_stock__gte=0), name="stock_non_negative"
+                check=Q(current_stock__gte=0), name="stock_non_negative"
             ),
         ),
     ]
