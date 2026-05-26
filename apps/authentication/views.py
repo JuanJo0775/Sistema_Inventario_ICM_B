@@ -22,10 +22,11 @@ from apps.authentication.serializers import (ICMTokenObtainPairSerializer,
                                              LoginRequestSerializer,
                                              UserCreateSerializer,
                                              UserSerializer)
+from apps.authentication.permissions import (IsAlmacenista,
+                                             IsAlmacenistaOrAdministrador)
 from apps.authentication.services import (create_user, disable_user,
                                           update_user, update_user_password)
 from shared.openapi import TAG_AUTH, TAG_SYSTEM, standard_error_responses
-from shared.permissions import IsAlmacenista, IsAlmacenistaOrAdministrador
 
 User = get_user_model()
 
@@ -128,11 +129,16 @@ class MeView(APIView):
 
 
 class UserListCreateView(APIView):
-    permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
+    def get_permissions(self):
+        if self.request.method == "POST":
+            permission_classes = (IsAuthenticated, IsAlmacenista)
+        else:
+            permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
+        return [permission() for permission in permission_classes]
 
     @extend_schema(
         summary="Listar usuarios",
-        description="Solo almacenista (RF-002, BR-02).",
+        description="Almacenista o administrador. Vista de lectura protegida (RF-002, BR-02).",
         tags=[TAG_AUTH],
         responses={
             200: UserSerializer(many=True),
@@ -163,7 +169,12 @@ class UserListCreateView(APIView):
 
 
 class UserDetailView(APIView):
-    permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
+    def get_permissions(self):
+        if self.request.method in {"PUT", "PATCH"}:
+            permission_classes = (IsAuthenticated, IsAlmacenista)
+        else:
+            permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
+        return [permission() for permission in permission_classes]
 
     @extend_schema(
         summary="Detalle de usuario",
@@ -181,6 +192,7 @@ class UserDetailView(APIView):
 
     @extend_schema(
         summary="Actualizar usuario",
+        description="Solo almacenista.",
         tags=[TAG_AUTH],
         request=UserSerializer,
         responses={
@@ -193,6 +205,7 @@ class UserDetailView(APIView):
 
     @extend_schema(
         summary="Actualizar usuario (parcial)",
+        description="Solo almacenista.",
         tags=[TAG_AUTH],
         request=UserSerializer,
         responses={
