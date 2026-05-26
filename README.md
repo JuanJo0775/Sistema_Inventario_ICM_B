@@ -38,6 +38,10 @@ Documentación funcional y arquitectónica disponible en el repositorio:
 - [README_ARQUITECTURA.md](docs/README_ARQUITECTURA.md): arquitectura técnica consolidada (estructura, desacoplamiento, inventario, Docker, testing, SOLID y patrones).
 - [README_RESTRICCIONES.md](docs/calidad_restricciones/README_RESTRICCIONES.md): catálogo consolidado de restricciones arquitectónicas, operativas, tecnológicas y de despliegue.
 - [README_ATRIBUTOS_CALIDAD.md](docs/calidad_restricciones/README_ATRIBUTOS_CALIDAD.md): inventario de atributos de calidad, evidencia y recomendaciones.
+- [architecture_drivers.md](docs/architecture/architecture_drivers.md): drivers funcionales y arquitectónicos priorizados.
+- [utility_tree.md](docs/architecture/utility_tree.md): Utility Tree del proyecto con escenarios e impacto.
+- [architectural_constraints.md](docs/architecture/architectural_constraints.md): restricciones formales que condicionan el diseño.
+- [adr_relationships.md](docs/architecture/adr_relationships.md): trazabilidad drivers → problema → decisión → ADR.
 - [ERS_ICM_Requisitos.md](docs/requisitos/ERS_ICM_Requisitos.md): requisitos funcionales, no funcionales y reglas de negocio.
 - [ICM_Informe_Elicitacion_v2_plus.docx.md](docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md): contexto de levantamiento y análisis del dominio.
 - [AGENTS.md](AGENTS.md): instrucciones y reglas para asistentes de código del proyecto.

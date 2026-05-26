@@ -46,6 +46,8 @@ Este documento consolida el estado de los atributos de calidad observables en el
 
 - [docs/calidad_restricciones/README_RESTRICCIONES.md](README_RESTRICCIONES.md) contiene las restricciones que condicionan estos atributos.
 - [docs/README_ARQUITECTURA.md](../README_ARQUITECTURA.md) describe el marco tecnico que sostiene la mayoria de ellos.
+- [docs/architecture/utility_tree.md](../architecture/utility_tree.md) consolida estos atributos en formato Utility Tree.
+- [docs/architecture/architecture_drivers.md](../architecture/architecture_drivers.md) prioriza los drivers que explican estos atributos.
 
 ## Escenarios de Calidad (ISO 25010)
 

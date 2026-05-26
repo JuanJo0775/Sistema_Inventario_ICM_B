@@ -96,4 +96,10 @@ Este documento consolida las restricciones reales del backend ICM derivadas del 
 - ADR-011 documenta la estrategia de pruebas y su limite de fidelidad.
 - ADR-012 documenta la restriccion de empaquetado de produccion.
 
+## 11. Documentos de síntesis relacionados
+
+- [docs/architecture/architectural_constraints.md](../architecture/architectural_constraints.md) — resumen formal de las restricciones con foco arquitectónico.
+- [docs/architecture/adr_relationships.md](../architecture/adr_relationships.md) — trazabilidad de restricciones y drivers hacia ADRs.
+- [docs/architecture/architecture_drivers.md](../architecture/architecture_drivers.md) — drivers que estas restricciones condicionan.
+
 Si una nueva restriccion afecta diseno o despliegue, debe agregarse aqui y, si introduce una decision de arquitectura, debe reflejarse en un ADR.

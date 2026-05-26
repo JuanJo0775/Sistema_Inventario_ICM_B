@@ -50,6 +50,13 @@ Este directorio contiene las decisiones arquitectonicas del Sistema Inventario I
 - **ADR-011**: Testing en tres niveles (60% unitario, 25% integracion, 15% invariantes).
 - **ADR-012**: Imagen de produccion con dependencias runtime explicitas.
 
+## Documentos de síntesis relacionados
+
+- [architecture_drivers.md](../architecture/architecture_drivers.md) — drivers funcionales y arquitectónicos priorizados.
+- [utility_tree.md](../architecture/utility_tree.md) — Utility Tree del sistema con escenarios de calidad.
+- [architectural_constraints.md](../architecture/architectural_constraints.md) — restricciones reales que condicionan el diseño.
+- [adr_relationships.md](../architecture/adr_relationships.md) — trazabilidad entre drivers, problemas, decisiones y ADRs.
+
 ## Notas sobre decisiones interrelacionadas
 
 - **ADR-005** es el nucleo arquitectonico mas relevante del proyecto. El modelo ledger + stock derivado tiene implicaciones directas en casi todos los demas modulos.

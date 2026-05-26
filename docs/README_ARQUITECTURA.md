@@ -198,6 +198,11 @@ icm_backend/
 │   ├── calidad_restricciones/                                  # Atributos de calidad y restricciones
 │   │   ├── README_ATRIBUTOS_CALIDAD.md
 │   │   └── README_RESTRICCIONES.md
+│   ├── architecture/                                           # Síntesis arquitectónica: drivers, Utility Tree y relaciones con ADRs
+│   │   ├── architecture_drivers.md                             # Drivers arquitectónicos priorizados basados en el código y requisitos
+│   │   ├── utility_tree.md                                     # Utility Tree: escenarios, métricas y trade-offs
+│   │   ├── architectural_constraints.md                        # Restricciones arquitectónicas y riesgos
+│   │   └── adr_relationships.md                                # Trazabilidad entre drivers y ADRs
 │   └── adr/                                                    # Architecture Decision Records
 ├── requirements/                                               # Dependencias por entorno
 │   ├── base.txt
@@ -1905,6 +1910,10 @@ Documentacion complementaria de este analisis:
 
 - [docs/calidad_restricciones/README_RESTRICCIONES.md](calidad_restricciones/README_RESTRICCIONES.md)
 - [docs/calidad_restricciones/README_ATRIBUTOS_CALIDAD.md](calidad_restricciones/README_ATRIBUTOS_CALIDAD.md)
+- [docs/architecture/architecture_drivers.md](architecture_drivers.md)
+- [docs/architecture/utility_tree.md](utility_tree.md)
+- [docs/architecture/architectural_constraints.md](architectural_constraints.md)
+- [docs/architecture/adr_relationships.md](adr_relationships.md)
 
 ## 15. Matriz de Trazabilidad Completa (RF -> Arquitectura)
 

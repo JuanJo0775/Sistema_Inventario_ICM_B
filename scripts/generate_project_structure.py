@@ -80,7 +80,7 @@ APP_CHILD_ORDER = [
 CONFIG_ORDER = ["settings", "urls.py", "wsgi.py", "asgi.py"]
 SETTINGS_ORDER = ["base.py", "development.py", "production.py", "test.py"]
 SHARED_ORDER = ["models.py", "permissions.py", "exceptions.py", "mixins.py", "pagination.py", "openapi.py", "utils"]
-DOCS_ORDER = ["README_ARQUITECTURA.md", "api", "requisitos", "test", "calidad_restricciones", "adr"]
+DOCS_ORDER = ["README_ARQUITECTURA.md", "api", "requisitos", "test", "calidad_restricciones", "architecture", "adr"]
 SCRIPTS_ORDER = [
     "README_SCRIPTS.md",
     "generate_project_structure.py",
@@ -130,6 +130,11 @@ IMPORTANT_COMMENT_PATHS = {
     "docs/requisitos": "Requisitos funcionales y contexto de negocio",
     "docs/test": "Trazabilidad y documentación de pruebas",
     "docs/calidad_restricciones": "Atributos de calidad y restricciones",
+    "docs/architecture": "Síntesis arquitectónica: drivers, Utility Tree y relaciones con ADRs",
+    "docs/architecture/architecture_drivers.md": "Drivers arquitectónicos priorizados basados en el código y requisitos",
+    "docs/architecture/utility_tree.md": "Utility Tree: escenarios, métricas y trade-offs",
+    "docs/architecture/architectural_constraints.md": "Restricciones arquitectónicas y riesgos",
+    "docs/architecture/adr_relationships.md": "Trazabilidad entre drivers y ADRs",
     "docs/adr": "Architecture Decision Records",
     "scripts": "Automatizaciones reutilizables del repositorio",
     "scripts/README_SCRIPTS.md": "Indice y contexto de las automatizaciones",
@@ -201,6 +206,12 @@ DOCS_CHILDREN = {
         "scenarios",
     ],
     "calidad_restricciones": ["README_ATRIBUTOS_CALIDAD.md", "README_RESTRICCIONES.md"],
+    "architecture": [
+        "architecture_drivers.md",
+        "utility_tree.md",
+        "architectural_constraints.md",
+        "adr_relationships.md",
+    ],
     "adr": [],
 }
 

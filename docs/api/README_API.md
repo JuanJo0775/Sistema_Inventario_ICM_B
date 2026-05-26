@@ -6,6 +6,8 @@ Este documento consolida los estándares de la API REST del backend de ICM. Es l
 
 Definir un contrato de API estable, versionado y documentado para la comunicación entre frontend y backend mediante HTTP/JSON, con autenticación JWT, control RBAC, trazabilidad de errores y documentación OpenAPI 3.
 
+Este contrato se apoya en la arquitectura general del sistema y en los drivers descritos en [docs/architecture/architecture_drivers.md](../architecture/architecture_drivers.md) y [docs/architecture/utility_tree.md](../architecture/utility_tree.md).
+
 ## 2. Alcance
 
 La API cubre los dominios funcionales del backend:
