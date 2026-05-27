@@ -7,6 +7,10 @@ from apps.alerts.models import Alert
 
 class AlertSerializer(serializers.ModelSerializer):
     product_sku = serializers.CharField(source="product.sku", read_only=True)
+    lot_code = serializers.CharField(source="lot.code", read_only=True)
+    lot_expiration_date = serializers.DateField(
+        source="lot.expiration_date", read_only=True
+    )
 
     class Meta:
         model = Alert
@@ -14,6 +18,9 @@ class AlertSerializer(serializers.ModelSerializer):
             "id",
             "product",
             "product_sku",
+            "lot",
+            "lot_code",
+            "lot_expiration_date",
             "location",
             "alert_type",
             "message",

@@ -18,7 +18,9 @@ def get_active_alerts(filters: dict[str, Any] | None = None) -> QuerySet[Alert]:
         filters: `alert_type`, `product_id` opcionales.
     """
     filters = filters or {}
-    qs = Alert.objects.filter(is_resolved=False).select_related("product", "location")
+    qs = Alert.objects.filter(is_resolved=False).select_related(
+        "product", "lot", "location"
+    )
     if at := filters.get("alert_type"):
         qs = qs.filter(alert_type=at)
     if pid := filters.get("product_id"):
@@ -30,6 +32,6 @@ def get_alerts_by_product(product_id: UUID) -> QuerySet[Alert]:
     """RF-011 — Todas las alertas de un producto (activas e histórico)."""
     return (
         Alert.objects.filter(product_id=product_id)
-        .select_related("location")
+        .select_related("lot", "location")
         .order_by("-created_at")
     )

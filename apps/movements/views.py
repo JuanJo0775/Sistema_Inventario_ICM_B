@@ -48,7 +48,7 @@ class MovementListView(generics.ListAPIView):
 
     def get_queryset(self):
         qs = (
-            Movement.objects.select_related("product", "executed_by")
+            Movement.objects.select_related("product", "lot", "executed_by")
             .all()
             .order_by("-created_at")
         )
@@ -90,7 +90,7 @@ class EntryListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         return (
             Movement.objects.filter(movement_type=MovementType.ENTRADA)
-            .select_related("product", "executed_by", "destination_location")
+            .select_related("product", "lot", "executed_by", "destination_location")
             .order_by("-created_at")
         )
 
@@ -103,6 +103,8 @@ class EntryListCreateView(generics.ListCreateAPIView):
             d["product_id"],
             d["location_id"],
             d["quantity"],
+            lot_code=d.get("lot_code"),
+            lot_expiration_date=d.get("lot_expiration_date"),
             serial_number=d.get("serial_number"),
             qty_invoiced=d.get("qty_invoiced"),
             discrepancy_note=d.get("discrepancy_note"),
@@ -130,9 +132,9 @@ class EntryDetailView(generics.RetrieveAPIView):
     serializer_class = MovementSerializer
 
     def get_queryset(self):
-        return Movement.objects.filter(
-            movement_type=MovementType.ENTRADA
-        ).select_related("product", "executed_by", "destination_location")
+        return Movement.objects.filter(movement_type=MovementType.ENTRADA).select_related(
+            "product", "lot", "executed_by", "destination_location"
+        )
 
 
 @extend_schema_view(
@@ -184,6 +186,7 @@ class DispatchListCreateView(generics.ListCreateAPIView):
             d["location_id"],
             d["quantity"],
             d["movement_type"],
+            lot_id=d.get("lot_id"),
             scanned_code=d.get("scanned_code"),
             order_sku=d.get("order_sku"),
             serial_number=d.get("serial_number"),
@@ -195,9 +198,12 @@ class DispatchListCreateView(generics.ListCreateAPIView):
             ),
             privacy_notice_acknowledged=d.get("privacy_notice_acknowledged", False),
         )
-        return Response(
-            MovementSerializer(movement).data, status=status.HTTP_201_CREATED
-        )
+        # register_dispatch may return one Movement or a list of Movements
+        if isinstance(movement, (list, tuple)):
+            data = MovementSerializer(movement, many=True).data
+        else:
+            data = MovementSerializer(movement).data
+        return Response(data, status=status.HTTP_201_CREATED)
 
 
 @extend_schema_view(
@@ -301,6 +307,7 @@ class TransferListCreateView(generics.ListCreateAPIView):
             d["origin_id"],
             d["destination_id"],
             d["quantity"],
+            lot_id=d.get("lot_id"),
             cold_chain_acknowledged=d.get("cold_chain_acknowledged", False),
             electrical_safety_acknowledged=d.get(
                 "electrical_safety_acknowledged", False
@@ -353,6 +360,7 @@ class ReturnListCreateView(generics.ListCreateAPIView):
             d["product_id"],
             d["location_id"],
             d["quantity"],
+            lot_id=d.get("lot_id"),
             serial_number=d.get("serial_number"),
             related_movement_id=d.get("related_movement_id"),
         )

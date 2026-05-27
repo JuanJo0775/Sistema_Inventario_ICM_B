@@ -13,7 +13,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.catalog.serializers import ProductSerializer
 from apps.movements.serializers import MovementSerializer
 from apps.reports.selectors import (get_expiring_products,
                                     get_inventory_summary, get_invoice_history,
@@ -21,7 +20,8 @@ from apps.reports.selectors import (get_expiring_products,
                                     get_top_dispatched_products,
                                     movement_counts_by_period,
                                     movement_history, sales_dispatch_totals)
-from apps.reports.serializers import (InventorySummaryItemSerializer,
+from apps.reports.serializers import (ExpiringLotReportItemSerializer,
+                                      InventorySummaryItemSerializer,
                                       KpiDashboardSerializer,
                                       ReportDatasetSerializer,
                                       MovementReportItemSerializer,
@@ -327,15 +327,15 @@ class ExpiringProductsReportView(APIView):
             )
         ],
         responses={
-            200: ProductSerializer(many=True),
+            200: ExpiringLotReportItemSerializer(many=True),
             **standard_error_responses(include_403=True),
         },
         tags=[TAG_REPORTS],
     )
     def get(self, request):
         days = int(request.query_params.get("days", 30))
-        qs = get_expiring_products(days=days)
-        return Response(ProductSerializer(qs, many=True).data)
+        data = get_expiring_products(days=days)
+        return Response(ExpiringLotReportItemSerializer(data, many=True).data)
 
 
 class ReportDatasetView(APIView):
@@ -484,7 +484,9 @@ class ReportDatasetView(APIView):
             data = get_kpi_dashboard()
         elif kind == "expiring":
             days = int(request.query_params.get("days", 30))
-            data = ProductSerializer(get_expiring_products(days=days), many=True).data
+            data = ExpiringLotReportItemSerializer(
+                get_expiring_products(days=days), many=True
+            ).data
         else:
             raise ValidationError(
                 {

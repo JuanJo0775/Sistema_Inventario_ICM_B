@@ -27,6 +27,13 @@ class Alert(models.Model):
         on_delete=models.CASCADE,
         related_name="alerts",
     )
+    lot = models.ForeignKey(
+        "catalog.Lot",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="alerts",
+    )
     location = models.ForeignKey(
         "inventory.Location",
         null=True,

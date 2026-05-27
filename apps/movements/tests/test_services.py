@@ -19,7 +19,7 @@ from shared.exceptions import (AdjustmentJustificationRequiredError,
                                DiscrepancyNoteRequiredError,
                                ProductNotReturnableError,
                                SerialNumberRequiredError)
-from tests.factories import ElectroCategoryFactory, ProductFactory
+from tests.factories import ElectroCategoryFactory, LotFactory, ProductFactory
 
 
 @pytest.mark.django_db
@@ -39,6 +39,91 @@ def test_entry_increments_stock_and_creates_ledger_record(
     assert m.movement_type == MovementType.ENTRADA
     row = StockByLocation.objects.get(product=sample_product, location=loc)
     assert row.current_stock == 5
+
+
+@pytest.mark.django_db
+def test_entry_with_lot_persists_lot_on_movement(almacenista_user, sample_locations):
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="PRD-0100", requires_expiration=True)
+    loc = sample_locations[0]
+    lot = LotFactory(
+        product=product,
+        code="L001",
+        expiration_date=timezone.now().date() + timedelta(days=90),
+    )
+    movement = register_entry(
+        almacenista_user,
+        product.id,
+        loc.id,
+        8,
+        lot_code=lot.code,
+        lot_expiration_date=lot.expiration_date,
+        serial_number="SN-LOT",
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+    assert movement.lot_id == lot.id
+    assert movement.lot.code == "L001"
+
+
+@pytest.mark.django_db
+def test_dispatch_chooses_earliest_lot_when_expiring_product(
+    almacenista_user, sample_locations
+):
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="PRD-0200", requires_expiration=True)
+    loc = sample_locations[0]
+    lot_early = LotFactory(
+        product=product,
+        code="L-EARLY",
+        expiration_date=timezone.now().date() + timedelta(days=15),
+    )
+    lot_late = LotFactory(
+        product=product,
+        code="L-LATE",
+        expiration_date=timezone.now().date() + timedelta(days=90),
+    )
+    register_entry(
+        almacenista_user,
+        product.id,
+        loc.id,
+        10,
+        lot_code=lot_late.code,
+        lot_expiration_date=lot_late.expiration_date,
+        serial_number="SN-LATE",
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+    register_entry(
+        almacenista_user,
+        product.id,
+        loc.id,
+        8,
+        lot_code=lot_early.code,
+        lot_expiration_date=lot_early.expiration_date,
+        serial_number="SN-EARLY",
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+    movements = register_dispatch(
+        almacenista_user,
+        product.id,
+        loc.id,
+        3,
+        MovementType.SALIDA_VENTA_MENOR,
+        scanned_code=product.barcode,
+        order_sku=product.sku,
+        serial_number="SN-DSP",
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+    # should produce at least one movement; the earliest lot is consumed first
+    assert isinstance(movements, list)
+    assert movements[0].lot_id == lot_early.id
 
 
 @pytest.mark.django_db

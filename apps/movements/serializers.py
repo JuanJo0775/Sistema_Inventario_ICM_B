@@ -9,6 +9,15 @@ from apps.movements.models import Movement
 
 class MovementSerializer(serializers.ModelSerializer):
     product_sku = serializers.CharField(source="product.sku", read_only=True)
+    lot_code = serializers.SerializerMethodField()
+    lot_expiration_date = serializers.SerializerMethodField()
+
+    def get_lot_code(self, obj):
+        return getattr(getattr(obj, "lot", None), "code", None)
+
+    def get_lot_expiration_date(self, obj):
+        lot = getattr(obj, "lot", None)
+        return getattr(lot, "expiration_date", None)
 
     class Meta:
         model = Movement
@@ -17,6 +26,9 @@ class MovementSerializer(serializers.ModelSerializer):
             "movement_type",
             "product",
             "product_sku",
+            "lot",
+            "lot_code",
+            "lot_expiration_date",
             "origin_location",
             "destination_location",
             "quantity",
@@ -43,6 +55,8 @@ class EntryCreateSerializer(serializers.Serializer):
     product_id = serializers.UUIDField()
     location_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
+    lot_code = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    lot_expiration_date = serializers.DateField(required=False, allow_null=True)
     serial_number = serializers.CharField(
         required=False, allow_blank=True, allow_null=True
     )
@@ -59,6 +73,7 @@ class DispatchCreateSerializer(serializers.Serializer):
     location_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
     movement_type = serializers.CharField()
+    lot_id = serializers.UUIDField(required=False, allow_null=True)
     scanned_code = serializers.CharField(
         required=False, allow_blank=True, allow_null=True
     )
@@ -78,6 +93,7 @@ class TransferCreateSerializer(serializers.Serializer):
     origin_id = serializers.UUIDField()
     destination_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
+    lot_id = serializers.UUIDField(required=False, allow_null=True)
     cold_chain_acknowledged = serializers.BooleanField(default=False)
     electrical_safety_acknowledged = serializers.BooleanField(default=False)
 
@@ -86,6 +102,7 @@ class ReturnCreateSerializer(serializers.Serializer):
     product_id = serializers.UUIDField()
     location_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
+    lot_id = serializers.UUIDField(required=False, allow_null=True)
     serial_number = serializers.CharField(
         required=False, allow_blank=True, allow_null=True
     )

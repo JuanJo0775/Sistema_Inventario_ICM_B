@@ -41,6 +41,20 @@ class TopDispatchedProductSerializer(serializers.Serializer):
     dispatched_quantity = serializers.IntegerField()
 
 
+class ExpiringLotReportItemSerializer(serializers.Serializer):
+    product_id = serializers.UUIDField()
+    sku = serializers.CharField()
+    name = serializers.CharField()
+    lot_id = serializers.UUIDField()
+    lot_code = serializers.CharField()
+    expiration_date = serializers.DateField()
+    days_left = serializers.IntegerField()
+    location_id = serializers.UUIDField()
+    location_code = serializers.CharField()
+    location_name = serializers.CharField()
+    available_quantity = serializers.IntegerField()
+
+
 class KpiDashboardSerializer(serializers.Serializer):
     total_products = serializers.IntegerField()
     active_alerts = serializers.IntegerField()
