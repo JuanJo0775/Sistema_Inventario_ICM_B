@@ -11,10 +11,11 @@ from django.utils import timezone
 
 from apps.alerts.models import Alert
 from apps.catalog.models import Category, Product
-from apps.catalog.selectors import get_products_expiring_soon
+from apps.catalog.selectors import get_lots_expiring_soon
 from apps.inventory.selectors import get_low_stock_products
 from apps.movements.models import Movement, MovementType
 from apps.movements.selectors import get_dispatches_with_invoices
+from apps.movements.services import ledger_net_quantity_for_lot_location
 
 
 def movement_counts_by_period(*, start: datetime, end: datetime) -> dict[str, int]:
@@ -57,7 +58,7 @@ def movement_history(
     end: datetime | None = None,
 ):
     """RF-010 — Historial filtrable (QuerySet lazy)."""
-    qs = Movement.objects.all().select_related("product", "executed_by")
+    qs = Movement.objects.all().select_related("product", "lot", "executed_by")
     if product_id:
         qs = qs.filter(product_id=UUID(str(product_id)))
     if user_id is not None:
@@ -219,7 +220,7 @@ def get_invoice_history(
     del include_customer_metadata  # API estable; enlace a auditoría en capa de vista si aplica.
     filters = filters or {}
     qs = get_dispatches_with_invoices().select_related(
-        "product", "executed_by", "origin_location"
+        "product", "lot", "executed_by", "origin_location"
     )
     if start := filters.get("start"):
         qs = qs.filter(created_at__gte=start)
@@ -233,8 +234,43 @@ def get_invoice_history(
 
 
 def get_expiring_products(days: int = 30):
-    """RF-010, RF-011 — Productos que vencen en los próximos `days` días."""
-    return get_products_expiring_soon(days=days)
+    """RF-010, RF-011 — Lotes que vencen en los próximos `days` días."""
+    rows: list[dict[str, Any]] = []
+    for lot in get_lots_expiring_soon(days=days):
+        location_ids = set(
+            Movement.objects.filter(product_id=lot.product_id, lot_id=lot.id)
+            .values_list("origin_location_id", flat=True)
+        ) | set(
+            Movement.objects.filter(product_id=lot.product_id, lot_id=lot.id)
+            .values_list("destination_location_id", flat=True)
+        )
+        for location_id in {x for x in location_ids if x is not None}:
+            qty = ledger_net_quantity_for_lot_location(
+                product_id=lot.product_id, lot_id=lot.id, location_id=location_id
+            )
+            if qty <= 0:
+                continue
+            from apps.inventory.models import Location
+
+            location = Location.objects.filter(pk=location_id).only("id", "code", "name").first()
+            if not location:
+                continue
+            rows.append(
+                {
+                    "product_id": lot.product_id,
+                    "sku": lot.product.sku,
+                    "name": lot.product.name,
+                    "lot_id": lot.id,
+                    "lot_code": lot.code,
+                    "expiration_date": lot.expiration_date,
+                    "days_left": (lot.expiration_date - timezone.now().date()).days,
+                    "location_id": location.id,
+                    "location_code": location.code,
+                    "location_name": location.name,
+                    "available_quantity": int(qty),
+                }
+            )
+    return rows
 
 
 def get_kpi_dashboard() -> dict[str, Any]:

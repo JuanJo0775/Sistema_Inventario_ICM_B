@@ -9,7 +9,7 @@ from uuid import UUID
 from django.db.models import Q, QuerySet
 from django.utils import timezone
 
-from apps.catalog.models import Category, Product
+from apps.catalog.models import Category, Lot, Product
 
 
 def get_product_by_id(product_id: UUID) -> Product:
@@ -69,4 +69,19 @@ def get_products_expiring_soon(days: int = 30) -> QuerySet[Product]:
         .filter(expiration_date__gte=today, expiration_date__lte=until)
         .select_related("category")
         .order_by("expiration_date", "sku")
+    )
+
+
+def get_lots_expiring_soon(days: int = 30) -> QuerySet[Lot]:
+    """RF-003, RF-011 — Lotes con vencimiento en los próximos `days` días."""
+    today = timezone.now().date()
+    until = today + timedelta(days=days)
+    return (
+        Lot.objects.filter(
+            expiration_date__gte=today,
+            expiration_date__lte=until,
+            product__is_active=True,
+        )
+        .select_related("product", "product__category")
+        .order_by("expiration_date", "code")
     )

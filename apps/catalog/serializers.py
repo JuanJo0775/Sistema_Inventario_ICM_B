@@ -46,6 +46,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "barcode",
             "brand",
             "expiration_date",
+            "requires_expiration",
             "weight_grams",
             "requires_cold_chain",
             "is_active",
@@ -67,6 +68,7 @@ class ProductUpdateSerializer(serializers.Serializer):
     barcode = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     brand = serializers.CharField(required=False, allow_blank=True)
     requires_cold_chain = serializers.BooleanField(required=False)
+    requires_expiration = serializers.BooleanField(required=False)
     expiration_date = serializers.DateField(required=False, allow_null=True)
     weight_grams = serializers.IntegerField(
         required=False, allow_null=True, min_value=0
@@ -84,6 +86,7 @@ class ProductCreateSerializer(serializers.Serializer):
     barcode = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     brand = serializers.CharField(default="Can")
     requires_cold_chain = serializers.BooleanField(default=False)
+    requires_expiration = serializers.BooleanField(default=False)
     expiration_date = serializers.DateField(required=False, allow_null=True)
     expiry_date = serializers.DateField(required=False, allow_null=True)
     weight_grams = serializers.IntegerField(
