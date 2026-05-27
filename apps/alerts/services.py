@@ -11,7 +11,7 @@ from django.utils import timezone
 
 from apps.alerts.models import Alert, AlertType
 from apps.authentication.models import RoleChoices
-from apps.catalog.models import Product
+from apps.catalog.models import Lot, Product
 from apps.inventory.models import Location, StockByLocation
 from shared.exceptions import UnauthorizedDomainActionError
 
@@ -55,11 +55,56 @@ def sync_stock_alerts_for_product(product_id: UUID, *, user=None) -> None:
         open_alerts.update(is_resolved=True, resolved_at=timezone.now(), resolved_by=rb)
 
 
-def sync_expiry_alerts_for_product(product_id: UUID, *, user=None) -> None:
-    """RF-011 — Alertas de vencimiento a 60 y 30 días según `Product.expiration_date`."""
-    product = Product.objects.filter(pk=product_id).first()
-    if not product or not product.expiration_date:
+def _sync_lot_expiry_alert(lot: Lot, *, user=None) -> None:
+    today = timezone.now().date()
+    days_left = (lot.expiration_date - today).days
+    resolved_by = user if user is not None and getattr(user, "is_authenticated", False) else None
+
+    if days_left > 60:
+        Alert.objects.filter(
+            product_id=lot.product_id,
+            lot_id=lot.id,
+            alert_type__in=(AlertType.EXPIRATION_30, AlertType.EXPIRATION_60),
+            is_resolved=False,
+        ).update(is_resolved=True, resolved_at=timezone.now(), resolved_by=resolved_by)
         return
+
+    alert_type = AlertType.EXPIRATION_60 if days_left > 30 else AlertType.EXPIRATION_30
+    message = (
+        f"El lote {lot.code} vence en {days_left} días (ventana 60)."
+        if alert_type == AlertType.EXPIRATION_60
+        else f"El lote {lot.code} vence en {days_left} días (ventana 30)."
+    )
+    alert, created = Alert.objects.get_or_create(
+        product_id=lot.product_id,
+        lot_id=lot.id,
+        alert_type=alert_type,
+        location=None,
+        defaults={"message": message, "is_resolved": False},
+    )
+    if not created:
+        alert.message = message
+        alert.is_resolved = False
+        alert.resolved_at = None
+        alert.resolved_by = None
+        alert.save(update_fields=["message", "is_resolved", "resolved_at", "resolved_by"])
+
+
+def sync_expiry_alerts_for_product(product_id: UUID, *, user=None) -> None:
+    """RF-011 — Alertas de vencimiento a 60 y 30 días según lotes o `Product.expiration_date`."""
+    product = Product.objects.filter(pk=product_id).first()
+    if not product:
+        return
+
+    lots = list(product.lots.all())
+    if lots:
+        for lot in lots:
+            _sync_lot_expiry_alert(lot, user=user)
+        return
+
+    if not product.expiration_date:
+        return
+
     today = timezone.now().date()
     days_left = (product.expiration_date - today).days
     if days_left > 60:
@@ -67,12 +112,14 @@ def sync_expiry_alerts_for_product(product_id: UUID, *, user=None) -> None:
     if 30 < days_left <= 60:
         if not Alert.objects.filter(
             product_id=product_id,
+            lot__isnull=True,
             alert_type=AlertType.EXPIRATION_60,
             location__isnull=True,
             is_resolved=False,
         ).exists():
             Alert.objects.create(
                 product_id=product_id,
+                lot=None,
                 alert_type=AlertType.EXPIRATION_60,
                 location=None,
                 message=f"El producto vence en {days_left} días (ventana 60).",
@@ -80,6 +127,7 @@ def sync_expiry_alerts_for_product(product_id: UUID, *, user=None) -> None:
     if days_left <= 30:
         alert, _created = Alert.objects.get_or_create(
             product_id=product_id,
+            lot=None,
             alert_type=AlertType.EXPIRATION_30,
             location=None,
             defaults={
@@ -134,9 +182,7 @@ def check_and_create_expiration_alerts() -> list[Alert]:
     Returns:
         Lista vacía reservada para extensiones que retornen instancias creadas.
     """
-    for pid in Product.objects.filter(
-        expiration_date__isnull=False, is_active=True
-    ).values_list("id", flat=True):
+    for pid in Product.objects.filter(is_active=True).values_list("id", flat=True):
         sync_expiry_alerts_for_product(pid)
     return []
 

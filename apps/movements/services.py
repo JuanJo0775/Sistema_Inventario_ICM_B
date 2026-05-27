@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import timedelta
+from datetime import date, timedelta
 from typing import Any
 from uuid import UUID
 
@@ -15,7 +15,7 @@ from django.utils import timezone
 from apps.alerts import services as alert_services
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
-from apps.catalog.models import Product
+from apps.catalog.models import Lot, Product
 from apps.catalog.services import resolve_identifier
 from apps.inventory.models import Location, StockByLocation
 from apps.movements.models import InvoiceCounter, Movement, MovementType
@@ -176,6 +176,8 @@ def register_entry(
     location_id: UUID,
     quantity: int,
     *,
+    lot_code: str | None = None,
+    lot_expiration_date: date | None = None,
     serial_number: str | None = None,
     qty_invoiced: int | None = None,
     discrepancy_note: str | None = None,
@@ -215,6 +217,23 @@ def register_entry(
             "Debe reconocer la alerta de seguridad eléctrica."
         )
 
+    lot = None
+    product = (
+        Product.objects.select_for_update().select_related("category").get(pk=product_id)
+    )
+    if product.requires_expiration:
+        if not (lot_code or "").strip():
+            raise InsufficientStockError("Lote requerido para producto con vencimiento.")
+        if lot_expiration_date is None:
+            raise InsufficientStockError("Fecha de vencimiento del lote requerida.")
+        lot, created = Lot.objects.select_for_update().get_or_create(
+            product=product,
+            code=(lot_code or "").strip(),
+            defaults={"expiration_date": lot_expiration_date},
+        )
+        if not created and lot.expiration_date != lot_expiration_date:
+            raise ValueError("Inconsistencia en fecha de vencimiento del lote.")
+
     dest = _lock_stock(product_id, location_id)
     before = dest.current_stock
     after = before + quantity
@@ -225,6 +244,7 @@ def register_entry(
     movement = Movement.objects.create(
         movement_type=MovementType.ENTRADA,
         product_id=product_id,
+        lot=lot,
         destination_location_id=location_id,
         quantity=quantity,
         stock_previo_destino=before,
@@ -260,6 +280,7 @@ def register_dispatch(
     quantity: int,
     movement_type: str,
     *,
+    lot_id: UUID | None = None,
     scanned_code: str | None = None,
     order_sku: str | None = None,
     serial_number: str | None = None,
@@ -268,7 +289,7 @@ def register_dispatch(
     cold_chain_acknowledged: bool = False,
     electrical_safety_acknowledged: bool = False,
     privacy_notice_acknowledged: bool = False,
-) -> Movement:
+) -> list[Movement]:
     """
     RF-006, BR-04, BR-08, BR-11, BR-13 — Salida con validación cruzada opcional y factura.
 
@@ -354,6 +375,26 @@ def register_dispatch(
     if note:
         extra_audit["note"] = note
 
+    selected_lot: Lot | None = None
+    if getattr(product, "requires_expiration", False):
+        if lot_id is not None:
+            selected_lot = Lot.objects.select_for_update().get(
+                pk=lot_id, product_id=product_id
+            )
+            available = ledger_net_quantity_for_lot_location(
+                product_id=product_id, lot_id=selected_lot.id, location_id=location_id
+            )
+            if available < quantity:
+                raise InsufficientStockError(
+                    detail={
+                        "product_id": str(product_id),
+                        "lot_id": str(selected_lot.id),
+                        "location_id": str(location_id),
+                        "available": available,
+                        "requested": quantity,
+                    }
+                )
+
     origin = _lock_stock(product_id, location_id)
     if origin.current_stock < quantity:
         raise InsufficientStockError(
@@ -364,12 +405,8 @@ def register_dispatch(
                 "requested": quantity,
             }
         )
-    before = origin.current_stock
-    after = before - quantity
-    origin.current_stock = after
-    origin.last_movement_at = timezone.now()
-    origin.save(update_fields=["current_stock", "last_movement_at", "updated_at"])
 
+    # Prepare invoice and PDF once for the whole dispatch
     invoice_number = generate_invoice_number()
     pdf_file = _try_build_invoice_pdf(
         invoice_number=invoice_number,
@@ -377,38 +414,99 @@ def register_dispatch(
         quantity=quantity,
         movement_type=movement_type,
     )
-    movement = Movement.objects.create(
-        movement_type=movement_type,
-        product_id=product_id,
-        origin_location_id=location_id,
-        quantity=quantity,
-        stock_previo_origen=before,
-        stock_resultante_origen=after,
-        scanned_code=sc or None,
-        order_sku=osku or None,
-        serial_number=serial_number,
-        invoice_number=invoice_number,
-        invoice_pdf=pdf_file,
-        executed_by=user,
-    )
 
-    log_event(
-        AuditEventType.MOVEMENT_CREATED,
-        description="Salida / despacho",
-        user=user,
-        movement=movement,
-        detail={"type": movement_type, **extra_audit},
-    )
-    _log_alert_acknowledgement(
-        user=user,
-        movement=movement,
-        cold_chain_acknowledged=cold,
-        electrical_safety_acknowledged=electric,
-    )
+    movements_created: list[Movement] = []
+
+    if product.requires_expiration and selected_lot is None:
+        # evaluate lots available and ensure total covers requested quantity
+        candidates = available_lots_at_location(product_id=product_id, location_id=location_id)
+        total_available = sum(c["available"] for c in candidates)
+        if total_available < quantity:
+            raise InsufficientStockError(
+                detail={
+                    "product_id": str(product_id),
+                    "location_id": str(location_id),
+                    "requested": quantity,
+                    "available": total_available,
+                }
+            )
+        # prefer single-lot if possible
+        single_candidate = next((c for c in candidates if c["available"] >= quantity), None)
+        if single_candidate is not None:
+            selected_lot = single_candidate["lot"]
+
+    if product.requires_expiration and selected_lot is None:
+        # Multi-lot consumption: take from earliest-expiring lots
+        remaining = int(quantity)
+        candidates = available_lots_at_location(product_id=product_id, location_id=location_id)
+        for candidate in candidates:
+            if remaining <= 0:
+                break
+            lot = candidate["lot"]
+            take = min(candidate["available"], remaining)
+            prev = origin.current_stock
+            after = prev - take
+            origin.current_stock = after
+            origin.last_movement_at = timezone.now()
+            origin.save(update_fields=["current_stock", "last_movement_at", "updated_at"])
+
+            movement = Movement.objects.create(
+                movement_type=movement_type,
+                product_id=product_id,
+                lot=lot,
+                origin_location_id=location_id,
+                quantity=take,
+                stock_previo_origen=prev,
+                stock_resultante_origen=after,
+                scanned_code=sc or None,
+                order_sku=osku or None,
+                serial_number=serial_number,
+                invoice_number=invoice_number,
+                invoice_pdf=pdf_file,
+                executed_by=user,
+            )
+            movements_created.append(movement)
+            _log_alert_acknowledgement(
+                user=user,
+                movement=movement,
+                cold_chain_acknowledged=cold,
+                electrical_safety_acknowledged=electric,
+            )
+            remaining -= take
+
+        if remaining > 0:
+            raise InsufficientStockError(detail={"requested": quantity, "remaining": remaining})
+
+    else:
+        # Single movement (either non-expiring product or selected_lot provided)
+        before = origin.current_stock
+        after = before - quantity
+        origin.current_stock = after
+        origin.last_movement_at = timezone.now()
+        origin.save(update_fields=["current_stock", "last_movement_at", "updated_at"])
+
+        movement = Movement.objects.create(
+            movement_type=movement_type,
+            product_id=product_id,
+            lot=selected_lot,
+            origin_location_id=location_id,
+            quantity=quantity,
+            stock_previo_origen=before,
+            stock_resultante_origen=after,
+            scanned_code=sc or None,
+            order_sku=osku or None,
+            serial_number=serial_number,
+            invoice_number=invoice_number,
+            invoice_pdf=pdf_file,
+            executed_by=user,
+        )
+        movements_created.append(movement)
+
     loc = Location.objects.get(pk=location_id)
     check_and_create_alerts(product, loc)
-    movement.refresh_from_db()
-    return movement
+    for m in movements_created:
+        m.refresh_from_db()
+    return movements_created
 
 
 @transaction.atomic
@@ -733,6 +831,66 @@ def ledger_net_quantity_for_location(*, product_id: UUID, location_id: UUID) -> 
         ):
             total += m.quantity
     return total
+
+
+def ledger_net_quantity_for_lot_location(
+    *, product_id: UUID, lot_id: UUID, location_id: UUID
+) -> int:
+    """Suma algebraica del ledger para un lote específico en una ubicación."""
+    total = 0
+    qs = Movement.objects.filter(product_id=product_id, lot_id=lot_id).order_by(
+        "created_at"
+    )
+    for m in qs.iterator():
+        if (
+            m.movement_type == MovementType.ENTRADA
+            and m.destination_location_id == location_id
+        ):
+            total += m.quantity
+        elif m.movement_type in {
+            MovementType.SALIDA_VENTA_MAYOR,
+            MovementType.SALIDA_VENTA_MENOR,
+            MovementType.SALIDA_DANO,
+            MovementType.SALIDA_VENCIMIENTO,
+            MovementType.SALIDA_COMBO,
+        }:
+            if m.origin_location_id == location_id:
+                total -= m.quantity
+        elif m.movement_type == MovementType.TRASLADO:
+            if m.origin_location_id == location_id:
+                total -= m.quantity
+            if m.destination_location_id == location_id:
+                total += m.quantity
+        elif m.movement_type == MovementType.AJUSTE:
+            if m.destination_location_id == location_id:
+                total += m.quantity
+            if m.origin_location_id == location_id:
+                total -= m.quantity
+        elif (
+            m.movement_type == MovementType.DEVOLUCION
+            and m.destination_location_id == location_id
+        ):
+            total += m.quantity
+    return total
+
+
+def available_lots_at_location(
+    *, product_id: UUID, location_id: UUID
+) -> list[dict[str, Any]]:
+    """Retorna lotes con stock positivo en una ubicación, ordenados por vencimiento."""
+    lots = list(
+        Lot.objects.filter(product_id=product_id)
+        .select_related("product")
+        .order_by("expiration_date", "code")
+    )
+    out: list[dict[str, Any]] = []
+    for lot in lots:
+        available = ledger_net_quantity_for_lot_location(
+            product_id=product_id, lot_id=lot.id, location_id=location_id
+        )
+        if available > 0:
+            out.append({"lot": lot, "available": int(available)})
+    return out
 
 
 @transaction.atomic
