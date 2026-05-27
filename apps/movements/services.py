@@ -517,6 +517,7 @@ def register_internal_transfer(
     destination_id: UUID,
     quantity: int,
     *,
+    lot_id: UUID | None = None,
     cold_chain_acknowledged: bool = False,
     electrical_safety_acknowledged: bool = False,
     related_movement: Movement | None = None,
@@ -543,6 +544,23 @@ def register_internal_transfer(
         )
 
     total_before = _consolidated_stock_total(product_id=product_id)
+
+    selected_lot: Lot | None = None
+    if getattr(product, "requires_expiration", False) and lot_id is not None:
+        selected_lot = Lot.objects.select_for_update().get(pk=lot_id, product_id=product_id)
+        available = ledger_net_quantity_for_lot_location(
+            product_id=product_id, lot_id=selected_lot.id, location_id=origin_id
+        )
+        if available < quantity:
+            raise InsufficientStockError(
+                detail={
+                    "product_id": str(product_id),
+                    "lot_id": str(selected_lot.id),
+                    "location_id": str(origin_id),
+                    "available": available,
+                    "requested": quantity,
+                }
+            )
 
     first_id, second_id = sorted([origin_id, destination_id], key=lambda u: str(u))
     row_first = _lock_stock(product_id, first_id)
@@ -579,6 +597,7 @@ def register_internal_transfer(
 
     movement = Movement.objects.create(
         movement_type=MovementType.TRASLADO,
+        lot=selected_lot,
         product_id=product_id,
         origin_location_id=origin_id,
         destination_location_id=destination_id,
@@ -613,6 +632,7 @@ def register_return(
     location_id: UUID,
     quantity: int,
     *,
+    lot_id: UUID | None = None,
     serial_number: str | None = None,
     related_movement_id: UUID | None = None,
 ) -> Movement:
@@ -641,6 +661,10 @@ def register_return(
         if related is None:
             raise ValueError("related_movement_id no existe.")
 
+    selected_lot: Lot | None = None
+    if getattr(product, "requires_expiration", False) and lot_id is not None:
+        selected_lot = Lot.objects.select_for_update().get(pk=lot_id, product_id=product_id)
+
     dest = _lock_stock(product_id, location_id)
     before = dest.current_stock
     after = before + quantity
@@ -652,6 +676,7 @@ def register_return(
         movement_type=MovementType.DEVOLUCION,
         product_id=product_id,
         destination_location_id=location_id,
+        lot=selected_lot,
         quantity=quantity,
         stock_previo_destino=before,
         stock_resultante_destino=after,
