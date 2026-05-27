@@ -11,6 +11,7 @@ from apps.audit.services import log_event
 from apps.catalog.models import Category, ComboItem, Product, ProductCombo, Subcategory
 from shared.exceptions import (InvalidSKUFormatError,
                                UnauthorizedCredentialManagementError)
+from shared.utils.barcode import build_product_barcode
 from shared.utils.validators import validate_sku_format
 
 if TYPE_CHECKING:
@@ -51,6 +52,9 @@ def create_product(
         notes=data.get("notes") or "",
         reorder_point=int(data.get("reorder_point", 0)),
     )
+    if not product.barcode:
+        product.barcode = build_product_barcode(product.id)
+        product.save(update_fields=("barcode",))
     log_event(
         AuditEventType.PRODUCT_CREATED,
         description=f"Producto creado: {product.sku}",
@@ -92,7 +96,6 @@ def update_product(
     for field in (
         "name",
         "sku",
-        "barcode",
         "brand",
         "expiration_date",
         "requires_expiration",
@@ -108,6 +111,8 @@ def update_product(
         product.category_id = data["category_id"]
     if "subcategory_id" in data:
         product.subcategory_id = data.get("subcategory_id")
+    if not product.barcode:
+        product.barcode = data.get("barcode") or build_product_barcode(product.id)
     product.save()
     log_event(
         AuditEventType.PRODUCT_UPDATED,
