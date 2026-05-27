@@ -7,7 +7,8 @@
       "request": "launch",
       "module": "pytest",
       "args": ["-q", "${file}"],
-      "justMyCode": false
+      "justMyCode": false,
+      "env": {"DJANGO_SETTINGS_MODULE": "config.settings.test"}
     },
     {
       "name": "Debug pytest: all",
@@ -15,7 +16,8 @@
       "request": "launch",
       "module": "pytest",
       "args": ["-q"],
-      "justMyCode": false
+      "justMyCode": false,
+      "env": {"DJANGO_SETTINGS_MODULE": "config.settings.test"}
     },
     {
       "name": "Debug pytest: unit (apps)",
@@ -23,7 +25,8 @@
       "request": "launch",
       "module": "pytest",
       "args": ["apps", "-q"],
-      "justMyCode": false
+      "justMyCode": false,
+      "env": {"DJANGO_SETTINGS_MODULE": "config.settings.test"}
     },
     {
       "name": "Debug pytest: integration",
@@ -31,7 +34,8 @@
       "request": "launch",
       "module": "pytest",
       "args": ["tests/integration", "-q"],
-      "justMyCode": false
+      "justMyCode": false,
+      "env": {"DJANGO_SETTINGS_MODULE": "config.settings.test"}
     },
     {
       "name": "Debug pytest: gherkin",
@@ -39,7 +43,8 @@
       "request": "launch",
       "module": "pytest",
       "args": ["tests/ers", "-q"],
-      "justMyCode": false
+      "justMyCode": false,
+      "env": {"DJANGO_SETTINGS_MODULE": "config.settings.test"}
     }
   ]
 }
