@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from apps.catalog.models import (Category, ComboItem, Product, ProductCombo,
-                                 Subcategory)
+from apps.catalog.models import (Category, ComboItem, Lot, Product,
+                                 ProductCombo, Subcategory)
 
 
 @admin.register(Category)
@@ -18,8 +18,21 @@ class SubcategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("sku", "name", "category", "brand", "is_active")
+    list_display = (
+        "sku",
+        "name",
+        "category",
+        "brand",
+        "requires_expiration",
+        "is_active",
+    )
     search_fields = ("sku", "name", "barcode")
+
+
+@admin.register(Lot)
+class LotAdmin(admin.ModelAdmin):
+    list_display = ("product", "code", "expiration_date", "created_at")
+    search_fields = ("code", "product__sku", "product__name")
 
 
 class ComboItemInline(admin.TabularInline):

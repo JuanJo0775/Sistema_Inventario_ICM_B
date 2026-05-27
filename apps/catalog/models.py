@@ -97,6 +97,10 @@ class Product(BaseModel):
     )
     brand = models.CharField(max_length=100, default="Can")
     expiration_date = models.DateField(null=True, blank=True)
+    requires_expiration = models.BooleanField(
+        default=False,
+        help_text="True si el producto requiere control de vencimiento por lote.",
+    )
     weight_grams = models.PositiveIntegerField(null=True, blank=True)
     requires_cold_chain = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -131,6 +135,39 @@ class Product(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.sku} — {self.name}"
+
+
+class Lot(BaseModel):
+    """
+    Lote de inventario asociado a un producto.
+
+    Se usa para trazabilidad de partidas con fechas de vencimiento distintas.
+    """
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.PROTECT,
+        related_name="lots",
+    )
+    code = models.CharField(max_length=100)
+    expiration_date = models.DateField()
+
+    class Meta:
+        verbose_name = "Lote"
+        verbose_name_plural = "Lotes"
+        ordering = ("expiration_date", "code")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("product", "code"), name="uniq_lot_code_per_product"
+            ),
+        ]
+        indexes = [
+            models.Index(fields=("product", "expiration_date")),
+            models.Index(fields=("code",)),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.product.sku} / {self.code}"
 
 
 class ProductCombo(BaseModel):

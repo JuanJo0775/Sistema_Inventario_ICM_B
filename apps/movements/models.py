@@ -36,6 +36,13 @@ class Movement(models.Model):
         on_delete=models.PROTECT,
         related_name="movements",
     )
+    lot = models.ForeignKey(
+        "catalog.Lot",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="movements",
+    )
     origin_location = models.ForeignKey(
         "inventory.Location",
         null=True,
