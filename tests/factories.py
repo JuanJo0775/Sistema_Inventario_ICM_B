@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import factory
+from datetime import timedelta
 from django.contrib.auth import get_user_model
 from factory.django import DjangoModelFactory
+from django.utils import timezone
 
 from apps.authentication.models import UserRole
-from apps.catalog.models import Category, Product
+from apps.catalog.models import Category, Lot, Product
 from apps.inventory.models import Location
 
 User = get_user_model()
@@ -85,6 +87,18 @@ class ProductFactory(DjangoModelFactory):
     barcode = factory.Sequence(lambda n: f"BAR{n:08d}")
     brand = "Can"
     reorder_point = 5
+    requires_expiration = False
+
+
+class LotFactory(DjangoModelFactory):
+    class Meta:
+        model = Lot
+
+    product = factory.SubFactory(ProductFactory)
+    code = factory.Sequence(lambda n: f"LOT-{n:04d}")
+    expiration_date = factory.LazyFunction(
+        lambda: timezone.now().date() + timedelta(days=180)
+    )
 
 
 class LocationFactory(DjangoModelFactory):

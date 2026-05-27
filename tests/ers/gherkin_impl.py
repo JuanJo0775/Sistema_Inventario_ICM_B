@@ -967,10 +967,35 @@ def impl_rf010_s04(authenticated_almacenista_client: APIClient):
     assert r.status_code == status.HTTP_200_OK
 
 
-def impl_rf010_s05(authenticated_almacenista_client: APIClient):
+def impl_rf010_s05(authenticated_almacenista_client: APIClient, almacenista_user, sample_locations, db):
+    from datetime import timedelta
+    from django.utils import timezone
+    from apps.reports.selectors import get_expiring_products
+    from apps.movements.services import register_entry
+    from tests.factories import LotFactory, ProductFactory
+
+    product = ProductFactory(requires_expiration=True)
+    location = sample_locations[0]
+    LotFactory(
+        product=product,
+        code="L-REP-001",
+        expiration_date=timezone.now().date() + timedelta(days=45),
+    )
+    register_entry(
+        almacenista_user,
+        product.id,
+        location.id,
+        4,
+        lot_code="L-REP-001",
+        lot_expiration_date=timezone.now().date() + timedelta(days=45),
+        serial_number="SN-REP-001",
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
     url = reverse("reports-expiring")
     r = authenticated_almacenista_client.get(url)
     assert r.status_code == status.HTTP_200_OK
+    assert any(item["lot_code"] == "L-REP-001" for item in get_expiring_products(days=60))
 
 
 def impl_rf010_s03(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
@@ -1091,12 +1116,19 @@ def impl_rf011_s02(authenticated_almacenista_client: APIClient, sample_product, 
     from django.utils import timezone
     from apps.alerts.models import Alert, AlertType
     from apps.alerts.services import sync_expiry_alerts_for_product
+    from tests.factories import LotFactory
 
-    sample_product.expiration_date = timezone.now().date() + timedelta(days=60)
-    sample_product.save(update_fields=["expiration_date"])
+    sample_product.requires_expiration = True
+    sample_product.save(update_fields=["requires_expiration"])
+    lot = LotFactory(
+        product=sample_product,
+        code="L-60",
+        expiration_date=timezone.now().date() + timedelta(days=60),
+    )
     sync_expiry_alerts_for_product(sample_product.id)
     assert Alert.objects.filter(
         product=sample_product,
+        lot=lot,
         alert_type=AlertType.EXPIRATION_60,
         is_resolved=False,
     ).exists()
@@ -1109,12 +1141,19 @@ def impl_rf011_s03(authenticated_almacenista_client: APIClient, sample_product, 
     from django.utils import timezone
     from apps.alerts.models import Alert, AlertType
     from apps.alerts.services import sync_expiry_alerts_for_product
+    from tests.factories import LotFactory
 
-    sample_product.expiration_date = timezone.now().date() + timedelta(days=30)
-    sample_product.save(update_fields=["expiration_date"])
+    sample_product.requires_expiration = True
+    sample_product.save(update_fields=["requires_expiration"])
+    lot = LotFactory(
+        product=sample_product,
+        code="L-30",
+        expiration_date=timezone.now().date() + timedelta(days=30),
+    )
     sync_expiry_alerts_for_product(sample_product.id)
     assert Alert.objects.filter(
         product=sample_product,
+        lot=lot,
         alert_type=AlertType.EXPIRATION_30,
         is_resolved=False,
     ).exists()

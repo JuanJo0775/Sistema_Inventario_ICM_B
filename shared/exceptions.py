@@ -133,6 +133,27 @@ class AlertAcknowledgementRequiredError(DomainValidationError):
     default_code = "ALERT_ACKNOWLEDGEMENT_REQUIRED"
 
 
+class LotCodeRequiredError(DomainValidationError):
+    """RF-011 / lote: falta código de lote en un producto que lo requiere."""
+
+    default_message = "El producto requiere código de lote."
+    default_code = "LOT_CODE_REQUIRED"
+
+
+class LotExpirationDateRequiredError(DomainValidationError):
+    """RF-011 / lote: falta fecha de vencimiento para un producto que lo requiere."""
+
+    default_message = "El producto requiere fecha de vencimiento por lote."
+    default_code = "LOT_EXPIRATION_DATE_REQUIRED"
+
+
+class LotMismatchError(DomainValidationError):
+    """RF-011 / lote: la fecha ingresada no coincide con el lote existente."""
+
+    default_message = "La fecha de vencimiento no coincide con un lote existente."
+    default_code = "LOT_MISMATCH"
+
+
 class InventoryError(ICMBaseException):
     """Errores de inventario y consistencia de stock."""
 
