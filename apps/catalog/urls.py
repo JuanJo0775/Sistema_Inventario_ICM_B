@@ -1,8 +1,9 @@
 from django.urls import path
 
 from apps.catalog.views import (CategoryListCreateView, ComboListCreateView,
-                                ProductDetailView, ProductListCreateView,
-                                ResolveIdentifierView, SubcategoryListCreateView)
+                                ProductBarcodeView, ProductDetailView,
+                                ProductListCreateView, ResolveIdentifierView,
+                                SubcategoryListCreateView)
 
 urlpatterns = [
     path("categories/", CategoryListCreateView.as_view(), name="catalog-categories"),
@@ -12,6 +13,11 @@ urlpatterns = [
         "products/<uuid:pk>/",
         ProductDetailView.as_view(),
         name="catalog-product-detail",
+    ),
+    path(
+        "products/<uuid:pk>/barcode/",
+        ProductBarcodeView.as_view(),
+        name="catalog-product-barcode",
     ),
     path(
         "products/resolve/",

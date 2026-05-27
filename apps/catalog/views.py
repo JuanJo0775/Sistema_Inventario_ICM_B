@@ -16,6 +16,8 @@ from apps.catalog.serializers import (CategoryCreateSerializer,
                                       CategorySerializer,
                                       ComboCreateSerializer, ComboSerializer,
                                       ProductCreateSerializer,
+                                      ProductBarcodeSerializer,
+                                      ProductDetailSerializer,
                                       ProductSerializer,
                                       ProductUpdateSerializer,
                                       ResolveIdentifierQuerySerializer,
@@ -154,7 +156,7 @@ class ProductListCreateView(generics.ListCreateAPIView):
         summary="Detalle de producto",
         tags=[TAG_CATALOG],
         responses={
-            200: ProductSerializer,
+            200: ProductDetailSerializer,
             **standard_error_responses(include_404=True),
         },
     ),
@@ -162,7 +164,7 @@ class ProductListCreateView(generics.ListCreateAPIView):
         summary="Actualizar producto",
         tags=[TAG_CATALOG],
         responses={
-            200: ProductSerializer,
+            200: ProductDetailSerializer,
             **standard_error_responses(include_403=True, include_404=True),
         },
     ),
@@ -170,7 +172,7 @@ class ProductListCreateView(generics.ListCreateAPIView):
         summary="Actualizar producto parcialmente",
         tags=[TAG_CATALOG],
         responses={
-            200: ProductSerializer,
+            200: ProductDetailSerializer,
             **standard_error_responses(include_403=True, include_404=True),
         },
     ),
@@ -188,7 +190,27 @@ class ProductDetailView(generics.RetrieveUpdateAPIView):
         ser.is_valid(raise_exception=True)
         payload = {k: v for k, v in ser.validated_data.items()}
         product = update_product(request.user, instance.pk, payload, request=request)
-        return Response(ProductSerializer(product).data)
+        return Response(ProductDetailSerializer(product).data)
+
+
+class ProductBarcodeView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @extend_schema(
+        summary="Obtener barcode de producto",
+        description=(
+            "Devuelve el payload completo del barcode para que el frontend lo consuma "
+            "sin reconstruir SVG ni metadata."
+        ),
+        responses={
+            200: ProductBarcodeSerializer,
+            **standard_error_responses(include_404=True),
+        },
+        tags=[TAG_CATALOG],
+    )
+    def get(self, request, pk):
+        product = Product.objects.select_related("category", "subcategory").get(pk=pk)
+        return Response(ProductBarcodeSerializer.from_product(product))
 
 
 class ResolveIdentifierView(APIView):
@@ -212,7 +234,7 @@ class ResolveIdentifierView(APIView):
             ),
         ],
         responses={
-            200: ProductSerializer,
+            200: ProductDetailSerializer,
             **standard_error_responses(include_404=True),
         },
         tags=[TAG_CATALOG],
@@ -221,7 +243,7 @@ class ResolveIdentifierView(APIView):
         qser = ResolveIdentifierQuerySerializer(data=request.query_params)
         qser.is_valid(raise_exception=True)
         product = resolve_identifier(qser.validated_data["_value"])
-        return Response(ProductSerializer(product).data)
+        return Response(ProductDetailSerializer(product).data)
 
 
 @extend_schema_view(
