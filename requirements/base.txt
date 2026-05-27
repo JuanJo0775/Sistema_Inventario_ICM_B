@@ -21,6 +21,9 @@ django-filter==23.5
 # PDF Generation
 WeasyPrint==60.1
 
+# Barcode generation
+python-barcode==0.15.1
+
 # Testing
 pytest==7.4.3
 pytest-django==4.7.0
