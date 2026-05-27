@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "pytest:all",
+      "type": "shell",
+      "command": "pytest -q",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "pytest:unit",
+      "type": "shell",
+      "command": "pytest apps -q",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "pytest:integration",
+      "type": "shell",
+      "command": "pytest tests/integration -q",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "pytest:gherkin",
+      "type": "shell",
+      "command": "pytest tests/ers -q",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

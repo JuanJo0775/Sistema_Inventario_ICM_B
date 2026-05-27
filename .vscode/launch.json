@@ -1,0 +1,45 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug pytest: current file",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-q", "${file}"],
+      "justMyCode": false
+    },
+    {
+      "name": "Debug pytest: all",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-q"],
+      "justMyCode": false
+    },
+    {
+      "name": "Debug pytest: unit (apps)",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["apps", "-q"],
+      "justMyCode": false
+    },
+    {
+      "name": "Debug pytest: integration",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests/integration", "-q"],
+      "justMyCode": false
+    },
+    {
+      "name": "Debug pytest: gherkin",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests/ers", "-q"],
+      "justMyCode": false
+    }
+  ]
+}
