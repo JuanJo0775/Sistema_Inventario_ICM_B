@@ -16,7 +16,10 @@ from pathlib import Path
 from typing import List
 
 ROOT = Path(__file__).resolve().parents[1]
-ERS_PATH = ROOT / "docs" / "ERS_ICM_Requisitos.md"
+ERS_PATH = ROOT / "docs" / "requisitos" / "ERS_ICM_Requisitos.md"
+# Compatibilidad con repos antiguos o worktrees con la ruta previa.
+if not ERS_PATH.exists():
+    ERS_PATH = ROOT / "docs" / "ERS_ICM_Requisitos.md"
 # Asegura que el script funcione al ejecutarse directo desde la raíz del repo.
 sys.path.insert(0, str(ROOT))
 # write logic delegated to utils

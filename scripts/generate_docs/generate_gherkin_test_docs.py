@@ -19,7 +19,9 @@ def main() -> None:
     if not SCRIPT.exists():
         print(f"No encontrado: {SCRIPT}")
         raise SystemExit(1)
-    rc = subprocess.run([sys.executable, str(SCRIPT)], cwd=str(ROOT)).returncode
+    env = dict(**__import__("os").environ)
+    env["PYTHONPATH"] = str(ROOT)
+    rc = subprocess.run([sys.executable, str(SCRIPT)], cwd=str(ROOT), env=env).returncode
     raise SystemExit(rc)
 
 

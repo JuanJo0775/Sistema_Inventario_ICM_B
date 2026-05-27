@@ -9,10 +9,13 @@ from __future__ import annotations
 
 from importlib import import_module
 from pathlib import Path
+import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 out_dir = ROOT / "docs" / "test" / "unit"
 out_dir.mkdir(parents=True, exist_ok=True)
+
+sys.path.insert(0, str(ROOT))
 
 utils = import_module("scripts.generate_docs.utils")
 iter_test_nodes = utils.iter_test_nodes
