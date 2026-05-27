@@ -29,6 +29,9 @@ Este documento enlaza pruebas automatizadas con **requisitos** y **criterios de 
 | Criterio | Cobertura |
 |----------|-----------|
 | SKU con patrón 1–4 letras + guion + 1–4 dígitos (BR-12) | `apps/catalog/tests/test_models.py::test_product_full_clean_rejects_invalid_sku_format` (`Product.clean()` / Admin) |
+| Barcode estable, write-once y consumible por frontend como payload listo | `apps/catalog/tests/test_services.py::test_create_product_auto_generates_stable_barcode`, `apps/catalog/tests/test_services.py::test_update_product_keeps_existing_barcode`, `apps/catalog/tests/test_services.py::test_update_product_backfills_missing_barcode`, `apps/catalog/tests/test_views.py::test_product_barcode_endpoint_returns_ready_to_consume_payload` |
+
+**Nota de alcance:** el barcode deja de depender de `sku` o `name`; se genera una sola vez desde la identidad técnica del producto y el frontend consume el payload ya renderizado en `GET /api/v1/catalog/products/<id>/barcode/`.
 
 ---
 

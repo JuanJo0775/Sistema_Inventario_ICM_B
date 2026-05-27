@@ -256,6 +256,8 @@ El backend usa `djangorestframework-simplejwt` con rotación de refresh tokens y
 - productos
 - combos
 - resolución de identificadores por SKU, barcode o nombre
+- el detalle de producto expone `barcode`, `barcode_type`, `barcode_payload`, `barcode_svg` y `barcode_svg_data_uri` para consumo directo del frontend e impresión de etiquetas
+- `GET /api/v1/catalog/products/<id>/barcode/` devuelve el payload listo para renderizar/impresión del barcode del producto
 
 ### 10.3 Inventario
 
