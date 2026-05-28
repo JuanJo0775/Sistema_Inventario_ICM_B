@@ -15,6 +15,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
+from apps.authentication.permissions import IsAlmacenista, IsAlmacenistaOrAdministrador
 from apps.authentication.serializers import (
     ICMTokenObtainPairSerializer,
     ICMTokenRefreshSerializer,
@@ -22,7 +23,6 @@ from apps.authentication.serializers import (
     UserCreateSerializer,
     UserSerializer,
 )
-from apps.authentication.permissions import IsAlmacenista, IsAlmacenistaOrAdministrador
 from apps.authentication.services import (
     create_user,
     disable_user,

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from django.utils.dateparse import parse_datetime
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
@@ -14,9 +14,9 @@ from rest_framework.views import APIView
 
 from apps.movements.serializers import MovementSerializer
 from apps.reports.selectors import (
+    get_discard_operational_summary,
     get_dispatch_operational_summary,
     get_dispatch_order_samples,
-    get_discard_operational_summary,
     get_expiring_products,
     get_inventory_summary,
     get_invoice_history,
@@ -30,19 +30,19 @@ from apps.reports.selectors import (
     sales_dispatch_totals,
 )
 from apps.reports.serializers import (
+    DiscardOperationalSummarySerializer,
+    DispatchOperationalSummarySerializer,
     ExpiringLotReportItemSerializer,
     InventorySummaryItemSerializer,
     KpiDashboardSerializer,
-    ReportDatasetSerializer,
     MovementReportItemSerializer,
     MovementSummaryResponseSerializer,
-    QualityOperationalResponseSerializer,
-    DiscardOperationalSummarySerializer,
-    DispatchOperationalSummarySerializer,
     PerOrderSampleSerializer,
+    QualityOperationalResponseSerializer,
+    ReportDatasetSerializer,
     SalesSummaryResponseSerializer,
-    WarehouseUtilizationResponseSerializer,
     TopDispatchedProductSerializer,
+    WarehouseUtilizationResponseSerializer,
 )
 from shared.openapi import TAG_REPORTS, standard_error_responses
 from shared.pagination import ICMPageNumberPagination

@@ -10,12 +10,13 @@ def run_system_health_check():
     Realiza un diagnóstico real del sistema antes de arrancar el servidor.
     Verifica DB (PostgreSQL), migraciones pendientes y entorno.
     """
+    from io import StringIO
+
     from django.conf import settings
-    from django.db import connection
-    from django.db.utils import OperationalError
     from django.core.management import call_command
     from django.core.management.color import color_style
-    from io import StringIO
+    from django.db import connection
+    from django.db.utils import OperationalError
 
     style = color_style()
 

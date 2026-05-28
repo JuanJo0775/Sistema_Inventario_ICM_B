@@ -6,13 +6,13 @@ consistente actualizada solo desde `apps.movements.services`.
 
 from __future__ import annotations
 
+# Determinar el nombre de argumento correcto para CheckConstraint
+from inspect import signature as _inspect_signature
+
 from django.db import models
 from django.db.models import Q
 
 from shared.models import BaseModel
-
-# Determinar el nombre de argumento correcto para CheckConstraint
-from inspect import signature as _inspect_signature
 
 _cc_params = _inspect_signature(models.CheckConstraint.__init__).parameters
 if "condition" in _cc_params:

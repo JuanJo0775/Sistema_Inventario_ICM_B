@@ -6,10 +6,9 @@ Las funciones registradas en IMPLEMENTATIONS reciben solo fixtures declaradas en
 
 from __future__ import annotations
 
-import inspect
 import csv
-from datetime import datetime
-from datetime import timedelta
+import inspect
+from datetime import datetime, timedelta
 from io import StringIO
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
@@ -248,8 +247,8 @@ def impl_rf003_s06(almacenista_user, db):
         {"sku": "RFB-0007", "name": "B", "category_id": cat.id},
     )
     # Asegurar stock disponible para incluir en el combo
-    from tests.factories import LocationFactory
     from apps.inventory.models import StockByLocation
+    from tests.factories import LocationFactory
 
     loc = LocationFactory()
     StockByLocation.objects.create(product=p1, location=loc, current_stock=1)
@@ -811,8 +810,8 @@ def impl_rf008_s02(
 
 def impl_rf008_s03(authenticated_almacenista_client: APIClient, sample_locations, db):
     from apps.inventory.models import StockByLocation
-    from tests.factories import ElectroCategoryFactory, ProductFactory
     from apps.movements.models import Movement
+    from tests.factories import ElectroCategoryFactory, ProductFactory
 
     cat = ElectroCategoryFactory()
     p = ProductFactory(category=cat, sku="P-0803")
@@ -1069,9 +1068,11 @@ def impl_rf010_s05(
     authenticated_almacenista_client: APIClient, almacenista_user, sample_locations, db
 ):
     from datetime import timedelta
+
     from django.utils import timezone
-    from apps.reports.selectors import get_expiring_products
+
     from apps.movements.services import register_entry
+    from apps.reports.selectors import get_expiring_products
     from tests.factories import LotFactory, ProductFactory
 
     product = ProductFactory(requires_expiration=True)
@@ -1232,7 +1233,9 @@ def impl_rf011_s01(authenticated_almacenista_client: APIClient, sample_product, 
 
 def impl_rf011_s02(authenticated_almacenista_client: APIClient, sample_product, db):
     from datetime import timedelta
+
     from django.utils import timezone
+
     from apps.alerts.models import Alert, AlertType
     from apps.alerts.services import sync_expiry_alerts_for_product
     from tests.factories import LotFactory
@@ -1257,7 +1260,9 @@ def impl_rf011_s02(authenticated_almacenista_client: APIClient, sample_product, 
 
 def impl_rf011_s03(authenticated_almacenista_client: APIClient, sample_product, db):
     from datetime import timedelta
+
     from django.utils import timezone
+
     from apps.alerts.models import Alert, AlertType
     from apps.alerts.services import sync_expiry_alerts_for_product
     from tests.factories import LotFactory
@@ -1623,8 +1628,9 @@ def impl_rnf003_s04(
 def impl_rnf004_s02(
     authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
 ):
-    from apps.inventory.models import StockByLocation
     import time
+
+    from apps.inventory.models import StockByLocation
 
     loc = sample_locations[0]
     StockByLocation.objects.create(
@@ -1656,8 +1662,9 @@ def impl_rnf004_s03(
     sample_locations,
     db,
 ):
-    from apps.inventory.models import StockByLocation
     import time
+
+    from apps.inventory.models import StockByLocation
 
     loc = sample_locations[0]
     StockByLocation.objects.create(

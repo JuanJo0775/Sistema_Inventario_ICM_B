@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.audit.services import log_immutable_modification_attempt
 from apps.movements.models import Movement, MovementType
 from apps.movements.serializers import (
     AdjustmentCorrectionSerializer,
@@ -30,7 +31,6 @@ from apps.movements.services import (
     register_internal_transfer,
     register_return,
 )
-from apps.audit.services import log_immutable_modification_attempt
 from shared.exceptions import ImmutableRecordError
 from shared.openapi import TAG_MOVEMENTS, standard_error_responses
 from shared.pagination import ICMPageNumberPagination

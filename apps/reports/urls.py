@@ -1,21 +1,21 @@
 from django.urls import path
 
 from apps.reports.views import (
+    DiscardOperationalReportView,
+    DispatchOperationalReportView,
+    DispatchOrdersReportView,
     ExpiringProductsReportView,
     InventorySummaryReportView,
     InvoiceHistoryReportView,
     KpiDashboardReportView,
     MovementHistoryReportView,
     MovementReportView,
-    ReportDatasetView,
     MovementSummaryReportView,
-    DiscardOperationalReportView,
-    SalesSummaryReportView,
-    WarehouseUtilizationReportView,
     QualityOperationalReportView,
-    DispatchOperationalReportView,
-    DispatchOrdersReportView,
+    ReportDatasetView,
+    SalesSummaryReportView,
     TopDispatchedProductsReportView,
+    WarehouseUtilizationReportView,
 )
 
 urlpatterns = [

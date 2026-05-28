@@ -1,7 +1,7 @@
 from apps.reports.views import (
+    DiscardOperationalReportView,
     DispatchOperationalReportView,
     ExpiringProductsReportView,
-    DiscardOperationalReportView,
     InventorySummaryReportView,
     InvoiceHistoryReportView,
     KpiDashboardReportView,

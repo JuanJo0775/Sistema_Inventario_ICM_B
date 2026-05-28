@@ -1,6 +1,8 @@
-from apps.reports.selectors import get_warehouse_utilization
-from apps.reports.selectors import get_quality_operational_summary
-from apps.reports.selectors import get_discard_operational_summary
+from apps.reports.selectors import (
+    get_discard_operational_summary,
+    get_quality_operational_summary,
+    get_warehouse_utilization,
+)
 
 
 def test_get_warehouse_utilization_uses_capacity_and_stock(db):

@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import factory
 from datetime import timedelta
+
+import factory
 from django.contrib.auth import get_user_model
-from factory.django import DjangoModelFactory
 from django.utils import timezone
+from factory.django import DjangoModelFactory
 
 from apps.authentication.models import UserRole
 from apps.catalog.models import Category, Lot, Product
