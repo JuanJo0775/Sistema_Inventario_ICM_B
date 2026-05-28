@@ -1,5 +1,9 @@
 name: CI
 
+permissions:
+  contents: read
+  packages: write
+
 on:
   push:
     branches: [staging, main]
@@ -76,6 +80,10 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Set image repository
+        id: image
+        run: echo "repo=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
 
       - name: Build image (local)
         uses: docker/build-push-action@v5
@@ -168,7 +176,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${{ github.sha }}
+          tags: ${{ steps.image.outputs.repo }}:${{ github.sha }}
           labels: |
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
@@ -178,7 +186,7 @@ jobs:
             echo "No digest produced by build step" >&2
             exit 2
           fi
-          IMAGE=ghcr.io/${{ github.repository_owner }}/${{ github.repository }}@${{ steps.build.outputs.digest }}
+          IMAGE=${{ steps.image.outputs.repo }}@${{ steps.build.outputs.digest }}
           echo "{\"image\": \"${IMAGE}\", \"ref\": \"${{ github.sha }}\"}" > release-manifest.json
           cat release-manifest.json
       - name: Upload release manifest
@@ -193,7 +201,7 @@ jobs:
         run: |
           curl -sSfL https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64 -o cosign
           chmod +x cosign
-          IMAGE=ghcr.io/${{ github.repository_owner }}/${{ github.repository }}@${{ steps.build.outputs.digest }}
+          IMAGE=${{ steps.image.outputs.repo }}@${{ steps.build.outputs.digest }}
           echo "Signing ${IMAGE}"
           echo "${{ secrets.COSIGN_PRIVATE_KEY }}" > cosign.key
           ./cosign sign --key cosign.key "${IMAGE}"
@@ -207,5 +215,5 @@ jobs:
           body: |
             Immutable artifact release
             - commit: ${{ github.sha }}
-            - image: ghcr.io/${{ github.repository_owner }}/${{ github.repository }}@${{ steps.build.outputs.digest }}
+            - image: ${{ steps.image.outputs.repo }}@${{ steps.build.outputs.digest }}
           files: release-manifest.json
