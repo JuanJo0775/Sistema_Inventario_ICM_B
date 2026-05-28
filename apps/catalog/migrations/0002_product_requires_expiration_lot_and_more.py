@@ -6,36 +6,72 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('catalog', '0001_initial'),
+        ("catalog", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='product',
-            name='requires_expiration',
-            field=models.BooleanField(default=False, help_text='True si el producto requiere control de vencimiento por lote.'),
+            model_name="product",
+            name="requires_expiration",
+            field=models.BooleanField(
+                default=False,
+                help_text="True si el producto requiere control de vencimiento por lote.",
+            ),
         ),
         migrations.CreateModel(
-            name='Lot',
+            name="Lot",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True, help_text='Fecha y hora de creación (UTC).')),
-                ('updated_at', models.DateTimeField(auto_now=True, help_text='Fecha y hora de última modificación (UTC).')),
-                ('code', models.CharField(max_length=100)),
-                ('expiration_date', models.DateField()),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='lots', to='catalog.product')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True, help_text="Fecha y hora de creación (UTC)."
+                    ),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(
+                        auto_now=True,
+                        help_text="Fecha y hora de última modificación (UTC).",
+                    ),
+                ),
+                ("code", models.CharField(max_length=100)),
+                ("expiration_date", models.DateField()),
+                (
+                    "product",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="lots",
+                        to="catalog.product",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Lote',
-                'verbose_name_plural': 'Lotes',
-                'ordering': ('expiration_date', 'code'),
-                'indexes': [models.Index(fields=['product', 'expiration_date'], name='catalog_lot_product_01cc64_idx'), models.Index(fields=['code'], name='catalog_lot_code_2f4351_idx')],
+                "verbose_name": "Lote",
+                "verbose_name_plural": "Lotes",
+                "ordering": ("expiration_date", "code"),
+                "indexes": [
+                    models.Index(
+                        fields=["product", "expiration_date"],
+                        name="catalog_lot_product_01cc64_idx",
+                    ),
+                    models.Index(fields=["code"], name="catalog_lot_code_2f4351_idx"),
+                ],
             },
         ),
         migrations.AddConstraint(
-            model_name='lot',
-            constraint=models.UniqueConstraint(fields=('product', 'code'), name='uniq_lot_code_per_product'),
+            model_name="lot",
+            constraint=models.UniqueConstraint(
+                fields=("product", "code"), name="uniq_lot_code_per_product"
+            ),
         ),
     ]

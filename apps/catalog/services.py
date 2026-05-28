@@ -9,8 +9,10 @@ from django.db import transaction
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
 from apps.catalog.models import Category, ComboItem, Product, ProductCombo, Subcategory
-from shared.exceptions import (InvalidSKUFormatError,
-                               UnauthorizedCredentialManagementError)
+from shared.exceptions import (
+    InvalidSKUFormatError,
+    UnauthorizedCredentialManagementError,
+)
 from shared.utils.barcode import build_product_barcode
 from shared.utils.validators import validate_sku_format
 
@@ -161,15 +163,22 @@ def create_combo(
 
         if not p.is_active:
             from shared.exceptions import DomainValidationError
+
             raise DomainValidationError(f"Producto {p.sku} no está activo.")
 
         current_stock = consolidated_stock_total(p.id)
         if current_stock <= 0:
             from shared.exceptions import InsufficientStockError
-            raise InsufficientStockError(f"El producto {p.sku} no tiene stock disponible (Stock: {current_stock}). No se puede incluir en el combo.")
+
+            raise InsufficientStockError(
+                f"El producto {p.sku} no tiene stock disponible (Stock: {current_stock}). No se puede incluir en el combo."
+            )
         if qty_needed > current_stock:
             from shared.exceptions import InsufficientStockError
-            raise InsufficientStockError(f"No hay suficiente stock para el producto {p.sku}. Solicitado: {qty_needed}, Disponible: {current_stock}.")
+
+            raise InsufficientStockError(
+                f"No hay suficiente stock para el producto {p.sku}. Solicitado: {qty_needed}, Disponible: {current_stock}."
+            )
     combo = ProductCombo.objects.create(
         name=name,
         sku=sku,

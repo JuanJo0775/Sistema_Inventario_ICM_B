@@ -28,6 +28,7 @@ _BOGOTA = ZoneInfo("America/Bogota")
 
 # --- RF-001 -----------------------------------------------------------------
 
+
 def impl_rf001_s01(api_client: APIClient, almacenista_user):
     url = reverse("token_obtain_pair")
     r = api_client.post(
@@ -206,7 +207,12 @@ def impl_rf003_s04(almacenista_user, db):
     cat = CategoryFactory(name="Cat RF003 S4", slug="cat-rf003-s4")
     p = create_product(
         almacenista_user,
-        {"sku": "RFB-0004", "name": "Con barcode", "category_id": cat.id, "barcode": "8710999000001"},
+        {
+            "sku": "RFB-0004",
+            "name": "Con barcode",
+            "category_id": cat.id,
+            "barcode": "8710999000001",
+        },
     )
     assert p.barcode == "8710999000001"
 
@@ -218,7 +224,12 @@ def impl_rf003_s05(almacenista_user, db):
     cat = CategoryFactory(name="Cat RF003 S5", slug="cat-rf003-s5")
     p = create_product(
         almacenista_user,
-        {"sku": "RFF-0005", "name": "Frío", "category_id": cat.id, "requires_cold_chain": True},
+        {
+            "sku": "RFF-0005",
+            "name": "Frío",
+            "category_id": cat.id,
+            "requires_cold_chain": True,
+        },
     )
     assert p.requires_cold_chain is True
 
@@ -282,7 +293,9 @@ def impl_rf004_s02(authenticated_almacenista_client: APIClient, sample_product):
 
 def impl_rf004_s03(authenticated_almacenista_client: APIClient, sample_product):
     url = reverse("catalog-resolve")
-    r = authenticated_almacenista_client.get(url, {"identifier": sample_product.barcode})
+    r = authenticated_almacenista_client.get(
+        url, {"identifier": sample_product.barcode}
+    )
     assert r.status_code == status.HTTP_200_OK
 
 
@@ -302,7 +315,9 @@ def impl_rf004_s06(authenticated_almacenista_client: APIClient, sample_product):
 
 def impl_rf004_s07(authenticated_almacenista_client: APIClient):
     url = reverse("catalog-resolve")
-    r = authenticated_almacenista_client.get(url, {"identifier": "SKU-INEXISTENTE-XYZ999"})
+    r = authenticated_almacenista_client.get(
+        url, {"identifier": "SKU-INEXISTENTE-XYZ999"}
+    )
     assert r.status_code == status.HTTP_404_NOT_FOUND
 
 
@@ -321,7 +336,9 @@ def _entry_payload(product_id, location_id, **extra):
     return base
 
 
-def impl_rf005_s01(authenticated_almacenista_client: APIClient, sample_product, sample_locations):
+def impl_rf005_s01(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations
+):
     loc = sample_locations[0]
     url = reverse("movements-entries")
     r = authenticated_almacenista_client.post(
@@ -332,18 +349,24 @@ def impl_rf005_s01(authenticated_almacenista_client: APIClient, sample_product, 
     assert r.status_code == status.HTTP_201_CREATED
 
 
-def impl_rf005_s02(authenticated_almacenista_client: APIClient, sample_product, sample_locations):
+def impl_rf005_s02(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations
+):
     loc = sample_locations[0]
     url = reverse("movements-entries")
     r = authenticated_almacenista_client.post(
         url,
-        _entry_payload(sample_product.id, loc.id, qty_invoiced=5, serial_number="SN-RF005-02"),
+        _entry_payload(
+            sample_product.id, loc.id, qty_invoiced=5, serial_number="SN-RF005-02"
+        ),
         format="json",
     )
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-def impl_rf005_s03(authenticated_almacenista_client: APIClient, sample_product, sample_locations):
+def impl_rf005_s03(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations
+):
     loc = sample_locations[0]
     url = reverse("movements-entries")
     r = authenticated_almacenista_client.post(
@@ -391,11 +414,15 @@ def impl_rf005_s05(authenticated_almacenista_client: APIClient, sample_locations
     assert r.status_code == status.HTTP_201_CREATED
 
 
-def impl_rf005_s06(authenticated_almacenista_client: APIClient, sample_product, sample_locations):
+def impl_rf005_s06(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations
+):
     impl_rf005_s01(authenticated_almacenista_client, sample_product, sample_locations)
 
 
-def impl_rf005_s07(authenticated_almacenista_client: APIClient, sample_product, sample_locations):
+def impl_rf005_s07(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations
+):
     impl_rf005_s06(authenticated_almacenista_client, sample_product, sample_locations)
 
 
@@ -410,11 +437,15 @@ _MAJEUR_CD = {
 }
 
 
-def impl_rf006_s01(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf006_s01(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     loc = sample_locations[0]
     from apps.inventory.models import StockByLocation
 
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=20)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=20
+    )
     url = reverse("movements-dispatches")
     r = authenticated_almacenista_client.post(
         url,
@@ -436,11 +467,15 @@ def impl_rf006_s01(authenticated_almacenista_client: APIClient, sample_product, 
     assert r.data.get("invoice_number")
 
 
-def impl_rf006_s02(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf006_s02(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     loc = sample_locations[0]
     from apps.inventory.models import StockByLocation
 
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=10)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=10
+    )
     url = reverse("movements-dispatches")
     r = authenticated_almacenista_client.post(
         url,
@@ -460,11 +495,15 @@ def impl_rf006_s02(authenticated_almacenista_client: APIClient, sample_product, 
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-def impl_rf006_s03(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf006_s03(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     loc = sample_locations[0]
     from apps.inventory.models import StockByLocation
 
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=5
+    )
     url = reverse("movements-dispatches")
     r = authenticated_almacenista_client.post(
         url,
@@ -482,11 +521,15 @@ def impl_rf006_s03(authenticated_almacenista_client: APIClient, sample_product, 
     assert r.status_code == status.HTTP_201_CREATED
 
 
-def impl_rf006_s04(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf006_s04(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     loc = sample_locations[0]
     from apps.inventory.models import StockByLocation
 
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=5
+    )
     url = reverse("movements-dispatches")
     r = authenticated_almacenista_client.post(
         url,
@@ -505,11 +548,15 @@ def impl_rf006_s04(authenticated_almacenista_client: APIClient, sample_product, 
     assert r.status_code == status.HTTP_201_CREATED
 
 
-def impl_rf006_s05(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf006_s05(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     loc = sample_locations[0]
     from apps.inventory.models import StockByLocation
 
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=5
+    )
     url = reverse("movements-dispatches")
     r = authenticated_almacenista_client.post(
         url,
@@ -527,13 +574,17 @@ def impl_rf006_s05(authenticated_almacenista_client: APIClient, sample_product, 
     assert r.status_code == status.HTTP_201_CREATED
 
 
-def impl_rf006_s06(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf006_s06(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     from apps.inventory.models import StockByLocation
 
     loc = sample_locations[0]
     sample_product.weight_grams = 500000
     sample_product.save(update_fields=["weight_grams"])
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=10)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=10
+    )
     url = reverse("movements-dispatches")
     r = authenticated_almacenista_client.post(
         url,
@@ -555,11 +606,15 @@ def impl_rf006_s06(authenticated_almacenista_client: APIClient, sample_product, 
     assert r.data["invoice_number"]
 
 
-def impl_rf006_s07(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf006_s07(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     from apps.inventory.models import StockByLocation
 
     loc = sample_locations[0]
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=10)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=10
+    )
     url = reverse("movements-dispatches")
     r = authenticated_almacenista_client.post(
         url,
@@ -580,7 +635,9 @@ def impl_rf006_s07(authenticated_almacenista_client: APIClient, sample_product, 
 # --- RF-007 -----------------------------------------------------------------
 
 
-def impl_rf007_s01(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf007_s01(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     a, b = sample_locations[0], sample_locations[1]
     from apps.inventory.models import StockByLocation
 
@@ -601,7 +658,9 @@ def impl_rf007_s01(authenticated_almacenista_client: APIClient, sample_product, 
     assert r.status_code == status.HTTP_201_CREATED
 
 
-def impl_rf007_s02(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf007_s02(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     a, b = sample_locations[0], sample_locations[1]
     from apps.inventory.models import StockByLocation
 
@@ -639,7 +698,9 @@ def impl_rf007_s03(almacenista_user, sample_product, sample_locations, db):
         )
 
 
-def _create_transfer(api_client: APIClient, user, product, origin, destination, quantity: int):
+def _create_transfer(
+    api_client: APIClient, user, product, origin, destination, quantity: int
+):
     from apps.inventory.models import StockByLocation
 
     api_client.force_authenticate(user=user)
@@ -659,7 +720,9 @@ def _create_transfer(api_client: APIClient, user, product, origin, destination, 
     )
 
 
-def impl_rf007_s04(api_client: APIClient, auxiliar_user, sample_product, sample_locations, db):
+def impl_rf007_s04(
+    api_client: APIClient, auxiliar_user, sample_product, sample_locations, db
+):
     a, b = sample_locations[0], sample_locations[1]
     r = _create_transfer(api_client, auxiliar_user, sample_product, a, b, 3)
     assert r.status_code == status.HTTP_201_CREATED
@@ -677,7 +740,9 @@ def impl_rf007_s04(api_client: APIClient, auxiliar_user, sample_product, sample_
     assert Movement.objects.filter(related_movement=original).exists()
 
 
-def impl_rf007_s05(api_client: APIClient, auxiliar_user, sample_product, sample_locations, db):
+def impl_rf007_s05(
+    api_client: APIClient, auxiliar_user, sample_product, sample_locations, db
+):
     a, b = sample_locations[0], sample_locations[1]
     r = _create_transfer(api_client, auxiliar_user, sample_product, a, b, 3)
     assert r.status_code == status.HTTP_201_CREATED
@@ -721,11 +786,15 @@ def impl_rf008_s01(authenticated_almacenista_client: APIClient, sample_locations
     assert r.status_code == status.HTTP_201_CREATED
 
 
-def impl_rf008_s02(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf008_s02(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     loc = sample_locations[0]
     from apps.inventory.models import StockByLocation
 
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=1)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=1
+    )
     url = reverse("movements-returns")
     r = authenticated_almacenista_client.post(
         url,
@@ -779,11 +848,15 @@ def impl_rf008_s03(authenticated_almacenista_client: APIClient, sample_locations
     assert Movement.objects.filter(related_movement=original).exists()
 
 
-def impl_rf008_s04(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf008_s04(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     from apps.inventory.models import StockByLocation
 
     loc = sample_locations[0]
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=3)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=3
+    )
     r = authenticated_almacenista_client.post(
         reverse("movements-returns"),
         {
@@ -795,7 +868,10 @@ def impl_rf008_s04(authenticated_almacenista_client: APIClient, sample_product, 
         format="json",
     )
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert StockByLocation.objects.get(product=sample_product, location=loc).current_stock == 3
+    assert (
+        StockByLocation.objects.get(product=sample_product, location=loc).current_stock
+        == 3
+    )
 
 
 def impl_rf008_s05(authenticated_almacenista_client: APIClient, sample_locations, db):
@@ -839,11 +915,15 @@ def impl_rf008_s05(authenticated_almacenista_client: APIClient, sample_locations
     assert any(str(item.get("related_movement")) == str(original) for item in results)
 
 
-def impl_rf009_s01(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf009_s01(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     loc = sample_locations[0]
     from apps.inventory.models import StockByLocation
 
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=10)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=10
+    )
     url = reverse("movements-adjustments")
     r = authenticated_almacenista_client.post(
         url,
@@ -858,11 +938,15 @@ def impl_rf009_s01(authenticated_almacenista_client: APIClient, sample_product, 
     assert r.status_code == status.HTTP_201_CREATED
 
 
-def impl_rf009_s02(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf009_s02(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     loc = sample_locations[0]
     from apps.inventory.models import StockByLocation
 
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=10)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=10
+    )
     url = reverse("movements-adjustments")
     r = authenticated_almacenista_client.post(
         url,
@@ -877,11 +961,15 @@ def impl_rf009_s02(authenticated_almacenista_client: APIClient, sample_product, 
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-def impl_rf009_s03(api_client: APIClient, auxiliar_user, sample_product, sample_locations, db):
+def impl_rf009_s03(
+    api_client: APIClient, auxiliar_user, sample_product, sample_locations, db
+):
     loc = sample_locations[0]
     from apps.inventory.models import StockByLocation
 
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=10)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=10
+    )
     api_client.force_authenticate(user=auxiliar_user)
     url = reverse("movements-adjustments")
     r = api_client.post(
@@ -897,8 +985,12 @@ def impl_rf009_s03(api_client: APIClient, auxiliar_user, sample_product, sample_
     assert r.status_code == status.HTTP_403_FORBIDDEN
 
 
-def impl_rf009_s04(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
-    impl_rf009_s01(authenticated_almacenista_client, sample_product, sample_locations, db)
+def impl_rf009_s04(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
+    impl_rf009_s01(
+        authenticated_almacenista_client, sample_product, sample_locations, db
+    )
     loc = sample_locations[0]
     url = reverse("movements-adjustments")
     r = authenticated_almacenista_client.post(
@@ -914,7 +1006,9 @@ def impl_rf009_s04(authenticated_almacenista_client: APIClient, sample_product, 
     assert r.status_code == status.HTTP_201_CREATED
 
 
-def impl_rf009_s05(api_client: APIClient, auxiliar_user, sample_product, sample_locations, db):
+def impl_rf009_s05(
+    api_client: APIClient, auxiliar_user, sample_product, sample_locations, db
+):
     a, b = sample_locations[0], sample_locations[1]
     r = _create_transfer(api_client, auxiliar_user, sample_product, a, b, 4)
     assert r.status_code == status.HTTP_201_CREATED
@@ -947,7 +1041,9 @@ def impl_rf010_s01(authenticated_almacenista_client: APIClient):
     start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
     end = timezone.now()
     url = reverse("reports-sales-summary")
-    r = authenticated_almacenista_client.get(url, {"start": start.isoformat(), "end": end.isoformat()})
+    r = authenticated_almacenista_client.get(
+        url, {"start": start.isoformat(), "end": end.isoformat()}
+    )
     assert r.status_code == status.HTTP_200_OK
 
 
@@ -963,11 +1059,15 @@ def impl_rf010_s04(authenticated_almacenista_client: APIClient):
     start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
     end = timezone.now()
     url = reverse("reports-movements-history")
-    r = authenticated_almacenista_client.get(url, {"start": start.isoformat(), "end": end.isoformat()})
+    r = authenticated_almacenista_client.get(
+        url, {"start": start.isoformat(), "end": end.isoformat()}
+    )
     assert r.status_code == status.HTTP_200_OK
 
 
-def impl_rf010_s05(authenticated_almacenista_client: APIClient, almacenista_user, sample_locations, db):
+def impl_rf010_s05(
+    authenticated_almacenista_client: APIClient, almacenista_user, sample_locations, db
+):
     from datetime import timedelta
     from django.utils import timezone
     from apps.reports.selectors import get_expiring_products
@@ -995,15 +1095,21 @@ def impl_rf010_s05(authenticated_almacenista_client: APIClient, almacenista_user
     url = reverse("reports-expiring")
     r = authenticated_almacenista_client.get(url)
     assert r.status_code == status.HTTP_200_OK
-    assert any(item["lot_code"] == "L-REP-001" for item in get_expiring_products(days=60))
+    assert any(
+        item["lot_code"] == "L-REP-001" for item in get_expiring_products(days=60)
+    )
 
 
-def impl_rf010_s03(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf010_s03(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     from apps.inventory.models import StockByLocation
     from apps.movements.models import Movement
 
     loc = sample_locations[0]
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=5
+    )
     sale = authenticated_almacenista_client.post(
         reverse("movements-dispatches"),
         {
@@ -1025,7 +1131,11 @@ def impl_rf010_s03(authenticated_almacenista_client: APIClient, sample_product, 
     end = movement.created_at
     report = authenticated_almacenista_client.get(
         reverse("reports-movements-history"),
-        {"start": start.isoformat(), "end": end.isoformat(), "product_id": str(sample_product.id)},
+        {
+            "start": start.isoformat(),
+            "end": end.isoformat(),
+            "product_id": str(sample_product.id),
+        },
     )
     assert report.status_code == status.HTTP_200_OK
     rows = report.data
@@ -1050,12 +1160,16 @@ def impl_rf010_s03(authenticated_almacenista_client: APIClient, sample_product, 
     assert sample_product.sku in csv_output
 
 
-def impl_rf010_s06(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf010_s06(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     from apps.inventory.models import StockByLocation
     from apps.movements.models import Movement
 
     loc = sample_locations[0]
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=5
+    )
     sale = authenticated_almacenista_client.post(
         reverse("movements-dispatches"),
         {
@@ -1105,7 +1219,12 @@ def impl_rf010_s07(api_client: APIClient, auxiliar_user):
 def impl_rf011_s01(authenticated_almacenista_client: APIClient, sample_product, db):
     from apps.alerts.models import Alert, AlertType
 
-    Alert.objects.create(product=sample_product, alert_type=AlertType.LOW_STOCK, message="bajo", is_resolved=False)
+    Alert.objects.create(
+        product=sample_product,
+        alert_type=AlertType.LOW_STOCK,
+        message="bajo",
+        is_resolved=False,
+    )
     url = reverse("alerts-list")
     r = authenticated_almacenista_client.get(url)
     assert r.status_code == status.HTTP_200_OK
@@ -1159,13 +1278,17 @@ def impl_rf011_s03(authenticated_almacenista_client: APIClient, sample_product, 
     ).exists()
 
 
-def impl_rf011_s04(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf011_s04(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     from apps.inventory.models import StockByLocation
 
     sample_product.requires_cold_chain = True
     sample_product.save(update_fields=["requires_cold_chain"])
     loc = sample_locations[0]
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=0)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=0
+    )
     r = authenticated_almacenista_client.post(
         reverse("movements-entries"),
         {
@@ -1202,7 +1325,13 @@ def impl_rf011_s05(authenticated_almacenista_client: APIClient, sample_locations
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-def impl_rf011_s06(authenticated_almacenista_client: APIClient, authenticated_administrador_client: APIClient, sample_product, sample_locations, db):
+def impl_rf011_s06(
+    authenticated_almacenista_client: APIClient,
+    authenticated_administrador_client: APIClient,
+    sample_product,
+    sample_locations,
+    db,
+):
     from apps.alerts.models import Alert, AlertType
     from apps.alerts.services import sync_stock_alerts_for_product
     from apps.inventory.models import StockByLocation
@@ -1210,9 +1339,13 @@ def impl_rf011_s06(authenticated_almacenista_client: APIClient, authenticated_ad
     loc = sample_locations[0]
     sample_product.reorder_point = 10
     sample_product.save(update_fields=["reorder_point"])
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=8)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=8
+    )
     sync_stock_alerts_for_product(sample_product.id)
-    active = Alert.objects.filter(product=sample_product, alert_type=AlertType.LOW_STOCK, is_resolved=False)
+    active = Alert.objects.filter(
+        product=sample_product, alert_type=AlertType.LOW_STOCK, is_resolved=False
+    )
     assert active.exists()
     kpi = authenticated_administrador_client.get(reverse("reports-kpi"))
     assert kpi.status_code == status.HTTP_200_OK
@@ -1223,7 +1356,9 @@ def impl_rf011_s06(authenticated_almacenista_client: APIClient, authenticated_ad
     assert any(str(item["id"]) == str(active.first().id) for item in results)
 
 
-def impl_rf011_s07(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rf011_s07(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     from apps.alerts.models import Alert, AlertType
     from apps.alerts.services import sync_stock_alerts_for_product
     from apps.inventory.models import StockByLocation
@@ -1231,9 +1366,13 @@ def impl_rf011_s07(authenticated_almacenista_client: APIClient, sample_product, 
     loc = sample_locations[0]
     sample_product.reorder_point = 10
     sample_product.save(update_fields=["reorder_point"])
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=8)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=8
+    )
     sync_stock_alerts_for_product(sample_product.id)
-    alert = Alert.objects.get(product=sample_product, alert_type=AlertType.LOW_STOCK, is_resolved=False)
+    alert = Alert.objects.get(
+        product=sample_product, alert_type=AlertType.LOW_STOCK, is_resolved=False
+    )
     r = authenticated_almacenista_client.post(
         reverse("movements-entries"),
         {
@@ -1251,7 +1390,9 @@ def impl_rf011_s07(authenticated_almacenista_client: APIClient, sample_product, 
     assert alert.is_resolved is True
 
 
-def impl_rf012_s01(authenticated_almacenista_client: APIClient, sample_product, sample_locations):
+def impl_rf012_s01(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations
+):
     impl_rf005_s01(authenticated_almacenista_client, sample_product, sample_locations)
     assert AuditLog.objects.filter(event_type=AuditEventType.MOVEMENT_CREATED).exists()
 
@@ -1344,7 +1485,9 @@ def impl_rf012_s04(authenticated_almacenista_client: APIClient, sample_locations
     ).exists()
 
 
-def impl_rf012_s07(api_client: APIClient, auxiliar_user, sample_product, sample_locations, db):
+def impl_rf012_s07(
+    api_client: APIClient, auxiliar_user, sample_product, sample_locations, db
+):
     from apps.inventory.models import StockByLocation
     from apps.movements.models import Movement
 
@@ -1374,15 +1517,25 @@ def impl_rf012_s07(api_client: APIClient, auxiliar_user, sample_product, sample_
         )
     assert corr.status_code == status.HTTP_201_CREATED
     assert AuditLog.objects.filter(event_type=AuditEventType.MOVEMENT_CREATED).exists()
-    assert AuditLog.objects.filter(event_type=AuditEventType.MOVEMENT_CORRECTED).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.MOVEMENT_CORRECTED
+    ).exists()
 
 
-def impl_rf012_s08(authenticated_almacenista_client: APIClient, almacenista_user, sample_product, sample_locations, db):
+def impl_rf012_s08(
+    authenticated_almacenista_client: APIClient,
+    almacenista_user,
+    sample_product,
+    sample_locations,
+    db,
+):
     from apps.audit.services import log_event
     from apps.inventory.models import StockByLocation
 
     loc = sample_locations[0]
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=5
+    )
     movement = authenticated_almacenista_client.post(
         reverse("movements-entries"),
         {
@@ -1419,15 +1572,26 @@ def impl_rnf003_s01(api_client: APIClient):
     assert production_settings.SECURE_SSL_REDIRECT is True
     assert production_settings.SESSION_COOKIE_SECURE is True
     assert production_settings.CSRF_COOKIE_SECURE is True
-    assert "django.middleware.security.SecurityMiddleware" in production_settings.MIDDLEWARE
+    assert (
+        "django.middleware.security.SecurityMiddleware"
+        in production_settings.MIDDLEWARE
+    )
 
 
-def impl_rnf003_s04(authenticated_almacenista_client: APIClient, almacenista_user, sample_product, sample_locations, db):
+def impl_rnf003_s04(
+    authenticated_almacenista_client: APIClient,
+    almacenista_user,
+    sample_product,
+    sample_locations,
+    db,
+):
     from apps.inventory.models import StockByLocation
     from apps.movements.models import Movement
 
     loc = sample_locations[0]
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=5
+    )
     sale = authenticated_almacenista_client.post(
         reverse("movements-dispatches"),
         {
@@ -1456,12 +1620,16 @@ def impl_rnf003_s04(authenticated_almacenista_client: APIClient, almacenista_use
     ).exists()
 
 
-def impl_rnf004_s02(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rnf004_s02(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     from apps.inventory.models import StockByLocation
     import time
 
     loc = sample_locations[0]
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=5
+    )
     t0 = time.perf_counter()
     r = authenticated_almacenista_client.post(
         reverse("movements-entries"),
@@ -1480,12 +1648,21 @@ def impl_rnf004_s02(authenticated_almacenista_client: APIClient, sample_product,
     assert elapsed < 3.0
 
 
-def impl_rnf004_s03(authenticated_almacenista_client: APIClient, authenticated_administrador_client: APIClient, auxiliar_user, sample_product, sample_locations, db):
+def impl_rnf004_s03(
+    authenticated_almacenista_client: APIClient,
+    authenticated_administrador_client: APIClient,
+    auxiliar_user,
+    sample_product,
+    sample_locations,
+    db,
+):
     from apps.inventory.models import StockByLocation
     import time
 
     loc = sample_locations[0]
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=5
+    )
     aux_client = APIClient()
     aux_client.force_authenticate(user=auxiliar_user)
 
@@ -1498,7 +1675,9 @@ def impl_rnf004_s03(authenticated_almacenista_client: APIClient, authenticated_a
     elapsed_2 = time.perf_counter() - start
 
     start = time.perf_counter()
-    response_3 = aux_client.get(reverse("inventory-search"), {"q": sample_product.sku[:3]})
+    response_3 = aux_client.get(
+        reverse("inventory-search"), {"q": sample_product.sku[:3]}
+    )
     elapsed_3 = time.perf_counter() - start
 
     assert response_1.status_code == status.HTTP_200_OK
@@ -1531,17 +1710,23 @@ def impl_rnf005_s03(db):
     from pathlib import Path
 
     root = Path(__file__).resolve().parents[2]
-    architecture = (root / "docs" / "README_ARQUITECTURA.md").read_text(encoding="utf-8")
+    architecture = (root / "docs" / "README_ARQUITECTURA.md").read_text(
+        encoding="utf-8"
+    )
     assert "services.py" in architecture
     assert "selectors.py" in architecture
     assert "Negocio" in architecture or "Business logic" in architecture
 
 
-def impl_rnf006_s02(api_client: APIClient, auxiliar_user, sample_product, sample_locations, db):
+def impl_rnf006_s02(
+    api_client: APIClient, auxiliar_user, sample_product, sample_locations, db
+):
     from apps.inventory.models import StockByLocation
 
     loc = sample_locations[0]
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=5
+    )
     api_client.force_authenticate(user=auxiliar_user)
     response = api_client.get(reverse("reports-invoices"))
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -1551,8 +1736,12 @@ def impl_rnf006_s03(db):
     from pathlib import Path
 
     root = Path(__file__).resolve().parents[2]
-    scenario = (root / "docs" / "test" / "scenarios" / "RNF006-S03.md").read_text(encoding="utf-8")
-    ers = (root / "docs" / "requisitos" / "ERS_ICM_Requisitos.md").read_text(encoding="utf-8")
+    scenario = (root / "docs" / "test" / "scenarios" / "RNF006-S03.md").read_text(
+        encoding="utf-8"
+    )
+    ers = (root / "docs" / "requisitos" / "ERS_ICM_Requisitos.md").read_text(
+        encoding="utf-8"
+    )
     assert "autorización expresa" in scenario.lower()
     assert "no deben ejecutarse" in scenario.lower()
     assert "autorización expresa" in ers.lower()
@@ -1602,12 +1791,16 @@ def impl_rnf005_s01(api_client: APIClient):
     assert r.headers.get("Content-Type", "").startswith("application/vnd.oai.openapi")
 
 
-def impl_rnf006_s01(authenticated_almacenista_client: APIClient, sample_product, sample_locations, db):
+def impl_rnf006_s01(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
     """Ley 1581: venta mayor sin consentimiento explícito → error de dominio."""
     loc = sample_locations[0]
     from apps.inventory.models import StockByLocation
 
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=10)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=10
+    )
     url = reverse("movements-dispatches")
     cd = {k: v for k, v in _MAJEUR_CD.items() if k != "privacy_notice_acknowledged"}
     r = authenticated_almacenista_client.post(

@@ -12,8 +12,12 @@ from rest_framework.response import Response
 from rest_framework.views import exception_handler as drf_exception_handler
 
 from apps.catalog.models import Product
-from shared.exceptions import (AuthenticationError, AuthorizationError,
-                               ICMBaseException, ImmutableRecordError)
+from shared.exceptions import (
+    AuthenticationError,
+    AuthorizationError,
+    ICMBaseException,
+    ImmutableRecordError,
+)
 
 logger = logging.getLogger(__name__)
 

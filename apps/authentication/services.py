@@ -11,14 +11,18 @@ from django.contrib.auth import authenticate
 from django.db import transaction
 from django.utils import timezone
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework_simplejwt.token_blacklist.models import (BlacklistedToken,
-                                                             OutstandingToken)
+from rest_framework_simplejwt.token_blacklist.models import (
+    BlacklistedToken,
+    OutstandingToken,
+)
 
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
-from shared.exceptions import (DomainValidationError,
-                               OutsideOperatingHoursError,
-                               UnauthorizedCredentialManagementError)
+from shared.exceptions import (
+    DomainValidationError,
+    OutsideOperatingHoursError,
+    UnauthorizedCredentialManagementError,
+)
 
 if TYPE_CHECKING:
     from django.http import HttpRequest

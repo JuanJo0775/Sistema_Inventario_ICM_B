@@ -32,9 +32,7 @@ def test_create_product_auto_generates_stable_barcode(almacenista_user):
         "value": product.barcode,
     }
     assert detail["barcode_svg"].startswith("<?xml")
-    assert detail["barcode_svg_data_uri"].startswith(
-        "data:image/svg+xml;base64,"
-    )
+    assert detail["barcode_svg_data_uri"].startswith("data:image/svg+xml;base64,")
 
 
 @pytest.mark.django_db

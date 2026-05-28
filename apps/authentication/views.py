@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 from django.contrib.auth import get_user_model
-from drf_spectacular.utils import (OpenApiResponse, extend_schema,
-                                   extend_schema_view)
+from drf_spectacular.utils import OpenApiResponse, extend_schema, extend_schema_view
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -12,20 +11,24 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import (TokenObtainPairView,
-                                            TokenRefreshView)
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
-from apps.authentication.serializers import (ICMTokenObtainPairSerializer,
-                                             ICMTokenRefreshSerializer,
-                                             LoginRequestSerializer,
-                                             UserCreateSerializer,
-                                             UserSerializer)
-from apps.authentication.permissions import (IsAlmacenista,
-                                             IsAlmacenistaOrAdministrador)
-from apps.authentication.services import (create_user, disable_user,
-                                          update_user, update_user_password)
+from apps.authentication.serializers import (
+    ICMTokenObtainPairSerializer,
+    ICMTokenRefreshSerializer,
+    LoginRequestSerializer,
+    UserCreateSerializer,
+    UserSerializer,
+)
+from apps.authentication.permissions import IsAlmacenista, IsAlmacenistaOrAdministrador
+from apps.authentication.services import (
+    create_user,
+    disable_user,
+    update_user,
+    update_user_password,
+)
 from shared.openapi import TAG_AUTH, TAG_SYSTEM, standard_error_responses
 
 User = get_user_model()

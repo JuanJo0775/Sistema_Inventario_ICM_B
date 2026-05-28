@@ -18,7 +18,7 @@ def run_system_health_check():
     from io import StringIO
 
     style = color_style()
-    
+
     print("\n" + "-" * 60)
     print(style.MIGRATE_LABEL("SISTEMA DE INVENTARIO ICM - DIAGNÓSTICO DE ARRANQUE"))
     print("-" * 60)
@@ -29,13 +29,15 @@ def run_system_health_check():
         # Verificacion extra: ejecutar una consulta real
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
-        
-        db_info = settings.DATABASES['default']
-        engine = db_info['ENGINE'].split('.')[-1]
-        db_name = db_info['NAME']
-        host = db_info.get('HOST', 'localhost')
-        
-        print(f"{style.SUCCESS('[OK]')} Base de Datos ({engine}) : CONECTADA [{db_name} en {host}]")
+
+        db_info = settings.DATABASES["default"]
+        engine = db_info["ENGINE"].split(".")[-1]
+        db_name = db_info["NAME"]
+        host = db_info.get("HOST", "localhost")
+
+        print(
+            f"{style.SUCCESS('[OK]')} Base de Datos ({engine}) : CONECTADA [{db_name} en {host}]"
+        )
     except OperationalError as e:
         print(f"{style.ERROR('[ERROR]')} Base de Datos : NO SE PUDO CONECTAR")
         print(f"        Detalle: {e}")
@@ -46,12 +48,14 @@ def run_system_health_check():
     # 2. Migraciones Pendientes
     try:
         out = StringIO()
-        call_command('showmigrations', format='plan', stdout=out)
+        call_command("showmigrations", format="plan", stdout=out)
         out.seek(0)
-        pending = [line for line in out.readlines() if '[ ]' in line]
-        
+        pending = [line for line in out.readlines() if "[ ]" in line]
+
         if pending:
-            print(f"{style.WARNING('[ALERTA]')} Migraciones : {len(pending)} PENDIENTES (Ejecute 'python manage.py migrate')")
+            print(
+                f"{style.WARNING('[ALERTA]')} Migraciones : {len(pending)} PENDIENTES (Ejecute 'python manage.py migrate')"
+            )
         else:
             print(f"{style.SUCCESS('[OK]')} Migraciones : AL DIA")
     except Exception:
@@ -73,6 +77,7 @@ def patch_runserver_message():
     """Cambia el mensaje de 'CTRL-BREAK' por 'CTRL+C' en Windows."""
     try:
         from django.core.management.commands import runserver
+
         def custom_on_bind(self, server_port):
             quit_command = "CTRL+C"
             if self._raw_ipv6:
@@ -84,6 +89,7 @@ def patch_runserver_message():
             now = datetime.now().strftime("%B %d, %Y - %X")
             version = self.get_version()
             from django.conf import settings
+
             print(
                 f"{now}\n"
                 f"Django version {version}, using settings {settings.SETTINGS_MODULE!r}\n"
@@ -91,6 +97,7 @@ def patch_runserver_message():
                 f"Quit the server with {quit_command}.",
                 file=self.stdout,
             )
+
         runserver.Command.on_bind = custom_on_bind
     except Exception:
         pass
@@ -102,24 +109,30 @@ def main():
     venv_exe = "Scripts\\python.exe" if os.name == "nt" else "bin/python"
     venv_python = os.path.join(base_dir, ".venv", venv_exe)
 
-    if os.path.exists(venv_python) and os.path.abspath(sys.executable).lower() != os.path.abspath(venv_python).lower():
+    if (
+        os.path.exists(venv_python)
+        and os.path.abspath(sys.executable).lower()
+        != os.path.abspath(venv_python).lower()
+    ):
         import subprocess
+
         try:
             sys.exit(subprocess.call([venv_python] + sys.argv))
         except KeyboardInterrupt:
             sys.exit(0)
     # -------------------------------
 
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.development')
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
         raise ImportError(
             "Couldn't import Django. Are you sure it's installed and available on your PYTHONPATH env?"
         ) from exc
-        
+
     if "runserver" in sys.argv and os.environ.get("RUN_MAIN") == "true":
         import django
+
         django.setup()
         run_system_health_check()
 
@@ -132,5 +145,5 @@ def main():
         pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

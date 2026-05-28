@@ -3,8 +3,12 @@
 from __future__ import annotations
 
 from django.db.models import Q
-from drf_spectacular.utils import (OpenApiParameter, OpenApiResponse,
-                                   extend_schema, extend_schema_view)
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    extend_schema,
+    extend_schema_view,
+)
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -12,20 +16,28 @@ from rest_framework.views import APIView
 
 from apps.catalog.models import Category, Product, ProductCombo, Subcategory
 from apps.catalog.permissions import IsAlmacenistaOrReadOnly
-from apps.catalog.serializers import (CategoryCreateSerializer,
-                                      CategorySerializer,
-                                      ComboCreateSerializer, ComboSerializer,
-                                      ProductCreateSerializer,
-                                      ProductBarcodeSerializer,
-                                      ProductDetailSerializer,
-                                      ProductSerializer,
-                                      ProductUpdateSerializer,
-                                      ResolveIdentifierQuerySerializer,
-                                      SubcategoryCreateSerializer,
-                                      SubcategorySerializer)
-from apps.catalog.services import (create_category, create_combo,
-                                   create_product, create_subcategory,
-                                   resolve_identifier, update_product)
+from apps.catalog.serializers import (
+    CategoryCreateSerializer,
+    CategorySerializer,
+    ComboCreateSerializer,
+    ComboSerializer,
+    ProductCreateSerializer,
+    ProductBarcodeSerializer,
+    ProductDetailSerializer,
+    ProductSerializer,
+    ProductUpdateSerializer,
+    ResolveIdentifierQuerySerializer,
+    SubcategoryCreateSerializer,
+    SubcategorySerializer,
+)
+from apps.catalog.services import (
+    create_category,
+    create_combo,
+    create_product,
+    create_subcategory,
+    resolve_identifier,
+    update_product,
+)
 from shared.openapi import TAG_CATALOG, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenista
@@ -106,7 +118,9 @@ class SubcategoryListCreateView(generics.ListCreateAPIView):
             name=d["name"],
             request=request,
         )
-        return Response(SubcategorySerializer(subcat).data, status=status.HTTP_201_CREATED)
+        return Response(
+            SubcategorySerializer(subcat).data, status=status.HTTP_201_CREATED
+        )
 
 
 @extend_schema_view(

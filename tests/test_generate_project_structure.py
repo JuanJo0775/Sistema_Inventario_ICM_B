@@ -43,8 +43,13 @@ def test_semantic_comment_for_services_is_specific(tmp_path: Path) -> None:
     )
     config = load_tree_config(root, readme)
     context = load_existing_architecture_context(root, readme, config.doc_paths)
-    comment = semantic_comment_for_file(services, root, services.read_text(encoding="utf-8"))
-    assert comment == "Reglas de negocio del ledger y actualización transaccional del stock"
+    comment = semantic_comment_for_file(
+        services, root, services.read_text(encoding="utf-8")
+    )
+    assert (
+        comment
+        == "Reglas de negocio del ledger y actualización transaccional del stock"
+    )
     model = build_tree_model(root, context, config)
     tree_text = build_tree_text(model)
     assert "payments/" in tree_text
@@ -74,8 +79,14 @@ def test_change_report_detects_additions_and_removals(tmp_path: Path) -> None:
     root = tmp_path
     old_tree = "icm_backend/\n├── apps/\n└── README.md\n"
     readme = _make_readme(root, old_tree)
-    _write(root / "apps" / "payments" / "services.py", "@transaction.atomic\ndef run():\n    pass\n")
-    _write(root / "apps" / "payments" / "tests" / "test_services.py", "def test_run():\n    assert True\n")
+    _write(
+        root / "apps" / "payments" / "services.py",
+        "@transaction.atomic\ndef run():\n    pass\n",
+    )
+    _write(
+        root / "apps" / "payments" / "tests" / "test_services.py",
+        "def test_run():\n    assert True\n",
+    )
     config = load_tree_config(root, readme)
     context = load_existing_architecture_context(root, readme, config.doc_paths)
     model = build_tree_model(root, context, config)

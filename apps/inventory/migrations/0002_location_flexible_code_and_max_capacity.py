@@ -4,25 +4,31 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('inventory', '0001_initial'),
+        ("inventory", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='location',
-            name='max_capacity',
-            field=models.PositiveIntegerField(blank=True, help_text='Capacidad máxima de productos. Aplica principalmente a vitrinas.', null=True),
+            model_name="location",
+            name="max_capacity",
+            field=models.PositiveIntegerField(
+                blank=True,
+                help_text="Capacidad máxima de productos. Aplica principalmente a vitrinas.",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='location',
-            name='code',
+            model_name="location",
+            name="code",
             field=models.SlugField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='location',
-            name='is_retail',
-            field=models.BooleanField(default=False, help_text='True si la ubicación es un punto de venta minorista (vitrina, mostrador, etc.).'),
+            model_name="location",
+            name="is_retail",
+            field=models.BooleanField(
+                default=False,
+                help_text="True si la ubicación es un punto de venta minorista (vitrina, mostrador, etc.).",
+            ),
         ),
     ]

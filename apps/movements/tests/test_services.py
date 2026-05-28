@@ -8,17 +8,22 @@ from django.utils import timezone
 
 from apps.inventory.models import StockByLocation
 from apps.movements.models import Movement, MovementType
-from apps.movements.services import (correct_movement_within_window,
-                                     ledger_net_quantity_for_location,
-                                     register_adjustment, register_dispatch,
-                                     register_entry,
-                                     register_internal_transfer,
-                                     register_return)
-from shared.exceptions import (AdjustmentJustificationRequiredError,
-                               CrossValidationFailedError,
-                               DiscrepancyNoteRequiredError,
-                               ProductNotReturnableError,
-                               SerialNumberRequiredError)
+from apps.movements.services import (
+    correct_movement_within_window,
+    ledger_net_quantity_for_location,
+    register_adjustment,
+    register_dispatch,
+    register_entry,
+    register_internal_transfer,
+    register_return,
+)
+from shared.exceptions import (
+    AdjustmentJustificationRequiredError,
+    CrossValidationFailedError,
+    DiscrepancyNoteRequiredError,
+    ProductNotReturnableError,
+    SerialNumberRequiredError,
+)
 from tests.factories import ElectroCategoryFactory, LotFactory, ProductFactory
 
 

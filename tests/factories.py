@@ -32,6 +32,7 @@ class UserFactory(DjangoModelFactory):
         obj.set_password(pwd)
         if create:
             obj.save()
+
     role = UserRole.AUXILIAR_DESPACHO
     is_active = True
 

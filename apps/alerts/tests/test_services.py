@@ -48,5 +48,7 @@ def test_sync_expiry_alerts_for_product_creates_lot_alert(db):
         code="L-ALERT",
     )
     sync_expiry_alerts_for_product(product.id)
-    alert = Alert.objects.get(product=product, lot=lot, alert_type=AlertType.EXPIRATION_60)
+    alert = Alert.objects.get(
+        product=product, lot=lot, alert_type=AlertType.EXPIRATION_60
+    )
     assert alert.message.startswith("El lote L-ALERT")

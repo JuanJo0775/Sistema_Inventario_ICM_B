@@ -62,9 +62,11 @@ def get_dispatch_operational_summary(period_days: int = 30) -> dict[str, Any]:
     end = timezone.now()
     start = end - timedelta(days=period_days)
     sales = sales_dispatch_totals(start=start, end=end)
-    invoice_linked_count = get_dispatches_with_invoices().filter(
-        created_at__gte=start, created_at__lte=end
-    ).count()
+    invoice_linked_count = (
+        get_dispatches_with_invoices()
+        .filter(created_at__gte=start, created_at__lte=end)
+        .count()
+    )
     top_products = get_top_dispatched_products(limit=10, period_days=period_days)
     movement_counts = movement_counts_by_period(start=start, end=end)
     # Número de envíos (movimientos de salida de venta)
@@ -88,7 +90,10 @@ def get_dispatch_operational_summary(period_days: int = 30) -> dict[str, Any]:
         Movement.objects.filter(
             created_at__gte=start,
             created_at__lte=end,
-            movement_type__in=[MovementType.SALIDA_VENTA_MAYOR, MovementType.SALIDA_VENTA_MENOR],
+            movement_type__in=[
+                MovementType.SALIDA_VENTA_MAYOR,
+                MovementType.SALIDA_VENTA_MENOR,
+            ],
         )
         .exclude(invoice_number__isnull=True)
         .exclude(invoice_number__exact="")
@@ -119,7 +124,11 @@ def get_dispatch_operational_summary(period_days: int = 30) -> dict[str, Any]:
         )
 
     return {
-        "period": {"days": period_days, "start": start.isoformat(), "end": end.isoformat()},
+        "period": {
+            "days": period_days,
+            "start": start.isoformat(),
+            "end": end.isoformat(),
+        },
         "sales": sales,
         "invoice_linked_dispatches": invoice_linked_count,
         "shipments": shipments,
@@ -237,11 +246,18 @@ def get_dispatch_order_samples(
     """
     end = end or timezone.now()
     start = start or (end - timedelta(days=30))
-    q = Movement.objects.filter(
-        created_at__gte=start,
-        created_at__lte=end,
-        movement_type__in=[MovementType.SALIDA_VENTA_MAYOR, MovementType.SALIDA_VENTA_MENOR],
-    ).exclude(invoice_number__isnull=True).exclude(invoice_number__exact="")
+    q = (
+        Movement.objects.filter(
+            created_at__gte=start,
+            created_at__lte=end,
+            movement_type__in=[
+                MovementType.SALIDA_VENTA_MAYOR,
+                MovementType.SALIDA_VENTA_MENOR,
+            ],
+        )
+        .exclude(invoice_number__isnull=True)
+        .exclude(invoice_number__exact="")
+    )
     if invoice_number:
         q = q.filter(invoice_number=invoice_number)
 
@@ -409,10 +425,16 @@ def get_quality_operational_summary(period_days: int = 30) -> dict[str, Any]:
 
     # KPI 2 se expresa como un proxy operativo: hechos de calidad sobre total de hechos de calidad.
     # El frontend puede combinarlo con otro denominador de negocio si incorpora pedidos o salidas totales.
-    quality_index_pct = round((incident_units / total_units) * 100, 2) if total_units else 0.0
+    quality_index_pct = (
+        round((incident_units / total_units) * 100, 2) if total_units else 0.0
+    )
 
     return {
-        "period": {"days": period_days, "start": start.isoformat(), "end": end.isoformat()},
+        "period": {
+            "days": period_days,
+            "start": start.isoformat(),
+            "end": end.isoformat(),
+        },
         "totals": {"movements": total_movements, "units": total_units},
         "breakdown": {
             "incident_units": incident_units,
@@ -480,7 +502,11 @@ def get_discard_operational_summary(period_days: int = 30) -> dict[str, Any]:
         )
 
     return {
-        "period": {"days": period_days, "start": start.isoformat(), "end": end.isoformat()},
+        "period": {
+            "days": period_days,
+            "start": start.isoformat(),
+            "end": end.isoformat(),
+        },
         "totals": {"movements": total_movements, "units": total_units},
         "by_type": list(by_type.values()),
         "by_product": by_product[:50],
@@ -592,11 +618,13 @@ def get_expiring_products(days: int = 30):
     rows: list[dict[str, Any]] = []
     for lot in get_lots_expiring_soon(days=days):
         location_ids = set(
-            Movement.objects.filter(product_id=lot.product_id, lot_id=lot.id)
-            .values_list("origin_location_id", flat=True)
+            Movement.objects.filter(
+                product_id=lot.product_id, lot_id=lot.id
+            ).values_list("origin_location_id", flat=True)
         ) | set(
-            Movement.objects.filter(product_id=lot.product_id, lot_id=lot.id)
-            .values_list("destination_location_id", flat=True)
+            Movement.objects.filter(
+                product_id=lot.product_id, lot_id=lot.id
+            ).values_list("destination_location_id", flat=True)
         )
         for location_id in {x for x in location_ids if x is not None}:
             qty = ledger_net_quantity_for_lot_location(
@@ -606,7 +634,11 @@ def get_expiring_products(days: int = 30):
                 continue
             from apps.inventory.models import Location
 
-            location = Location.objects.filter(pk=location_id).only("id", "code", "name").first()
+            location = (
+                Location.objects.filter(pk=location_id)
+                .only("id", "code", "name")
+                .first()
+            )
             if not location:
                 continue
             rows.append(

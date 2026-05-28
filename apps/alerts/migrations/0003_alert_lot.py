@@ -5,16 +5,21 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('catalog', '0002_product_requires_expiration_lot_and_more'),
-        ('alerts', '0002_initial'),
+        ("catalog", "0002_product_requires_expiration_lot_and_more"),
+        ("alerts", "0002_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='alert',
-            name='lot',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='alerts', to='catalog.lot'),
+            model_name="alert",
+            name="lot",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="alerts",
+                to="catalog.lot",
+            ),
         ),
     ]

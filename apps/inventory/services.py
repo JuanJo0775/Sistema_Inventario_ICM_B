@@ -13,8 +13,7 @@ from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
 from apps.inventory.models import Location, _is_retail_by_name
 from apps.inventory.selectors import reconstruct_stock_from_ledger
-from shared.exceptions import (DomainValidationError,
-                               UnauthorizedDomainActionError)
+from shared.exceptions import DomainValidationError, UnauthorizedDomainActionError
 
 if TYPE_CHECKING:
     from apps.inventory.models import StockByLocation

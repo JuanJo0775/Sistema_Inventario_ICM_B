@@ -5,14 +5,18 @@ from __future__ import annotations
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
-from rest_framework_simplejwt.serializers import (TokenObtainPairSerializer,
-                                                  TokenRefreshSerializer)
+from rest_framework_simplejwt.serializers import (
+    TokenObtainPairSerializer,
+    TokenRefreshSerializer,
+)
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.authentication.models import UserRole
-from apps.authentication.services import (OutsideOperatingHoursError,
-                                          authenticate_user,
-                                          is_within_operating_hours)
+from apps.authentication.services import (
+    OutsideOperatingHoursError,
+    authenticate_user,
+    is_within_operating_hours,
+)
 
 User = get_user_model()
 

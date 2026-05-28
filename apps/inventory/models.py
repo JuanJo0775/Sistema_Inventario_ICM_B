@@ -10,6 +10,7 @@ from django.db import models
 from django.db.models import Q
 
 from shared.models import BaseModel
+
 # Determinar el nombre de argumento correcto para CheckConstraint
 from inspect import signature as _inspect_signature
 
@@ -23,7 +24,15 @@ else:
 _STOCK_NON_NEGATIVE_CC = models.CheckConstraint(name="stock_non_negative", **_cc_kw)
 
 # Palabras clave para detectar automáticamente si una ubicación es de tipo vitrina (minorista)
-_VITRINA_KEYWORDS = {"vitrina", "mostrador", "exhibición", "exhibicion", "display", "tienda", "punto de venta"}
+_VITRINA_KEYWORDS = {
+    "vitrina",
+    "mostrador",
+    "exhibición",
+    "exhibicion",
+    "display",
+    "tienda",
+    "punto de venta",
+}
 
 
 def _is_retail_by_name(name: str) -> bool:

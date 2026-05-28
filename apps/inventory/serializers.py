@@ -12,7 +12,9 @@ from apps.inventory.models import Location, StockByLocation
 class LocationCreateSerializer(serializers.Serializer):
     """Serializador de entrada para crear una ubicación (sin code, sin enum)."""
 
-    name = serializers.CharField(help_text="Nombre de la ubicación (ej. 'Vitrina', 'Bodega Central').")
+    name = serializers.CharField(
+        help_text="Nombre de la ubicación (ej. 'Vitrina', 'Bodega Central')."
+    )
     description = serializers.CharField(required=False, allow_blank=True, default="")
     is_retail = serializers.BooleanField(
         required=False,
@@ -26,7 +28,6 @@ class LocationCreateSerializer(serializers.Serializer):
         min_value=1,
         help_text="Capacidad máxima de productos. Recomendado para vitrinas.",
     )
-
 
 
 class LocationSerializer(serializers.ModelSerializer):

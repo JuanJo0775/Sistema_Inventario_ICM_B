@@ -5,28 +5,35 @@ from __future__ import annotations
 from uuid import UUID
 
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import (OpenApiParameter, OpenApiResponse,
-                                   extend_schema)
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.inventory.models import Location
-from apps.inventory.selectors import (get_full_inventory,
-                                      get_stock_by_location,
-                                      get_stock_by_product, search_products)
-from apps.inventory.serializers import (LocationSerializer,
-                                        PaginatedProductListSerializer,
-                                        PaginatedStockByLocationListSerializer,
-                                        ProductSerializer,
-                                        StockByLocationSerializer,
-                                        StockByProductResponseSerializer,
-                                        StockReconstructRequestSerializer,
-                                        StockReconstructResponseSerializer)
-from apps.inventory.services import (create_location, deactivate_location,
-                                     trigger_stock_reconstruction,
-                                     update_location)
+from apps.inventory.selectors import (
+    get_full_inventory,
+    get_stock_by_location,
+    get_stock_by_product,
+    search_products,
+)
+from apps.inventory.serializers import (
+    LocationSerializer,
+    PaginatedProductListSerializer,
+    PaginatedStockByLocationListSerializer,
+    ProductSerializer,
+    StockByLocationSerializer,
+    StockByProductResponseSerializer,
+    StockReconstructRequestSerializer,
+    StockReconstructResponseSerializer,
+)
+from apps.inventory.services import (
+    create_location,
+    deactivate_location,
+    trigger_stock_reconstruction,
+    update_location,
+)
 from shared.openapi import TAG_INVENTORY, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenista
@@ -125,6 +132,7 @@ class LocationListCreateView(APIView):
     )
     def post(self, request):
         from apps.inventory.serializers import LocationCreateSerializer
+
         ser = LocationCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         d = ser.validated_data

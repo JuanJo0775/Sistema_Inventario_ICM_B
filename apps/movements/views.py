@@ -3,28 +3,33 @@
 from __future__ import annotations
 
 from django.http import FileResponse
-from drf_spectacular.utils import (OpenApiResponse, extend_schema,
-                                   extend_schema_view)
+from drf_spectacular.utils import OpenApiResponse, extend_schema, extend_schema_view
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.movements.models import Movement, MovementType
-from apps.movements.serializers import (AdjustmentCorrectionSerializer,
-                                        AdjustmentCreateSerializer,
-                                        ComboDispatchSerializer,
-                                        CorrectionCreateSerializer,
-                                        DispatchCreateSerializer,
-                                        EntryCreateSerializer,
-                                        MovementSerializer,
-                                        ReturnCreateSerializer,
-                                        TransferCreateSerializer)
-from apps.movements.services import (correct_movement_within_window,
-                                     dispatch_combo, register_adjustment,
-                                     register_dispatch, register_entry,
-                                     register_internal_transfer,
-                                     register_return)
+from apps.movements.serializers import (
+    AdjustmentCorrectionSerializer,
+    AdjustmentCreateSerializer,
+    ComboDispatchSerializer,
+    CorrectionCreateSerializer,
+    DispatchCreateSerializer,
+    EntryCreateSerializer,
+    MovementSerializer,
+    ReturnCreateSerializer,
+    TransferCreateSerializer,
+)
+from apps.movements.services import (
+    correct_movement_within_window,
+    dispatch_combo,
+    register_adjustment,
+    register_dispatch,
+    register_entry,
+    register_internal_transfer,
+    register_return,
+)
 from apps.audit.services import log_immutable_modification_attempt
 from shared.exceptions import ImmutableRecordError
 from shared.openapi import TAG_MOVEMENTS, standard_error_responses
@@ -132,9 +137,9 @@ class EntryDetailView(generics.RetrieveAPIView):
     serializer_class = MovementSerializer
 
     def get_queryset(self):
-        return Movement.objects.filter(movement_type=MovementType.ENTRADA).select_related(
-            "product", "lot", "executed_by", "destination_location"
-        )
+        return Movement.objects.filter(
+            movement_type=MovementType.ENTRADA
+        ).select_related("product", "lot", "executed_by", "destination_location")
 
 
 @extend_schema_view(
@@ -465,7 +470,9 @@ class MovementDetailView(generics.RetrieveAPIView):
 
     def http_method_not_allowed(self, request, *args, **kwargs):
         log_immutable_modification_attempt(
-            user=request.user if getattr(request.user, "is_authenticated", False) else None,
+            user=request.user
+            if getattr(request.user, "is_authenticated", False)
+            else None,
             request=request,
             detail={"resource": "movement", "movement_id": str(kwargs.get("pk") or "")},
         )
@@ -508,7 +515,9 @@ class ComboDispatchView(APIView):
         tags=[TAG_MOVEMENTS],
         responses={
             201: MovementSerializer(many=True),
-            **standard_error_responses(include_403=True, include_404=True, include_409=True),
+            **standard_error_responses(
+                include_403=True, include_404=True, include_409=True
+            ),
         },
     )
     def post(self, request):

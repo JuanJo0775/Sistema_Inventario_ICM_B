@@ -19,15 +19,19 @@ from apps.catalog.models import Lot, Product
 from apps.catalog.services import resolve_identifier
 from apps.inventory.models import Location, StockByLocation
 from apps.movements.models import InvoiceCounter, Movement, MovementType
-from shared.exceptions import (AdjustmentJustificationRequiredError,
-                               AlertAcknowledgementRequiredError,
-                               CrossValidationFailedError,
-                               DiscrepancyNoteRequiredError,
-                               ImmutableRecordError, InsufficientStockError,
-                               PrivacyConsentRequiredError,
-                               ProductNotReturnableError,
-                               SerialNumberRequiredError, StockMismatchError,
-                               UnauthorizedDomainActionError)
+from shared.exceptions import (
+    AdjustmentJustificationRequiredError,
+    AlertAcknowledgementRequiredError,
+    CrossValidationFailedError,
+    DiscrepancyNoteRequiredError,
+    ImmutableRecordError,
+    InsufficientStockError,
+    PrivacyConsentRequiredError,
+    ProductNotReturnableError,
+    SerialNumberRequiredError,
+    StockMismatchError,
+    UnauthorizedDomainActionError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -219,11 +223,15 @@ def register_entry(
 
     lot = None
     product = (
-        Product.objects.select_for_update().select_related("category").get(pk=product_id)
+        Product.objects.select_for_update()
+        .select_related("category")
+        .get(pk=product_id)
     )
     if product.requires_expiration:
         if not (lot_code or "").strip():
-            raise InsufficientStockError("Lote requerido para producto con vencimiento.")
+            raise InsufficientStockError(
+                "Lote requerido para producto con vencimiento."
+            )
         if lot_expiration_date is None:
             raise InsufficientStockError("Fecha de vencimiento del lote requerida.")
         lot, created = Lot.objects.select_for_update().get_or_create(
@@ -419,7 +427,9 @@ def register_dispatch(
 
     if product.requires_expiration and selected_lot is None:
         # evaluate lots available and ensure total covers requested quantity
-        candidates = available_lots_at_location(product_id=product_id, location_id=location_id)
+        candidates = available_lots_at_location(
+            product_id=product_id, location_id=location_id
+        )
         total_available = sum(c["available"] for c in candidates)
         if total_available < quantity:
             raise InsufficientStockError(
@@ -431,14 +441,18 @@ def register_dispatch(
                 }
             )
         # prefer single-lot if possible
-        single_candidate = next((c for c in candidates if c["available"] >= quantity), None)
+        single_candidate = next(
+            (c for c in candidates if c["available"] >= quantity), None
+        )
         if single_candidate is not None:
             selected_lot = single_candidate["lot"]
 
     if product.requires_expiration and selected_lot is None:
         # Multi-lot consumption: take from earliest-expiring lots
         remaining = int(quantity)
-        candidates = available_lots_at_location(product_id=product_id, location_id=location_id)
+        candidates = available_lots_at_location(
+            product_id=product_id, location_id=location_id
+        )
         for candidate in candidates:
             if remaining <= 0:
                 break
@@ -448,7 +462,9 @@ def register_dispatch(
             after = prev - take
             origin.current_stock = after
             origin.last_movement_at = timezone.now()
-            origin.save(update_fields=["current_stock", "last_movement_at", "updated_at"])
+            origin.save(
+                update_fields=["current_stock", "last_movement_at", "updated_at"]
+            )
 
             movement = Movement.objects.create(
                 movement_type=movement_type,
@@ -475,7 +491,9 @@ def register_dispatch(
             remaining -= take
 
         if remaining > 0:
-            raise InsufficientStockError(detail={"requested": quantity, "remaining": remaining})
+            raise InsufficientStockError(
+                detail={"requested": quantity, "remaining": remaining}
+            )
 
     else:
         # Single movement (either non-expiring product or selected_lot provided)
@@ -547,7 +565,9 @@ def register_internal_transfer(
 
     selected_lot: Lot | None = None
     if getattr(product, "requires_expiration", False) and lot_id is not None:
-        selected_lot = Lot.objects.select_for_update().get(pk=lot_id, product_id=product_id)
+        selected_lot = Lot.objects.select_for_update().get(
+            pk=lot_id, product_id=product_id
+        )
         available = ledger_net_quantity_for_lot_location(
             product_id=product_id, lot_id=selected_lot.id, location_id=origin_id
         )
@@ -663,7 +683,9 @@ def register_return(
 
     selected_lot: Lot | None = None
     if getattr(product, "requires_expiration", False) and lot_id is not None:
-        selected_lot = Lot.objects.select_for_update().get(pk=lot_id, product_id=product_id)
+        selected_lot = Lot.objects.select_for_update().get(
+            pk=lot_id, product_id=product_id
+        )
 
     dest = _lock_stock(product_id, location_id)
     before = dest.current_stock
@@ -946,9 +968,8 @@ def dispatch_combo(
     """
     from apps.catalog.models import ComboItem, ProductCombo
 
-    combo = (
-        ProductCombo.objects.prefetch_related("combo_items__product__category")
-        .get(pk=combo_id, is_active=True)
+    combo = ProductCombo.objects.prefetch_related("combo_items__product__category").get(
+        pk=combo_id, is_active=True
     )
     items = list(combo.combo_items.all())
     if not items:
@@ -979,7 +1000,9 @@ def dispatch_combo(
         after = before - qty_needed
         stock_row.current_stock = after
         stock_row.last_movement_at = timezone.now()
-        stock_row.save(update_fields=["current_stock", "last_movement_at", "updated_at"])
+        stock_row.save(
+            update_fields=["current_stock", "last_movement_at", "updated_at"]
+        )
 
         movement = Movement.objects.create(
             movement_type=MovementType.SALIDA_COMBO,

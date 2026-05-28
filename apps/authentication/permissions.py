@@ -41,4 +41,3 @@ class IsAuxiliarDespacho(BasePermission):
 
     def has_permission(self, request, view) -> bool:
         return _has_role(request, "auxiliar_despacho")
-

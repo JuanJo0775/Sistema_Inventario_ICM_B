@@ -8,6 +8,7 @@ from uuid import UUID
 try:
     from barcode import get_barcode_class  # type: ignore
     from barcode.writer import SVGWriter  # type: ignore
+
     _HAS_BARCODE_LIB = True
 except Exception:  # pragma: no cover - environment fallback for tests
     _HAS_BARCODE_LIB = False
@@ -31,8 +32,8 @@ def render_code128_svg(value: str) -> str:
             '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="80">'
             f'<rect width="100%" height="100%" fill="#f3f3f3"/>'
             f'<text x="10" y="40" font-family="sans-serif" font-size="12" fill="#333">'
-            f'Barcode lib missing - value: {value}'
-            '</text></svg>'
+            f"Barcode lib missing - value: {value}"
+            "</text></svg>"
         )
         return placeholder
     code128 = get_barcode_class("code128")
@@ -47,7 +48,9 @@ def barcode_svg_data_uri(svg: str) -> str:
     return f"data:image/svg+xml;base64,{encoded}"
 
 
-def build_product_barcode_payload(product_id: UUID, barcode: str | None = None) -> dict[str, str]:
+def build_product_barcode_payload(
+    product_id: UUID, barcode: str | None = None
+) -> dict[str, str]:
     """Construye valor, simbología y representación SVG para un producto."""
     value = barcode or build_product_barcode(product_id)
     svg = render_code128_svg(value)

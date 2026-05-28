@@ -1,16 +1,19 @@
-from apps.reports.views import (DispatchOperationalReportView,
-                                ExpiringProductsReportView,
-                                DiscardOperationalReportView,
-                                InventorySummaryReportView,
-                                InvoiceHistoryReportView,
-                                KpiDashboardReportView,
-                                MovementHistoryReportView, MovementReportView,
-                                MovementSummaryReportView,
-                                QualityOperationalReportView,
-                                ReportDatasetView,
-                                SalesSummaryReportView,
-                                TopDispatchedProductsReportView,
-                                WarehouseUtilizationReportView)
+from apps.reports.views import (
+    DispatchOperationalReportView,
+    ExpiringProductsReportView,
+    DiscardOperationalReportView,
+    InventorySummaryReportView,
+    InvoiceHistoryReportView,
+    KpiDashboardReportView,
+    MovementHistoryReportView,
+    MovementReportView,
+    MovementSummaryReportView,
+    QualityOperationalReportView,
+    ReportDatasetView,
+    SalesSummaryReportView,
+    TopDispatchedProductsReportView,
+    WarehouseUtilizationReportView,
+)
 
 
 def test_reports_dataset_view_is_available(authenticated_almacenista_client):
@@ -41,7 +44,9 @@ def test_reports_warehouse_utilization_view_returns_summary(
         "/api/v1/reports/warehouse-utilization/"
     )
     assert response.status_code == 200
-    row = next(item for item in response.data["by_location"] if item["code"] == "BODEGA-KPI")
+    row = next(
+        item for item in response.data["by_location"] if item["code"] == "BODEGA-KPI"
+    )
     assert row["occupied_units"] == 8
     assert row["capacity_units"] == 20
     assert row["utilization_pct"] == 40.0
@@ -67,7 +72,11 @@ def test_reports_dataset_view_supports_warehouse_utilization(
     )
     assert response.status_code == 200
     assert response.data["report"] == "warehouse-utilization"
-    row = next(item for item in response.data["data"]["by_location"] if item["code"] == "BODEGA-KPI-2")
+    row = next(
+        item
+        for item in response.data["data"]["by_location"]
+        if item["code"] == "BODEGA-KPI-2"
+    )
     assert row["capacity_units"] == 10
 
 
@@ -101,7 +110,9 @@ def test_reports_quality_operational_view_returns_summary(
     assert response.status_code == 200
     assert response.data["totals"]["units"] >= 3
     assert response.data["breakdown"]["incident_units"] >= 3
-    assert any(item["movement_type"] == "SALIDA_DANO" for item in response.data["by_type"])
+    assert any(
+        item["movement_type"] == "SALIDA_DANO" for item in response.data["by_type"]
+    )
 
 
 def test_reports_dataset_view_supports_quality_operational(
@@ -150,7 +161,10 @@ def test_reports_discard_operational_view_returns_summary(
     )
     assert response.status_code == 200
     assert response.data["totals"]["units"] == 6
-    assert any(item["movement_type"] == "SALIDA_VENCIMIENTO" for item in response.data["by_type"])
+    assert any(
+        item["movement_type"] == "SALIDA_VENCIMIENTO"
+        for item in response.data["by_type"]
+    )
 
 
 def test_reports_dispatch_operational_view_returns_summary(
@@ -199,7 +213,9 @@ def test_reports_dispatch_operational_view_returns_summary(
     assert "per_order_samples" in response.data
     assert isinstance(response.data["per_order_samples"], list)
     # should include the invoice sample we created
-    assert any(p.get("invoice_number") == "F-001" for p in response.data["per_order_samples"])
+    assert any(
+        p.get("invoice_number") == "F-001" for p in response.data["per_order_samples"]
+    )
     assert "promised_date_example" in response.data
 
 
@@ -234,7 +250,10 @@ def test_reports_dataset_view_supports_dispatch_operational(
     assert "order_proxy" in response.data["data"]
     assert "carriers" in response.data["data"]
     assert "per_order_samples" in response.data["data"]
-    assert any(p.get("invoice_number") == "F-002" or p.get("invoice_number") == "F-001" for p in response.data["data"]["per_order_samples"])
+    assert any(
+        p.get("invoice_number") == "F-002" or p.get("invoice_number") == "F-001"
+        for p in response.data["data"]["per_order_samples"]
+    )
     assert "promised_date_example" in response.data["data"]
 
 
@@ -335,4 +354,6 @@ def test_dispatch_orders_endpoint_returns_samples(
     assert response.status_code == 200
     assert "results" in response.data
     assert isinstance(response.data["results"], list)
-    assert any(item.get("invoice_number") == "ORD-100" for item in response.data["results"])
+    assert any(
+        item.get("invoice_number") == "ORD-100" for item in response.data["results"]
+    )

@@ -6,8 +6,7 @@ from uuid import UUID
 
 from rest_framework import serializers
 
-from apps.catalog.models import (Category, ComboItem, Product, ProductCombo,
-                                 Subcategory)
+from apps.catalog.models import Category, ComboItem, Product, ProductCombo, Subcategory
 from shared.utils.barcode import build_product_barcode_payload
 
 
@@ -214,7 +213,9 @@ class ResolveIdentifierQuerySerializer(serializers.Serializer):
 
 class ComboCreateItemSerializer(serializers.Serializer):
     product_id = serializers.UUIDField(help_text="UUID del producto")
-    quantity = serializers.IntegerField(default=1, min_value=1, help_text="Cantidad del producto en el combo")
+    quantity = serializers.IntegerField(
+        default=1, min_value=1, help_text="Cantidad del producto en el combo"
+    )
 
 
 class ComboCreateSerializer(serializers.Serializer):

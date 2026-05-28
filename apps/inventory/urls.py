@@ -1,9 +1,14 @@
 from django.urls import path
 
-from apps.inventory.views import (InventoryFullListView, LocationDetailView,
-                                  LocationListCreateView, ProductSearchView,
-                                  ReconstructStockView, StockByLocationView,
-                                  StockByProductView)
+from apps.inventory.views import (
+    InventoryFullListView,
+    LocationDetailView,
+    LocationListCreateView,
+    ProductSearchView,
+    ReconstructStockView,
+    StockByLocationView,
+    StockByProductView,
+)
 
 urlpatterns = [
     path("", InventoryFullListView.as_view(), name="inventory-full"),

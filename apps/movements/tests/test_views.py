@@ -1,6 +1,9 @@
-from apps.movements.views import (AdjustmentListCreateView,
-                                  DispatchListCreateView, EntryListCreateView,
-                                  MovementListView)
+from apps.movements.views import (
+    AdjustmentListCreateView,
+    DispatchListCreateView,
+    EntryListCreateView,
+    MovementListView,
+)
 
 
 def test_movement_views_are_available():

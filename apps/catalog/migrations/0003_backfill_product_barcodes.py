@@ -26,7 +26,6 @@ def backwards(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("catalog", "0002_product_requires_expiration_lot_and_more"),
     ]

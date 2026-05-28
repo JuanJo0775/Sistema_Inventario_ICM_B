@@ -58,7 +58,9 @@ def sync_stock_alerts_for_product(product_id: UUID, *, user=None) -> None:
 def _sync_lot_expiry_alert(lot: Lot, *, user=None) -> None:
     today = timezone.now().date()
     days_left = (lot.expiration_date - today).days
-    resolved_by = user if user is not None and getattr(user, "is_authenticated", False) else None
+    resolved_by = (
+        user if user is not None and getattr(user, "is_authenticated", False) else None
+    )
 
     if days_left > 60:
         Alert.objects.filter(
@@ -87,7 +89,9 @@ def _sync_lot_expiry_alert(lot: Lot, *, user=None) -> None:
         alert.is_resolved = False
         alert.resolved_at = None
         alert.resolved_by = None
-        alert.save(update_fields=["message", "is_resolved", "resolved_at", "resolved_by"])
+        alert.save(
+            update_fields=["message", "is_resolved", "resolved_at", "resolved_by"]
+        )
 
 
 def sync_expiry_alerts_for_product(product_id: UUID, *, user=None) -> None:

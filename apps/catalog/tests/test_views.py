@@ -1,7 +1,11 @@
 import pytest
 
-from apps.catalog.views import (CategoryListCreateView, ProductBarcodeView,
-                                ProductListCreateView, ResolveIdentifierView)
+from apps.catalog.views import (
+    CategoryListCreateView,
+    ProductBarcodeView,
+    ProductListCreateView,
+    ResolveIdentifierView,
+)
 
 
 def test_catalog_views_are_available():

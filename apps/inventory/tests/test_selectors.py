@@ -3,8 +3,10 @@ from __future__ import annotations
 import pytest
 from django.db import IntegrityError
 
-from apps.inventory.selectors import (get_stock_by_product,
-                                      search_products_duration_seconds)
+from apps.inventory.selectors import (
+    get_stock_by_product,
+    search_products_duration_seconds,
+)
 from apps.movements.services import register_entry
 from tests.factories import ManoCategoryFactory, ProductFactory
 

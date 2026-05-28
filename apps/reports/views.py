@@ -6,8 +6,7 @@ from uuid import UUID
 
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone
-from drf_spectacular.utils import (OpenApiParameter, OpenApiResponse,
-                                   extend_schema)
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -62,7 +61,16 @@ def _parse_range(request):
 
 def _report_filters_payload(request):
     filters: dict[str, object] = {}
-    for key in ("start", "end", "invoice_number", "type", "days", "limit", "period_days", "kind"):
+    for key in (
+        "start",
+        "end",
+        "invoice_number",
+        "type",
+        "days",
+        "limit",
+        "period_days",
+        "kind",
+    ):
         value = request.query_params.get(key)
         if value not in (None, ""):
             filters[key] = value
@@ -301,7 +309,6 @@ class InvoiceHistoryReportView(APIView):
         },
         tags=[TAG_REPORTS],
     )
-
     def get(self, request):
         filters: dict = {}
         if s := request.query_params.get("start"):
@@ -474,7 +481,10 @@ class DispatchOrdersReportView(APIView):
                 required=False,
             ),
         ],
-        responses={200: PerOrderSampleSerializer(many=True), **standard_error_responses(include_403=True)},
+        responses={
+            200: PerOrderSampleSerializer(many=True),
+            **standard_error_responses(include_403=True),
+        },
         tags=[TAG_REPORTS],
     )
     def get(self, request):
@@ -486,10 +496,14 @@ class DispatchOrdersReportView(APIView):
             end = parse_datetime(e)
         inv = request.query_params.get("invoice_number")
         limit = int(request.query_params.get("limit", 100))
-        data = get_dispatch_order_samples(start=start, end=end, invoice_number=inv, limit=limit)
+        data = get_dispatch_order_samples(
+            start=start, end=end, invoice_number=inv, limit=limit
+        )
         paginator = ICMPageNumberPagination()
         page = paginator.paginate_queryset(list(data), request, view=self)
-        return paginator.get_paginated_response(PerOrderSampleSerializer(page, many=True).data)
+        return paginator.get_paginated_response(
+            PerOrderSampleSerializer(page, many=True).data
+        )
 
 
 class ReportDatasetView(APIView):

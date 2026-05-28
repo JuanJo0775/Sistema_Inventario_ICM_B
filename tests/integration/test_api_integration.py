@@ -27,7 +27,9 @@ def test_reports_kpi_almacenista_200(authenticated_almacenista_client):
 
 
 @pytest.mark.django_db
-def test_inventory_full_list_authenticated(authenticated_almacenista_client, sample_product):
+def test_inventory_full_list_authenticated(
+    authenticated_almacenista_client, sample_product
+):
     url = reverse("inventory-full")
     r = authenticated_almacenista_client.get(url)
     assert r.status_code == 200
@@ -35,7 +37,9 @@ def test_inventory_full_list_authenticated(authenticated_almacenista_client, sam
 
 
 @pytest.mark.django_db
-def test_catalog_resolve_identifier_param(authenticated_almacenista_client, sample_product):
+def test_catalog_resolve_identifier_param(
+    authenticated_almacenista_client, sample_product
+):
     url = reverse("catalog-resolve")
     r = authenticated_almacenista_client.get(url, {"identifier": sample_product.sku})
     assert r.status_code == 200
@@ -98,7 +102,9 @@ def test_auth_token_refresh_auxiliar_outside_hours_forbidden(api_client, auxilia
 
 
 @pytest.mark.django_db
-def test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window(api_client, almacenista_user):
+def test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window(
+    api_client, almacenista_user
+):
     """
     RF-001 — Contraste con Scenario 3 (solo aplica a auxiliar).
 
@@ -134,7 +140,9 @@ def test_auth_user_disable_route(api_client, almacenista_user, auxiliar_user):
 
 
 @pytest.mark.django_db
-def test_alerts_list_uses_is_resolved_filter(authenticated_almacenista_client, sample_product):
+def test_alerts_list_uses_is_resolved_filter(
+    authenticated_almacenista_client, sample_product
+):
     from apps.alerts.models import Alert, AlertType
 
     Alert.objects.create(

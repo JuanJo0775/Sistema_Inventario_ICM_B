@@ -21,7 +21,9 @@ from typing import Iterable, Iterator, Sequence
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_README = ROOT / "docs" / "README_ARQUITECTURA.md"
 DEFAULT_REPORT = ROOT / "scripts" / "project_structure" / "project_structure_report.md"
-SECTION_ANCHOR = "## 3. Estructura del Proyecto\n\nEstructura de Directorios del Proyecto:"
+SECTION_ANCHOR = (
+    "## 3. Estructura del Proyecto\n\nEstructura de Directorios del Proyecto:"
+)
 DERIVED_REPORT_REL = "scripts/project_structure/project_structure_report.md"
 
 DEFAULT_EXCLUDED_DIRS = {
@@ -55,8 +57,25 @@ ROOT_FILES = {
     "docker-compose.prod.yml",
 }
 
-ROOT_DIR_ORDER = ["config", "apps", "shared", "tests", "docs", "scripts", "requirements", "docker"]
-APP_ORDER = ["authentication", "catalog", "inventory", "movements", "reports", "alerts", "audit"]
+ROOT_DIR_ORDER = [
+    "config",
+    "apps",
+    "shared",
+    "tests",
+    "docs",
+    "scripts",
+    "requirements",
+    "docker",
+]
+APP_ORDER = [
+    "authentication",
+    "catalog",
+    "inventory",
+    "movements",
+    "reports",
+    "alerts",
+    "audit",
+]
 APP_FILE_ORDER = [
     "models.py",
     "serializers.py",
@@ -74,9 +93,30 @@ APP_FILE_ORDER = [
 ]
 CONFIG_ORDER = ["settings", "urls.py", "middleware.py", "wsgi.py", "asgi.py"]
 SETTINGS_ORDER = ["base.py", "development.py", "production.py", "test.py"]
-SHARED_ORDER = ["models.py", "permissions.py", "exceptions.py", "mixins.py", "pagination.py", "openapi.py", "utils"]
-DOCS_ORDER = ["README_ARQUITECTURA.md", "api", "requisitos", "test", "calidad_restricciones", "architecture", "adr"]
-SCRIPTS_ORDER = ["README_SCRIPTS.md", "project_structure", "parse_ers_gherkin.py", "generate_docs"]
+SHARED_ORDER = [
+    "models.py",
+    "permissions.py",
+    "exceptions.py",
+    "mixins.py",
+    "pagination.py",
+    "openapi.py",
+    "utils",
+]
+DOCS_ORDER = [
+    "README_ARQUITECTURA.md",
+    "api",
+    "requisitos",
+    "test",
+    "calidad_restricciones",
+    "architecture",
+    "adr",
+]
+SCRIPTS_ORDER = [
+    "README_SCRIPTS.md",
+    "project_structure",
+    "parse_ers_gherkin.py",
+    "generate_docs",
+]
 REQUIREMENTS_ORDER = ["base.txt", "development.txt", "production.txt"]
 DOCKER_ORDER = ["Dockerfile", "entrypoint.sh"]
 TESTS_ORDER = ["conftest.py", "factories.py", "ers", "integration"]
@@ -213,15 +253,34 @@ ROLE_PATTERNS = [
     ("task", re.compile(r"@shared_task\b|\bcelery\b|\bCelery\b")),
     ("router", re.compile(r"\burlpatterns\b|\bpath\(|\bre_path\(|\binclude\(")),
     ("serializer", re.compile(r"\b(ModelSerializer|Serializer)\b")),
-    ("view", re.compile(r"\b(APIView|ViewSet|GenericViewSet)\b|@extend_schema\b|\bResponse\(")),
+    (
+        "view",
+        re.compile(
+            r"\b(APIView|ViewSet|GenericViewSet)\b|@extend_schema\b|\bResponse\("
+        ),
+    ),
     ("model", re.compile(r"\bmodels\.Model\b|\bAbstractUser\b|\bForeignKey\(")),
-    ("permission", re.compile(r"\bBasePermission\b|\bhas_permission\b|\bhas_object_permission\b")),
-    ("middleware", re.compile(r"\bMiddlewareMixin\b|\bprocess_request\b|\bprocess_response\b")),
+    (
+        "permission",
+        re.compile(r"\bBasePermission\b|\bhas_permission\b|\bhas_object_permission\b"),
+    ),
+    (
+        "middleware",
+        re.compile(r"\bMiddlewareMixin\b|\bprocess_request\b|\bprocess_response\b"),
+    ),
     ("selector", re.compile(r"\bselect_related\b|\bprefetch_related\b|\bannotate\(")),
-    ("service", re.compile(r"\btransaction\.atomic\b|\bselect_for_update\b|\bMovement\b|\bStockByLocation\b|\bledger\b", re.IGNORECASE)),
+    (
+        "service",
+        re.compile(
+            r"\btransaction\.atomic\b|\bselect_for_update\b|\bMovement\b|\bStockByLocation\b|\bledger\b",
+            re.IGNORECASE,
+        ),
+    ),
 ]
 
-TREE_LINE_RE = re.compile(r"^(?P<prefix>(?:│   |    )*)(?P<branch>├── |└── )(?P<label>.+?)(?:\s+#.*)?$")
+TREE_LINE_RE = re.compile(
+    r"^(?P<prefix>(?:│   |    )*)(?P<branch>├── |└── )(?P<label>.+?)(?:\s+#.*)?$"
+)
 
 
 @dataclass
@@ -318,7 +377,9 @@ def _normalize_comment_map(values: object) -> dict[str, str]:
     return {str(key): str(value) for key, value in values.items()}
 
 
-def load_tree_config(root: Path, readme_path: Path, config_path: Path | None = None) -> TreeConfig:
+def load_tree_config(
+    root: Path, readme_path: Path, config_path: Path | None = None
+) -> TreeConfig:
     external = load_json_config(config_path)
     excluded_dirs = set(DEFAULT_EXCLUDED_DIRS)
     excluded_dirs.update(_normalize_config_list(external.get("excluded_dirs")))
@@ -327,8 +388,12 @@ def load_tree_config(root: Path, readme_path: Path, config_path: Path | None = N
     excluded_names = set(DEFAULT_EXCLUDED_NAMES)
     excluded_names.update(_normalize_config_list(external.get("excluded_names")))
     forced_includes = _normalize_config_list(external.get("forced_includes"))
-    manual_comments = _normalize_comment_map(external.get("manual_comments") or external.get("comments"))
-    root_label = str(external.get("root_label") or readme_path.parent.parent.name or root.name)
+    manual_comments = _normalize_comment_map(
+        external.get("manual_comments") or external.get("comments")
+    )
+    root_label = str(
+        external.get("root_label") or readme_path.parent.parent.name or root.name
+    )
     max_depth = int(external.get("max_depth", 5))
     return TreeConfig(
         root_label=root_label,
@@ -398,7 +463,9 @@ def parse_rendered_tree_snapshot(tree_block: str) -> TreeSnapshot:
     return TreeSnapshot(root_label=root_label, paths=tuple(paths))
 
 
-def load_existing_architecture_context(root: Path, readme_path: Path, doc_paths: tuple[Path, ...]) -> AnalysisContext:
+def load_existing_architecture_context(
+    root: Path, readme_path: Path, doc_paths: tuple[Path, ...]
+) -> AnalysisContext:
     texts = [extract_text(readme_path)]
     texts.extend(extract_text(path) for path in doc_paths)
     tree_block = extract_existing_tree_block(texts[0])
@@ -409,7 +476,11 @@ def load_existing_architecture_context(root: Path, readme_path: Path, doc_paths:
         first_line = tree_block.splitlines()[0].strip()
         if first_line.endswith("/"):
             root_label = first_line.rstrip("/")
-    return AnalysisContext(root_label=root_label, existing_comments=existing_comments, existing_paths=snapshot.paths)
+    return AnalysisContext(
+        root_label=root_label,
+        existing_comments=existing_comments,
+        existing_paths=snapshot.paths,
+    )
 
 
 def rel_key(path: Path, root: Path) -> str:
@@ -420,7 +491,10 @@ def forced_include(path: Path, root: Path, config: TreeConfig) -> bool:
     rel = rel_key(path, root)
     if rel in config.forced_includes:
         return True
-    return any(rel == forced or rel.startswith(f"{forced.rstrip('/')}/") for forced in config.forced_includes)
+    return any(
+        rel == forced or rel.startswith(f"{forced.rstrip('/')}/")
+        for forced in config.forced_includes
+    )
 
 
 def is_excluded(path: Path, root: Path, config: TreeConfig) -> bool:
@@ -467,7 +541,9 @@ def classify_python_role(path: Path, text: str) -> str | None:
     return None
 
 
-def classify_path(path: Path, root: Path, text: str = "") -> tuple[str | None, str | None]:
+def classify_path(
+    path: Path, root: Path, text: str = ""
+) -> tuple[str | None, str | None]:
     rel = rel_key(path, root)
     if rel == DERIVED_REPORT_REL:
         return None, None
@@ -476,7 +552,9 @@ def classify_path(path: Path, root: Path, text: str = "") -> tuple[str | None, s
             return "apps-root", IMPORTANT_COMMENT_PATHS["apps"]
         if rel.startswith("apps/") and len(path.relative_to(root).parts) == 2:
             app_name = path.name
-            return "app", APP_OVERVIEW_COMMENT.get(app_name, "Aplicación Django detectada automáticamente")
+            return "app", APP_OVERVIEW_COMMENT.get(
+                app_name, "Aplicación Django detectada automáticamente"
+            )
         if rel == "config":
             return "config-root", IMPORTANT_COMMENT_PATHS["config"]
         if rel == "config/settings":
@@ -486,7 +564,9 @@ def classify_path(path: Path, root: Path, text: str = "") -> tuple[str | None, s
         if rel == "docs":
             return "docs-root", IMPORTANT_COMMENT_PATHS["docs"]
         if rel.startswith("docs/") and len(path.relative_to(root).parts) == 2:
-            return "docs-section", IMPORTANT_COMMENT_PATHS.get(rel, "Documento arquitectónico relevante")
+            return "docs-section", IMPORTANT_COMMENT_PATHS.get(
+                rel, "Documento arquitectónico relevante"
+            )
         if rel == "scripts":
             return "scripts-root", IMPORTANT_COMMENT_PATHS["scripts"]
         if rel == "requirements":
@@ -506,7 +586,9 @@ def classify_path(path: Path, root: Path, text: str = "") -> tuple[str | None, s
     if rel.startswith("requirements/"):
         return "dependency", "Dependencia del entorno"
     if rel.startswith("docker"):
-        return "infra", IMPORTANT_COMMENT_PATHS.get(rel, "Infraestructura de despliegue")
+        return "infra", IMPORTANT_COMMENT_PATHS.get(
+            rel, "Infraestructura de despliegue"
+        )
     if rel == "manage.py":
         return "entrypoint", IMPORTANT_COMMENT_PATHS["manage.py"]
     if rel == "pytest.ini":
@@ -542,7 +624,9 @@ def classify_path(path: Path, root: Path, text: str = "") -> tuple[str | None, s
             role = classify_python_role(path, text)
             if role:
                 return role, None
-        return "script", IMPORTANT_COMMENT_PATHS.get(rel, "Automatización del repositorio")
+        return "script", IMPORTANT_COMMENT_PATHS.get(
+            rel, "Automatización del repositorio"
+        )
     if rel.startswith("apps/"):
         if path.name == "__init__.py":
             return None, None
@@ -578,9 +662,13 @@ def should_include_file(path: Path, root: Path, config: TreeConfig) -> bool:
         # Excluir archivos MD auto-generados de la estructura de tests (UNIT-, INT-, RFxxx-Sxx)
         if rel.startswith("docs/test") and path.suffix == ".md":
             # patrones: UNIT-0001.md, INT-0001.md, RF001-S01.md, RNF001-S01.md, etc.
-            if re.match(r"^(UNIT|INT)-\d{4}\.md$", path.name) or re.match(r"^(?:RNF|RF)\d{3}(-S\d{2})?\.md$", path.name):
+            if re.match(r"^(UNIT|INT)-\d{4}\.md$", path.name) or re.match(
+                r"^(?:RNF|RF)\d{3}(-S\d{2})?\.md$", path.name
+            ):
                 return False
-        return path.suffix in {".md", ".json", ".yml", ".yaml"} or path.name.startswith("README")
+        return path.suffix in {".md", ".json", ".yml", ".yaml"} or path.name.startswith(
+            "README"
+        )
     if rel.startswith("requirements/"):
         return path.suffix == ".txt"
     if rel.startswith("docker"):
@@ -601,16 +689,39 @@ def should_include_file(path: Path, root: Path, config: TreeConfig) -> bool:
                 return path.name in {"gherkin_impl.py", "test_gherkin_dynamic.py"}
             if "/integration/" in rel:
                 return path.name.startswith("test_") or path.name == "conftest.py"
-            return path.name.startswith("test_") or path.name in {"conftest.py", "factories.py"}
+            return path.name.startswith("test_") or path.name in {
+                "conftest.py",
+                "factories.py",
+            }
         return False
     if rel.startswith("scripts/"):
         return path.suffix == ".py" or path.name == "README_SCRIPTS.md"
     if rel.startswith("apps/"):
-        if path.name in {"models.py", "serializers.py", "views.py", "urls.py", "services.py", "selectors.py", "permissions.py", "exceptions.py", "signals.py", "tasks.py", "middleware.py", "admin.py"}:
+        if path.name in {
+            "models.py",
+            "serializers.py",
+            "views.py",
+            "urls.py",
+            "services.py",
+            "selectors.py",
+            "permissions.py",
+            "exceptions.py",
+            "signals.py",
+            "tasks.py",
+            "middleware.py",
+            "admin.py",
+        }:
             return True
         if path.parent.name == "tests" and path.suffix == ".py":
-            return path.name.startswith("test_") or path.name in {"conftest.py", "factories.py"}
-        if "/management/commands/" in rel and path.suffix == ".py" and path.name != "__init__.py":
+            return path.name.startswith("test_") or path.name in {
+                "conftest.py",
+                "factories.py",
+            }
+        if (
+            "/management/commands/" in rel
+            and path.suffix == ".py"
+            and path.name != "__init__.py"
+        ):
             return True
         role = classify_python_role(path, file_text_for_analysis(path))
         return role is not None
@@ -659,10 +770,17 @@ def visible_children(dir_path: Path, root: Path, config: TreeConfig) -> list[Pat
             candidate = dir_path / name
             if candidate.exists() and not is_excluded(candidate, root, config):
                 result.append(candidate)
-        for candidate in sorted(dir_path.iterdir(), key=lambda item: child_sort_key(rel, item)):
+        for candidate in sorted(
+            dir_path.iterdir(), key=lambda item: child_sort_key(rel, item)
+        ):
             if candidate in result or is_excluded(candidate, root, config):
                 continue
-            if candidate.is_dir() or candidate.suffix in {".md", ".json", ".yml", ".yaml"}:
+            if candidate.is_dir() or candidate.suffix in {
+                ".md",
+                ".json",
+                ".yml",
+                ".yaml",
+            }:
                 result.append(candidate)
         return result
     if rel == "scripts":
@@ -671,27 +789,47 @@ def visible_children(dir_path: Path, root: Path, config: TreeConfig) -> list[Pat
             candidate = dir_path / name
             if candidate.exists() and not is_excluded(candidate, root, config):
                 result.append(candidate)
-        for candidate in sorted(dir_path.iterdir(), key=lambda item: child_sort_key(rel, item)):
+        for candidate in sorted(
+            dir_path.iterdir(), key=lambda item: child_sort_key(rel, item)
+        ):
             if candidate in result or is_excluded(candidate, root, config):
                 continue
             if candidate.is_dir() or candidate.suffix == ".py":
                 result.append(candidate)
         return result
     if rel == "requirements":
-        return [candidate for candidate in (dir_path / name for name in REQUIREMENTS_ORDER) if candidate.exists() and not is_excluded(candidate, root, config)]
+        return [
+            candidate
+            for candidate in (dir_path / name for name in REQUIREMENTS_ORDER)
+            if candidate.exists() and not is_excluded(candidate, root, config)
+        ]
     if rel == "docker":
-        return [candidate for candidate in (dir_path / name for name in DOCKER_ORDER) if candidate.exists() and not is_excluded(candidate, root, config)]
+        return [
+            candidate
+            for candidate in (dir_path / name for name in DOCKER_ORDER)
+            if candidate.exists() and not is_excluded(candidate, root, config)
+        ]
     if rel == "config":
-        return [candidate for candidate in (dir_path / name for name in CONFIG_ORDER) if candidate.exists() and not is_excluded(candidate, root, config)]
+        return [
+            candidate
+            for candidate in (dir_path / name for name in CONFIG_ORDER)
+            if candidate.exists() and not is_excluded(candidate, root, config)
+        ]
     if rel == "config/settings":
-        return [candidate for candidate in (dir_path / name for name in SETTINGS_ORDER) if candidate.exists() and not is_excluded(candidate, root, config)]
+        return [
+            candidate
+            for candidate in (dir_path / name for name in SETTINGS_ORDER)
+            if candidate.exists() and not is_excluded(candidate, root, config)
+        ]
     if rel == "shared":
         result = []
         for name in SHARED_ORDER:
             candidate = dir_path / name
             if candidate.exists() and not is_excluded(candidate, root, config):
                 result.append(candidate)
-        for candidate in sorted(dir_path.iterdir(), key=lambda item: child_sort_key(rel, item)):
+        for candidate in sorted(
+            dir_path.iterdir(), key=lambda item: child_sort_key(rel, item)
+        ):
             if candidate in result or is_excluded(candidate, root, config):
                 continue
             if candidate.is_dir() or candidate.suffix == ".py":
@@ -699,26 +837,42 @@ def visible_children(dir_path: Path, root: Path, config: TreeConfig) -> list[Pat
         return result
     if rel == "shared/utils":
         candidate = dir_path / "validators.py"
-        return [candidate] if candidate.exists() and not is_excluded(candidate, root, config) else []
+        return (
+            [candidate]
+            if candidate.exists() and not is_excluded(candidate, root, config)
+            else []
+        )
     if rel == "tests":
         result = []
         for name in TESTS_ORDER:
             candidate = dir_path / name
             if candidate.exists() and not is_excluded(candidate, root, config):
                 result.append(candidate)
-        for candidate in sorted(dir_path.iterdir(), key=lambda item: child_sort_key(rel, item)):
+        for candidate in sorted(
+            dir_path.iterdir(), key=lambda item: child_sort_key(rel, item)
+        ):
             if candidate in result or is_excluded(candidate, root, config):
                 continue
-            if candidate.is_dir() or candidate.name in {"conftest.py", "factories.py"} or candidate.name.startswith("test_"):
+            if (
+                candidate.is_dir()
+                or candidate.name in {"conftest.py", "factories.py"}
+                or candidate.name.startswith("test_")
+            ):
                 result.append(candidate)
         return result
     if rel == "apps":
         result = []
         for name in APP_ORDER:
             candidate = dir_path / name
-            if candidate.exists() and candidate.is_dir() and not is_excluded(candidate, root, config):
+            if (
+                candidate.exists()
+                and candidate.is_dir()
+                and not is_excluded(candidate, root, config)
+            ):
                 result.append(candidate)
-        for candidate in sorted(dir_path.iterdir(), key=lambda item: child_sort_key(rel, item)):
+        for candidate in sorted(
+            dir_path.iterdir(), key=lambda item: child_sort_key(rel, item)
+        ):
             if candidate in result or is_excluded(candidate, root, config):
                 continue
             if candidate.is_dir():
@@ -735,7 +889,9 @@ def visible_children(dir_path: Path, root: Path, config: TreeConfig) -> list[Pat
             return result
     if rel.startswith("apps/"):
         result = []
-        for candidate in sorted(dir_path.iterdir(), key=lambda item: child_sort_key(rel, item)):
+        for candidate in sorted(
+            dir_path.iterdir(), key=lambda item: child_sort_key(rel, item)
+        ):
             if is_excluded(candidate, root, config):
                 continue
             if candidate.is_dir():
@@ -747,7 +903,9 @@ def visible_children(dir_path: Path, root: Path, config: TreeConfig) -> list[Pat
                 result.append(candidate)
         return result
     result = []
-    for candidate in sorted(dir_path.iterdir(), key=lambda item: child_sort_key(rel, item)):
+    for candidate in sorted(
+        dir_path.iterdir(), key=lambda item: child_sort_key(rel, item)
+    ):
         if is_excluded(candidate, root, config):
             continue
         if candidate.is_dir():
@@ -771,7 +929,11 @@ def _generic_dir_comment(rel: str) -> str | None:
 
 def semantic_comment_for_file(path: Path, root: Path, text: str) -> str | None:
     rel = rel_key(path, root)
-    app_name = path.relative_to(root).parts[1] if rel.startswith("apps/") and len(path.relative_to(root).parts) >= 2 else ""
+    app_name = (
+        path.relative_to(root).parts[1]
+        if rel.startswith("apps/") and len(path.relative_to(root).parts) >= 2
+        else ""
+    )
     if rel in IMPORTANT_COMMENT_PATHS:
         return IMPORTANT_COMMENT_PATHS[rel]
     if rel.startswith("apps/"):
@@ -786,9 +948,20 @@ def semantic_comment_for_file(path: Path, root: Path, text: str) -> str | None:
                     if "stockbylocation" in lowered or "movement" in lowered:
                         return "Reglas de negocio del ledger y actualización transaccional del stock"
                     return "Reglas de negocio y transacciones del dominio"
-            if path.name == "selectors.py" and text and any(token in text.lower() for token in ("select_related", "prefetch_related", "annotate")):
+            if (
+                path.name == "selectors.py"
+                and text
+                and any(
+                    token in text.lower()
+                    for token in ("select_related", "prefetch_related", "annotate")
+                )
+            ):
                 return "Consultas de lectura y agregaciones del módulo"
-            if path.name == "views.py" and text and ("extend_schema" in text or "APIView" in text or "ViewSet" in text):
+            if (
+                path.name == "views.py"
+                and text
+                and ("extend_schema" in text or "APIView" in text or "ViewSet" in text)
+            ):
                 return "Endpoints HTTP del módulo y orquestación de requests"
             if path.name == "urls.py":
                 return "Ruteo HTTP y composición de endpoints"
@@ -860,7 +1033,9 @@ def semantic_comment_for_dir(path: Path, root: Path) -> str | None:
     if rel in IMPORTANT_COMMENT_PATHS:
         return IMPORTANT_COMMENT_PATHS[rel]
     if rel.startswith("apps/") and len(path.relative_to(root).parts) == 2:
-        return APP_OVERVIEW_COMMENT.get(path.name, "Aplicación Django detectada automáticamente")
+        return APP_OVERVIEW_COMMENT.get(
+            path.name, "Aplicación Django detectada automáticamente"
+        )
     if rel.startswith("apps/") and rel.endswith("/tests"):
         return "Pruebas del subdominio"
     if "/management/commands" in rel:
@@ -870,14 +1045,18 @@ def semantic_comment_for_dir(path: Path, root: Path) -> str | None:
     return _generic_dir_comment(rel)
 
 
-def resolve_comment_for_path(path: Path, root: Path, context: AnalysisContext, config: TreeConfig, text: str = "") -> str | None:
+def resolve_comment_for_path(
+    path: Path, root: Path, context: AnalysisContext, config: TreeConfig, text: str = ""
+) -> str | None:
     rel = rel_key(path, root)
     if rel in config.manual_comments:
         return config.manual_comments[rel]
     if path.name.lower() in config.manual_comments:
         return config.manual_comments[path.name.lower()]
     if path.is_dir():
-        return semantic_comment_for_dir(path, root) or context.existing_comments.get(path.name.lower())
+        return semantic_comment_for_dir(path, root) or context.existing_comments.get(
+            path.name.lower()
+        )
     semantic = semantic_comment_for_file(path, root, text)
     if semantic:
         return semantic
@@ -888,7 +1067,9 @@ def resolve_comment_for_path(path: Path, root: Path, context: AnalysisContext, c
     return None
 
 
-def build_tree_node(path: Path, root: Path, config: TreeConfig, context: AnalysisContext, depth: int = 0) -> TreeNode | None:
+def build_tree_node(
+    path: Path, root: Path, config: TreeConfig, context: AnalysisContext, depth: int = 0
+) -> TreeNode | None:
     if is_excluded(path, root, config):
         return None
     rel = rel_key(path, root)
@@ -898,9 +1079,27 @@ def build_tree_node(path: Path, root: Path, config: TreeConfig, context: Analysi
         if not should_include_file(path, root, config):
             return None
         comment = resolve_comment_for_path(path, root, context, config, text)
-        return TreeNode(path=path, rel=rel, is_dir=False, kind=kind or "file", comment=comment, children=[])
+        return TreeNode(
+            path=path,
+            rel=rel,
+            is_dir=False,
+            kind=kind or "file",
+            comment=comment,
+            children=[],
+        )
 
-    if depth > config.max_depth and not rel.startswith(("apps", "config", "shared", "tests", "docs", "scripts", "requirements", "docker")):
+    if depth > config.max_depth and not rel.startswith(
+        (
+            "apps",
+            "config",
+            "shared",
+            "tests",
+            "docs",
+            "scripts",
+            "requirements",
+            "docker",
+        )
+    ):
         return None
     children: list[TreeNode] = []
     for candidate in visible_children(path, root, config):
@@ -908,15 +1107,40 @@ def build_tree_node(path: Path, root: Path, config: TreeConfig, context: Analysi
         if node is not None:
             children.append(node)
     if not children and path != root:
-        if rel in {"apps", "config", "shared", "tests", "docs", "scripts", "requirements", "docker"}:
+        if rel in {
+            "apps",
+            "config",
+            "shared",
+            "tests",
+            "docs",
+            "scripts",
+            "requirements",
+            "docker",
+        }:
             comment = resolve_comment_for_path(path, root, context, config)
-            return TreeNode(path=path, rel=rel, is_dir=True, kind=kind or "directory", comment=comment, children=[])
+            return TreeNode(
+                path=path,
+                rel=rel,
+                is_dir=True,
+                kind=kind or "directory",
+                comment=comment,
+                children=[],
+            )
         return None
     comment = resolve_comment_for_path(path, root, context, config)
-    return TreeNode(path=path, rel=rel, is_dir=True, kind=kind or "directory", comment=comment, children=children)
+    return TreeNode(
+        path=path,
+        rel=rel,
+        is_dir=True,
+        kind=kind or "directory",
+        comment=comment,
+        children=children,
+    )
 
 
-def build_tree_model(root: Path, context: AnalysisContext, config: TreeConfig) -> TreeModel:
+def build_tree_model(
+    root: Path, context: AnalysisContext, config: TreeConfig
+) -> TreeModel:
     children: list[TreeNode] = []
     for candidate in visible_children(root, root, config):
         node = build_tree_node(candidate, root, config, context, 0)
@@ -935,7 +1159,9 @@ def render_entry(node: TreeNode, prefix: str, is_last: bool) -> list[str]:
     if node.is_dir:
         next_prefix = prefix + ("    " if is_last else "│   ")
         for index, child in enumerate(node.children):
-            lines.extend(render_entry(child, next_prefix, index == len(node.children) - 1))
+            lines.extend(
+                render_entry(child, next_prefix, index == len(node.children) - 1)
+            )
     return lines
 
 
@@ -975,9 +1201,18 @@ def summarize_paths(paths: Sequence[str], limit: int = 12) -> list[str]:
 
 def is_report_relevant(path: str) -> bool:
     if path.startswith("docs/test/"):
-        return path in {"docs/test/", "docs/test/README_TEST.md", "docs/test/TRAZABILIDAD_ERS_GHERKIN.md"}
+        return path in {
+            "docs/test/",
+            "docs/test/README_TEST.md",
+            "docs/test/TRAZABILIDAD_ERS_GHERKIN.md",
+        }
     if path.startswith("tests/"):
-        return path in {"tests/ers/", "tests/integration/", "tests/conftest.py", "tests/factories.py"}
+        return path in {
+            "tests/ers/",
+            "tests/integration/",
+            "tests/conftest.py",
+            "tests/factories.py",
+        }
     if path.startswith("apps/"):
         if path.endswith("/"):
             return path.count("/") == 2
@@ -997,14 +1232,30 @@ def is_report_relevant(path: str) -> bool:
             "middleware.py",
             "admin.py",
         }
-    if path.startswith(("docs/architecture/", "docs/api/", "docs/requisitos/", "docs/calidad_restricciones/")):
+    if path.startswith(
+        (
+            "docs/architecture/",
+            "docs/api/",
+            "docs/requisitos/",
+            "docs/calidad_restricciones/",
+        )
+    ):
         return True
     if path.startswith(("config/", "shared/", "scripts/", "requirements/", "docker/")):
         return True
-    return path in {"README.md", "manage.py", "pytest.ini", "schema.yml", "docker-compose.yml", "docker-compose.prod.yml"}
+    return path in {
+        "README.md",
+        "manage.py",
+        "pytest.ini",
+        "schema.yml",
+        "docker-compose.yml",
+        "docker-compose.prod.yml",
+    }
 
 
-def detect_moves(added: set[str], removed: set[str]) -> tuple[list[str], set[str], set[str]]:
+def detect_moves(
+    added: set[str], removed: set[str]
+) -> tuple[list[str], set[str], set[str]]:
     additions_by_name: dict[tuple[str, bool], list[str]] = defaultdict(list)
     removals_by_name: dict[tuple[str, bool], list[str]] = defaultdict(list)
     for path in added:
@@ -1017,8 +1268,13 @@ def detect_moves(added: set[str], removed: set[str]) -> tuple[list[str], set[str
     matched_added: set[str] = set()
     matched_removed: set[str] = set()
     for key in sorted(additions_by_name.keys() & removals_by_name.keys()):
-        for new_path, old_path in zip(sorted(additions_by_name[key]), sorted(removals_by_name[key])):
-            if Path(new_path.rstrip("/")).parent.as_posix() == Path(old_path.rstrip("/")).parent.as_posix():
+        for new_path, old_path in zip(
+            sorted(additions_by_name[key]), sorted(removals_by_name[key])
+        ):
+            if (
+                Path(new_path.rstrip("/")).parent.as_posix()
+                == Path(old_path.rstrip("/")).parent.as_posix()
+            ):
                 continue
             moves.append(f"{old_path} -> {new_path}")
             matched_added.add(new_path)
@@ -1030,18 +1286,42 @@ def build_change_report(model: TreeModel, previous: TreeSnapshot) -> str:
     current = snapshot_from_model(model)
     current_paths = set(current.paths)
     previous_paths = set(previous.paths)
-    added = {path for path in current_paths - previous_paths if is_report_relevant(path)}
-    removed = {path for path in previous_paths - current_paths if is_report_relevant(path)}
+    added = {
+        path for path in current_paths - previous_paths if is_report_relevant(path)
+    }
+    removed = {
+        path for path in previous_paths - current_paths if is_report_relevant(path)
+    }
     moves, matched_added, matched_removed = detect_moves(set(added), set(removed))
     added -= matched_added
     removed -= matched_removed
 
-    app_additions = [path for path in added if path.startswith("apps/") and path.count("/") == 2 and path.endswith("/")]
+    app_additions = [
+        path
+        for path in added
+        if path.startswith("apps/") and path.count("/") == 2 and path.endswith("/")
+    ]
     module_additions = [
-        path for path in added
+        path
+        for path in added
         if path.startswith("apps/")
         and not path.endswith("/")
-        and any(path.endswith(suffix) for suffix in ("services.py", "selectors.py", "views.py", "urls.py", "models.py", "serializers.py", "permissions.py", "tasks.py", "middleware.py", "signals.py", "exceptions.py"))
+        and any(
+            path.endswith(suffix)
+            for suffix in (
+                "services.py",
+                "selectors.py",
+                "views.py",
+                "urls.py",
+                "models.py",
+                "serializers.py",
+                "permissions.py",
+                "tasks.py",
+                "middleware.py",
+                "signals.py",
+                "exceptions.py",
+            )
+        )
     ]
     docs_additions = [path for path in added if path.startswith("docs/")]
 
@@ -1066,38 +1346,84 @@ def build_change_report(model: TreeModel, previous: TreeSnapshot) -> str:
     lines.append("")
 
     if app_additions:
-        lines.extend(["## Apps nuevas", *[f"- {item}" for item in summarize_paths(app_additions)] , ""])
+        lines.extend(
+            [
+                "## Apps nuevas",
+                *[f"- {item}" for item in summarize_paths(app_additions)],
+                "",
+            ]
+        )
     if module_additions:
-        lines.extend(["## Módulos nuevos", *[f"- {item}" for item in summarize_paths(module_additions)] , ""])
+        lines.extend(
+            [
+                "## Módulos nuevos",
+                *[f"- {item}" for item in summarize_paths(module_additions)],
+                "",
+            ]
+        )
     if moves:
-        lines.extend(["## Reorganizaciones", *[f"- {item}" for item in summarize_paths(moves)] , ""])
+        lines.extend(
+            [
+                "## Reorganizaciones",
+                *[f"- {item}" for item in summarize_paths(moves)],
+                "",
+            ]
+        )
     if added:
-        lines.extend(["## Altas relevantes", *[f"- {item}" for item in summarize_paths(added)] , ""])
+        lines.extend(
+            [
+                "## Altas relevantes",
+                *[f"- {item}" for item in summarize_paths(added)],
+                "",
+            ]
+        )
     if removed:
-        lines.extend(["## Bajas relevantes", *[f"- {item}" for item in summarize_paths(removed)] , ""])
+        lines.extend(
+            [
+                "## Bajas relevantes",
+                *[f"- {item}" for item in summarize_paths(removed)],
+                "",
+            ]
+        )
     if not added and not removed and not moves:
-        lines.extend(["## Estado", "- Sin cambios estructurales relevantes detectados respecto al README actual.", ""])
+        lines.extend(
+            [
+                "## Estado",
+                "- Sin cambios estructurales relevantes detectados respecto al README actual.",
+                "",
+            ]
+        )
     return "\n".join(lines).rstrip() + "\n"
 
 
 def replace_architecture_section(readme_text: str, tree_text: str) -> str:
     anchor_index = readme_text.find(SECTION_ANCHOR)
     if anchor_index < 0:
-        raise RuntimeError("No se encontró la sección arquitectónica objetivo en el README")
+        raise RuntimeError(
+            "No se encontró la sección arquitectónica objetivo en el README"
+        )
     block_start = readme_text.find("```", anchor_index)
     if block_start < 0:
-        raise RuntimeError("No se encontró el bloque de árbol dentro de la sección arquitectónica")
+        raise RuntimeError(
+            "No se encontró el bloque de árbol dentro de la sección arquitectónica"
+        )
     block_end = readme_text.find("\n```", block_start + 3)
     if block_end < 0:
         raise RuntimeError("No se encontró el cierre del bloque de árbol en el README")
-    return readme_text[:block_start] + f"```text\n{tree_text}\n```" + readme_text[block_end + 4 :]
+    return (
+        readme_text[:block_start]
+        + f"```text\n{tree_text}\n```"
+        + readme_text[block_end + 4 :]
+    )
 
 
 def update_readme_section(readme_path: Path, tree_text: str) -> None:
     try:
         original = readme_path.read_text(encoding="utf-8")
     except FileNotFoundError as exc:
-        raise FileNotFoundError(f"No existe el README de arquitectura: {readme_path}") from exc
+        raise FileNotFoundError(
+            f"No existe el README de arquitectura: {readme_path}"
+        ) from exc
     updated = replace_architecture_section(original, tree_text)
     readme_path.write_text(updated, encoding="utf-8")
 
@@ -1117,7 +1443,11 @@ def build_external_config(config: TreeConfig, external: dict) -> TreeConfig:
     forced_includes = set(config.forced_includes)
     forced_includes.update(_normalize_config_list(external.get("forced_includes")))
     manual_comments = dict(config.manual_comments)
-    manual_comments.update(_normalize_comment_map(external.get("manual_comments") or external.get("comments")))
+    manual_comments.update(
+        _normalize_comment_map(
+            external.get("manual_comments") or external.get("comments")
+        )
+    )
     root_label = str(external.get("root_label", config.root_label))
     max_depth = int(external.get("max_depth", config.max_depth))
     return TreeConfig(
@@ -1133,12 +1463,30 @@ def build_external_config(config: TreeConfig, external: dict) -> TreeConfig:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Genera la estructura del proyecto y sincroniza el README arquitectónico.")
-    parser.add_argument("--root", type=Path, default=ROOT, help="Raíz del proyecto a analizar")
-    parser.add_argument("--readme", type=Path, default=DEFAULT_README, help="Archivo README de arquitectura a actualizar")
-    parser.add_argument("--config", type=Path, default=None, help="Configuración externa JSON opcional")
-    parser.add_argument("--report", type=Path, default=DEFAULT_REPORT, help="Reporte auxiliar de cambios arquitectónicos")
-    parser.add_argument("--dry-run", action="store_true", help="Imprime el árbol sin modificar archivos")
+    parser = argparse.ArgumentParser(
+        description="Genera la estructura del proyecto y sincroniza el README arquitectónico."
+    )
+    parser.add_argument(
+        "--root", type=Path, default=ROOT, help="Raíz del proyecto a analizar"
+    )
+    parser.add_argument(
+        "--readme",
+        type=Path,
+        default=DEFAULT_README,
+        help="Archivo README de arquitectura a actualizar",
+    )
+    parser.add_argument(
+        "--config", type=Path, default=None, help="Configuración externa JSON opcional"
+    )
+    parser.add_argument(
+        "--report",
+        type=Path,
+        default=DEFAULT_REPORT,
+        help="Reporte auxiliar de cambios arquitectónicos",
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Imprime el árbol sin modificar archivos"
+    )
     args = parser.parse_args(argv)
 
     root = args.root.resolve()
@@ -1150,11 +1498,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     if external:
         tree_config = build_external_config(tree_config, external)
 
-    context = load_existing_architecture_context(root, readme_path, tree_config.doc_paths)
+    context = load_existing_architecture_context(
+        root, readme_path, tree_config.doc_paths
+    )
     model = build_tree_model(root, context, tree_config)
     tree_text = build_tree_text(model)
 
-    previous_snapshot = parse_rendered_tree_snapshot(extract_existing_tree_block(extract_text(readme_path)))
+    previous_snapshot = parse_rendered_tree_snapshot(
+        extract_existing_tree_block(extract_text(readme_path))
+    )
     report_text = build_change_report(model, previous_snapshot)
 
     if args.dry_run:
