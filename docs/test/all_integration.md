@@ -354,5 +354,7 @@ pytest tests/integration/test_api_integration.py::test_reports_kpi_requires_auth
 ```
 
 Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 16)
+
+
 ---
 

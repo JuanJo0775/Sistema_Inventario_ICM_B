@@ -2406,5 +2406,115 @@ pytest apps/reports/tests/test_views.py::test_reports_warehouse_utilization_view
 ```
 
 Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 25)
+
+
+---
+
+<!-- file: UNIT-0068.md -->
+**Código:** UNIT-0068
+
+# test_change_report_detects_additions_and_removals
+
+## Nombre del test
+
+`tests/test_generate_project_structure.py::test_change_report_detects_additions_and_removals`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_generate_project_structure.py::test_change_report_detects_additions_and_removals -v
+```
+
+Código fuente: [tests/test_generate_project_structure.py](../../tests/test_generate_project_structure.py) (aprox. línea 73)
+
+
+---
+
+<!-- file: UNIT-0069.md -->
+**Código:** UNIT-0069
+
+# test_semantic_comment_for_services_is_specific
+
+## Nombre del test
+
+`tests/test_generate_project_structure.py::test_semantic_comment_for_services_is_specific`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_generate_project_structure.py::test_semantic_comment_for_services_is_specific -v
+```
+
+Código fuente: [tests/test_generate_project_structure.py](../../tests/test_generate_project_structure.py) (aprox. línea 32)
+
+
+---
+
+<!-- file: UNIT-0070.md -->
+**Código:** UNIT-0070
+
+# test_tree_ignores_noise_and_keeps_relevant_nodes
+
+## Nombre del test
+
+`tests/test_generate_project_structure.py::test_tree_ignores_noise_and_keeps_relevant_nodes`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_generate_project_structure.py::test_tree_ignores_noise_and_keeps_relevant_nodes -v
+```
+
+Código fuente: [tests/test_generate_project_structure.py](../../tests/test_generate_project_structure.py) (aprox. línea 55)
+
+
 ---
 

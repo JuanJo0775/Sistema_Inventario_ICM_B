@@ -68,3 +68,6 @@
 | UNIT-0065 | test_reports_quality_operational_view_returns_summary | [UNIT-0065.md](./UNIT-0065.md) |
 | UNIT-0066 | test_reports_views_are_available | [UNIT-0066.md](./UNIT-0066.md) |
 | UNIT-0067 | test_reports_warehouse_utilization_view_returns_summary | [UNIT-0067.md](./UNIT-0067.md) |
+| UNIT-0068 | test_change_report_detects_additions_and_removals | [UNIT-0068.md](./UNIT-0068.md) |
+| UNIT-0069 | test_semantic_comment_for_services_is_specific | [UNIT-0069.md](./UNIT-0069.md) |
+| UNIT-0070 | test_tree_ignores_noise_and_keeps_relevant_nodes | [UNIT-0070.md](./UNIT-0070.md) |
