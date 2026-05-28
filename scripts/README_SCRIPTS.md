@@ -29,41 +29,23 @@ Lee `docs/requisitos/ERS_ICM_Requisitos.md`, extrae los escenarios Gherkin y gen
 
 Sirve para mantener sincronizada la trazabilidad entre requisitos y escenarios automatizados.
 
-### `generate_all_test_docs.py`
-
-Orquesta la regeneracion completa de la documentacion de tests.
-
-Ejecuta los generadores de escenarios Gherkin, tests unitarios y tests de integracion en una sola pasada.
-
-### `concat_md.ps1`
-
-Concatena los archivos Markdown generados en salidas agregadas como `docs/test/all_unit.md`, `docs/test/all_integration.md` y `docs/test/all_scenarios.md`.
-
-Se usa para tener una vista compacta de toda la documentacion generada sin abrir archivo por archivo.
-
 ## Subcarpeta `generate_docs/`
 
-Esta subcarpeta contiene wrappers y utilidades comunes para la generacion de documentacion de pruebas.
+Esta subcarpeta contiene el entrypoint canónico de generación.
 
-### `generate_docs/menu.py`
+### `generate_docs/__main__.py`
 
-Menú interactivo para regenerar la documentacion de tests por tipo: unit, integration, gherkin o todo.
+Punto de entrada oficial para la generación de documentación de tests.
 
-### `generate_docs/generate_unit_test_docs.py`
+Uso recomendado:
 
-Genera la documentacion de tests unitarios dentro de `docs/test/unit/`.
-
-### `generate_docs/generate_integration_test_docs.py`
-
-Genera la documentacion de tests de integracion dentro de `docs/test/integration/`.
-
-### `generate_docs/generate_gherkin_test_docs.py`
-
-Wrapper que invoca `parse_ers_gherkin.py` para regenerar la documentacion de escenarios Gherkin.
+```bash
+python -m scripts.generate_docs
+```
 
 ### `generate_docs/utils.py`
 
-Contiene utilidades compartidas para leer tests, clasificar nodos, asignar codigos y escribir Markdown consistente.
+Contiene el pipeline común de descubrimiento, renderizado, escritura idempotente y concatenación.
 
 ## Como usarlo
 
@@ -71,9 +53,9 @@ Ejemplos comunes:
 
 ```bash
 python scripts/generate_project_structure.py
-python scripts/parse_ers_gherkin.py
-python scripts/generate_all_test_docs.py
-python scripts/generate_docs/menu.py
+python -m scripts.generate_docs
+python -m scripts.generate_docs --only unit
+python -m scripts.generate_docs --check
 ```
 
 ## Criterio de mantenimiento

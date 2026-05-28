@@ -1,23 +1,5 @@
-﻿<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\index.md -->
-
-# Ãndice de tests (integraciÃ³n)
-| CÃ³digo | Test | Archivo |
-|---|---|---|
-| INT-0001 | test_alerts_list_uses_is_resolved_filter | [INT-0001.md](./INT-0001.md) |
-| INT-0002 | test_auth_login_with_email_returns_jwt | [INT-0002.md](./INT-0002.md) |
-| INT-0003 | test_auth_login_with_username_returns_jwt_and_profile | [INT-0003.md](./INT-0003.md) |
-| INT-0004 | test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window | [INT-0004.md](./INT-0004.md) |
-| INT-0005 | test_auth_token_refresh_auxiliar_outside_hours_forbidden | [INT-0005.md](./INT-0005.md) |
-| INT-0006 | test_auth_user_disable_route | [INT-0006.md](./INT-0006.md) |
-| INT-0007 | test_catalog_resolve_identifier_param | [INT-0007.md](./INT-0007.md) |
-| INT-0008 | test_inventory_full_list_authenticated | [INT-0008.md](./INT-0008.md) |
-| INT-0009 | test_reports_kpi_almacenista_200 | [INT-0009.md](./INT-0009.md) |
-| INT-0010 | test_reports_kpi_requires_auth | [INT-0010.md](./INT-0010.md) |
-
-
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\INT-0001.md -->
-
-**CÃ³digo:** INT-0001
+<!-- file: INT-0001.md -->
+**Código:** INT-0001
 
 # test_alerts_list_uses_is_resolved_filter
 
@@ -25,21 +7,21 @@
 
 `tests/integration/test_api_integration.py::test_alerts_list_uses_is_resolved_filter`
 
-## PropÃ³sito
+## Propósito
 
-Prueba de integraciÃ³n HTTP (API) â€” validar flujos y contratos entre capas.
+Prueba de integración HTTP para validar flujos y contratos entre capas.
 
 ## Requisito o caso de negocio asociado
 
-Ver docstring del test y mÃ³dulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
 
 ## Inputs
 
-Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementaciÃ³n.
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
+Aserciones del test (assert); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
@@ -47,12 +29,13 @@ Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_alerts_list_uses_is_resolved_filter -v
 ```
 
-CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. lÃ­nea 137)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 137)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\INT-0002.md -->
+---
 
-**CÃ³digo:** INT-0002
+<!-- file: INT-0002.md -->
+**Código:** INT-0002
 
 # test_auth_login_with_email_returns_jwt
 
@@ -60,21 +43,21 @@ CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration
 
 `tests/integration/test_api_integration.py::test_auth_login_with_email_returns_jwt`
 
-## PropÃ³sito
+## Propósito
 
-Prueba de integraciÃ³n HTTP (API) â€” validar flujos y contratos entre capas.
+Prueba de integración HTTP para validar flujos y contratos entre capas.
 
 ## Requisito o caso de negocio asociado
 
-Ver docstring del test y mÃ³dulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
 
 ## Inputs
 
-Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementaciÃ³n.
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
+Aserciones del test (assert); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
@@ -82,12 +65,13 @@ Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_auth_login_with_email_returns_jwt -v
 ```
 
-CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. lÃ­nea 62)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 62)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\INT-0003.md -->
+---
 
-**CÃ³digo:** INT-0003
+<!-- file: INT-0003.md -->
+**Código:** INT-0003
 
 # test_auth_login_with_username_returns_jwt_and_profile
 
@@ -95,21 +79,21 @@ CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration
 
 `tests/integration/test_api_integration.py::test_auth_login_with_username_returns_jwt_and_profile`
 
-## PropÃ³sito
+## Propósito
 
-Prueba de integraciÃ³n HTTP (API) â€” validar flujos y contratos entre capas.
+Prueba de integración HTTP para validar flujos y contratos entre capas.
 
 ## Requisito o caso de negocio asociado
 
-Ver docstring del test y mÃ³dulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
 
 ## Inputs
 
-Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementaciÃ³n.
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
+Aserciones del test (assert); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
@@ -117,12 +101,13 @@ Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_auth_login_with_username_returns_jwt_and_profile -v
 ```
 
-CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. lÃ­nea 46)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 46)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\INT-0004.md -->
+---
 
-**CÃ³digo:** INT-0004
+<!-- file: INT-0004.md -->
+**Código:** INT-0004
 
 # test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window
 
@@ -130,21 +115,21 @@ CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration
 
 `tests/integration/test_api_integration.py::test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window`
 
-## PropÃ³sito
+## Propósito
 
-Prueba de integraciÃ³n HTTP (API) â€” validar flujos y contratos entre capas.
+Prueba de integración HTTP para validar flujos y contratos entre capas.
 
 ## Requisito o caso de negocio asociado
 
-Ver docstring del test y mÃ³dulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
 
 ## Inputs
 
-Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementaciÃ³n.
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
+Aserciones del test (assert); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
@@ -152,12 +137,13 @@ Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window -v
 ```
 
-CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. lÃ­nea 101)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 101)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\INT-0005.md -->
+---
 
-**CÃ³digo:** INT-0005
+<!-- file: INT-0005.md -->
+**Código:** INT-0005
 
 # test_auth_token_refresh_auxiliar_outside_hours_forbidden
 
@@ -165,21 +151,21 @@ CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration
 
 `tests/integration/test_api_integration.py::test_auth_token_refresh_auxiliar_outside_hours_forbidden`
 
-## PropÃ³sito
+## Propósito
 
-Prueba de integraciÃ³n HTTP (API) â€” validar flujos y contratos entre capas.
+Prueba de integración HTTP para validar flujos y contratos entre capas.
 
 ## Requisito o caso de negocio asociado
 
-Ver docstring del test y mÃ³dulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
 
 ## Inputs
 
-Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementaciÃ³n.
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
+Aserciones del test (assert); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
@@ -187,12 +173,13 @@ Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_auth_token_refresh_auxiliar_outside_hours_forbidden -v
 ```
 
-CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. lÃ­nea 74)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 74)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\INT-0006.md -->
+---
 
-**CÃ³digo:** INT-0006
+<!-- file: INT-0006.md -->
+**Código:** INT-0006
 
 # test_auth_user_disable_route
 
@@ -200,21 +187,21 @@ CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration
 
 `tests/integration/test_api_integration.py::test_auth_user_disable_route`
 
-## PropÃ³sito
+## Propósito
 
-Prueba de integraciÃ³n HTTP (API) â€” validar flujos y contratos entre capas.
+Prueba de integración HTTP para validar flujos y contratos entre capas.
 
 ## Requisito o caso de negocio asociado
 
-Ver docstring del test y mÃ³dulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
 
 ## Inputs
 
-Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementaciÃ³n.
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
+Aserciones del test (assert); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
@@ -222,12 +209,13 @@ Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_auth_user_disable_route -v
 ```
 
-CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. lÃ­nea 127)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 127)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\INT-0007.md -->
+---
 
-**CÃ³digo:** INT-0007
+<!-- file: INT-0007.md -->
+**Código:** INT-0007
 
 # test_catalog_resolve_identifier_param
 
@@ -235,21 +223,21 @@ CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration
 
 `tests/integration/test_api_integration.py::test_catalog_resolve_identifier_param`
 
-## PropÃ³sito
+## Propósito
 
-Prueba de integraciÃ³n HTTP (API) â€” validar flujos y contratos entre capas.
+Prueba de integración HTTP para validar flujos y contratos entre capas.
 
 ## Requisito o caso de negocio asociado
 
-Ver docstring del test y mÃ³dulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
 
 ## Inputs
 
-Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementaciÃ³n.
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
+Aserciones del test (assert); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
@@ -257,12 +245,13 @@ Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_catalog_resolve_identifier_param -v
 ```
 
-CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. lÃ­nea 38)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 38)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\INT-0008.md -->
+---
 
-**CÃ³digo:** INT-0008
+<!-- file: INT-0008.md -->
+**Código:** INT-0008
 
 # test_inventory_full_list_authenticated
 
@@ -270,21 +259,21 @@ CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration
 
 `tests/integration/test_api_integration.py::test_inventory_full_list_authenticated`
 
-## PropÃ³sito
+## Propósito
 
-Prueba de integraciÃ³n HTTP (API) â€” validar flujos y contratos entre capas.
+Prueba de integración HTTP para validar flujos y contratos entre capas.
 
 ## Requisito o caso de negocio asociado
 
-Ver docstring del test y mÃ³dulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
 
 ## Inputs
 
-Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementaciÃ³n.
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
+Aserciones del test (assert); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
@@ -292,12 +281,13 @@ Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_inventory_full_list_authenticated -v
 ```
 
-CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. lÃ­nea 30)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 30)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\INT-0009.md -->
+---
 
-**CÃ³digo:** INT-0009
+<!-- file: INT-0009.md -->
+**Código:** INT-0009
 
 # test_reports_kpi_almacenista_200
 
@@ -305,21 +295,21 @@ CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration
 
 `tests/integration/test_api_integration.py::test_reports_kpi_almacenista_200`
 
-## PropÃ³sito
+## Propósito
 
-Prueba de integraciÃ³n HTTP (API) â€” validar flujos y contratos entre capas.
+Prueba de integración HTTP para validar flujos y contratos entre capas.
 
 ## Requisito o caso de negocio asociado
 
-Ver docstring del test y mÃ³dulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
 
 ## Inputs
 
-Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementaciÃ³n.
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
+Aserciones del test (assert); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
@@ -327,12 +317,13 @@ Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_reports_kpi_almacenista_200 -v
 ```
 
-CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. lÃ­nea 22)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 22)
 
 
-<!-- file: C:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM\docs\test\integration\INT-0010.md -->
+---
 
-**CÃ³digo:** INT-0010
+<!-- file: INT-0010.md -->
+**Código:** INT-0010
 
 # test_reports_kpi_requires_auth
 
@@ -340,21 +331,21 @@ CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration
 
 `tests/integration/test_api_integration.py::test_reports_kpi_requires_auth`
 
-## PropÃ³sito
+## Propósito
 
-Prueba de integraciÃ³n HTTP (API) â€” validar flujos y contratos entre capas.
+Prueba de integración HTTP para validar flujos y contratos entre capas.
 
 ## Requisito o caso de negocio asociado
 
-Ver docstring del test y mÃ³dulo; trazabilidad RF/BR en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` cuando aplique.
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
 
 ## Inputs
 
-Fixtures pytest (`conftest.py`, `tests/factories.py`) y datos creados en el propio test. Ver implementaciÃ³n.
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
 
 ## Resultado esperado
 
-Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
+Aserciones del test (assert); ver código en la línea indicada abajo.
 
 ## Link directo al test
 
@@ -362,4 +353,6 @@ Aserciones del test (`assert`); ver cÃ³digo en la lÃ­nea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_reports_kpi_requires_auth -v
 ```
 
-CÃ³digo: [`tests/integration/test_api_integration.py`](../../tests/integration/test_api_integration.py) (aprox. lÃ­nea 16)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 16)
+---
+

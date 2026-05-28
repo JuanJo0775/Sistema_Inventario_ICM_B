@@ -84,7 +84,6 @@ DOCS_ORDER = ["README_ARQUITECTURA.md", "api", "requisitos", "test", "calidad_re
 SCRIPTS_ORDER = [
     "README_SCRIPTS.md",
     "generate_project_structure.py",
-    "generate_all_test_docs.py",
     "parse_ers_gherkin.py",
     "generate_docs",
 ]
@@ -453,7 +452,7 @@ def should_render_file(path: Path, root: Path, config: TreeConfig, depth: int) -
             return path.name in set(DOCS_CHILDREN[path.parent.name])
         return path.name.startswith("README") or path.name.endswith(".md")
     if rel.startswith("scripts/generate_docs"):
-        return path.name in {"menu.py", "utils.py", "generate_gherkin_test_docs.py", "generate_integration_test_docs.py", "generate_unit_test_docs.py"}
+        return path.name in {"menu.py", "utils.py", "__init__.py", "__main__.py"}
     if rel.startswith("scripts"):
         return path.suffix == ".py" or path.name == "README_SCRIPTS.md"
     if rel.startswith("requirements"):
@@ -515,11 +514,8 @@ def resolve_comment_for_path(path: Path, root: Path, context: ArchitectureContex
 
     if parent_rel == "scripts/generate_docs":
         base = {
-            "menu.py": "Orquestador interactivo de documentación",
             "utils.py": "Utilidades compartidas para generación documental",
-            "generate_unit_test_docs.py": "Generación de documentación de tests unitarios",
-            "generate_integration_test_docs.py": "Generación de documentación de integración",
-            "generate_gherkin_test_docs.py": "Wrapper para escenarios Gherkin",
+            "__main__.py": "Entry point oficial de documentación de tests",
         }.get(path.name)
         if base:
             return base

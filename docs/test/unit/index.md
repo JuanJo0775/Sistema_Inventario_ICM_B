@@ -1,4 +1,4 @@
-# Índice de tests (unitarios)
+# Índice de tests unitarios
 | Código | Test | Archivo |
 |---|---|---|
 | UNIT-0001 | test_alert_type_low_stock | [UNIT-0001.md](./UNIT-0001.md) |
@@ -51,8 +51,20 @@
 | UNIT-0048 | test_stock_can_be_reconstructed_from_ledger | [UNIT-0048.md](./UNIT-0048.md) |
 | UNIT-0049 | test_movement_views_are_available | [UNIT-0049.md](./UNIT-0049.md) |
 | UNIT-0050 | test_reports_app_has_no_domain_models | [UNIT-0050.md](./UNIT-0050.md) |
-| UNIT-0051 | test_generate_kpis_returns_dashboard_keys | [UNIT-0051.md](./UNIT-0051.md) |
-| UNIT-0052 | test_get_expiring_products_returns_lot_rows | [UNIT-0052.md](./UNIT-0052.md) |
-| UNIT-0053 | test_reports_dataset_view_is_available | [UNIT-0053.md](./UNIT-0053.md) |
-| UNIT-0054 | test_reports_expiring_view_returns_lots | [UNIT-0054.md](./UNIT-0054.md) |
-| UNIT-0055 | test_reports_views_are_available | [UNIT-0055.md](./UNIT-0055.md) |
+| UNIT-0051 | test_get_discard_operational_summary_excludes_returns | [UNIT-0051.md](./UNIT-0051.md) |
+| UNIT-0052 | test_get_quality_operational_summary_groups_damage_and_returns | [UNIT-0052.md](./UNIT-0052.md) |
+| UNIT-0053 | test_get_warehouse_utilization_uses_capacity_and_stock | [UNIT-0053.md](./UNIT-0053.md) |
+| UNIT-0054 | test_generate_kpis_returns_dashboard_keys | [UNIT-0054.md](./UNIT-0054.md) |
+| UNIT-0055 | test_get_expiring_products_returns_lot_rows | [UNIT-0055.md](./UNIT-0055.md) |
+| UNIT-0056 | test_dispatch_orders_endpoint_returns_samples | [UNIT-0056.md](./UNIT-0056.md) |
+| UNIT-0057 | test_reports_dataset_view_is_available | [UNIT-0057.md](./UNIT-0057.md) |
+| UNIT-0058 | test_reports_dataset_view_supports_discard_operational | [UNIT-0058.md](./UNIT-0058.md) |
+| UNIT-0059 | test_reports_dataset_view_supports_dispatch_operational | [UNIT-0059.md](./UNIT-0059.md) |
+| UNIT-0060 | test_reports_dataset_view_supports_quality_operational | [UNIT-0060.md](./UNIT-0060.md) |
+| UNIT-0061 | test_reports_dataset_view_supports_warehouse_utilization | [UNIT-0061.md](./UNIT-0061.md) |
+| UNIT-0062 | test_reports_discard_operational_view_returns_summary | [UNIT-0062.md](./UNIT-0062.md) |
+| UNIT-0063 | test_reports_dispatch_operational_view_returns_summary | [UNIT-0063.md](./UNIT-0063.md) |
+| UNIT-0064 | test_reports_expiring_view_returns_lots | [UNIT-0064.md](./UNIT-0064.md) |
+| UNIT-0065 | test_reports_quality_operational_view_returns_summary | [UNIT-0065.md](./UNIT-0065.md) |
+| UNIT-0066 | test_reports_views_are_available | [UNIT-0066.md](./UNIT-0066.md) |
+| UNIT-0067 | test_reports_warehouse_utilization_view_returns_summary | [UNIT-0067.md](./UNIT-0067.md) |

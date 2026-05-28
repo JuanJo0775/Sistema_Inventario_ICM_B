@@ -30,66 +30,43 @@ Cada bloque genera:
 - Un archivo `.md` por cada test o escenario.
 - Un archivo agregado `docs/test/all_*.md` cuando se ejecuta la concatenación.
 
-### Opción recomendada: menú interactivo
+### Opción oficial: CLI única
 
-El menú vive en `scripts/generate_docs/menu.py` y permite regenerar docs sin recordar scripts individuales.
-
-```bash
-python scripts/generate_docs/menu.py
-```
-
-Al abrirse verás estas opciones:
-
-1. **Unitarias**: regenera `docs/test/unit/`.
-2. **Integración**: regenera `docs/test/integration/`.
-3. **Escenarios (Gherkin)**: regenera `docs/test/scenarios/`.
-4. **Todo**: ejecuta unitarios + integración + Gherkin y después concatena los archivos agregados.
-5. **Salir**: cierra el menú.
-
-### Opción por línea de comandos
-
-Si prefieres ejecutar directamente sin menú interactivo, puedes usar:
+El punto de entrada recomendado es el módulo canónico de Python:
 
 ```bash
-python scripts/generate_docs/menu.py --type all
+python -m scripts.generate_docs
 ```
 
-Ese comando hace lo mismo que elegir la opción 4 del menú: regenera los tres bloques y deja actualizados:
+Ese comando regenera los tres bloques y deja actualizados:
 
 - `docs/test/unit/`
 - `docs/test/integration/`
 - `docs/test/scenarios/`
 - `docs/test/all_unit.md`
 - `docs/test/all_integration.md`
+
 - `docs/test/all_scenarios.md`
 
 También puedes ejecutar un bloque específico:
 
 ```bash
-python scripts/generate_docs/menu.py --type unit
-python scripts/generate_docs/menu.py --type integration
-python scripts/generate_docs/menu.py --type gherkin
+python -m scripts.generate_docs --only unit
+python -m scripts.generate_docs --only integration
+python -m scripts.generate_docs --only gherkin
 ```
 
-Si quieres regenerar sólo las carpetas, pero sin concatenar los archivos `all_*.md`, usa `--no-concat`:
+Si quieres validar sin escribir archivos, usa `--check`:
 
 ```bash
-python scripts/generate_docs/menu.py --type all --no-concat
+python -m scripts.generate_docs --check
 ```
 
-### Scripts individuales
-
-Si necesitas ejecutar los generadores por separado, estos son los comandos reales del repositorio:
+Si necesitas forzar reescritura aunque el contenido sea igual, usa `--force`:
 
 ```bash
-python scripts/parse_ers_gherkin.py
-python scripts/generate_docs/generate_unit_test_docs.py
-python scripts/generate_docs/generate_integration_test_docs.py
+python -m scripts.generate_docs --force
 ```
-
-- El primero genera los escenarios Gherkin y su `index.md`.
-- El segundo genera la documentación de unitarios.
-- El tercero genera la documentación de integración.
 
 ### Qué valida la generación
 
@@ -112,24 +89,18 @@ python scripts/parse_ers_gherkin.py
 
 ## Tests unitarios / integración (no Gherkin dinámico)
 
-Para regenerar toda la documentación de tests, usa el menú o el orquestador principal:
+Para regenerar toda la documentación de tests, usa el comando oficial:
 
 ```bash
-python scripts/generate_all_test_docs.py
+python -m scripts.generate_docs
 ```
 
-O usa directamente el menú interactivo:
+Si quieres hacerlo por partes:
 
 ```bash
-python scripts/generate_docs/menu.py
-```
-
-Si quieres hacerlo por partes, ejecuta los scripts individuales:
-
-```bash
-python scripts/parse_ers_gherkin.py
-python scripts/generate_docs/generate_unit_test_docs.py
-python scripts/generate_docs/generate_integration_test_docs.py
+python -m scripts.generate_docs --only unit
+python -m scripts.generate_docs --only integration
+python -m scripts.generate_docs --only gherkin
 ```
 
 ## Cómo ejecutar la suite de tests
@@ -214,9 +185,8 @@ pytest --cov=apps
 
 ## Mantenimiento
 
-- Añadir implementación: función en `tests/ers/gherkin_impl.py` + clave en `IMPLEMENTATIONS` + id en `_IMPL_IDS` en `scripts/parse_ers_gherkin.py`  
+- Añadir implementación: función en `tests/ers/gherkin_impl.py` + clave en `IMPLEMENTATIONS` + id en `_IMPL_IDS` en `scripts/parse_ers_gherkin.py`
   → `python scripts/parse_ers_gherkin.py`
 
-- Regenerar docs de tests unitarios e integración:  
-  `python scripts/generate_docs/generate_unit_test_docs.py`  
-  `python scripts/generate_docs/generate_integration_test_docs.py`
+- Regenerar docs de tests:
+  `python -m scripts.generate_docs`

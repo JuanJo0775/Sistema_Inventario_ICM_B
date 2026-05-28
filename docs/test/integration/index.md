@@ -1,4 +1,4 @@
-# Índice de tests (integración)
+# Índice de tests de integración
 | Código | Test | Archivo |
 |---|---|---|
 | INT-0001 | test_alerts_list_uses_is_resolved_filter | [INT-0001.md](./INT-0001.md) |
