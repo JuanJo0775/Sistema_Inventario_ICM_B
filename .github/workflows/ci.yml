@@ -41,7 +41,7 @@ jobs:
 
       - name: Black & isort checks
         run: |
-          pip install black==23.12.1 isort==5.13.2
+          pip install black==26.3.1 isort==5.13.2
           black --check .
           isort --check-only .
 

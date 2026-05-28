@@ -470,9 +470,11 @@ class MovementDetailView(generics.RetrieveAPIView):
 
     def http_method_not_allowed(self, request, *args, **kwargs):
         log_immutable_modification_attempt(
-            user=request.user
-            if getattr(request.user, "is_authenticated", False)
-            else None,
+            user=(
+                request.user
+                if getattr(request.user, "is_authenticated", False)
+                else None
+            ),
             request=request,
             detail={"resource": "movement", "movement_id": str(kwargs.get("pk") or "")},
         )

@@ -197,9 +197,11 @@ class MovementHistoryReportView(APIView):
         product_id = UUID(str(raw_pid)) if raw_pid else None
         qs = movement_history(
             product_id=product_id,
-            user_id=int(request.query_params["user_id"])
-            if request.query_params.get("user_id")
-            else None,
+            user_id=(
+                int(request.query_params["user_id"])
+                if request.query_params.get("user_id")
+                else None
+            ),
             start=start,
             end=end,
         )[:200]
@@ -631,9 +633,11 @@ class ReportDatasetView(APIView):
             product_id = UUID(str(raw_pid)) if raw_pid else None
             qs = movement_history(
                 product_id=product_id,
-                user_id=int(request.query_params["user_id"])
-                if request.query_params.get("user_id")
-                else None,
+                user_id=(
+                    int(request.query_params["user_id"])
+                    if request.query_params.get("user_id")
+                    else None
+                ),
                 start=start,
                 end=end,
             )[:200]

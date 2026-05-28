@@ -3,6 +3,7 @@
 This migration removes the old constraint and re-adds it using the
 `condition=` argument to be explicit and avoid deprecation warnings.
 """
+
 from django.db import migrations, models
 from django.db.models import Q
 

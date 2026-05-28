@@ -468,9 +468,11 @@ def write_test_docs(
     out_dir.mkdir(parents=True, exist_ok=True)
 
     node_objects = [
-        node
-        if isinstance(node, TestNode)
-        else TestNode(node[0], node[1], node[2], kind)
+        (
+            node
+            if isinstance(node, TestNode)
+            else TestNode(node[0], node[1], node[2], kind)
+        )
         for node in nodes
     ]
     codes = assign_codes(node_objects, kind)

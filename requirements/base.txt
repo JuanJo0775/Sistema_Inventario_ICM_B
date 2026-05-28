@@ -19,20 +19,20 @@ django-cors-headers==4.3.1
 django-filter==23.5
 
 # PDF Generation
-WeasyPrint==60.1
+WeasyPrint==68.0
 
 # Barcode generation
 python-barcode==0.15.1
 
 # Testing
-pytest==7.4.3
+pytest==9.0.3
 pytest-django==4.7.0
 pytest-cov==4.1.0
 factory-boy==3.3.0
 faker==20.1.0
 
 # Code Quality
-black==23.12.1
+black==26.3.1
 flake8==6.1.0
 isort==5.13.2
 
