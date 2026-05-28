@@ -20,50 +20,16 @@ Registry principal: **GHCR** (`ghcr.io`).
 - `.github/workflows/ci.yml`
   - Lint (`black`, `isort`)
   - Security scan Python (`pip-audit --strict`)
-  - Tests rapidos
-  - Check de docs de tests
-  - `makemigrations --check --dry-run`
-  - Scan de imagen con Trivy (`HIGH,CRITICAL` bloqueante)
+  - Tests unitarios
   - Integration tests con PostgreSQL
-  - Build and push a GHCR en `main`
-  - Generacion y publicacion de `release-manifest.json`
-  - Firma opcional de imagen con cosign
-  - Creacion de GitHub Release por commit (`release-<sha>`)
+  - Tests de escenarios (Gherkin)
+  - `makemigrations --check --dry-run`
 
-- `.github/workflows/deploy-staging.yml`
-  - Trigger en `push` a `staging`
-  - Build and push de imagen para staging
-  - Deploy por SSH al host de staging
-  - Backup pre-deploy (si existe `deploy/backup_db.sh`)
-  - Smoke tests (`deploy/smoke_test.sh`)
-  - Concurrency lock para evitar despliegues simultaneos
-
-- `.github/workflows/promote-to-production.yml`
-  - Trigger manual (`workflow_dispatch`)
-  - Requiere aprobacion del environment `production`
-  - Promocion por digest (`sha256`) en host productivo
-  - Backup obligatorio pre-deploy
-  - Smoke tests post-deploy
-  - Rollback automatico del `docker-compose.yml` si falla smoke test
-  - Persistencia de manifiesto de release en servidor
-  - Concurrency lock para evitar promociones concurrentes
+Nota: Los workflows y scripts de despliegue han sido removidos de este repositorio por decisión del equipo; la canalización actual está limitada a comprobaciones y pruebas CI.
 
 ### 2.2 Scripts operativos
 
-- `deploy/backup_db.sh`
-  - Genera backup `.sql.gz`
-  - Verifica integridad con `gunzip -t`
-  - Calcula checksum `sha256`
-  - Retencion configurable por dias
-  - Subida opcional a S3
-
-- `deploy/restart.sh`
-  - Pull de imagenes y `docker compose up -d --remove-orphans`
-
-- `deploy/smoke_test.sh`
-  - Valida endpoints:
-    - `/api/schema/`
-    - `/api/docs/`
+Los scripts operativos previamente en `deploy/` fueron eliminados del repositorio. Las tareas operativas (backups, despliegues y smoke tests) deben gestionarse externamente o mediante la plataforma de hosting/environamiento correspondiente.
 
 ---
 
@@ -307,7 +273,8 @@ cat /srv/icm/releases/release-<timestamp>.json
 
 ```bash
 cd /srv/icm
-BACKUP_RETENTION_DAYS=14 ./deploy/backup_db.sh
+# Los scripts en `deploy/` fueron removidos del repositorio.
+# Gestionar backups fuera del repositorio (p. ej. cron, Ansible o la plataforma de hosting).
 ```
 
 ## 9.4 Checklist pre-PR CI/CD

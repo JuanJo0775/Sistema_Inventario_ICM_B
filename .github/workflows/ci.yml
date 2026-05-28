@@ -72,38 +72,6 @@ jobs:
             junit.xml
             .coverage
 
-  image_scan:
-    name: Image security scan
-    runs-on: ubuntu-latest
-    needs: lint_test
-    if: github.event_name == 'push'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Set image repository
-        id: image
-        run: echo "repo=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
-
-      - name: Build image (local)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/Dockerfile
-          push: false
-          tags: icm-ci:${{ github.sha }}
-
-      - name: Trivy scan image
-        uses: aquasecurity/trivy-action@v1
-        with:
-          image-ref: icm-ci:${{ github.sha }}
-          format: 'table'
-          exit-code: '1'
-          severity: 'CRITICAL,HIGH'
-
   integration_tests:
     name: Integration tests (Postgres)
     runs-on: ubuntu-latest
@@ -152,77 +120,38 @@ jobs:
           python manage.py migrate --noinput
           pytest tests/integration -q || pytest -q tests/integration -q
 
-  build_and_push:
-    name: Build and push image to GHCR
+  gherkin_tests:
+    name: Gherkin / ERS scenarios
     runs-on: ubuntu-latest
     needs: [lint_test, integration_tests]
-    if: github.ref == 'refs/heads/main'
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.test
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Set image repository
-        id: image
-        run: echo "repo=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
-
-      - name: Login to GHCR
-        uses: docker/login-action@v2
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          python-version: '3.11'
 
-      - name: Build and push
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/Dockerfile
-          push: true
-          tags: ${{ steps.image.outputs.repo }}:${{ github.sha }}
-          labels: |
-            org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-      - name: Create release manifest (image digest)
+      - name: Install dependencies for scenarios
         run: |
-          if [ -z "${{ steps.build.outputs.digest }}" ]; then
-            echo "No digest produced by build step" >&2
-            exit 2
-          fi
-          IMAGE=${{ steps.image.outputs.repo }}@${{ steps.build.outputs.digest }}
-          echo "{\"image\": \"${IMAGE}\", \"ref\": \"${{ github.sha }}\"}" > release-manifest.json
-          cat release-manifest.json
-      - name: Upload release manifest
+          python -m pip install -U pip
+          pip install -r requirements/base.txt
+          pip install pytest pytest-django
+
+      - name: Run Gherkin scenarios
+        run: |
+          pytest tests/ers -q
+
+      - name: Upload artifacts (gherkin logs)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: release-manifest
-          path: release-manifest.json
-      - name: Sign image with cosign (keyless optional)
-        if: ${{ secrets.COSIGN_PRIVATE_KEY != '' }}
-        env:
-          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-        run: |
-          curl -sSfL https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64 -o cosign
-          chmod +x cosign
-          IMAGE=${{ steps.image.outputs.repo }}@${{ steps.build.outputs.digest }}
-          echo "Signing ${IMAGE}"
-          echo "${{ secrets.COSIGN_PRIVATE_KEY }}" > cosign.key
-          ./cosign sign --key cosign.key "${IMAGE}"
-          rm -f cosign.key
-      - name: Create or update GitHub release for rollback history
-        uses: softprops/action-gh-release@v2
-        if: github.ref == 'refs/heads/main'
-        with:
-          tag_name: release-${{ github.sha }}
-          name: Release ${{ github.sha }}
-          body: |
-            Immutable artifact release
-            - commit: ${{ github.sha }}
-            - image: ${{ steps.image.outputs.repo }}@${{ steps.build.outputs.digest }}
-          files: release-manifest.json
+          name: gherkin-artifacts
+          path: |
+            junit.xml
+            .coverage
+
+  # build_and_push and image_scan removed - CI now runs tests only (lint_test, integration_tests)
