@@ -2,6 +2,10 @@
 
 Este documento describe la arquitectura tecnica del backend, con foco en decisiones de diseno, desacoplamiento, reglas de consistencia de inventario, calidad de codigo y criterios operativos (Docker, testing, seguridad y rendimiento).
 
+Para operacion CI/CD (gates, despliegue, promociones, backups y rollback), consultar tambien:
+
+- [docs/CI-CD/README_CICD.md](CI-CD/README_CICD.md)
+
 ## 1. Objetivo Arquitectonico
 
 Construir un backend mantenible y trazable para inventario y operaciones logisticas, donde:
@@ -88,149 +92,177 @@ Estructura de Directorios del Proyecto:
 
 ```text
 icm_backend/
-├── apps/                                                       # Todas las apps del dominio del backend
-│   ├── authentication/                                         # RF-001, RF-002 — JWT, RBAC, restricción horaria
-│   │   ├── tests/
-│   │   ├── models.py                                           # BaseModel con created_at, updated_at, etc.
-│   │   ├── serializers.py                                      # Validación y transformación de entrada/salida
-│   │   ├── views.py                                            # Adaptador HTTP sin reglas de negocio
-│   │   ├── urls.py                                             # URL root con inclusión por módulo
-│   │   ├── services.py                                         # ⭐ Lógica crítica aquí
-│   │   ├── selectors.py                                        # Solo lectura
-│   │   ├── permissions.py                                      # Permisos RBAC base
-│   │   ├── exceptions.py                                       # Excepciones base del sistema
+├── apps/                                                       # Dominios Django del backend
+│   ├── authentication/                                         # Autenticación JWT, RBAC y control de acceso
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_services.py                                # Política de acceso y restricciones de rol
+│   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Autenticación JWT, RBAC y verificación de identidad
+│   │   ├── selectors.py                                        # Consultas de lectura sin efectos secundarios
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   ├── exceptions.py                                       # Excepciones de dominio y validación
 │   │   ├── signals.py                                          # Sincronización de eventos de identidad
-│   │   └── admin.py                                            # Registro administrativo del módulo
-│   ├── catalog/                                                # RF-003 — Productos, SKUs, categorías y validadores
-│   │   ├── tests/
-│   │   ├── models.py                                           # BaseModel con created_at, updated_at, etc.
-│   │   ├── serializers.py                                      # Validación y transformación de entrada/salida
-│   │   ├── views.py                                            # Adaptador HTTP sin reglas de negocio
-│   │   ├── urls.py                                             # URL root con inclusión por módulo
-│   │   ├── services.py                                         # ⭐ Lógica crítica aquí
-│   │   ├── selectors.py                                        # Solo lectura
-│   │   ├── permissions.py                                      # Permisos RBAC base
-│   │   ├── exceptions.py                                       # Excepciones base del sistema
-│   │   └── admin.py                                            # Registro administrativo del módulo
-│   ├── inventory/                                              # RF-004 — Consulta de stock en tiempo real
-│   │   ├── tests/
-│   │   ├── models.py                                           # BaseModel con created_at, updated_at, etc.
-│   │   ├── serializers.py                                      # Validación y transformación de entrada/salida
-│   │   ├── views.py                                            # Adaptador HTTP sin reglas de negocio
-│   │   ├── urls.py                                             # URL root con inclusión por módulo
-│   │   ├── services.py                                         # ⭐ Lógica crítica aquí
-│   │   ├── selectors.py                                        # Solo lectura
-│   │   ├── permissions.py                                      # Permisos RBAC base
-│   │   ├── exceptions.py                                       # Excepciones base del sistema
-│   │   └── admin.py                                            # Registro administrativo del módulo
-│   ├── movements/                                              # RF-005 a RF-009 — Ledger central e invariantes de inventario
-│   │   ├── tests/
-│   │   ├── models.py                                           # BaseModel con created_at, updated_at, etc.
-│   │   ├── serializers.py                                      # Validación y transformación de entrada/salida
-│   │   ├── views.py                                            # Adaptador HTTP sin reglas de negocio
-│   │   ├── urls.py                                             # URL root con inclusión por módulo
-│   │   ├── services.py                                         # ⭐ Lógica crítica aquí
-│   │   ├── selectors.py                                        # Solo lectura
-│   │   ├── permissions.py                                      # Permisos RBAC base
-│   │   ├── exceptions.py                                       # Excepciones base del sistema
-│   │   └── admin.py                                            # Registro administrativo del módulo
-│   ├── reports/                                                # RF-010 — Reportes e indicadores operativos
-│   │   ├── tests/
-│   │   ├── models.py                                           # BaseModel con created_at, updated_at, etc.
-│   │   ├── serializers.py                                      # Validación y transformación de entrada/salida
-│   │   ├── views.py                                            # Adaptador HTTP sin reglas de negocio
-│   │   ├── urls.py                                             # URL root con inclusión por módulo
-│   │   ├── services.py                                         # ⭐ Lógica crítica aquí
-│   │   ├── selectors.py                                        # Solo lectura
-│   │   ├── permissions.py                                      # Permisos RBAC base
-│   │   └── admin.py                                            # Registro administrativo del módulo
-│   ├── alerts/                                                 # RF-011 — Alertas proactivas del sistema
-│   │   ├── tests/
-│   │   ├── models.py                                           # BaseModel con created_at, updated_at, etc.
-│   │   ├── serializers.py                                      # Validación y transformación de entrada/salida
-│   │   ├── views.py                                            # Adaptador HTTP sin reglas de negocio
-│   │   ├── urls.py                                             # URL root con inclusión por módulo
-│   │   ├── services.py                                         # ⭐ Lógica crítica aquí
-│   │   ├── selectors.py                                        # Solo lectura
-│   │   ├── permissions.py                                      # Permisos RBAC base
-│   │   └── admin.py                                            # Registro administrativo del módulo
-│   └── audit/                                                  # RF-012 — Log de auditoría y trazabilidad
-│       ├── tests/
-│       ├── models.py                                           # BaseModel con created_at, updated_at, etc.
-│       ├── serializers.py                                      # Validación y transformación de entrada/salida
-│       ├── views.py                                            # Adaptador HTTP sin reglas de negocio
-│       ├── urls.py                                             # URL root con inclusión por módulo
-│       ├── services.py                                         # ⭐ Lógica crítica aquí
-│       ├── selectors.py                                        # Solo lectura
-│       ├── permissions.py                                      # Permisos RBAC base
-│       └── admin.py                                            # Registro administrativo del módulo
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
+│   ├── catalog/                                                # Catálogo, SKUs definidos por usuario y validación de productos
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_services.py                                # Cobertura crítica del módulo
+│   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Catálogo, SKU definido por usuario y validación de producto
+│   │   ├── selectors.py                                        # Consultas de lectura y agregaciones del módulo
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   ├── exceptions.py                                       # Excepciones de dominio y validación
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
+│   ├── inventory/                                              # Consulta de stock en tiempo real
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_admin.py                                   # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_models.py                                  # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_selectors.py                               # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_services.py                                # Cobertura crítica del módulo
+│   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Reglas de negocio del ledger y actualización transaccional del stock
+│   │   ├── selectors.py                                        # Lecturas de stock por ubicación
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   ├── exceptions.py                                       # Excepciones de dominio y validación
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
+│   ├── movements/                                              # Ledger inmutable y consistencia de inventario
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
+│   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Ledger inmutable, atomicidad y actualización del stock derivado
+│   │   ├── selectors.py                                        # Lecturas del ledger y del stock derivado
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   ├── exceptions.py                                       # Errores de inventario y consistencia
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
+│   ├── reports/                                                # Reportes e indicadores operativos
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_selectors.py                               # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_services.py                                # Cobertura crítica del módulo
+│   │   │   └── test_views.py                                   # Reglas de negocio y transacciones del dominio
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Reglas de negocio y transacciones del dominio
+│   │   ├── selectors.py                                        # Consultas agregadas para reportes y KPIs
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
+│   ├── alerts/                                                 # Alertas operativas y monitoreo preventivo
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_services.py                                # Cobertura crítica del módulo
+│   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Generación de alertas operativas
+│   │   ├── selectors.py                                        # Consultas de lectura y agregaciones del módulo
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
+│   └── audit/                                                  # Trazabilidad e histórico de eventos
+│       ├── tests/                                              # Pruebas del subdominio
+│       │   ├── test_models.py                                  # Cobertura crítica del módulo
+│       │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
+│       │   └── test_views.py                                   # Cobertura crítica del módulo
+│       ├── models.py                                           # Entidades y constraints de persistencia
+│       ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│       ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│       ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│       ├── services.py                                         # Trazabilidad e inmutabilidad de eventos
+│       ├── selectors.py                                        # Consultas de auditoría
+│       ├── permissions.py                                      # Política de acceso y restricciones de rol
+│       └── admin.py                                            # Registro administrativo y soporte operacional
 ├── config/                                                     # Configuración central del proyecto Django
 │   ├── settings/                                               # Configuración compartida y sobreescrituras por entorno
 │   │   ├── base.py                                             # Configuración base compartida
 │   │   ├── development.py                                      # Sobreescrituras para desarrollo local
 │   │   ├── production.py                                       # Sobreescrituras para producción
 │   │   └── test.py                                             # Configuración aislada para la suite de pruebas
-│   ├── urls.py                                                 # URL root con inclusión por módulo
+│   ├── urls.py                                                 # Composición de rutas y puntos de entrada HTTP
 │   ├── wsgi.py                                                 # Punto de entrada WSGI
 │   └── asgi.py                                                 # Punto de entrada ASGI
 ├── docker/                                                     # Infraestructura de contenedores y arranque
 │   ├── Dockerfile                                              # Imagen base del contenedor de despliegue
-│   └── entrypoint.sh                                           # Script de inicialización del contenedor
+│   └── entrypoint.sh                                           # Inicialización del contenedor y arranque
 ├── docs/                                                       # Documentación técnica viva del proyecto
 │   ├── README_ARQUITECTURA.md                                  # Documento vivo de arquitectura
 │   ├── api/                                                    # Contratos OpenAPI, seguridad y permisos
-│   │   ├── README_API.md                                       # Contratos OpenAPI, seguridad y permisos
-│   │   └── README_MATRIZ_PERMISOS.md
+│   │   ├── README_API.md                                       # Documento técnico relevante
+│   │   └── README_MATRIZ_PERMISOS.md                           # Documento técnico relevante
 │   ├── requisitos/                                             # Requisitos funcionales y contexto de negocio
-│   │   ├── ERS_ICM_Requisitos.md
-│   │   └── ICM_Informe_Elicitacion_v2_plus.docx.md
+│   │   ├── ERS_ICM_Requisitos.md                               # Documento técnico relevante
+│   │   └── ICM_Informe_Elicitacion_v2_plus.docx.md             # Documento técnico relevante
 │   ├── test/                                                   # Trazabilidad y documentación de pruebas
-│   │   ├── README_TEST.md                                      # Trazabilidad y documentación de pruebas
-│   │   ├── TRAZABILIDAD_ERS_GHERKIN.md                         # Trazabilidad y documentación de pruebas
-│   │   ├── gherkin_scenarios.json
-│   │   ├── gherkin_out_of_scope.json
-│   │   ├── all_unit.md
-│   │   ├── all_integration.md
-│   │   ├── all_scenarios.md
+│   │   ├── README_TEST.md                                      # Documento técnico relevante
+│   │   ├── TRAZABILIDAD_ERS_GHERKIN.md                         # Documento técnico relevante
+│   │   ├── gherkin_scenarios.json                              # Documento técnico relevante
+│   │   ├── gherkin_out_of_scope.json                           # Documento técnico relevante
+│   │   ├── all_unit.md                                         # Documento técnico relevante
+│   │   ├── all_integration.md                                  # Documento técnico relevante
+│   │   ├── all_scenarios.md                                    # Documento técnico relevante
 │   │   ├── unit/
-│   │   ├── integration/
+│   │   │   └── index.md                                        # Documento técnico relevante
+│   │   ├── integration/                                        # Pruebas HTTP/API de integración
+│   │   │   └── index.md                                        # Documento técnico relevante
 │   │   └── scenarios/
+│   │       └── index.md                                        # Documento técnico relevante
 │   ├── calidad_restricciones/                                  # Atributos de calidad y restricciones
-│   │   ├── README_ATRIBUTOS_CALIDAD.md
-│   │   └── README_RESTRICCIONES.md
-│   ├── architecture/                                           # Síntesis arquitectónica: drivers, Utility Tree y relaciones con ADRs
-│   │   ├── architecture_drivers.md                             # Drivers arquitectónicos priorizados basados en el código y requisitos
-│   │   ├── utility_tree.md                                     # Utility Tree: escenarios, métricas y trade-offs
+│   │   ├── README_ATRIBUTOS_CALIDAD.md                         # Documento técnico relevante
+│   │   └── README_RESTRICCIONES.md                             # Documento técnico relevante
+│   ├── architecture/                                           # Síntesis arquitectónica: drivers, Utility Tree y ADRs
+│   │   ├── architecture_drivers.md                             # Drivers arquitectónicos priorizados
+│   │   ├── utility_tree.md                                     # Utility Tree con escenarios y trade-offs
 │   │   ├── architectural_constraints.md                        # Restricciones arquitectónicas y riesgos
 │   │   └── adr_relationships.md                                # Trazabilidad entre drivers y ADRs
-│   └── adr/                                                    # Architecture Decision Records
+│   └── GUIA_ONBOARDING.md                                      # Documento técnico relevante
 ├── requirements/                                               # Dependencias por entorno
 │   ├── base.txt
 │   ├── development.txt
 │   └── production.txt
 ├── scripts/                                                    # Automatizaciones reutilizables del repositorio
-│   ├── README_SCRIPTS.md                                       # Indice y contexto de las automatizaciones
-│   ├── generate_project_structure.py
-│   ├── parse_ers_gherkin.py                                   # Generador de escenarios ERS/Gherkin
-│   └── generate_docs/                                          # Generación canónica de documentación de tests
-│       ├── __init__.py
+│   ├── README_SCRIPTS.md                                       # Índice y contexto de las automatizaciones
+│   ├── project_structure/                                      # Generador semántico de la estructura arquitectónica
+│   │   └── generate_project_structure.py                       # Generador semántico de la estructura arquitectónica
+│   ├── parse_ers_gherkin.py                                    # Generador de escenarios ERS/Gherkin
+│   └── generate_docs/                                          # Generadores compartidos de documentación
 │       ├── __main__.py                                         # Entry point oficial: python -m scripts.generate_docs
 │       └── utils.py                                            # Pipeline compartido: descubrimiento, renderizado y escritura
-├── shared/                                                     # Código compartido entre apps sin lógica de dominio
-│   ├── models.py                                               # BaseModel con timestamps y metadatos comunes
-│   ├── permissions.py                                          # Permisos RBAC base
-│   ├── exceptions.py                                           # Excepciones base del sistema
-│   ├── mixins.py                                               # Mixins reutilizables para views
-│   ├── pagination.py                                           # Configuración de paginación
+├── shared/                                                     # Código transversal reutilizable
+│   ├── models.py                                               # BaseModel y metadatos comunes
+│   ├── permissions.py                                          # Permisos base y reutilizables
+│   ├── exceptions.py                                           # Excepciones tipadas del sistema
+│   ├── mixins.py                                               # Mixins transversales para vistas
+│   ├── pagination.py                                           # Paginación reutilizable
 │   ├── openapi.py                                              # Tags OpenAPI y contratos compartidos
 │   └── utils/                                                  # Utilidades transversales
 │       └── validators.py                                       # Validadores reutilizables
 ├── tests/                                                      # Tests de integración cross-módulo
 │   ├── factories.py                                            # Factories de datos de prueba
 │   ├── ers/                                                    # Suite Gherkin dinámica alineada al ERS
-│   │   ├── gherkin_impl.py
-│   │   └── test_gherkin_dynamic.py
+│   │   ├── gherkin_impl.py                                     # Escenarios Gherkin y trazabilidad al ERS
+│   │   └── test_gherkin_dynamic.py                             # Escenarios Gherkin y trazabilidad al ERS
 │   └── integration/                                            # Pruebas HTTP/API de integración
+│       └── test_api_integration.py                             # Pruebas de integración HTTP/API
 ├── docker-compose.prod.yml                                     # Orquestación de producción
 ├── docker-compose.yml                                          # Orquestación local del stack
 ├── manage.py                                                   # Punto de entrada de comandos Django

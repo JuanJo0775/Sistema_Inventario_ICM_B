@@ -2,6 +2,8 @@
 
 > **🚀 ¿Eres nuevo en el proyecto?** Empieza por aquí: **[Guía de Onboarding](docs/GUIA_ONBOARDING.md)** para levantar el entorno y conocer los comandos principales.
 
+> **⚙️ Operación CI/CD:** guía completa en **[README_CICD.md](docs/CI-CD/README_CICD.md)**.
+
 Backend del sistema de gestión de inventario y operaciones de Import Corporal Medical (ICM), construido con Django y Django REST Framework.
 
 Este repositorio contiene la estructura del proyecto (arquitectura, configuración, dependencias y contenedorización), preparada para evolucionar la API de forma consistente y documentada.
@@ -9,6 +11,7 @@ Este repositorio contiene la estructura del proyecto (arquitectura, configuraci�
 ## Contenido
 
 - [Guía de Onboarding](docs/GUIA_ONBOARDING.md)
+- [Guía CI/CD Operativa](docs/CI-CD/README_CICD.md)
 - [Propósito del proyecto](#proposito-del-proyecto)
 - [Índice de documentación](#indice-de-documentacion)
 - [Stack tecnológico](#stack-tecnologico)
@@ -47,6 +50,7 @@ Documentación funcional y arquitectónica disponible en el repositorio:
 - [AGENTS.md](AGENTS.md): instrucciones y reglas para asistentes de código del proyecto.
 - [README_ADR.md](docs/adr/README_ADR.md): índice y trazabilidad de decisiones arquitectónicas.
 - [README_TEST.md](docs/test/README_TEST.md): estrategia de testing, tipos de pruebas, convenciones y ejemplos de escenarios Gherkin automatizados.
+- [README_CICD.md](docs/CI-CD/README_CICD.md): runbook operativo de CI/CD (gates, deploy, promoción, backup, rollback, seguridad y secretos).
 
 ## Stack tecnológico
 

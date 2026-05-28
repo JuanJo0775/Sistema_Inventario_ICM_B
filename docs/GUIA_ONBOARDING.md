@@ -2,6 +2,10 @@
 
 Bienvenido/a al proyecto. Esta guía contiene los comandos rápidos y exactos que necesitas para configurar tu entorno de desarrollo local paso a paso.
 
+Para operación de integración y despliegue (pipelines, backups, promoción y rollback), consulta también:
+
+- [README_CICD.md](CI-CD/README_CICD.md)
+
 ## 1. Clonar el repositorio y entrar a la carpeta
 
 Si aún no lo has hecho, clona el proyecto y entra al directorio:
@@ -96,3 +100,17 @@ pytest --cov=apps
 black apps/ shared/ config/
 isort apps/ shared/ config/
 ```
+
+## 10. CI/CD y operación de despliegue
+
+Si vas a participar en despliegues o soporte operativo, revisa el runbook completo:
+
+- [README_CICD.md](CI-CD/README_CICD.md)
+
+Ahí se documenta:
+
+- flujo CI con checks bloqueantes,
+- despliegue a staging,
+- promoción manual a production por digest,
+- política de backups, restauración y rollback,
+- manejo de secretos y controles de seguridad.
