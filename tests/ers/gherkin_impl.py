@@ -1198,7 +1198,8 @@ def impl_rf010_s06(
     download = authenticated_almacenista_client.get(
         reverse("movements-dispatch-invoice", kwargs={"pk": movement.id})
     )
-    assert download.status_code == status.HTTP_404_NOT_FOUND
+    assert download.status_code == status.HTTP_200_OK
+    assert "application/pdf" in download["Content-Type"]
 
 
 def impl_rf010_s07(api_client: APIClient, auxiliar_user):
@@ -1572,7 +1573,20 @@ def impl_rf012_s08(
 
 
 def impl_rnf003_s01(api_client: APIClient):
-    from config.settings import production as production_settings
+    import importlib
+    import os
+    import sys
+    from unittest.mock import patch
+
+    sys.modules.pop("config.settings.production", None)
+    db_env = {
+        "DB_NAME": "ci_test",
+        "DB_USER": "ci_user",
+        "DB_PASSWORD": "ci_pass",
+        "DB_HOST": "localhost",
+    }
+    with patch.dict(os.environ, db_env):
+        production_settings = importlib.import_module("config.settings.production")
 
     assert production_settings.SECURE_SSL_REDIRECT is True
     assert production_settings.SESSION_COOKIE_SECURE is True
