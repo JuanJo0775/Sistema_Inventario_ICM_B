@@ -7,10 +7,7 @@ Actual: icm_backend
 ## Resumen
 - Nuevos nodos relevantes: 1
 - Eliminados: 0
-- Reorganizaciones: 1
-
-## Reorganizaciones
-- scripts/generate_project_structure.py -> scripts/project_structure/generate_project_structure.py
+- Reorganizaciones: 0
 
 ## Altas relevantes
-- scripts/project_structure/
+- scripts/set_secret.py

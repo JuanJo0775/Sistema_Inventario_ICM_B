@@ -60,3 +60,63 @@ Este documento resume las restricciones reales que condicionan el diseño del ba
 - La imagen de producción requiere coordinación explícita de dependencias runtime.
 - El sistema no está diseñado para alta disponibilidad distribuida en este alcance.
 - La auditoría depende de que nadie escriba fuera del flujo de `services.py`.
+
+---
+
+## 8. Restricciones formales  — Clasificación por tipo (REST-01 a REST-06)
+
+Esta sección presenta las restricciones en el formato requerido por el entregable académico: ID, tipo (Tecnológica / Organizacional / Regulatoria), descripción, impacto en opciones de diseño y ADR vinculado.
+
+---
+
+### REST-01 — Django + PostgreSQL como stack obligatorio
+
+- **Tipo:** Tecnológica
+- **Descripción:** El sistema usa Django 4.x + Django REST Framework + PostgreSQL como stack central. No es negociable cambiar el framework ni el motor de base de datos en el alcance del proyecto.
+- **Impacto en diseño:** Descarta arquitecturas basadas en NoSQL para el ledger principal; descarta frameworks alternativos (FastAPI, Flask); obliga a usar el ORM de Django con sus patrones (migrations, models, transactions). Habilita ACID, `select_for_update()` y constraints fuertes que sustentan la consistencia del inventario.
+- **ADR vinculado:** ADR-003 (PostgreSQL como BD única), ADR-001 (monolito modular con Django).
+
+---
+
+### REST-02 — Despliegue exclusivo con Docker Compose (sin orquestadores cloud)
+
+- **Tipo:** Tecnológica / Organizacional
+- **Descripción:** El despliegue del sistema se realiza únicamente con Docker Compose. No se usa Kubernetes, AWS ECS, ni ningún orquestador de contenedores en la nube.
+- **Impacto en diseño:** Descarta estrategias de alta disponibilidad complejas (autoescalado horizontal, failover automático entre zonas). La disponibilidad depende de los health checks del Compose y del servidor donde se despliega. Descarta también microservicios en esta fase, ya que su operación requiere orquestación.
+- **ADR vinculado:** ADR-008 (Docker Compose), ADR-001 (monolito modular vs. microservicios).
+
+---
+
+### REST-03 — Equipo pequeño con tiempo acotado (contexto universitario)
+
+- **Tipo:** Organizacional
+- **Descripción:** El equipo tiene 3-5 integrantes con dedicación parcial y un plazo de semanas por corte. No hay presupuesto para infraestructura cloud pagada ni para herramientas de observabilidad avanzada.
+- **Impacto en diseño:** Descarta microservicios (overhead operacional alto), descarta event sourcing completo, descarta Redis para caché en primera fase, y obliga a priorizar simplicidad de implementación sobre optimizaciones prematuras. Justifica también el uso de SQLite en tests (velocidad sobre fidelidad).
+- **ADR vinculado:** ADR-001 (monolito modular justificado por restricción de equipo), ADR-011 (estrategia de testing con SQLite por velocidad).
+
+---
+
+### REST-04 — Datos de operación en servidores locales de la empresa (on-premise)
+
+- **Tipo:** Regulatoria
+- **Descripción:** Los datos del inventario, movimientos y clientes deben residir en servidores on-premise de la empresa. No se permite almacenamiento en cloud público (AWS S3, Firebase, GCP, etc.) para datos transaccionales del sistema.
+- **Impacto en diseño:** Descarta soluciones de storage en nube para backups primarios y sincronización automática a cloud. Obliga a que Docker Compose corra en servidor local. Condiciona la estrategia de backups a herramientas locales.
+- **ADR vinculado:** ADR-008 (despliegue Docker en servidor local), ADR-009 (variables de entorno para secretos, sin hardcoding hacia servicios cloud).
+
+---
+
+### REST-05 — API exclusivamente REST sobre HTTP/JSON sin WebSockets en fase actual
+
+- **Tipo:** Tecnológica
+- **Descripción:** La comunicación frontend-backend se realiza exclusivamente por HTTP/JSON bajo `/api/v1/`. No se implementa WebSockets, SSE (Server-Sent Events) ni GraphQL en esta fase del proyecto.
+- **Impacto en diseño:** Descarta dashboards con actualización push en tiempo real. El monitoreo de stock en tiempo real se implementa con polling desde el frontend, no con WebSockets. Limita el diseño del módulo de alertas a consultas por demanda. Simplifica la capa de servidor al no necesitar canales async.
+- **ADR vinculado:** ADR-006 (API REST versionada bajo `/api/v1/`).
+
+---
+
+### REST-06 — Protección de datos personales de clientes (Ley 1581 de Colombia)
+
+- **Tipo:** Regulatoria
+- **Descripción:** El sistema maneja datos de clientes (nombre, contacto en despachos). La Ley 1581 de Habeas Data de Colombia exige consentimiento para el tratamiento de datos personales y restringe su exposición a terceros no autorizados.
+- **Impacto en diseño:** Obliga a restringir la exposición de datos personales a roles autorizados (no todos los reportes pueden incluir nombres de cliente). Exige que el AuditLog registre quién accedió a datos sensibles. Condiciona el diseño de los serializers de despacho para no exponer datos innecesarios. Referenciado en RNF-006 del ERS.
+- **ADR vinculado:** ADR-007 (RBAC con permisos componibles, incluyendo restricción de datos por rol). Si no existe un ADR específico de privacidad, debe crearse para el Corte 2.

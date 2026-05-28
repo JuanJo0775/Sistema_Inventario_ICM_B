@@ -44,10 +44,11 @@ Este documento consolida el estado de los atributos de calidad observables en el
 
 ## Relacion con la documentacion existente
 
-- [docs/calidad_restricciones/README_RESTRICCIONES.md](README_RESTRICCIONES.md) contiene las restricciones que condicionan estos atributos.
+- [docs/calidad_restricciones/README_RESTRICCIONES.md](README_RESTRICCIONES.md) contiene las restricciones que condicionan estos atributos, incluyendo clasificación formal REST-01 a REST-06.
 - [docs/README_ARQUITECTURA.md](../README_ARQUITECTURA.md) describe el marco tecnico que sostiene la mayoria de ellos.
-- [docs/architecture/utility_tree.md](../architecture/utility_tree.md) consolida estos atributos en formato Utility Tree.
-- [docs/architecture/architecture_drivers.md](../architecture/architecture_drivers.md) prioriza los drivers que explican estos atributos.
+- [docs/architecture/utility_tree.md](../architecture/utility_tree.md) consolida estos atributos en formato Utility Tree con métricas concretas, calificaciones (A/M/B) y driver más crítico identificado.
+- [docs/architecture/architecture_drivers.md](../architecture/architecture_drivers.md) prioriza los drivers con identificadores formales DF-01 a DF-06.
+- [docs/architecture/adr_relationships.md](../architecture/adr_relationships.md) contiene la matriz de trazabilidad Driver → Táctica → ADR del Corte 2.
 
 ## Escenarios de Calidad (ISO 25010)
 

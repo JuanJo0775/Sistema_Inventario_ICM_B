@@ -234,6 +234,8 @@ icm_backend/
 │   │   ├── utility_tree.md                                     # Utility Tree con escenarios y trade-offs
 │   │   ├── architectural_constraints.md                        # Restricciones arquitectónicas y riesgos
 │   │   └── adr_relationships.md                                # Trazabilidad entre drivers y ADRs
+│   ├── CI-CD/                                                  # Documento arquitectónico relevante
+│   │   └── README_CICD.md                                      # Documento técnico relevante
 │   └── GUIA_ONBOARDING.md                                      # Documento técnico relevante
 ├── requirements/                                               # Dependencias por entorno
 │   ├── base.txt
@@ -244,9 +246,10 @@ icm_backend/
 │   ├── project_structure/                                      # Generador semántico de la estructura arquitectónica
 │   │   └── generate_project_structure.py                       # Generador semántico de la estructura arquitectónica
 │   ├── parse_ers_gherkin.py                                    # Generador de escenarios ERS/Gherkin
-│   └── generate_docs/                                          # Generadores compartidos de documentación
-│       ├── __main__.py                                         # Entry point oficial: python -m scripts.generate_docs
-│       └── utils.py                                            # Pipeline compartido: descubrimiento, renderizado y escritura
+│   ├── generate_docs/                                          # Generadores compartidos de documentación
+│   │   ├── __main__.py                                         # Entry point oficial: python -m scripts.generate_docs
+│   │   └── utils.py                                            # Pipeline compartido: descubrimiento, renderizado y escritura
+│   └── set_secret.py
 ├── shared/                                                     # Código transversal reutilizable
 │   ├── models.py                                               # BaseModel y metadatos comunes
 │   ├── permissions.py                                          # Permisos base y reutilizables

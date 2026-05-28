@@ -103,3 +103,29 @@ Este documento consolida las restricciones reales del backend ICM derivadas del 
 - [docs/architecture/architecture_drivers.md](../architecture/architecture_drivers.md) — drivers que estas restricciones condicionan.
 
 Si una nueva restriccion afecta diseno o despliegue, debe agregarse aqui y, si introduce una decision de arquitectura, debe reflejarse en un ADR.
+
+---
+
+## 12. Clasificación formal para Entregable Corte 2 (REST-01 a REST-06)
+
+Esta sección presenta las restricciones más relevantes en el formato requerido por el entregable académico, clasificadas en las tres categorías del modelo: Tecnológica, Organizacional y Regulatoria.
+
+> *"Un buen arquitecto no lucha contra las restricciones. Un sistema elegante dentro de restricciones reales vale más que uno perfecto que nadie puede implementar."* — Santiago Jaramillo López
+
+| ID | Nombre | Tipo | Impacto principal en diseño | ADR vinculado |
+|----|--------|:---:|---|---|
+| REST-01 | Django + PostgreSQL como stack obligatorio | Tecnológica | Descarta NoSQL, FastAPI/Flask; obliga a ORM Django, ACID y `select_for_update()` | ADR-001, ADR-003 |
+| REST-02 | Despliegue exclusivo con Docker Compose | Tecnológica / Organizacional | Descarta Kubernetes, cloud orchestrators y microservicios en esta fase | ADR-008, ADR-001 |
+| REST-03 | Equipo pequeño con tiempo acotado | Organizacional | Descarta event sourcing completo, Redis, optimizaciones prematuras; justifica SQLite en tests | ADR-001, ADR-011 |
+| REST-04 | Datos on-premise (no cloud público) | Regulatoria | Descarta AWS S3/Firebase para datos transaccionales; obliga despliegue local | ADR-008, ADR-009 |
+| REST-05 | API REST HTTP/JSON sin WebSockets | Tecnológica | Descarta dashboards con push en tiempo real; limita alertas a polling | ADR-006 |
+| REST-06 | Protección de datos personales — Ley 1581 Colombia | Regulatoria | Restringe exposición de datos de clientes por rol; obliga a auditoría de acceso a datos sensibles | ADR-007 |
+
+**Relación con restricciones existentes en este documento:**
+
+- REST-01 → Secciones 2 (restricciones tecnológicas) y 1 (monolito modular).
+- REST-02 → Sección 6 (despliegue e infraestructura: Docker Compose, sin Kubernetes).
+- REST-03 → Sección 4 (organizacionales: equipo, roles, decisiones en ADRs) y sección 8 (pruebas con SQLite).
+- REST-04 → Sección 6 (despliegue local, sin cloud storage para datos transaccionales).
+- REST-05 → Sección 1 (API pública solo en `/api/v1/`) y sección 7 (frontend consume solo la API REST).
+- REST-06 → Sección 5 (regulatorias: datos personales de clientes, RNF-006).
