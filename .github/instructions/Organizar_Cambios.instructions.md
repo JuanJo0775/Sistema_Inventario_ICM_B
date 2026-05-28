@@ -87,3 +87,25 @@ Antes de modificar reglas de negocio, APIs o tests, consulta la guía de agentes
 - Runbook operativo CI/CD: [docs/CI-CD/README_CICD.md](../../docs/CI-CD/README_CICD.md)
 
 Mantén estas guías sincronizadas: cuando actualices políticas que afecten el flujo de trabajo (nomenclatura de ramas, convención de commits, pruebas obligatorias), actualiza ambos archivos y referencia los RF/BR/RNF afectados en la descripción del PR.
+
+## Anexo: regeneración obligatoria de documentación al cambiar tests o estructura
+
+Cuando un cambio afecta a los tests o a la estructura del proyecto, el autor del cambio debe regenerar y commitear la documentación correspondiente **antes** de hacer `push`.
+
+- Si modificas tests o escenarios Gherkin (`tests/`, `tests/ers/`, `apps/*/tests/`) ejecuta:
+
+```bash
+python scripts/parse_ers_gherkin.py
+```
+
+    Esto actualiza la documentación de pruebas y la matriz de trazabilidad. Incluir los archivos generados en el mismo commit.
+
+- Si modificas la estructura del proyecto (mover/renombrar apps, añadir/quitar carpetas top-level) ejecuta:
+
+```bash
+python scripts/generate_project_structure.py
+```
+
+    Esto actualiza `docs/README_ARQUITECTURA.md` y otros artefactos relacionados. Incluir los archivos generados en el mismo commit.
+
+En la descripción del PR: indicar qué scripts se ejecutaron para regenerar documentación y confirmar que los artefactos generados están incluidos en el cambio. Si la documentación no está sincronizada, el PR debe solicitar corrección antes de merge.

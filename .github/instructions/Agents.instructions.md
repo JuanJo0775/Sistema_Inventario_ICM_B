@@ -113,6 +113,37 @@ Uso práctico para asistentes:
 - Si cambias reglas de negocio: añadir/actualizar tests del dominio y referenciar RF/BR/RNF en docstrings y PR.
 - Al crear endpoints nuevos o modificar contratos, documentar con `@extend_schema` y usar tags oficiales.
 
+## Anexo: regeneración de documentación antes de commit/push
+
+Regla: cada vez que se modifica código de pruebas o los escenarios Gherkin (`tests/`, `tests/ers/`, `apps/*/tests/`), el autor del cambio debe regenerar la documentación de pruebas antes de hacer `commit` y `push`.
+
+- Comando recomendado (regenera documentación de escenarios Gherkin y tests relacionados):
+
+```bash
+python scripts/parse_ers_gherkin.py
+```
+
+- Incluir los archivos generados en el mismo commit que introduce los cambios en los tests (no separar en commits independientes).
+
+Regla: cada vez que cambia la estructura del proyecto (añadir/quitar carpetas top-level, mover apps, o cambios que afectan la vista del árbol del proyecto), el autor debe regenerar la sección de estructura del proyecto en la documentación de arquitectura antes de `commit`/`push`.
+
+- Comando recomendado (genera/actualiza `docs/README_ARQUITECTURA.md`):
+
+```bash
+python scripts/generate_project_structure.py
+```
+
+- Incluir los cambios generados por este script en el mismo commit que modifica la estructura del proyecto.
+
+Checklist rápido antes de `git push` cuando tocas tests o estructura:
+
+- Ejecutaste `python scripts/parse_ers_gherkin.py` si cambiaste tests/gherkin
+- Ejecutaste `python scripts/generate_project_structure.py` si cambiaste la estructura del repo
+- Añadiste los archivos generados al `git add` y están incluidos en el mismo commit
+- En la descripción del PR listaste explícitamente los comandos usados para regenerar la documentación
+
+Nota operativa: se recomienda añadir hooks locales (`pre-commit` o `pre-push`) que ejecuten estos scripts o, como mínimo, comprobar en CI que los artefactos generados estén actualizados. Si se detecta que la documentación generada no está sincronizada con los cambios, el PR debe marcarse para corrección.
+
 Contacto y notas finales:
 - Este archivo actúa como la versión canonical para reglas de agentes. Manténlo sincronizado con `AGENTS.md` en la raíz del repo.
 
