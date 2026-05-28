@@ -4,6 +4,114 @@
 
 *Comercialización e importación de indumentos de fisioterapia – Colombia*
 
+## **Dictamen tecnico de implementacion**
+
+Este documento no debe leerse como una lista uniforme de indicadores listos para backend. Los 7 KPIs mezclan dominios distintos: inventario, costos, calidad, logística, servicio al cliente e IoT. La arquitectura actual del repositorio ya soporta reportes de solo lectura y agregaciones sobre ledger, stock y alertas, pero no contiene todos los hechos de negocio que varios KPIs necesitan para ser calculados con precisión.
+
+### **Estado global**
+
+| KPI | Decision | Estado actual en backend | Endpoints / contrato relacionado | Dependencias o cambios requeridos |
+| --- | --- | --- | --- | --- |
+| KPI 1 Rotacion de Inventario | No implementar como KPI formal aun | Parcial, sin costo/valoracion | No existe endpoint especifico. Solo panel generico en `/api/v1/reports/kpi/` y dataset en `/api/v1/reports/data/?kind=kpi` | Faltan costo unitario, inventario valorizado, snapshots de cierre y/o capa contable. Mejor como BI financiero o KPI de un subdominio de costing |
+| KPI 2 Indice de Productos Danados | Implementacion parcial con datos backend disponibles | Parcial, pero utilizable como hechos derivados | `GET /api/v1/reports/quality-operational/`, `GET /api/v1/reports/data/?kind=quality-operational` | El backend entrega movimientos de daño/vencimiento y el frontend debe calcular la tasa final. Faltan incidente formal de calidad, catálogo de causas y trazabilidad de recuperación |
+| KPI 3 Utilizacion de Almacen | Implementado en backend con ajuste de definicion | Viable con el modelo actual si se interpreta como ocupacion por capacidad logica | `GET /api/v1/reports/warehouse-utilization/`, `GET /api/v1/reports/data/?kind=warehouse-utilization`, `GET /api/v1/inventory/summary/` | Requiere mantener `Location.max_capacity` configurado y aclarar que la unidad es operacional, no fisica. La métrica ya sale por API de solo lectura |
+| KPI 4 Cumplimiento en Despacho OTIF | No implementar OTIF como calculo backend; exponer solo hechos operativos | Parcial: hay resumen de despacho y facturas, pero no dominio de pedidos | `GET /api/v1/reports/dispatch-operational/`, `GET /api/v1/reports/data/?kind=dispatch-operational` | Faltan ordenes, promesas de entrega, transportadora, guia, confirmacion de entrega y estados logisticos. El backend solo entrega hechos para que frontend o BI calcule OTIF |
+| KPI 5 Tasa de Descarte de Mercancia Defectuosa | Implementacion parcial con datos backend disponibles | Parcial, utilizable como hechos derivados | `GET /api/v1/reports/quality-operational/`, `GET /api/v1/reports/data/?kind=quality-operational` | El backend entrega salidas por daño, vencimiento y devoluciones como hechos operativos; el frontend calcula la tasa y el costo proxy. Faltan doble autorización formal, causal normalizada, adjuntos y acta de descarte |
+| KPI 6 Tasa de Devoluciones + PQRSF | Separar en dos problemas | Devoluciones: parcial en backend. PQRSF: fuera de alcance actual | `GET /api/v1/reports/quality-operational/`, `GET /api/v1/reports/data/?kind=quality-operational` | El backend entrega devoluciones como hecho derivado; el frontend calcula tasa y tiempos. PQRSF requiere otro dominio, con formulario, cronómetro legal y trazabilidad propia |
+| KPI 7 Cumplimiento de Cadena de Frio | No implementar como KPI completo aun | Parcial: hay bandera de producto y alertas, pero no telemetria | No existe endpoint de sensores ni de lecturas | Faltan sensores, lecturas historicas, estado de cuarentena, reglas de excursion termica, integracion IoT y reporte por lote |
+
+### **Lectura tecnica por KPI**
+
+#### **KPI 1: Rotacion de Inventario**
+
+No debe implementarse hoy como KPI oficial del backend. La formula depende de costo de mercancia vendida e inventario promedio valorizado, pero el backend solo conserva movimientos y stock derivado, no valores economicos de inventario ni cierres contables. Si se fuerza su calculo, el resultado sera una aproximacion fragil y discutible.
+
+Si en el futuro se incorpora una capa de costing, la API deberia salir desde un endpoint de reportes de solo lectura, por ejemplo un dataset nuevo bajo `/api/v1/reports/`, con parametros de periodo y con valores ya consolidados. Hasta entonces, este KPI es mejor candidato para BI o analitica financiera.
+
+#### **KPI 2: Indice de Productos Danados**
+
+Este KPI ya puede alimentarse desde backend como hechos derivados, pero no como incidente formal. El backend expone las salidas por daño y vencimiento en el ledger y también un resumen operativo agregado para frontend; con eso el frontend puede calcular la tasa, segmentar por periodo y visualizar tendencias. Lo que no existe aún es la entidad primaria de incidente de calidad, la causal normalizada y la trazabilidad de recuperación o reproceso.
+
+La mejor opción a mediano plazo sigue siendo un modelo de incidente de calidad o baja por daño, con causas normalizadas y relación al producto/lote. Hasta entonces, este KPI debe mostrarse como una métrica derivada y no como auditoría sanitaria completa.
+
+#### **KPI 3: Utilizacion de Almacen**
+
+Es el KPI mas cercano a la implementacion actual. `StockByLocation` ya permite conocer ocupacion por ubicacion y `Location.max_capacity` existe como capacidad maxima. Sin embargo, la definicion del documento habla de m2, m3, pallets o posiciones de rack, y el modelo actual no distingue esas unidades. Por tanto, el KPI es implementable solo si se formaliza la unidad de capacidad y se acepta que la medicion es operacional, no fisica.
+
+La exposicion recomendada ya encaja con la arquitectura: un selector de reportes que agregue stock por ubicacion y compare contra capacidad configurada. Puede colgar de `/api/v1/inventory/summary/` o de un dataset de reportes. No requiere jobs, solo recalculo al consultar o despues de eventos de movimiento.
+
+#### **KPI 4: Cumplimiento en Despacho de Mercancia OTIF**
+
+No debe implementarse OTIF como calculo backend en el estado actual. OTIF requiere pedido, fecha comprometida, despacho, entrega, transportadora, guia y estado de completitud por item. El repositorio no tiene un dominio de pedidos ni de entregas; el ledger de movimientos no es suficiente para inferir a tiempo, completo y en contexto comercial.
+
+Lo correcto hoy es exponer hechos de despacho y facturacion por API para consumo del frontend o de un BI externo. El backend ya puede servir `/api/v1/reports/dispatch-operational/` y `/api/v1/reports/data/?kind=dispatch-operational` con volumen de despachos, facturas vinculadas y productos top, pero deja el calculo final de OTIF a la capa que posea pedidos, promesas de entrega y confirmacion de entrega.
+
+**NUEVO (contrato operativo):** el endpoint `dispatch-operational` ahora expone campos adicionales pensados para facilitar el cálculo de OTIF por parte del frontend:
+
+- `shipments`: conteo de movimientos de salida de venta en el período.
+- `invoice_linked_dispatches`: conteo de despachos con factura vinculada.
+- `invoice_linked_ratio`: porcentaje (0-100) de despachos con factura sobre el total de `shipments`.
+- `top_products`: listado de productos más despachados.
+- `order_proxy`: campo libre (lista) pensado para que integraciones o futuros dominios inyecten datos por pedido cuando existan (hoy vacío).
+- `carriers`: campo libre (objeto) pensado para agregar información de transportadoras cuando se integre ese dominio.
+
+Con estos hechos el frontend puede:
+
+- Unir localmente con su fuente de pedidos (si la tiene) por fecha/cliente y calcular `On Time` y `In Full` por pedido.
+- Mostrar dashboards operativos que muestren volumen, facturación proxy y productos críticos.
+
+Si el frontend no tiene la fuente de pedidos, el `dispatch-operational` sirve como resumen visual y de apoyo para BI, pero no puede producir OTIF fiable por sí solo.
+
+#### **KPI 5: Tasa de Descarte de Mercancia Defectuosa**
+
+El backend sí puede alimentar este KPI como hechos derivados, pero no como flujo formal de descarte. Hoy el sistema entrega salidas por daño, vencimiento y devoluciones como base operativa; con eso el frontend puede calcular tasa de descarte y tendencias. Lo que no existe aún es el modelo de descarte formal con doble autorización, causal normalizada, soporte documental y relación con proveedor.
+
+Se puede construir sobre `Movement` como ledger, pero conviene separar "baja de inventario" de "descartar" y modelarlo en un servicio dedicado si el negocio decide formalizarlo. Sin ese cambio, el KPI debe presentarse como una métrica derivada para frontend, no como baja contable o sanitaria cerrada.
+
+#### **KPI 6: Tasa de Devoluciones de Clientes y PQRSF**
+
+El documento mezcla dos dominios que no deberían estar fusionados. Las devoluciones sí pueden apoyarse en `MovementType.DEVOLUCION` y ahora el backend ya las entrega como hecho derivado en el resumen operativo de calidad; el frontend puede calcular la tasa. PQRSF sigue sin existir en el backend actual. Un QR por pedido, cronómetro legal, adjuntos y respuesta formal requieren otra app, otro modelo y otro flujo de atención.
+
+La recomendación arquitectónica sigue siendo separar el KPI en dos: devoluciones como KPI logístico con datos backend, y PQRSF como dominio de servicio al cliente o integración externa. Mantenerlos juntos solo produce un contrato ambiguo y un dashboard poco trazable.
+
+#### **KPI 7: Cumplimiento de Cadena de Frio**
+
+No es implementable como KPI completo con el backend actual. El sistema solo tiene una bandera `requires_cold_chain` y alertas de reconocimiento, pero no ingesta de sensores, historico termico, excursion, cuarentena o liberacion por lote. Eso significa que el backend hoy puede registrar conciencia operativa, pero no cumplimiento real de cadena de frio.
+
+La via correcta es un subdominio de IoT/telemetria con lectura periodica, almacenamiento historico y calculo por lote. Si se quiere exponer por API, primero deben existir los modelos de lectura y los eventos de excursion. Sin eso, el KPI seria una declaracion vacia.
+
+### **Endpoints relacionados en el estado actual**
+
+Los siguientes endpoints ya existen y son la base de los reportes de solo lectura, aunque no cubren todos los KPIs del documento:
+
+- `/api/v1/reports/kpi/` : panel operativo generico con movimientos de hoy, alertas activas y salidas del mes.
+- `/api/v1/reports/data/?kind=kpi` : dataset unificado para frontend, equivalente al panel anterior.
+- `/api/v1/reports/inventory/summary/` : resumen de inventario actual.
+- `/api/v1/reports/movements/summary/` : conteo de movimientos por tipo.
+- `/api/v1/reports/movements/report/` : agregados por tipo, producto y usuario.
+- `/api/v1/reports/movements/history/` : historial de movimientos filtrable.
+- `/api/v1/reports/top-products/` : productos mas despachados.
+- `/api/v1/reports/warehouse-utilization/` : utilización de almacén por capacidad configurada.
+- `/api/v1/reports/quality-operational/` : hechos derivados de daño, vencimiento y devoluciones para cálculo frontend de KPI 2 y KPI 6.
+- `/api/v1/reports/invoices/` : historial de salidas con factura.
+- `/api/v1/reports/expiring/` : lotes con vencimiento proximo.
+
+**Nota sobre generación de códigos de barra:** el backend expone payloads listos para consumir con la forma `{ type, value, svg, svg_data_uri }` (por ejemplo desde el endpoint de producto). En entornos de test donde la librería de render `python-barcode` no está instalada se devuelve un `svg` placeholder con encabezado XML para mantener la compatibilidad del contrato; en producción recomendamos instalar `python-barcode` para obtener SVG completos y legibles.
+
+### **Pendientes tecnicos explicitos**
+
+- Crear o no crear un dominio de costing antes de intentar KPI 1.
+- Definir si el KPI 2 mide incidencias o bajas definitivas, porque hoy el documento mezcla ambos conceptos.
+- Formalizar la unidad de capacidad para KPI 3.
+- Diseñar dominio de pedidos y entregas para KPI 4.
+- Separar descarte sanitario de salida operativa para KPI 5.
+- Separar devoluciones de PQRSF para KPI 6.
+- Introducir telemetria y cuarentena por lote para KPI 7.
+
+### **Conclusion operativa**
+
+De los 7 KPIs del documento, solo KPI 3 puede considerarse cercano a la implementacion actual del backend, y aun asi con ajuste conceptual. Los KPI 1, 4, 5 y 7 no deberian prometerse como backend listo porque faltan hechos de negocio esenciales. KPI 2 y KPI 6 son implementables solo de forma parcial y requieren separar definiciones para no mezclar eventos distintos bajo un mismo indicador.
+
 # **KPI 1: Rotación de Inventario**
 
 ### **Definición**

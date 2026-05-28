@@ -1,14 +1,22 @@
 from django.urls import path
 
-from apps.reports.views import (ExpiringProductsReportView,
-                                InventorySummaryReportView,
-                                InvoiceHistoryReportView,
-                                KpiDashboardReportView,
-                                MovementHistoryReportView, MovementReportView,
-                                ReportDatasetView,
-                                MovementSummaryReportView,
-                                SalesSummaryReportView,
-                                TopDispatchedProductsReportView)
+from apps.reports.views import (
+    ExpiringProductsReportView,
+    InventorySummaryReportView,
+    InvoiceHistoryReportView,
+    KpiDashboardReportView,
+    MovementHistoryReportView,
+    MovementReportView,
+    ReportDatasetView,
+    MovementSummaryReportView,
+    DiscardOperationalReportView,
+    SalesSummaryReportView,
+    WarehouseUtilizationReportView,
+    QualityOperationalReportView,
+    DispatchOperationalReportView,
+    DispatchOrdersReportView,
+    TopDispatchedProductsReportView,
+)
 
 urlpatterns = [
     path(
@@ -39,6 +47,31 @@ urlpatterns = [
         "top-products/",
         TopDispatchedProductsReportView.as_view(),
         name="reports-top-products",
+    ),
+    path(
+        "warehouse-utilization/",
+        WarehouseUtilizationReportView.as_view(),
+        name="reports-warehouse-utilization",
+    ),
+    path(
+        "quality-operational/",
+        QualityOperationalReportView.as_view(),
+        name="reports-quality-operational",
+    ),
+    path(
+        "discard-operational/",
+        DiscardOperationalReportView.as_view(),
+        name="reports-discard-operational",
+    ),
+    path(
+        "dispatch-operational/",
+        DispatchOperationalReportView.as_view(),
+        name="reports-dispatch-operational",
+    ),
+    path(
+        "dispatch-operational/orders/",
+        DispatchOrdersReportView.as_view(),
+        name="reports-dispatch-operational-orders",
     ),
     path("invoices/", InvoiceHistoryReportView.as_view(), name="reports-invoices"),
     path("kpi/", KpiDashboardReportView.as_view(), name="reports-kpi"),

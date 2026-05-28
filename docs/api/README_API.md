@@ -279,6 +279,10 @@ El backend usa `djangorestframework-simplejwt` con rotación de refresh tokens y
 - resumen de movimientos
 - resumen de ventas
 - historial de movimientos
+- utilización de almacén por capacidad configurada
+- resumen operativo de calidad y devoluciones derivadas para frontend
+- resumen operativo de descarte para frontend
+- resumen operativo de despacho e invoices vinculadas para frontend
 
 ### 10.6 Alertas
 

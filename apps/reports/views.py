@@ -14,20 +14,37 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.movements.serializers import MovementSerializer
-from apps.reports.selectors import (get_expiring_products,
-                                    get_inventory_summary, get_invoice_history,
-                                    get_kpi_dashboard, get_movement_report,
-                                    get_top_dispatched_products,
-                                    movement_counts_by_period,
-                                    movement_history, sales_dispatch_totals)
-from apps.reports.serializers import (ExpiringLotReportItemSerializer,
-                                      InventorySummaryItemSerializer,
-                                      KpiDashboardSerializer,
-                                      ReportDatasetSerializer,
-                                      MovementReportItemSerializer,
-                                      MovementSummaryResponseSerializer,
-                                      SalesSummaryResponseSerializer,
-                                      TopDispatchedProductSerializer)
+from apps.reports.selectors import (
+    get_dispatch_operational_summary,
+    get_dispatch_order_samples,
+    get_discard_operational_summary,
+    get_expiring_products,
+    get_inventory_summary,
+    get_invoice_history,
+    get_kpi_dashboard,
+    get_movement_report,
+    get_quality_operational_summary,
+    get_top_dispatched_products,
+    get_warehouse_utilization,
+    movement_counts_by_period,
+    movement_history,
+    sales_dispatch_totals,
+)
+from apps.reports.serializers import (
+    ExpiringLotReportItemSerializer,
+    InventorySummaryItemSerializer,
+    KpiDashboardSerializer,
+    ReportDatasetSerializer,
+    MovementReportItemSerializer,
+    MovementSummaryResponseSerializer,
+    QualityOperationalResponseSerializer,
+    DiscardOperationalSummarySerializer,
+    DispatchOperationalSummarySerializer,
+    PerOrderSampleSerializer,
+    SalesSummaryResponseSerializer,
+    WarehouseUtilizationResponseSerializer,
+    TopDispatchedProductSerializer,
+)
 from shared.openapi import TAG_REPORTS, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenistaOrAdministrador
@@ -317,6 +334,99 @@ class KpiDashboardReportView(APIView):
         return Response(get_kpi_dashboard())
 
 
+class WarehouseUtilizationReportView(APIView):
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
+
+    @extend_schema(
+        responses={
+            200: WarehouseUtilizationResponseSerializer,
+            **standard_error_responses(include_403=True),
+        },
+        tags=[TAG_REPORTS],
+    )
+    def get(self, request):
+        return Response(get_warehouse_utilization())
+
+
+class QualityOperationalReportView(APIView):
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="period_days",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Ventana histórica en días para el resumen operativo.",
+            )
+        ],
+        responses={
+            200: QualityOperationalResponseSerializer,
+            **standard_error_responses(include_403=True),
+        },
+        tags=[TAG_REPORTS],
+    )
+    def get(self, request):
+        period_days = int(request.query_params.get("period_days", 30))
+        return Response(get_quality_operational_summary(period_days=period_days))
+
+
+class DiscardOperationalReportView(APIView):
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="period_days",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Ventana histórica en días para el resumen de descarte.",
+            )
+        ],
+        responses={
+            200: DiscardOperationalSummarySerializer,
+            **standard_error_responses(include_403=True),
+        },
+        tags=[TAG_REPORTS],
+    )
+    def get(self, request):
+        period_days = int(request.query_params.get("period_days", 30))
+        return Response(get_discard_operational_summary(period_days=period_days))
+
+
+class DispatchOperationalReportView(APIView):
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="period_days",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Ventana histórica en días para el resumen operativo.",
+            )
+        ],
+        description=(
+            "Resumen operativo de despacho. Campos clave: `period`, `sales`, "
+            "`invoice_linked_dispatches`, `shipments`, `invoice_linked_ratio`, "
+            "`movement_counts`, `top_products`, `order_proxy`, `carriers`. "
+            "`order_proxy` y `carriers` son campos extensibles para integrar "
+            "información por pedido o transportadora cuando esos dominios existan."
+        ),
+        responses={
+            200: DispatchOperationalSummarySerializer,
+            **standard_error_responses(include_403=True),
+        },
+        tags=[TAG_REPORTS],
+    )
+    def get(self, request):
+        period_days = int(request.query_params.get("period_days", 30))
+        return Response(get_dispatch_operational_summary(period_days=period_days))
+
+
 class ExpiringProductsReportView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
@@ -338,6 +448,50 @@ class ExpiringProductsReportView(APIView):
         return Response(ExpiringLotReportItemSerializer(data, many=True).data)
 
 
+class DispatchOrdersReportView(APIView):
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="start",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Inicio del rango (ISO-8601).",
+            ),
+            OpenApiParameter(
+                name="end",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Fin del rango (ISO-8601).",
+            ),
+            OpenApiParameter(
+                name="invoice_number",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+        ],
+        responses={200: PerOrderSampleSerializer(many=True), **standard_error_responses(include_403=True)},
+        tags=[TAG_REPORTS],
+    )
+    def get(self, request):
+        start = None
+        end = None
+        if s := request.query_params.get("start"):
+            start = parse_datetime(s)
+        if e := request.query_params.get("end"):
+            end = parse_datetime(e)
+        inv = request.query_params.get("invoice_number")
+        limit = int(request.query_params.get("limit", 100))
+        data = get_dispatch_order_samples(start=start, end=end, invoice_number=inv, limit=limit)
+        paginator = ICMPageNumberPagination()
+        page = paginator.paginate_queryset(list(data), request, view=self)
+        return paginator.get_paginated_response(PerOrderSampleSerializer(page, many=True).data)
+
+
 class ReportDatasetView(APIView):
     """Contrato estable para que el frontend consuma datos y arme exportaciones."""
 
@@ -352,6 +506,7 @@ class ReportDatasetView(APIView):
                 required=True,
                 description=(
                     "Tipo de dataset: inventory-summary, movements-summary, movements-report, "
+                    "warehouse-utilization, quality-operational, discard-operational, dispatch-operational, "
                     "movements-history, sales-summary, top-products, invoices, kpi, expiring."
                 ),
             ),
@@ -430,6 +585,14 @@ class ReportDatasetView(APIView):
 
         if kind == "inventory-summary":
             data = get_inventory_summary()
+        elif kind == "warehouse-utilization":
+            data = get_warehouse_utilization()
+        elif kind == "quality-operational":
+            period_days = int(request.query_params.get("period_days", 30))
+            data = get_quality_operational_summary(period_days=period_days)
+        elif kind == "discard-operational":
+            period_days = int(request.query_params.get("period_days", 30))
+            data = get_discard_operational_summary(period_days=period_days)
         elif kind == "movements-summary":
             start, end = _parse_range(request)
             data = {"counts": movement_counts_by_period(start=start, end=end)}
@@ -487,13 +650,16 @@ class ReportDatasetView(APIView):
             data = ExpiringLotReportItemSerializer(
                 get_expiring_products(days=days), many=True
             ).data
+        elif kind == "dispatch-operational":
+            period_days = int(request.query_params.get("period_days", 30))
+            data = get_dispatch_operational_summary(period_days=period_days)
         else:
             raise ValidationError(
                 {
                     "detail": (
                         "kind debe ser uno de: inventory-summary, movements-summary, "
-                        "movements-report, movements-history, sales-summary, top-products, "
-                        "invoices, kpi, expiring."
+                        "warehouse-utilization, quality-operational, discard-operational, dispatch-operational, movements-report, "
+                        "movements-history, sales-summary, top-products, invoices, kpi, expiring."
                     )
                 }
             )
