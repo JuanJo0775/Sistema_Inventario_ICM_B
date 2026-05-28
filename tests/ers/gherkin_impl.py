@@ -1164,6 +1164,11 @@ def impl_rf010_s03(
 def impl_rf010_s06(
     authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
 ):
+    try:
+        from weasyprint import HTML  # noqa: F401
+    except Exception:
+        pytest.skip("WeasyPrint no disponible en este entorno")
+
     from apps.inventory.models import StockByLocation
     from apps.movements.models import Movement
 
