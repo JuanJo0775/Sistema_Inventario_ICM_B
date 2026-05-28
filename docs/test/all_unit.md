@@ -929,7 +929,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_services.py::test_update_product_backfills_missing_barcode -v
 ```
 
-Código fuente: [apps/catalog/tests/test_services.py](../../apps/catalog/tests/test_services.py) (aprox. línea 63)
+Código fuente: [apps/catalog/tests/test_services.py](../../apps/catalog/tests/test_services.py) (aprox. línea 61)
 
 
 ---
@@ -965,7 +965,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_services.py::test_update_product_keeps_existing_barcode -v
 ```
 
-Código fuente: [apps/catalog/tests/test_services.py](../../apps/catalog/tests/test_services.py) (aprox. línea 41)
+Código fuente: [apps/catalog/tests/test_services.py](../../apps/catalog/tests/test_services.py) (aprox. línea 39)
 
 
 ---
@@ -1001,7 +1001,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_views.py::test_catalog_views_are_available -v
 ```
 
-Código fuente: [apps/catalog/tests/test_views.py](../../apps/catalog/tests/test_views.py) (aprox. línea 7)
+Código fuente: [apps/catalog/tests/test_views.py](../../apps/catalog/tests/test_views.py) (aprox. línea 11)
 
 
 ---
@@ -1037,7 +1037,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_views.py::test_product_barcode_endpoint_returns_ready_to_consume_payload -v
 ```
 
-Código fuente: [apps/catalog/tests/test_views.py](../../apps/catalog/tests/test_views.py) (aprox. línea 15)
+Código fuente: [apps/catalog/tests/test_views.py](../../apps/catalog/tests/test_views.py) (aprox. línea 19)
 
 
 ---
@@ -1145,7 +1145,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_selectors.py::test_negative_stock_constraint_enforced -v
 ```
 
-Código fuente: [apps/inventory/tests/test_selectors.py](../../apps/inventory/tests/test_selectors.py) (aprox. línea 31)
+Código fuente: [apps/inventory/tests/test_selectors.py](../../apps/inventory/tests/test_selectors.py) (aprox. línea 33)
 
 
 ---
@@ -1181,7 +1181,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_selectors.py::test_search_products_performance_under_2s -v
 ```
 
-Código fuente: [apps/inventory/tests/test_selectors.py](../../apps/inventory/tests/test_selectors.py) (aprox. línea 42)
+Código fuente: [apps/inventory/tests/test_selectors.py](../../apps/inventory/tests/test_selectors.py) (aprox. línea 44)
 
 
 ---
@@ -1217,7 +1217,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_selectors.py::test_stock_query_returns_per_location_and_total -v
 ```
 
-Código fuente: [apps/inventory/tests/test_selectors.py](../../apps/inventory/tests/test_selectors.py) (aprox. línea 13)
+Código fuente: [apps/inventory/tests/test_selectors.py](../../apps/inventory/tests/test_selectors.py) (aprox. línea 15)
 
 
 ---
@@ -1289,7 +1289,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_views.py::test_inventory_views_are_available -v
 ```
 
-Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 6)
+Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 11)
 
 
 ---
@@ -1361,7 +1361,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_adjustment_requires_justification -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 225)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 230)
 
 
 ---
@@ -1397,7 +1397,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_correction_within_window_creates_reversal_and_fixed -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 259)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 264)
 
 
 ---
@@ -1433,7 +1433,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_chooses_earliest_lot_when_expiring_product -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 70)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 75)
 
 
 ---
@@ -1469,7 +1469,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_cross_validation_fails_wrong_sku -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 163)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 168)
 
 
 ---
@@ -1505,7 +1505,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_discrepancy_note_required_when_qty_mismatch -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 146)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 151)
 
 
 ---
@@ -1541,7 +1541,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_electroterapia_without_serial_fails -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 130)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 135)
 
 
 ---
@@ -1577,7 +1577,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_increments_stock_and_creates_ledger_record -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 26)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 31)
 
 
 ---
@@ -1613,7 +1613,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_with_lot_persists_lot_on_movement -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 45)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 50)
 
 
 ---
@@ -1649,7 +1649,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_internal_transfer_does_not_change_global_stock -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 185)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 190)
 
 
 ---
@@ -1685,7 +1685,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_return_blocked_for_non_returnable_category -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 213)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 218)
 
 
 ---
@@ -1721,7 +1721,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_stock_can_be_reconstructed_from_ledger -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 237)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 242)
 
 
 ---
@@ -1757,7 +1757,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_views.py::test_movement_views_are_available -v
 ```
 
-Código fuente: [apps/movements/tests/test_views.py](../../apps/movements/tests/test_views.py) (aprox. línea 6)
+Código fuente: [apps/movements/tests/test_views.py](../../apps/movements/tests/test_views.py) (aprox. línea 9)
 
 
 ---
@@ -1829,7 +1829,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_selectors.py::test_get_discard_operational_summary_excludes_returns -v
 ```
 
-Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/test_selectors.py) (aprox. línea 63)
+Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/test_selectors.py) (aprox. línea 65)
 
 
 ---
@@ -1865,7 +1865,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_selectors.py::test_get_quality_operational_summary_groups_damage_and_returns -v
 ```
 
-Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/test_selectors.py) (aprox. línea 28)
+Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/test_selectors.py) (aprox. línea 30)
 
 
 ---
@@ -1901,7 +1901,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_selectors.py::test_get_warehouse_utilization_uses_capacity_and_stock -v
 ```
 
-Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/test_selectors.py) (aprox. línea 6)
+Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/test_selectors.py) (aprox. línea 8)
 
 
 ---
@@ -2009,7 +2009,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_views.py::test_dispatch_orders_endpoint_returns_samples -v
 ```
 
-Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 314)
+Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 333)
 
 
 ---
@@ -2045,7 +2045,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_views.py::test_reports_dataset_view_is_available -v
 ```
 
-Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 16)
+Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 19)
 
 
 ---
@@ -2081,7 +2081,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_views.py::test_reports_dataset_view_supports_discard_operational -v
 ```
 
-Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 241)
+Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 260)
 
 
 ---
@@ -2117,7 +2117,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_views.py::test_reports_dataset_view_supports_dispatch_operational -v
 ```
 
-Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 206)
+Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 222)
 
 
 ---
@@ -2153,7 +2153,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_views.py::test_reports_dataset_view_supports_quality_operational -v
 ```
 
-Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 107)
+Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 118)
 
 
 ---
@@ -2189,7 +2189,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_views.py::test_reports_dataset_view_supports_warehouse_utilization -v
 ```
 
-Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 50)
+Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 55)
 
 
 ---
@@ -2225,7 +2225,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_views.py::test_reports_discard_operational_view_returns_summary -v
 ```
 
-Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 132)
+Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 143)
 
 
 ---
@@ -2261,7 +2261,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_views.py::test_reports_dispatch_operational_view_returns_summary -v
 ```
 
-Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 156)
+Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 170)
 
 
 ---
@@ -2297,7 +2297,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_views.py::test_reports_expiring_view_returns_lots -v
 ```
 
-Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 265)
+Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 284)
 
 
 ---
@@ -2333,7 +2333,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_views.py::test_reports_quality_operational_view_returns_summary -v
 ```
 
-Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 74)
+Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 83)
 
 
 ---
@@ -2369,7 +2369,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_views.py::test_reports_views_are_available -v
 ```
 
-Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 297)
+Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 316)
 
 
 ---
@@ -2405,7 +2405,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_views.py::test_reports_warehouse_utilization_view_returns_summary -v
 ```
 
-Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 25)
+Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test_views.py) (aprox. línea 28)
 
 
 ---
@@ -2441,7 +2441,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/test_generate_project_structure.py::test_change_report_detects_additions_and_removals -v
 ```
 
-Código fuente: [tests/test_generate_project_structure.py](../../tests/test_generate_project_structure.py) (aprox. línea 73)
+Código fuente: [tests/test_generate_project_structure.py](../../tests/test_generate_project_structure.py) (aprox. línea 78)
 
 
 ---
@@ -2513,7 +2513,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/test_generate_project_structure.py::test_tree_ignores_noise_and_keeps_relevant_nodes -v
 ```
 
-Código fuente: [tests/test_generate_project_structure.py](../../tests/test_generate_project_structure.py) (aprox. línea 55)
+Código fuente: [tests/test_generate_project_structure.py](../../tests/test_generate_project_structure.py) (aprox. línea 60)
 
 
 ---

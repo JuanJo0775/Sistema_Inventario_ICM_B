@@ -29,7 +29,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_alerts_list_uses_is_resolved_filter -v
 ```
 
-Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 137)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 143)
 
 
 ---
@@ -65,7 +65,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_auth_login_with_email_returns_jwt -v
 ```
 
-Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 62)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 66)
 
 
 ---
@@ -101,7 +101,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_auth_login_with_username_returns_jwt_and_profile -v
 ```
 
-Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 46)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 50)
 
 
 ---
@@ -137,7 +137,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window -v
 ```
 
-Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 101)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 105)
 
 
 ---
@@ -173,7 +173,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_auth_token_refresh_auxiliar_outside_hours_forbidden -v
 ```
 
-Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 74)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 78)
 
 
 ---
@@ -209,7 +209,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_auth_user_disable_route -v
 ```
 
-Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 127)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 133)
 
 
 ---
@@ -245,7 +245,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/integration/test_api_integration.py::test_catalog_resolve_identifier_param -v
 ```
 
-Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 38)
+Código fuente: [tests/integration/test_api_integration.py](../../tests/integration/test_api_integration.py) (aprox. línea 40)
 
 
 ---
