@@ -1,5 +1,8 @@
 name: Deploy to Staging
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
   contents: read
   packages: write
@@ -42,6 +45,7 @@ jobs:
         id: build
         with:
           context: .
+          file: docker/Dockerfile
           push: true
           tags: ${{ steps.image.outputs.repo }}:staging-${{ github.sha }}
 
