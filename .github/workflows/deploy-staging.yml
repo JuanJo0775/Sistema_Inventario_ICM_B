@@ -58,23 +58,20 @@ jobs:
       - name: Wait for image to be available
         run: sleep 3
 
-      - name: Validate SSH secrets
+      - name: Check SSH secrets and decide deploy
+        id: check
         run: |
           set -euo pipefail
-          if [ -z "${{ secrets.STAGING_SSH_PRIVATE_KEY }}" ]; then
-            echo "ERROR: STAGING_SSH_PRIVATE_KEY is not set in repository secrets" >&2
-            exit 1
-          fi
-          if [ -z "${{ secrets.STAGING_SSH_HOST }}" ]; then
-            echo "ERROR: STAGING_SSH_HOST is not set in repository secrets" >&2
-            exit 1
-          fi
-          if [ -z "${{ secrets.STAGING_SSH_USER }}" ]; then
-            echo "ERROR: STAGING_SSH_USER is not set in repository secrets" >&2
-            exit 1
+          if [ -z "${{ secrets.STAGING_SSH_PRIVATE_KEY }}" ] || [ -z "${{ secrets.STAGING_SSH_HOST }}" ] || [ -z "${{ secrets.STAGING_SSH_USER }}" ]; then
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            echo "Some SSH secrets missing; skipping deploy"
+          else
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+            echo "All SSH secrets present; proceeding with deploy"
           fi
 
       - name: Deploy via SSH (docker-compose pull & up)
+        if: ${{ steps.check.outputs.deploy == 'true' }}
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.STAGING_SSH_HOST }}
