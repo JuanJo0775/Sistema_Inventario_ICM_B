@@ -12,6 +12,7 @@ from django.utils import timezone
 from apps.alerts.models import Alert
 from apps.catalog.models import Category, Product
 from apps.catalog.selectors import get_lots_expiring_soon
+from apps.inventory.models import Location
 from apps.inventory.selectors import get_low_stock_products
 from apps.movements.models import Movement, MovementType
 from apps.movements.selectors import get_dispatches_with_invoices
@@ -47,6 +48,92 @@ def sales_dispatch_totals(*, start: datetime, end: datetime) -> dict[str, Any]:
             q=Sum("quantity")
         )["q"]
         or 0,
+    }
+
+
+def get_dispatch_operational_summary(period_days: int = 30) -> dict[str, Any]:
+    """
+    RF-010 — Resumen operativo de despacho para frontend.
+
+    No calcula OTIF porque el backend aún no modela pedidos, promesas de entrega ni
+    estados logísticos completos. Entrega hechos confiables para que el frontend,
+    o un ERP/OMS externo, calcule el KPI final.
+    """
+    end = timezone.now()
+    start = end - timedelta(days=period_days)
+    sales = sales_dispatch_totals(start=start, end=end)
+    invoice_linked_count = get_dispatches_with_invoices().filter(
+        created_at__gte=start, created_at__lte=end
+    ).count()
+    top_products = get_top_dispatched_products(limit=10, period_days=period_days)
+    movement_counts = movement_counts_by_period(start=start, end=end)
+    # Número de envíos (movimientos de salida de venta)
+    shipments = (
+        Movement.objects.filter(
+            created_at__gte=start,
+            created_at__lte=end,
+            movement_type__in=[
+                MovementType.SALIDA_VENTA_MAYOR,
+                MovementType.SALIDA_VENTA_MENOR,
+            ],
+        ).count()
+        or 0
+    )
+    invoice_linked_ratio = (
+        round((invoice_linked_count / shipments) * 100, 2) if shipments else 0.0
+    )
+    # Build per-order samples using invoice_number as proxy for orders when available
+    per_order_samples: list[dict[str, object]] = []
+    order_qs = (
+        Movement.objects.filter(
+            created_at__gte=start,
+            created_at__lte=end,
+            movement_type__in=[MovementType.SALIDA_VENTA_MAYOR, MovementType.SALIDA_VENTA_MENOR],
+        )
+        .exclude(invoice_number__isnull=True)
+        .exclude(invoice_number__exact="")
+        .values("invoice_number")
+        .annotate(movements=Count("id"), total_quantity=Sum("quantity"))
+        .order_by("-total_quantity")
+    )
+
+    for row in order_qs:
+        inv = row["invoice_number"]
+        mov_count = int(row["movements"] or 0)
+        tot_qty = int(row["total_quantity"] or 0)
+        # dispatched_at: approximate as latest movement created_at for that invoice
+        latest = (
+            Movement.objects.filter(invoice_number=inv)
+            .order_by("-created_at")
+            .values_list("created_at", flat=True)
+            .first()
+        )
+        per_order_samples.append(
+            {
+                "invoice_number": inv,
+                "movements": mov_count,
+                "total_quantity": tot_qty,
+                "items": mov_count,
+                "dispatched_at": latest.isoformat() if latest else None,
+            }
+        )
+
+    return {
+        "period": {"days": period_days, "start": start.isoformat(), "end": end.isoformat()},
+        "sales": sales,
+        "invoice_linked_dispatches": invoice_linked_count,
+        "shipments": shipments,
+        "invoice_linked_ratio": invoice_linked_ratio,
+        "movement_counts": movement_counts,
+        "top_products": top_products,
+        "order_proxy": [],
+        "carriers": {},
+        "per_order_samples": per_order_samples,
+        "promised_date_example": None,
+        "notes": [
+            "KPI 4 OTIF no se calcula aquí porque faltan pedidos, fecha pactada, transportadora y entrega confirmada.",
+            "El frontend puede usar este resumen como base visual y combinarlo con su fuente de pedidos o ERP.",
+        ],
     }
 
 
@@ -134,6 +221,273 @@ def get_inventory_summary() -> dict[str, Any]:
         "products_with_zero_stock": zero_stock,
         "approximate_value": None,
         "approximate_value_note": "El catálogo no almacena precio unitario (ICM).",
+    }
+
+
+def get_dispatch_order_samples(
+    *,
+    start: datetime | None = None,
+    end: datetime | None = None,
+    invoice_number: str | None = None,
+    limit: int = 100,
+) -> list[dict[str, object]]:
+    """Return a list of per-order samples using `invoice_number` as a proxy.
+
+    Each item: invoice_number, movements, total_quantity, items, dispatched_at
+    """
+    end = end or timezone.now()
+    start = start or (end - timedelta(days=30))
+    q = Movement.objects.filter(
+        created_at__gte=start,
+        created_at__lte=end,
+        movement_type__in=[MovementType.SALIDA_VENTA_MAYOR, MovementType.SALIDA_VENTA_MENOR],
+    ).exclude(invoice_number__isnull=True).exclude(invoice_number__exact="")
+    if invoice_number:
+        q = q.filter(invoice_number=invoice_number)
+
+    rows = (
+        q.values("invoice_number")
+        .annotate(movements=Count("id"), total_quantity=Sum("quantity"))
+        .order_by("-total_quantity")[:limit]
+    )
+
+    samples: list[dict[str, object]] = []
+    for row in rows:
+        inv = row["invoice_number"]
+        mov_count = int(row["movements"] or 0)
+        tot_qty = int(row["total_quantity"] or 0)
+        latest = (
+            Movement.objects.filter(invoice_number=inv)
+            .order_by("-created_at")
+            .values_list("created_at", flat=True)
+            .first()
+        )
+        samples.append(
+            {
+                "invoice_number": inv,
+                "movements": mov_count,
+                "total_quantity": tot_qty,
+                "items": mov_count,
+                "dispatched_at": latest.isoformat() if latest else None,
+            }
+        )
+    return samples
+
+
+def get_warehouse_utilization() -> dict[str, Any]:
+    """
+    RF-010 — Utilización de almacén por capacidad configurada.
+
+    Calcula ocupación sobre ubicaciones activas con `max_capacity` definido.
+    Las ubicaciones sin capacidad configurada se reportan aparte para no distorsionar
+    el porcentaje global.
+    """
+    locations = list(
+        Location.objects.filter(is_active=True)
+        .annotate(occupied_units=Sum("stock_items__current_stock"))
+        .order_by("code")
+    )
+
+    by_location: list[dict[str, Any]] = []
+    configured_occupied = 0
+    configured_capacity = 0
+    unconfigured_occupied = 0
+    configured_locations = 0
+    unconfigured_locations = 0
+
+    for location in locations:
+        occupied_units = int(getattr(location, "occupied_units", 0) or 0)
+        capacity_units = (
+            int(location.max_capacity) if location.max_capacity is not None else None
+        )
+        capacity_configured = capacity_units is not None and capacity_units > 0
+
+        if capacity_configured:
+            configured_locations += 1
+            configured_occupied += occupied_units
+            configured_capacity += capacity_units
+            utilization_pct = round((occupied_units / capacity_units) * 100, 2)
+        else:
+            unconfigured_locations += 1
+            unconfigured_occupied += occupied_units
+            utilization_pct = None
+
+        by_location.append(
+            {
+                "location_id": str(location.id),
+                "code": location.code,
+                "name": location.name,
+                "occupied_units": occupied_units,
+                "capacity_units": capacity_units,
+                "utilization_pct": utilization_pct,
+                "is_retail": bool(location.is_retail),
+                "capacity_configured": capacity_configured,
+            }
+        )
+
+    overall_utilization_pct = (
+        round((configured_occupied / configured_capacity) * 100, 2)
+        if configured_capacity
+        else None
+    )
+    return {
+        "overall": {
+            "occupied_units": configured_occupied,
+            "capacity_units": configured_capacity,
+            "utilization_pct": overall_utilization_pct,
+            "configured_locations": configured_locations,
+            "locations_without_capacity": unconfigured_locations,
+            "unconfigured_occupied_units": unconfigured_occupied,
+        },
+        "by_location": by_location,
+    }
+
+
+def get_quality_operational_summary(period_days: int = 30) -> dict[str, Any]:
+    """
+    RF-010 — Resumen operativo de calidad para frontend.
+
+    El backend no modela aún incidentes de calidad, PQRSF ni causales de descarte.
+    Esta vista entrega los hechos derivados disponibles hoy para que el frontend
+    construya la interpretación, alertas y visualizaciones.
+    """
+    end = timezone.now()
+    start = end - timedelta(days=period_days)
+    quality_types = (
+        MovementType.SALIDA_DANO,
+        MovementType.SALIDA_VENCIMIENTO,
+        MovementType.DEVOLUCION,
+    )
+    rows = list(
+        Movement.objects.filter(
+            created_at__gte=start,
+            created_at__lte=end,
+            movement_type__in=quality_types,
+        )
+        .values("movement_type", "product__sku", "product__name")
+        .annotate(movements=Count("id"), units=Sum("quantity"))
+        .order_by("movement_type", "-units", "product__sku")
+    )
+
+    by_type: dict[str, dict[str, Any]] = {}
+    by_product: list[dict[str, Any]] = []
+    total_units = 0
+    total_movements = 0
+    incident_units = 0
+    damage_units = 0
+    discard_units = 0
+    return_units = 0
+
+    for row in rows:
+        movement_type = row["movement_type"]
+        movements = int(row["movements"] or 0)
+        units = int(row["units"] or 0)
+        total_movements += movements
+        total_units += units
+        if movement_type == MovementType.SALIDA_DANO:
+            damage_units += units
+        elif movement_type == MovementType.SALIDA_VENCIMIENTO:
+            discard_units += units
+        elif movement_type == MovementType.DEVOLUCION:
+            return_units += units
+        incident_units += units
+        bucket = by_type.setdefault(
+            movement_type,
+            {"movement_type": movement_type, "movements": 0, "units": 0},
+        )
+        bucket["movements"] += movements
+        bucket["units"] += units
+        by_product.append(
+            {
+                "movement_type": movement_type,
+                "product_sku": row["product__sku"],
+                "product_name": row["product__name"],
+                "movements": movements,
+                "units": units,
+            }
+        )
+
+    # KPI 2 se expresa como un proxy operativo: hechos de calidad sobre total de hechos de calidad.
+    # El frontend puede combinarlo con otro denominador de negocio si incorpora pedidos o salidas totales.
+    quality_index_pct = round((incident_units / total_units) * 100, 2) if total_units else 0.0
+
+    return {
+        "period": {"days": period_days, "start": start.isoformat(), "end": end.isoformat()},
+        "totals": {"movements": total_movements, "units": total_units},
+        "breakdown": {
+            "incident_units": incident_units,
+            "damage_units": damage_units,
+            "discard_units": discard_units,
+            "return_units": return_units,
+            "quality_index_pct": quality_index_pct,
+        },
+        "by_type": list(by_type.values()),
+        "by_product": by_product[:50],
+        "notes": [
+            "KPI 2 y KPI 6 siguen siendo parciales: el backend entrega hechos derivados, no incidentes ni PQRSF formales.",
+            "quality_index_pct es un proxy operativo calculado solo con hechos de calidad visibles en el ledger.",
+            "La clasificación de causas y un denominador comercial más fino deben resolverse en frontend o en un bounded context adicional.",
+        ],
+    }
+
+
+def get_discard_operational_summary(period_days: int = 30) -> dict[str, Any]:
+    """
+    RF-010 — Resumen operativo de descarte para frontend.
+
+    KPI 5 se alimenta con salidas por daño y vencimiento. Las devoluciones se
+    excluyen para no mezclar descarte con logística inversa.
+    """
+    end = timezone.now()
+    start = end - timedelta(days=period_days)
+    discard_types = (MovementType.SALIDA_DANO, MovementType.SALIDA_VENCIMIENTO)
+    rows = list(
+        Movement.objects.filter(
+            created_at__gte=start,
+            created_at__lte=end,
+            movement_type__in=discard_types,
+        )
+        .values("movement_type", "product__sku", "product__name")
+        .annotate(movements=Count("id"), units=Sum("quantity"))
+        .order_by("movement_type", "-units", "product__sku")
+    )
+
+    by_type: dict[str, dict[str, Any]] = {}
+    by_product: list[dict[str, Any]] = []
+    total_units = 0
+    total_movements = 0
+
+    for row in rows:
+        movement_type = row["movement_type"]
+        movements = int(row["movements"] or 0)
+        units = int(row["units"] or 0)
+        total_movements += movements
+        total_units += units
+        bucket = by_type.setdefault(
+            movement_type,
+            {"movement_type": movement_type, "movements": 0, "units": 0},
+        )
+        bucket["movements"] += movements
+        bucket["units"] += units
+        by_product.append(
+            {
+                "movement_type": movement_type,
+                "product_sku": row["product__sku"],
+                "product_name": row["product__name"],
+                "movements": movements,
+                "units": units,
+            }
+        )
+
+    return {
+        "period": {"days": period_days, "start": start.isoformat(), "end": end.isoformat()},
+        "totals": {"movements": total_movements, "units": total_units},
+        "by_type": list(by_type.values()),
+        "by_product": by_product[:50],
+        "notes": [
+            "KPI 5 se calcula con salidas por daño y vencimiento; las devoluciones quedan fuera de este resumen.",
+            "La tasa final y el costo proxy deben resolverse en frontend o en una capa analítica si se agregan valores monetarios.",
+        ],
     }
 
 

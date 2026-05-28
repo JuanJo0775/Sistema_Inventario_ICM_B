@@ -211,14 +211,11 @@ icm_backend/
 ├── scripts/                                                    # Automatizaciones reutilizables del repositorio
 │   ├── README_SCRIPTS.md                                       # Indice y contexto de las automatizaciones
 │   ├── generate_project_structure.py
-│   ├── generate_all_test_docs.py
-│   ├── parse_ers_gherkin.py
-│   └── generate_docs/                                          # Generadores compartidos de documentación
-│       ├── generate_gherkin_test_docs.py                       # Wrapper para escenarios Gherkin
-│       ├── generate_integration_test_docs.py                   # Generación de documentación de integración
-│       ├── generate_unit_test_docs.py                          # Generación de documentación de tests unitarios
-│       ├── menu.py                                             # Orquestador interactivo de documentación
-│       └── utils.py                                            # Utilidades compartidas para generación documental
+│   ├── parse_ers_gherkin.py                                   # Generador de escenarios ERS/Gherkin
+│   └── generate_docs/                                          # Generación canónica de documentación de tests
+│       ├── __init__.py
+│       ├── __main__.py                                         # Entry point oficial: python -m scripts.generate_docs
+│       └── utils.py                                            # Pipeline compartido: descubrimiento, renderizado y escritura
 ├── shared/                                                     # Código compartido entre apps sin lógica de dominio
 │   ├── models.py                                               # BaseModel con timestamps y metadatos comunes
 │   ├── permissions.py                                          # Permisos RBAC base

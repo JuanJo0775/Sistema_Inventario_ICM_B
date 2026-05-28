@@ -46,7 +46,7 @@ Plan de ejecución concreto y secuencial
 2. Configurar jobs:
    - `lint`: `black --check`, `isort --check-only`.
    - `test`: `pytest -q --maxfail=1`; marcar slow tests si aplica.
-   - `docs`: ejecutar `python scripts/generate_all_test_docs.py` y guardar `docs/test/all_*.md`.
+   - `docs`: ejecutar `python -m scripts.generate_docs` y guardar `docs/test/all_*.md`.
    - Estimado: 0.5–1 día.
 3. Añadir badge de CI al `README.md` y documentar workflow en `docs/GUIA_ONBOARDING.md`.
    - Estimado: 0.25 día.
