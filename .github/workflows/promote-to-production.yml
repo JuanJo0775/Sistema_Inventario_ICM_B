@@ -1,0 +1,87 @@
+name: Promote to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_digest:
+        description: 'Image digest (sha256:...) to deploy'
+        required: true
+        type: string
+      version:
+        description: 'Version label (e.g. v1.2.3)'
+        required: true
+        type: string
+      migrations_executed:
+        description: 'Comma-separated migrations applied in this promotion (or none)'
+        required: false
+        default: 'none'
+        type: string
+
+jobs:
+  promote:
+    name: Promote image to Production (approval required)
+    concurrency:
+      group: promote-production
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Deploy to production host via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.PRODUCTION_SSH_HOST }}
+          username: ${{ secrets.PRODUCTION_SSH_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
+          port: ${{ secrets.PRODUCTION_SSH_PORT }}
+          script: |
+            set -euo pipefail
+            cd /srv/icm || exit 1
+            DIGEST="${{ github.event.inputs.image_digest }}"
+            VERSION="${{ github.event.inputs.version }}"
+            MIGRATIONS="${{ github.event.inputs.migrations_executed }}"
+            TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+            IMAGE=ghcr.io/${{ github.repository_owner }}/${{ github.repository }}@${DIGEST}
+            timestamp=$(date -u +%Y%m%dT%H%M%SZ)
+            cp docker-compose.yml docker-compose.yml.bak.${timestamp}
+            PREV_COMPOSE=docker-compose.yml.bak.${timestamp}
+
+            # Pre-deploy backup (retention defaults to 14 days)
+            export BACKUP_RETENTION_DAYS=${{ secrets.BACKUP_RETENTION_DAYS }}
+            if [ -x ./deploy/backup_db.sh ]; then
+              ./deploy/backup_db.sh
+            else
+              echo "backup_db.sh not found/executable; aborting deploy" >&2
+              exit 7
+            fi
+
+            # Replace first occurrence of the repository image with digest pinned image
+            sed -E -i "0,/ghcr.io\/.+\/[a-zA-Z0-9_\-]+(:[^\s]+)?|@sha256:[a-f0-9]+/s//${IMAGE}/" docker-compose.yml || true
+            echo "Pulled image: ${IMAGE}"
+            docker pull ${IMAGE}
+            docker compose up -d --remove-orphans
+            # Run smoke tests if present
+            if [ -x ./deploy/smoke_test.sh ]; then
+              if ! BASE_URL=${{ secrets.PRODUCTION_BASE_URL }} ./deploy/smoke_test.sh; then
+                echo "Smoke tests failed; rolling back compose file"
+                cp ${PREV_COMPOSE} docker-compose.yml
+                docker compose up -d --remove-orphans
+                exit 5
+              fi
+            fi
+
+            # Persist release manifest on server for reproducible rollback history
+            mkdir -p /srv/icm/releases
+            printf '{"commit_sha":"%s","image":"%s","image_digest":"%s","migrations_executed":"%s","timestamp":"%s","environment":"production","version":"%s"}\n' \
+              "${{ github.sha }}" "${IMAGE}" "${DIGEST}" "${MIGRATIONS}" "${TS}" "${VERSION}" \
+              > /srv/icm/releases/release-${timestamp}.json
+            echo "Promotion complete: deployed ${IMAGE}"

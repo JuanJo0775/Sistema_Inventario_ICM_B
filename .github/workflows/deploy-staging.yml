@@ -1,0 +1,75 @@
+name: Deploy to Staging
+
+concurrency:
+  group: deploy-staging-${{ github.ref }}
+  cancel-in-progress: false
+
+on:
+  push:
+    branches: [staging]
+
+jobs:
+  build_and_push:
+    name: Build and push image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        id: build
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:staging-${{ github.sha }}
+
+  deploy:
+    name: SSH deploy to staging host
+    runs-on: ubuntu-latest
+    needs: build_and_push
+    steps:
+      - name: Wait for image to be available
+        run: sleep 3
+
+      - name: Deploy via SSH (docker-compose pull & up)
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.STAGING_SSH_HOST }}
+          username: ${{ secrets.STAGING_SSH_USER }}
+          key: ${{ secrets.STAGING_SSH_PRIVATE_KEY }}
+          port: ${{ secrets.STAGING_SSH_PORT }}
+          script: |
+            set -euo pipefail
+            cd /srv/icm || exit 1
+            export GHCR_USER=${{ github.actor }}
+            export GHCR_TOKEN=${{ secrets.GHCR_PAT }}
+            export BASE_URL=${{ secrets.STAGING_BASE_URL }}
+            export BACKUP_RETENTION_DAYS=${{ secrets.BACKUP_RETENTION_DAYS }}
+            if [ -x ./deploy/backup_db.sh ]; then
+              ./deploy/backup_db.sh
+            fi
+            if [ -x ./deploy/restart.sh ]; then
+              ./deploy/restart.sh
+            else
+              docker compose pull --ignore-pull-failures
+              docker compose up -d --remove-orphans
+            fi
+            if [ -x ./deploy/smoke_test.sh ]; then
+              ./deploy/smoke_test.sh
+            else
+              echo "No smoke test script found, skipping"
+            fi

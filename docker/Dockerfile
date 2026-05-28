@@ -10,7 +10,9 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements/base.txt requirements/base.txt
-RUN pip install --no-cache-dir -r requirements/base.txt
+COPY requirements/production.txt requirements/production.txt
+RUN pip install --no-cache-dir -r requirements/base.txt \
+    && if [ -f requirements/production.txt ]; then pip install --no-cache-dir -r requirements/production.txt; fi
 
 COPY . .
 
