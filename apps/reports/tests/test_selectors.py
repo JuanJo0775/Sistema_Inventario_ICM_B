@@ -58,13 +58,23 @@ def test_rotation_by_category_counts_units(almacenista_user):
 def test_get_lots_expiring_soon_filters_by_window():
     p = ProductFactory()
     # create near-expiry lot and far-expiry lot
-    LotFactory(product=p, code="NEAR", expiration_date=timezone.now().date() + timedelta(days=5))
-    LotFactory(product=p, code="FAR", expiration_date=timezone.now().date() + timedelta(days=60))
+    LotFactory(
+        product=p,
+        code="NEAR",
+        expiration_date=timezone.now().date() + timedelta(days=5),
+    )
+    LotFactory(
+        product=p,
+        code="FAR",
+        expiration_date=timezone.now().date() + timedelta(days=60),
+    )
 
     q = get_lots_expiring_soon(days=10)
     codes = [l.code for l in q]
     assert "NEAR" in codes
     assert "FAR" not in codes
+
+
 from apps.reports.selectors import (
     get_discard_operational_summary,
     get_quality_operational_summary,

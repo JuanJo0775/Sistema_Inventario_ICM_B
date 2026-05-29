@@ -336,11 +336,13 @@ def test_dispatch_consumes_across_multiple_lots(almacenista_user, sample_locatio
 
     # Ensure InvoiceCounter exists to avoid invoice_number uniqueness collisions in tests
     from apps.movements.models import InvoiceCounter
+
     InvoiceCounter.objects.all().delete()
     InvoiceCounter.objects.create(last_number=1000000)
 
     # dispatch 12 should consume 8 from early, 4 from late
     from unittest.mock import patch as _patch
+
     with _patch("apps.movements.services.generate_invoice_number", return_value=None):
         movements = register_dispatch(
             almacenista_user,
@@ -364,7 +366,9 @@ def test_dispatch_consumes_across_multiple_lots(almacenista_user, sample_locatio
 
 
 @pytest.mark.django_db
-def test_dispatch_single_movement_nonexpiring_product(almacenista_user, sample_product, sample_locations):
+def test_dispatch_single_movement_nonexpiring_product(
+    almacenista_user, sample_product, sample_locations
+):
     """Producto sin vencimiento: despacho genera un único movimiento y ajusta stock.
 
     Esto cubre el comportamiento FIFO en el sentido de que sin lotes el sistema
@@ -372,13 +376,17 @@ def test_dispatch_single_movement_nonexpiring_product(almacenista_user, sample_p
     """
     loc = sample_locations[0]
     # Ensure initial stock
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=15)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=15
+    )
     # Ensure InvoiceCounter safe state
     from apps.movements.models import InvoiceCounter as IC2
+
     IC2.objects.all().delete()
     IC2.objects.create(last_number=2000000)
 
     from unittest.mock import patch as _patch2
+
     with _patch2("apps.movements.services.generate_invoice_number", return_value=None):
         movements = register_dispatch(
             almacenista_user,

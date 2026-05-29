@@ -14,7 +14,9 @@ from apps.movements.models import MovementType
 
 
 @pytest.mark.django_db(transaction=True)
-def test_concurrent_dispatches_does_not_produce_negative_stock(almacenista_user, sample_product, sample_locations):
+def test_concurrent_dispatches_does_not_produce_negative_stock(
+    almacenista_user, sample_product, sample_locations
+):
     """Simula despachos concurrentes y valida que no haya stock negativo.
 
     Esta prueba se salta en SQLite (no soporta `select_for_update` real)
@@ -44,7 +46,9 @@ def test_concurrent_dispatches_does_not_produce_negative_stock(almacenista_user,
     def worker(qty):
         # cerrar conexiones para forzar nueva conexión por hilo/proceso
         connections.close_all()
-        with patch("apps.movements.services.generate_invoice_number", return_value=None):
+        with patch(
+            "apps.movements.services.generate_invoice_number", return_value=None
+        ):
             try:
                 movements = register_dispatch(
                     almacenista_user,
@@ -77,6 +81,8 @@ def test_concurrent_dispatches_does_not_produce_negative_stock(almacenista_user,
     # sum of successful dispatched quantities cannot exceed initial stock (10)
     total_dispatched = sum(v for ok, v in results if ok and isinstance(v, int))
     assert total_dispatched <= 10
+
+
 import os
 import pytest
 
@@ -96,4 +102,6 @@ def test_concurrent_movements_do_not_create_negative_stock(db):
 
     Por ahora el test está marcado skip por defecto y actúa como plantilla.
     """
-    pytest.skip("Implementar prueba de concurrencia: requiere Postgres y setup de contenedor")
+    pytest.skip(
+        "Implementar prueba de concurrencia: requiere Postgres y setup de contenedor"
+    )
