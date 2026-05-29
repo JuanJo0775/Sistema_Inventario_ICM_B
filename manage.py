@@ -124,6 +124,39 @@ def main():
             sys.exit(0)
     # -------------------------------
 
+    # Cargar variables de entorno desde .env en la raíz del proyecto si existe.
+    # No sobrescribimos variables ya definidas en el entorno (por ejemplo CI).
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    env_path = os.path.join(base_dir, ".env")
+    env_values = {}
+    if os.path.exists(env_path):
+        try:
+            with open(env_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith("#"):
+                        continue
+                    if "=" not in line:
+                        continue
+                    key, val = line.split("=", 1)
+                    key = key.strip()
+                    val = val.strip().strip('"').strip("'")
+                    env_values[key] = val
+                    os.environ.setdefault(key, val)
+        except Exception:
+            # Si no podemos cargar .env por alguna razón, continuar sin fallar.
+            env_values = {}
+
+    # Si la terminal tiene `config.settings.test` (p. ej. heredado de CI)
+    # y `.env` define otro `DJANGO_SETTINGS_MODULE`, preferimos el valor de `.env`
+    # cuando no estamos ejecutando la suite de tests localmente.
+    if (
+        os.environ.get("DJANGO_SETTINGS_MODULE") == "config.settings.test"
+        and env_values.get("DJANGO_SETTINGS_MODULE")
+        and not any(arg in ("test", "pytest") for arg in sys.argv)
+    ):
+        os.environ["DJANGO_SETTINGS_MODULE"] = env_values.get("DJANGO_SETTINGS_MODULE")
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
     try:
         from django.core.management import execute_from_command_line
