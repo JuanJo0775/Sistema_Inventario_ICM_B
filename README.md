@@ -41,6 +41,7 @@ Documentación funcional y arquitectónica disponible en el repositorio:
 - [README_ARQUITECTURA.md](docs/README_ARQUITECTURA.md): arquitectura técnica consolidada (estructura, desacoplamiento, inventario, Docker, testing, SOLID y patrones).
 - [README_RESTRICCIONES.md](docs/calidad_restricciones/README_RESTRICCIONES.md): catálogo consolidado de restricciones arquitectónicas, operativas, tecnológicas y de despliegue.
 - [README_ATRIBUTOS_CALIDAD.md](docs/calidad_restricciones/README_ATRIBUTOS_CALIDAD.md): inventario de atributos de calidad, evidencia y recomendaciones.
+- [INFORME_COMPLETITUD_PRINCIPIOS_Y_CALIDAD.md](docs/calidad_restricciones/INFORME_COMPLETITUD_PRINCIPIOS_Y_CALIDAD.md): informe defendible de completitud para KISS, DRY, YAGNI y atributos priorizados.
 - [architecture_drivers.md](docs/architecture/architecture_drivers.md): drivers funcionales y arquitectónicos priorizados.
 - [utility_tree.md](docs/architecture/utility_tree.md): Utility Tree del proyecto con escenarios e impacto.
 - [architectural_constraints.md](docs/architecture/architectural_constraints.md): restricciones formales que condicionan el diseño.

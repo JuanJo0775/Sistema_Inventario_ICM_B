@@ -46,6 +46,7 @@ Este documento consolida el estado de los atributos de calidad observables en el
 
 - [docs/calidad_restricciones/README_RESTRICCIONES.md](README_RESTRICCIONES.md) contiene las restricciones que condicionan estos atributos, incluyendo clasificación formal REST-01 a REST-06.
 - [docs/README_ARQUITECTURA.md](../README_ARQUITECTURA.md) describe el marco tecnico que sostiene la mayoria de ellos.
+- [docs/calidad_restricciones/INFORME_COMPLETITUD_PRINCIPIOS_Y_CALIDAD.md](INFORME_COMPLETITUD_PRINCIPIOS_Y_CALIDAD.md) sintetiza la conclusión defendible sobre KISS, DRY, YAGNI, rendimiento, disponibilidad y seguridad.
 - [docs/architecture/utility_tree.md](../architecture/utility_tree.md) consolida estos atributos en formato Utility Tree con métricas concretas, calificaciones (A/M/B) y driver más crítico identificado.
 - [docs/architecture/architecture_drivers.md](../architecture/architecture_drivers.md) prioriza los drivers con identificadores formales DF-01 a DF-06.
 - [docs/architecture/adr_relationships.md](../architecture/adr_relationships.md) contiene la matriz de trazabilidad Driver → Táctica → ADR del Corte 2.
@@ -124,4 +125,34 @@ He añadido estos escenarios verificables al final del documento para que cada a
 
 - Añadir scripts de prueba (locust / pytest) que validen automáticamente algunos de estos escenarios.
 - Generar plantillas de pruebas de compatibilidad OpenAPI y de concurrencia PostgreSQL.
+
+## Evidencia de cumplimiento (acciones rápidas aplicadas)
+
+Se han añadido artefactos mínimos para proporcionar evidencia reproducible de los atributos y habilitar checks básicos en CI:
+
+- Workflow CI: `.github/workflows/basic_checks.yml` — ejecuta `pytest -q` y `bandit -r .` para validar comportamiento y SAST básico.
+- Script de carga ligero: `scripts/perf/locustfile.py` — escenario mínimo que ejecuta `GET /health/` y consultas de stock (`GET /api/v1/inventory/stock/`).
+
+Cómo ejecutar localmente (entorno de desarrollo con la app corriendo):
+
+```bash
+# Tests unitarios/integración
+pytest -q
+
+# Bandit SAST
+pip install bandit
+bandit -r . -ll
+
+# Locust (prueba de rendimiento ligera)
+pip install locust
+locust -f scripts/perf/locustfile.py --host=http://localhost:8000
+
+# En el UI de Locust, lanzar 50 usuarios y revisar p95 en el resumen.
+```
+
+Notas:
+
+- Estos artefactos no sustituyen una estrategia completa de HA o observabilidad, sino que proporcionan evidencia reproducible y gates mínimos para declarar completitud operativa sin sobre‑ingeniería.
+- Próximo paso recomendado: ejecutar los checks y adjuntar los reportes (pytest xml, bandit report, resumen locust) en una carpeta `docs/evidence/` dentro del repo si los resultados cumplen con los umbrales definidos.
+
 
