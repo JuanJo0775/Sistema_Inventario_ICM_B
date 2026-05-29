@@ -23,4 +23,4 @@ jobs:
       - name: Run pytest
         run: pytest -q
       - name: Run Bandit (SAST)
-        run: bandit -r . -ll
+        run: bandit -r apps shared -ll

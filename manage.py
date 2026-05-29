@@ -85,7 +85,7 @@ def patch_runserver_message():
             if self._raw_ipv6:
                 addr = f"[{self.addr}]"
             elif self.addr == "0":
-                addr = "0.0.0.0"
+                addr = "0.0.0.0"  # nosec B104: mostrado solo en mensaje de arranque, no abre sockets
             else:
                 addr = self.addr
             now = datetime.now().strftime("%B %d, %Y - %X")
