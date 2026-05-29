@@ -82,9 +82,9 @@ Usar nomenclatura clara y consistente:
 ### Sincronización con reglas de agentes
 Antes de modificar reglas de negocio, APIs o tests, consulta la guía de agentes y asistentes de código para asegurar consistencia de políticas y referencias:
 
-- Instrucción canonical para agentes: [`.github/instructions/Agents.instructions.md`](.github/instructions/Agents.instructions.md)
-- Documento legible en la raíz: [AGENTS.md](AGENTS.md)
-- Runbook operativo CI/CD: [docs/CI-CD/README_CICD.md](../../docs/CI-CD/README_CICD.md)
+-- Instrucción canonical para agentes: [`.github/instructions/Agents.instructions.md`](.github/instructions/Agents.instructions.md)
+-- Documento legible en la raíz: [AGENTS.md](AGENTS.md)
+-- Runbook operativo CI/CD: [docs/CI/README_CICD.md](../../docs/CI/README_CICD.md)
 
 Mantén estas guías sincronizadas: cuando actualices políticas que afecten el flujo de trabajo (nomenclatura de ramas, convención de commits, pruebas obligatorias), actualiza ambos archivos y referencia los RF/BR/RNF afectados en la descripción del PR.
 
