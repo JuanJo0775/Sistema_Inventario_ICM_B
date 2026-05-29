@@ -1,3 +1,70 @@
+from __future__ import annotations
+
+from datetime import timedelta
+
+import pytest
+from django.utils import timezone
+
+from apps.reports.selectors import rotation_by_category
+from apps.catalog.selectors import get_lots_expiring_soon
+from tests.factories import ProductFactory, LotFactory, CategoryFactory
+from apps.movements.services import register_entry
+
+
+@pytest.mark.django_db
+def test_rotation_by_category_counts_units(almacenista_user):
+    cat_a = CategoryFactory(name="Cat A")
+    cat_b = CategoryFactory(name="Cat B")
+
+    p1 = ProductFactory(category=cat_a)
+    p2 = ProductFactory(category=cat_b)
+
+    loc_id = None
+    # create some movements via services to ensure ledger entries
+    # use register_entry to create entries
+    from tests.factories import LocationFactory
+
+    loc = LocationFactory()
+    loc_id = loc.id
+
+    register_entry(
+        almacenista_user,
+        p1.id,
+        loc_id,
+        5,
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+    register_entry(
+        almacenista_user,
+        p2.id,
+        loc_id,
+        3,
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+
+    start = timezone.now() - timedelta(days=1)
+    end = timezone.now() + timedelta(days=1)
+
+    rows = rotation_by_category(start=start, end=end)
+    # expect both categories present and counts matching
+    mapping = {r["category"]: r["units"] for r in rows}
+    assert mapping.get(cat_a.name, 0) >= 5
+    assert mapping.get(cat_b.name, 0) >= 3
+
+
+@pytest.mark.django_db
+def test_get_lots_expiring_soon_filters_by_window():
+    p = ProductFactory()
+    # create near-expiry lot and far-expiry lot
+    LotFactory(product=p, code="NEAR", expiration_date=timezone.now().date() + timedelta(days=5))
+    LotFactory(product=p, code="FAR", expiration_date=timezone.now().date() + timedelta(days=60))
+
+    q = get_lots_expiring_soon(days=10)
+    codes = [l.code for l in q]
+    assert "NEAR" in codes
+    assert "FAR" not in codes
 from apps.reports.selectors import (
     get_discard_operational_summary,
     get_quality_operational_summary,
