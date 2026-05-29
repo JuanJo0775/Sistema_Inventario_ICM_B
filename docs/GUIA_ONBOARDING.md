@@ -4,7 +4,7 @@ Bienvenido/a al proyecto. Esta guía contiene los comandos rápidos y exactos qu
 
 Para operación de integración y despliegue (pipelines, backups, promoción y rollback), consulta también:
 
-- [README_CICD.md](CI-CD/README_CICD.md)
+- [README_CICD.md](CI/README_CICD.md)
 
 ## 1. Clonar el repositorio y entrar a la carpeta
 
@@ -105,7 +105,7 @@ isort apps/ shared/ config/
 
 Si vas a participar en despliegues o soporte operativo, revisa el runbook completo:
 
-- [README_CICD.md](CI-CD/README_CICD.md)
+- [README_CICD.md](CI/README_CICD.md)
 
 Ahí se documenta:
 

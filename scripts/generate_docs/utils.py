@@ -128,6 +128,7 @@ def classify_test(rel_path: str) -> str:
     if (
         "integration" in name
         or rel_path.startswith("tests/integration/")
+        or rel_path.startswith("tests/concurrency/")
         or rel_path == "tests/test_api_integration.py"
     ):
         return "integration"

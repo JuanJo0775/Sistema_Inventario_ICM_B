@@ -5,10 +5,9 @@ Base previa: icm_backend
 Actual: icm_backend
 
 ## Resumen
-- Nuevos nodos relevantes: 2
+- Nuevos nodos relevantes: 0
 - Eliminados: 0
 - Reorganizaciones: 0
 
-## Altas relevantes
-- scripts/perf/
-- scripts/perf/locustfile.py
+## Estado
+- Sin cambios estructurales relevantes detectados respecto al README actual.

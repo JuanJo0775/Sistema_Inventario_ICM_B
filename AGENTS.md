@@ -19,7 +19,7 @@ Propósito: proporcionar una guía rápida y completa en la raíz del repositori
 | `docs/adr/ADR-001.md` | ADR-001 (ejemplo y antecedentes) — revisar carpeta `docs/adr/` para más ADRs
 | `docs/calidad_restricciones/README_ATRIBUTOS_CALIDAD.md` | Atributos de calidad y criterios de aceptación
 | `docs/calidad_restricciones/README_RESTRICCIONES.md` | Restricciones y reglas no funcionales importantes
-| `docs/CI-CD/README_CICD.md` | Runbook de CI/CD: pipelines, despliegue, promoción, backups, rollback y operación segura |
+| `docs/CI/README_CICD.md` | Runbook de CI/CD: pipelines, despliegue, promoción, backups, rollback y operación segura |
 | `README.md` | Resumen del proyecto y enlaces rápidos
 | `AGENTS.md` | Guía rápida para asistentes de código (este archivo)
 

@@ -4,7 +4,7 @@ Este documento describe la arquitectura tecnica del backend, con foco en decisio
 
 Para operacion CI/CD (gates, despliegue, promociones, backups y rollback), consultar tambien:
 
-- [docs/CI-CD/README_CICD.md](CI-CD/README_CICD.md)
+- [docs/CI/README_CICD.md](CI/README_CICD.md)
 
 ## 1. Objetivo Arquitectonico
 
@@ -234,8 +234,10 @@ icm_backend/
 │   │   ├── utility_tree.md                                     # Utility Tree con escenarios y trade-offs
 │   │   ├── architectural_constraints.md                        # Restricciones arquitectónicas y riesgos
 │   │   └── adr_relationships.md                                # Trazabilidad entre drivers y ADRs
-│   ├── CI-CD/                                                  # Documento arquitectónico relevante
+│   ├── CI/                                                     # Documento arquitectónico relevante
 │   │   └── README_CICD.md                                      # Documento técnico relevante
+│   ├── evidence/                                               # Documento arquitectónico relevante
+│   │   └── README.md                                           # Documento técnico relevante
 │   └── GUIA_ONBOARDING.md                                      # Documento técnico relevante
 ├── requirements/                                               # Dependencias por entorno
 │   ├── base.txt
@@ -265,8 +267,12 @@ icm_backend/
 │   ├── ers/                                                    # Suite Gherkin dinámica alineada al ERS
 │   │   ├── gherkin_impl.py                                     # Escenarios Gherkin y trazabilidad al ERS
 │   │   └── test_gherkin_dynamic.py                             # Escenarios Gherkin y trazabilidad al ERS
-│   └── integration/                                            # Pruebas HTTP/API de integración
-│       └── test_api_integration.py                             # Pruebas de integración HTTP/API
+│   ├── integration/                                            # Pruebas HTTP/API de integración
+│   │   ├── test_api_integration.py                             # Pruebas de integración HTTP/API
+│   │   ├── test_movements_integration.py                       # Pruebas de integración HTTP/API
+│   │   └── test_smoke_endpoints.py                             # Pruebas de integración HTTP/API
+│   └── concurrency/
+│       └── test_concurrent_movements.py                        # Cobertura crítica del módulo
 ├── docker-compose.prod.yml                                     # Orquestación de producción
 ├── docker-compose.yml                                          # Orquestación local del stack
 ├── manage.py                                                   # Punto de entrada de comandos Django

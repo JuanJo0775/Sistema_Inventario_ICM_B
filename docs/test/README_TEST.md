@@ -190,3 +190,28 @@ pytest --cov=apps
 
 - Regenerar docs de tests:
   `python -m scripts.generate_docs`
+
+## Nuevas suites añadidas (concurrency / e2e)
+
+Se han añadido nuevas áreas de prueba previstas en el plan de cierre de brechas:
+
+- `tests/concurrency/`: pruebas de concurrencia/consistencia pensadas para ejecutarse contra PostgreSQL real (no SQLite). Estas pruebas están deshabilitadas por defecto y requieren una DB Postgres accesible y la variable de entorno `RUN_CONCURRENCY_TESTS=1` para ejecutarse.
+
+- `tests/e2e/`: carpeta objetivo para tests E2E UI (Playwright/Cypress). El repositorio incluye un plan de handoff para frontend en `docs/test/FRONTEND_E2E_PLAN.md` con escenarios, payloads y criterios de aceptación que el equipo frontend puede implementar.
+
+Nota: el generador de documentación ahora clasifica `tests/concurrency/` como parte de la familia `integration`. Al regenerar la documentación de integración (`python -m scripts.generate_docs --only integration`) se crearán las páginas markdown correspondientes dentro de `docs/test/integration/` y se añadirán al agregador `docs/test/all_integration.md`.
+
+Comandos recomendados para ejecutar las nuevas suites (localmente con Postgres):
+
+```powershell
+# Run concurrency tests (requires Postgres and RUN_CONCURRENCY_TESTS=1)
+$env:RUN_CONCURRENCY_TESTS = "1"
+& .\.venv\Scripts\python.exe -m pytest tests/concurrency -q
+
+# Run E2E tests (example for Playwright runner)
+pwsh -c "npx playwright test tests/e2e --project=chromium"
+```
+
+Notas:
+- Las pruebas de concurrencia deben correr en un entorno que reproduzca la semántica de PostgreSQL; la configuración por defecto de `config.settings.test` usa SQLite en memoria.
+- Añadir estas pruebas al pipeline de CI requiere exponer un servicio `postgres` en el job y establecer la variable `RUN_CONCURRENCY_TESTS=1`.

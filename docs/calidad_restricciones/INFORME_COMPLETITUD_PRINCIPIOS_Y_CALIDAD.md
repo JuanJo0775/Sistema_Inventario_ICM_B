@@ -119,7 +119,7 @@ Disponibilidad está tratada de forma coherente con el contexto del sistema. No 
 
 Evidencia:
 
-- Hay documentación de CI/CD, arranque, y operación en [docs/CI-CD/README_CICD.md](../CI-CD/README_CICD.md).
+-- Hay documentación de CI/CD, arranque, y operación en [docs/CI/README_CICD.md](../CI/README_CICD.md).
 - El proyecto usa Docker Compose y health checks como base operativa.
 - Los escenarios de calidad ya describen recuperación, reinicio y comportamiento esperado ante fallos.
 
@@ -165,6 +165,6 @@ La postura más sólida no es decir que el sistema es “perfecto”, sino que *
 - [docs/README_ARQUITECTURA.md](../README_ARQUITECTURA.md)
 - [docs/calidad_restricciones/README_ATRIBUTOS_CALIDAD.md](README_ATRIBUTOS_CALIDAD.md)
 - [docs/calidad_restricciones/README_RESTRICCIONES.md](README_RESTRICCIONES.md)
-- [docs/CI-CD/README_CICD.md](../CI-CD/README_CICD.md)
+-- [docs/CI/README_CICD.md](../CI/README_CICD.md)
 - [docs/requisitos/ERS_ICM_Requisitos.md](../requisitos/ERS_ICM_Requisitos.md)
 - [docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md](../requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md)
