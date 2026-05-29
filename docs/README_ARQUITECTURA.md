@@ -246,9 +246,11 @@ icm_backend/
 │   ├── project_structure/                                      # Generador semántico de la estructura arquitectónica
 │   │   └── generate_project_structure.py                       # Generador semántico de la estructura arquitectónica
 │   ├── parse_ers_gherkin.py                                    # Generador de escenarios ERS/Gherkin
-│   └── generate_docs/                                          # Generadores compartidos de documentación
-│       ├── __main__.py                                         # Entry point oficial: python -m scripts.generate_docs
-│       └── utils.py                                            # Pipeline compartido: descubrimiento, renderizado y escritura
+│   ├── generate_docs/                                          # Generadores compartidos de documentación
+│   │   ├── __main__.py                                         # Entry point oficial: python -m scripts.generate_docs
+│   │   └── utils.py                                            # Pipeline compartido: descubrimiento, renderizado y escritura
+│   └── perf/
+│       └── locustfile.py
 ├── shared/                                                     # Código transversal reutilizable
 │   ├── models.py                                               # BaseModel y metadatos comunes
 │   ├── permissions.py                                          # Permisos base y reutilizables

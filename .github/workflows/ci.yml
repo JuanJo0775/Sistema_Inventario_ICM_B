@@ -21,15 +21,15 @@ jobs:
       DJANGO_SETTINGS_MODULE: config.settings.test
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Cache pip
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements/*.txt') }}
@@ -53,7 +53,7 @@ jobs:
       - name: Quick tests (unit-level)
         run: |
           pip install pytest pytest-django pytest-cov
-          pytest -q -k "not integration and not ers" --maxfail=1
+          pytest -q -k "not integration and not ers" --maxfail=1 --junitxml=junit.xml --cov=.
 
       - name: Generate test docs (check)
         run: |
@@ -65,7 +65,7 @@ jobs:
 
       - name: Upload artifacts (logs/coverage)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ci-artifacts
           path: |
@@ -96,10 +96,10 @@ jobs:
           --health-cmd="pg_isready -U icm" --health-interval=5s --health-timeout=5s --health-retries=5
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -128,10 +128,10 @@ jobs:
       DJANGO_SETTINGS_MODULE: config.settings.test
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -143,11 +143,12 @@ jobs:
 
       - name: Run Gherkin scenarios
         run: |
-          pytest tests/ers -q
+          pip install pytest-cov
+          pytest tests/ers -q --junitxml=junit.xml --cov=.
 
       - name: Upload artifacts (gherkin logs)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: gherkin-artifacts
           path: |

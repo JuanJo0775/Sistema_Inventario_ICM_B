@@ -5,9 +5,10 @@ Base previa: icm_backend
 Actual: icm_backend
 
 ## Resumen
-- Nuevos nodos relevantes: 0
-- Eliminados: 1
+- Nuevos nodos relevantes: 2
+- Eliminados: 0
 - Reorganizaciones: 0
 
-## Bajas relevantes
-- scripts/set_secret.py
+## Altas relevantes
+- scripts/perf/
+- scripts/perf/locustfile.py
