@@ -6,9 +6,9 @@ from unittest.mock import patch
 import pytest
 from django.utils import timezone
 
-from apps.movements.models import MovementType
-from apps.movements.services import register_entry, register_dispatch
 from apps.inventory.models import StockByLocation
+from apps.movements.models import MovementType
+from apps.movements.services import register_dispatch, register_entry
 
 
 @pytest.mark.django_db(transaction=True)
@@ -19,7 +19,7 @@ def test_integration_fefo_multi_lot(almacenista_user, sample_locations):
     el lote con vencimiento más temprano primero y mantener las invariantes
     de stock (no negativo).
     """
-    from tests.factories import ProductFactory, LotFactory, ElectroCategoryFactory
+    from tests.factories import ElectroCategoryFactory, LotFactory, ProductFactory
 
     cat = ElectroCategoryFactory()
     product = ProductFactory(category=cat, requires_expiration=True)

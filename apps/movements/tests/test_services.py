@@ -294,8 +294,9 @@ def test_dispatch_consumes_across_multiple_lots(almacenista_user, sample_locatio
     consumir parte de ambos lotes y verifica que el primer movimiento
     corresponde al lote con vencimiento más cercano.
     """
-    from django.utils import timezone
     from datetime import timedelta
+
+    from django.utils import timezone
 
     cat = ElectroCategoryFactory()
     product = ProductFactory(category=cat, sku="PRD-0300", requires_expiration=True)

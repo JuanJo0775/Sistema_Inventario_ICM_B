@@ -8,9 +8,9 @@ from unittest.mock import patch
 import pytest
 from django.db import connections
 
-from apps.movements.services import register_entry, register_dispatch
 from apps.inventory.models import StockByLocation
 from apps.movements.models import MovementType
+from apps.movements.services import register_dispatch, register_entry
 
 
 @pytest.mark.django_db(transaction=True)
@@ -84,6 +84,7 @@ def test_concurrent_dispatches_does_not_produce_negative_stock(
 
 
 import os
+
 import pytest
 
 

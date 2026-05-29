@@ -5,10 +5,10 @@ from datetime import timedelta
 import pytest
 from django.utils import timezone
 
-from apps.reports.selectors import rotation_by_category
 from apps.catalog.selectors import get_lots_expiring_soon
-from tests.factories import ProductFactory, LotFactory, CategoryFactory
 from apps.movements.services import register_entry
+from apps.reports.selectors import rotation_by_category
+from tests.factories import CategoryFactory, LotFactory, ProductFactory
 
 
 @pytest.mark.django_db
