@@ -65,7 +65,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/concurrency/test_concurrent_movements.py::test_concurrent_movements_do_not_create_negative_stock -v
 ```
 
-Código fuente: [tests/concurrency/test_concurrent_movements.py](../../tests/concurrency/test_concurrent_movements.py) (aprox. línea 88)
+Código fuente: [tests/concurrency/test_concurrent_movements.py](../../tests/concurrency/test_concurrent_movements.py) (aprox. línea 95)
 
 
 ---

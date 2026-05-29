@@ -1541,7 +1541,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_single_movement_nonexpiring_product -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 367)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 370)
 
 
 ---
@@ -1901,7 +1901,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_selectors.py::test_get_discard_operational_summary_excludes_returns -v
 ```
 
-Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/test_selectors.py) (aprox. línea 132)
+Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/test_selectors.py) (aprox. línea 142)
 
 
 ---
@@ -1973,7 +1973,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_selectors.py::test_get_quality_operational_summary_groups_damage_and_returns -v
 ```
 
-Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/test_selectors.py) (aprox. línea 97)
+Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/test_selectors.py) (aprox. línea 107)
 
 
 ---
@@ -2009,7 +2009,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_selectors.py::test_get_warehouse_utilization_uses_capacity_and_stock -v
 ```
 
-Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/test_selectors.py) (aprox. línea 75)
+Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/test_selectors.py) (aprox. línea 85)
 
 
 ---
