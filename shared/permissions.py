@@ -6,7 +6,7 @@ from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
 class IsAlmacenista(BasePermission):
-    """BR-02 — Solo rol `almacenista` (gestión operativa y credenciales)."""
+    """BR-02 — Rol rector del sistema: permisos operativos y administrativos principales."""
 
     def has_permission(self, request, view) -> bool:
         u = request.user
@@ -26,7 +26,7 @@ class IsAuxiliarDespacho(BasePermission):
 
 
 class IsAdministrador(BasePermission):
-    """BR-01 — Solo rol `administrador` (lectura de reportes y KPI)."""
+    """BR-01 — Rol de lectura limitada para reportes y KPI; no desplaza al almacenista."""
 
     def has_permission(self, request, view) -> bool:
         u = request.user
@@ -48,7 +48,7 @@ class IsAlmacenistaOrAuxiliar(BasePermission):
 
 
 class IsAlmacenistaOrAdministrador(BasePermission):
-    """RF-010 — Reportes e inventario resumido para almacenista o administrador."""
+    """RF-010 — Lectura compartida para reportes y resumenes; el almacenista conserva el control principal."""
 
     def has_permission(self, request, view) -> bool:
         u = request.user

@@ -1,4 +1,7 @@
-"""Permisos RBAC para autenticación y gestión de usuarios (RF-001, RF-002)."""
+"""Permisos RBAC para autenticación y gestión de usuarios (RF-001, RF-002).
+
+El rol rector del sistema es `almacenista`; `administrador` conserva lectura limitada.
+"""
 
 from __future__ import annotations
 
@@ -11,21 +14,21 @@ def _has_role(request, role: str) -> bool:
 
 
 class IsAlmacenista(BasePermission):
-    """BR-02 — Solo rol `almacenista` para escrituras de credenciales."""
+    """BR-02 — Rol rector del sistema para escrituras y gestión de credenciales."""
 
     def has_permission(self, request, view) -> bool:
         return _has_role(request, "almacenista")
 
 
 class IsAdministrador(BasePermission):
-    """RBAC de lectura para rol `administrador`."""
+    """RBAC de lectura limitada para rol `administrador`."""
 
     def has_permission(self, request, view) -> bool:
         return _has_role(request, "administrador")
 
 
 class IsAlmacenistaOrAdministrador(BasePermission):
-    """Lectura compartida entre almacenista y administrador."""
+    """Lectura compartida entre almacenista y administrador; no concede privilegios de escritura al administrador."""
 
     def has_permission(self, request, view) -> bool:
         user = getattr(request, "user", None)

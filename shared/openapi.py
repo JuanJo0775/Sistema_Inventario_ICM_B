@@ -12,6 +12,7 @@ TAG_SYSTEM = "system"
 TAG_CATALOG = "catalog"
 TAG_INVENTORY = "inventory"
 TAG_MOVEMENTS = "movements"
+TAG_DASHBOARD = "dashboard"
 TAG_REPORTS = "reports"
 TAG_ALERTS = "alerts"
 TAG_AUDIT = "audit"
@@ -104,10 +105,9 @@ def standard_error_responses(
 SPECTACULAR_SETTINGS: dict = {
     "TITLE": "ICM — API de Gestión de Inventario y Operaciones",
     "DESCRIPTION": """
-# ICM — API de Gestión de Inventario y Operaciones
-**Version:** `1.0.0` | **OAS:** `3.0` | **Schema:** [/api/schema/](/api/schema/)
-
 API REST del sistema **ICM (Import Corporal Medical)**.
+
+**Schema:** [/api/schema/](/api/schema/)
 
 ---
 ### **Guía de Autenticación**
@@ -147,6 +147,10 @@ Para probar los endpoints, haga clic en el botón **Authorize**, use el esquema 
         {
             "name": TAG_MOVEMENTS,
             "description": "Ledger: entries, dispatches, transfers, returns, adjustments.",
+        },
+        {
+            "name": TAG_DASHBOARD,
+            "description": "Operational read model for executive UI and KPIs.",
         },
         {"name": TAG_REPORTS, "description": "Read-only reports and KPIs."},
         {"name": TAG_ALERTS, "description": "Operational alerts."},
