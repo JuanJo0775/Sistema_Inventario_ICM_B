@@ -33,7 +33,6 @@ urlpatterns = [
         name="reports-inventory-summary",
     ),
     path("expiring/", ExpiringProductsReportView.as_view(), name="reports-expiring"),
-
     # Movements
     path(
         "movements/summary/",
@@ -50,7 +49,6 @@ urlpatterns = [
         MovementHistoryReportView.as_view(),
         name="reports-movements-history",
     ),
-
     # Operational summaries
     path(
         "warehouse-utilization/",
@@ -77,10 +75,8 @@ urlpatterns = [
         DispatchOrdersReportView.as_view(),
         name="reports-dispatch-operational-orders",
     ),
-
     # Exports / dataset
     path("data/", ReportDatasetView.as_view(), name="reports-data"),
-
     # Sales / top products / invoices
     path(
         "sales/summary/", SalesSummaryReportView.as_view(), name="reports-sales-summary"
@@ -91,7 +87,6 @@ urlpatterns = [
         name="reports-top-products",
     ),
     path("invoices/", InvoiceHistoryReportView.as_view(), name="reports-invoices"),
-
     # KPI (legacy panel) - delegated to dashboard service for ownership
     path("kpi/", KpiDashboardReportView.as_view(), name="reports-kpi"),
 ]

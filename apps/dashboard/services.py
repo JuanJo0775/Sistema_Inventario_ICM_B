@@ -73,8 +73,16 @@ def _revision_stamp() -> str:
     stock_stamp = StockByLocation.objects.aggregate(last=Max("updated_at"))["last"]
     parts = [
         movement_stamp.isoformat() if movement_stamp else "none",
-        alert_stamp["last_created"].isoformat() if alert_stamp["last_created"] else "none",
-        alert_stamp["last_resolved"].isoformat() if alert_stamp["last_resolved"] else "none",
+        (
+            alert_stamp["last_created"].isoformat()
+            if alert_stamp["last_created"]
+            else "none"
+        ),
+        (
+            alert_stamp["last_resolved"].isoformat()
+            if alert_stamp["last_resolved"]
+            else "none"
+        ),
         product_stamp.isoformat() if product_stamp else "none",
         location_stamp.isoformat() if location_stamp else "none",
         stock_stamp.isoformat() if stock_stamp else "none",
@@ -109,7 +117,9 @@ def _reorder_product_count() -> int:
 
 def _stock_total() -> int:
     return int(
-        StockByLocation.objects.aggregate(total=Coalesce(Sum("current_stock"), 0))["total"]
+        StockByLocation.objects.aggregate(total=Coalesce(Sum("current_stock"), 0))[
+            "total"
+        ]
         or 0
     )
 
@@ -255,7 +265,9 @@ def build_dashboard_metrics(*, period_days: int = 30) -> dict[str, Any]:
     return _cached("metrics", _METRICS_TTL_SECONDS, _builder, period_days, revision)
 
 
-def build_dashboard_alerts(*, period_days: int = 30, expiring_days: int = 30) -> dict[str, Any]:
+def build_dashboard_alerts(
+    *, period_days: int = 30, expiring_days: int = 30
+) -> dict[str, Any]:
     revision = _revision_stamp()
 
     def _builder() -> dict[str, Any]:
@@ -361,7 +373,9 @@ def build_dashboard_kpis(*, period_days: int = 30) -> dict[str, Any]:
     return _cached("kpis", _KPIS_TTL_SECONDS, _builder, period_days, revision)
 
 
-def build_dashboard_movements(*, period_days: int = 30, limit: int = 10) -> list[dict[str, Any]]:
+def build_dashboard_movements(
+    *, period_days: int = 30, limit: int = 10
+) -> list[dict[str, Any]]:
     revision = _revision_stamp()
 
     def _builder() -> list[dict[str, Any]]:
@@ -396,10 +410,12 @@ def build_dashboard_movements(*, period_days: int = 30, limit: int = 10) -> list
                         or movement.executed_by.get_username()
                     ),
                     "time": timezone.localtime(movement.created_at).strftime("%H:%M"),
-                    "status": "pending"
-                    if movement.movement_type in _SALES_MOVEMENT_TYPES
-                    and not movement.invoice_number
-                    else "ok",
+                    "status": (
+                        "pending"
+                        if movement.movement_type in _SALES_MOVEMENT_TYPES
+                        and not movement.invoice_number
+                        else "ok"
+                    ),
                 }
             )
         return out
@@ -414,7 +430,9 @@ def build_dashboard_movements(*, period_days: int = 30, limit: int = 10) -> list
     )
 
 
-def build_dashboard_overview(*, period_days: int = 30, movements_limit: int = 10) -> dict[str, Any]:
+def build_dashboard_overview(
+    *, period_days: int = 30, movements_limit: int = 10
+) -> dict[str, Any]:
     revision = _revision_stamp()
 
     def _builder() -> dict[str, Any]:

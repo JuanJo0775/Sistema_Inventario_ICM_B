@@ -110,9 +110,7 @@ class DashboardAlertsView(APIView):
         period_days = int(request.query_params.get("period_days", 30))
         expiring_days = int(request.query_params.get("expiring_days", 30))
         return Response(
-            build_dashboard_alerts(
-                period_days=period_days, expiring_days=expiring_days
-            )
+            build_dashboard_alerts(period_days=period_days, expiring_days=expiring_days)
         )
 
 
