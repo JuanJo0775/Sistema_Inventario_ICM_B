@@ -2984,7 +2984,7 @@ Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes 
 ---
 
 <!-- file: RF010-S02.md -->
-# Administrador consulta el dashboard de KPIs operativos
+# Almacenista consulta el dashboard de KPIs operativos
 
 ## Nombre del test
 
@@ -3001,7 +3001,7 @@ Validar el criterio de aceptación Gherkin del ERS ICM para RF010 — escenario 
 ## Inputs (Given / When — extracto ERS)
 
 **Given (Dado que):**
-- El usuario autenticado tiene rol "Administrador/Jefe"
+- El usuario autenticado tiene rol "Almacenista"
 
 **When (Cuando):**
 - Accede al dashboard gerencial
@@ -3013,6 +3013,20 @@ Validar el criterio de aceptación Gherkin del ERS ICM para RF010 — escenario 
   - Nivel de servicio expresado como porcentaje de pedidos despachados completos y a tiempo
   - Panel de alertas operativas activas (vencimientos, stock mínimo y pedidos pendientes)
 - Ninguno de estos indicadores permite edición desde esta vista
+
+### Scenario 2.1: Almacenista consulta el dashboard operacional por contratos composables
+
+**Given (Dado que):**
+- El usuario autenticado tiene rol "Almacenista"
+
+**When (Cuando):**
+- Accede a `overview` o a uno de los contratos parciales del dashboard
+
+**Then (Entonces):**
+- El sistema permite consultar métricas, alertas, KPIs y movimientos recientes por separado
+- El contrato `overview` agrega estos bloques sin mezclar lógica de negocio ni exportación
+- El dashboard actúa como read model operacional orientado a UI ejecutiva
+- Las métricas parciales o futuras se presentan con su nivel real de precisión
 
 ---
 

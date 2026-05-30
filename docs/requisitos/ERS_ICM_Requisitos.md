@@ -1105,7 +1105,7 @@ Feature: Ajustes de inventario
 
 **Descripción**
 
-El sistema debe contar con un módulo de reportes y dashboard gerencial que transforme los datos operativos acumulados en información estratégica de valor para la toma de decisiones. Este módulo es accesible para el Almacenista y el Administrador/Jefe, cada uno con su nivel de acceso correspondiente. Los reportes deben poder exportarse en formato Excel o CSV para integrarse con el software contable externo de ICM, y el módulo debe centralizar además el historial completo de facturas y remisiones generadas desde el módulo de Despacho, permitiendo su consulta, filtrado y descarga individual en PDF. Este módulo no genera datos nuevos ni modifica el inventario: es exclusivamente un módulo de lectura y presentación de la información que otros módulos han producido.
+El sistema debe contar con un módulo de reportes y dashboard gerencial que transforme los datos operativos acumulados en información estratégica de valor para la toma de decisiones. El dashboard operacional pertenece al rol de Almacenista como usuario rector de la operación, mientras que el Administrador/Jefe conserva acceso de lectura limitada a los reportes que correspondan. Los reportes deben poder exportarse en formato Excel o CSV para integrarse con el software contable externo de ICM, y el módulo debe centralizar además el historial completo de facturas y remisiones generadas desde el módulo de Despacho, permitiendo su consulta, filtrado y descarga individual en PDF. Este módulo no genera datos nuevos ni modifica el inventario: es exclusivamente un módulo de lectura y presentación de la información que otros módulos han producido.
 
 **Reglas de Negocio Aplicables**
 
@@ -1135,10 +1135,10 @@ Feature: Reportes e indicadores operativos
 
 ---
 
-### Scenario 2: Administrador consulta el dashboard de KPIs operativos
+### Scenario 2: Almacenista consulta el dashboard de KPIs operativos
 
 **Given (Dado que):**
-- El usuario autenticado tiene rol "Administrador/Jefe"
+- El usuario autenticado tiene rol "Almacenista"
 
 **When (Cuando):**
 - Accede al dashboard gerencial
@@ -1150,6 +1150,20 @@ Feature: Reportes e indicadores operativos
   - Nivel de servicio expresado como porcentaje de pedidos despachados completos y a tiempo
   - Panel de alertas operativas activas (vencimientos, stock mínimo y pedidos pendientes)
 - Ninguno de estos indicadores permite edición desde esta vista
+
+### Scenario 2.1: Almacenista consulta el dashboard operacional por contratos composables
+
+**Given (Dado que):**
+- El usuario autenticado tiene rol "Almacenista"
+
+**When (Cuando):**
+- Accede a `overview` o a uno de los contratos parciales del dashboard
+
+**Then (Entonces):**
+- El sistema permite consultar métricas, alertas, KPIs y movimientos recientes por separado
+- El contrato `overview` agrega estos bloques sin mezclar lógica de negocio ni exportación
+- El dashboard actúa como read model operacional orientado a UI ejecutiva
+- Las métricas parciales o futuras se presentan con su nivel real de precisión
 
 ---
 

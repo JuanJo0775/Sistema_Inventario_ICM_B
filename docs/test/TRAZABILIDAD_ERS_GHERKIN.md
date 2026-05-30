@@ -76,6 +76,16 @@ Este documento enlaza pruebas automatizadas con **requisitos** y **criterios de 
 
 ---
 
+## RF-010 — Dashboard operacional
+
+| Criterio | Cobertura |
+|----------|-----------|
+| Dashboard agregado (`overview`) con métricas, alertas, KPIs y movimientos recientes | `apps/dashboard/tests/test_views.py::test_dashboard_overview_returns_composable_payload` |
+| KPIs con metadatos de precisión y clasificación explícita | `apps/dashboard/tests/test_views.py::test_dashboard_kpis_expose_precision_metadata` |
+| Ownership centralizado de KPIs sin drift entre reports y dashboard | `apps/reports/tests/test_services.py::test_generate_kpis_returns_dashboard_keys` y la delegación desde `apps/reports/selectors.py::get_kpi_dashboard` |
+
+---
+
 ## Cómo ejecutar (por módulo / test)
 
 ```bash

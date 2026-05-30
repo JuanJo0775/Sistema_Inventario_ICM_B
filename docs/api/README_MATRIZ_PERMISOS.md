@@ -303,7 +303,17 @@ Leyenda:
 | Correccion de movimiento | Ejecutar | `POST /api/v1/movements/<uuid:pk>/corrections/` | Denegado | Permitido | Permitido | Denegado | Denegado | Solo traslados, autor y ventana valida |
 | Despacho de combo | Ejecutar especial | `POST /api/v1/movements/combo-dispatch/` | Denegado | Permitido | Permitido | Denegado | Denegado | Descuenta por item del combo |
 
-### 11.5 Reportes
+### 11.5 Dashboard operacional
+
+| Recurso | Accion | Endpoint | Admin | Supervisor | Operador | Cliente | Invitado | Observaciones |
+|---|---|---|---|---|---|---|---|---|
+| Dashboard operacional | Leer overview | `GET /api/v1/dashboard/overview/` | Denegado | Permitido | Denegado | Denegado | Denegado | Read model operacional de UI ejecutiva; dueño funcional: almacenista |
+| Dashboard operacional | Leer métricas | `GET /api/v1/dashboard/metrics/` | Denegado | Permitido | Denegado | Denegado | Denegado | Contrato composable |
+| Dashboard operacional | Leer alertas | `GET /api/v1/dashboard/alerts/` | Denegado | Permitido | Denegado | Denegado | Denegado | Contrato composable |
+| Dashboard operacional | Leer KPIs | `GET /api/v1/dashboard/kpis/` | Denegado | Permitido | Denegado | Denegado | Denegado | KPIs con precisión explícita |
+| Dashboard operacional | Leer movimientos | `GET /api/v1/dashboard/movements/` | Denegado | Permitido | Denegado | Denegado | Denegado | Movimientos recientes para la UI |
+
+### 11.6 Reportes
 
 | Recurso | Accion | Endpoint | Admin | Supervisor | Operador | Cliente | Invitado | Observaciones |
 |---|---|---|---|---|---|---|---|---|
@@ -318,7 +328,7 @@ Leyenda:
 | KPI dashboard | Leer | `GET /api/v1/reports/kpi/` | Permitido | Permitido | Denegado | Denegado | Denegado | Panel operacional |
 | Productos por vencer | Leer | `GET /api/v1/reports/expiring/` | Permitido | Permitido | Denegado | Denegado | Denegado | Parametro `days` |
 
-### 11.6 Alertas
+### 11.7 Alertas
 
 | Recurso | Accion | Endpoint | Admin | Supervisor | Operador | Cliente | Invitado | Observaciones |
 |---|---|---|---|---|---|---|---|---|
@@ -326,7 +336,7 @@ Leyenda:
 | Alerta detalle | Leer | `GET /api/v1/alerts/<uuid:pk>/` | Permitido | Permitido | Denegado | Denegado | Denegado | Solo almacenista o administrador |
 | Alerta | Resolver | `POST /api/v1/alerts/<uuid:pk>/resolve/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista |
 
-### 11.7 Auditoria
+### 11.8 Auditoria
 
 | Recurso | Accion | Endpoint | Admin | Supervisor | Operador | Cliente | Invitado | Observaciones |
 |---|---|---|---|---|---|---|---|---|

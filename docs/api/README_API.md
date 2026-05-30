@@ -16,6 +16,7 @@ La API cubre los dominios funcionales del backend:
 - catálogo
 - inventario
 - movimientos
+- dashboard operacional
 - reportes
 - alertas
 - auditoría
@@ -45,6 +46,7 @@ Ejemplos:
 - `/api/v1/catalog/products/`
 - `/api/v1/inventory/stock/product/<id>/`
 - `/api/v1/movements/entries/`
+- `/api/v1/dashboard/overview/`
 - `/api/v1/reports/movements/summary/`
 
 ### 3.3 Formato de mensajes
@@ -79,9 +81,17 @@ Los tags se definen centralmente en [shared/openapi.py](shared/openapi.py) y deb
 - `Catálogo`
 - `Inventario`
 - `Movimientos`
+- `Dashboard`
 - `Reportes`
 - `Alertas`
 - `Auditoría`
+
+### 4.3 Frontera de dashboard y reportes
+
+- `dashboard` es un read model operacional orientado a UI ejecutiva y pertenece al rol `almacenista`.
+- `dashboard` expone contratos composables como `overview`, `metrics`, `alerts`, `kpis` y `movements`.
+- `reports` conserva reportes históricos, exportación y datasets analíticos de lectura.
+- El dashboard no debe usarse como BI genérico ni como zona de exportaciones; si el producto necesita analítica pesada, esa evolución debe vivir en una frontera futura separada.
 
 Regla:
 

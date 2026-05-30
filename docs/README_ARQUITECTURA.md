@@ -25,6 +25,7 @@ El proyecto usa un monolito modular con apps Django por dominio:
 - catalog
 - inventory
 - movements
+- dashboard
 - reports
 - alerts
 - audit
@@ -75,6 +76,7 @@ Dominios de API esperados:
 - `/api/v1/catalog/` productos, categorias, subcategorias y resolucion de identificadores
 - `/api/v1/inventory/` stock por ubicacion y busqueda
 - `/api/v1/movements/` entradas, salidas, traslados, devoluciones y ajustes
+- `/api/v1/dashboard/` read model operacional orientado a UI ejecutiva
 - `/api/v1/reports/` indicadores y reportes de solo lectura
 - `/api/v1/alerts/` alertas operativas activas
 - `/api/v1/audit/` trazabilidad historica (solo lectura autorizada)
@@ -179,19 +181,26 @@ icm_backend/
 │   │   ├── selectors.py                                        # Consultas de lectura y agregaciones del módulo
 │   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
 │   │   └── admin.py                                            # Registro administrativo y soporte operacional
-│   └── audit/                                                  # Trazabilidad e histórico de eventos
+│   ├── audit/                                                  # Trazabilidad e histórico de eventos
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
+│   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Trazabilidad e inmutabilidad de eventos
+│   │   ├── selectors.py                                        # Consultas de auditoría
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
+│   └── dashboard/                                              # Aplicación Django detectada automáticamente
 │       ├── tests/                                              # Pruebas del subdominio
-│       │   ├── test_models.py                                  # Cobertura crítica del módulo
-│       │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
-│       │   └── test_views.py                                   # Cobertura crítica del módulo
-│       ├── models.py                                           # Entidades y constraints de persistencia
+│       │   └── test_views.py                                   # Reglas de negocio y transacciones del dominio
 │       ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
 │       ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
 │       ├── urls.py                                             # Ruteo HTTP y composición de endpoints
-│       ├── services.py                                         # Trazabilidad e inmutabilidad de eventos
-│       ├── selectors.py                                        # Consultas de auditoría
-│       ├── permissions.py                                      # Política de acceso y restricciones de rol
-│       └── admin.py                                            # Registro administrativo y soporte operacional
+│       └── services.py                                         # Reglas de negocio y transacciones del dominio
 ├── config/                                                     # Configuración central del proyecto Django
 │   ├── settings/                                               # Configuración compartida y sobreescrituras por entorno
 │   │   ├── base.py                                             # Configuración base compartida

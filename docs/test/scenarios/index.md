@@ -56,7 +56,7 @@
 | RF009-S05 | Auxiliar corrige su propio movimiento dentro de la franja horaria activa | Implementado | [RF009-S05.md](./RF009-S05.md) |
 | RF009-S06 | Consulta del historial completo de ajustes por el Almacenista | Implementado | [RF009-S06.md](./RF009-S06.md) |
 | RF010-S01 | Almacenista consulta el reporte de ventas por período | Implementado | [RF010-S01.md](./RF010-S01.md) |
-| RF010-S02 | Administrador consulta el dashboard de KPIs operativos | Implementado | [RF010-S02.md](./RF010-S02.md) |
+| RF010-S02 | Almacenista consulta el dashboard de KPIs operativos | Implementado | [RF010-S02.md](./RF010-S02.md) |
 | RF010-S03 | Exportación de reporte en formato Excel o CSV | Implementado | [RF010-S03.md](./RF010-S03.md) |
 | RF010-S04 | Consulta del historial de movimientos por operario | Implementado | [RF010-S04.md](./RF010-S04.md) |
 | RF010-S05 | Consulta del reporte de productos próximos a vencer | Implementado | [RF010-S05.md](./RF010-S05.md) |

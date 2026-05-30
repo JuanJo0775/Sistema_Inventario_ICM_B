@@ -12,13 +12,13 @@ Este documento no debe leerse como una lista uniforme de indicadores listos para
 
 | KPI | Decision | Estado actual en backend | Endpoints / contrato relacionado | Dependencias o cambios requeridos |
 | --- | --- | --- | --- | --- |
-| KPI 1 Rotacion de Inventario | No implementar como KPI formal aun | Parcial, sin costo/valoracion | No existe endpoint especifico. Solo panel generico en `/api/v1/reports/kpi/` y dataset en `/api/v1/reports/data/?kind=kpi` | Faltan costo unitario, inventario valorizado, snapshots de cierre y/o capa contable. Mejor como BI financiero o KPI de un subdominio de costing |
-| KPI 2 Indice de Productos Danados | Implementacion parcial con datos backend disponibles | Parcial, pero utilizable como hechos derivados | `GET /api/v1/reports/quality-operational/`, `GET /api/v1/reports/data/?kind=quality-operational` | El backend entrega movimientos de daño/vencimiento y el frontend debe calcular la tasa final. Faltan incidente formal de calidad, catálogo de causas y trazabilidad de recuperación |
-| KPI 3 Utilizacion de Almacen | Implementado en backend con ajuste de definicion | Viable con el modelo actual si se interpreta como ocupacion por capacidad logica | `GET /api/v1/reports/warehouse-utilization/`, `GET /api/v1/reports/data/?kind=warehouse-utilization`, `GET /api/v1/inventory/summary/` | Requiere mantener `Location.max_capacity` configurado y aclarar que la unidad es operacional, no fisica. La métrica ya sale por API de solo lectura |
-| KPI 4 Cumplimiento en Despacho OTIF | No implementar OTIF como calculo backend; exponer solo hechos operativos | Parcial: hay resumen de despacho y facturas, pero no dominio de pedidos | `GET /api/v1/reports/dispatch-operational/`, `GET /api/v1/reports/data/?kind=dispatch-operational` | Faltan ordenes, promesas de entrega, transportadora, guia, confirmacion de entrega y estados logisticos. El backend solo entrega hechos para que frontend o BI calcule OTIF |
-| KPI 5 Tasa de Descarte de Mercancia Defectuosa | Implementacion parcial con datos backend disponibles | Parcial, utilizable como hechos derivados | `GET /api/v1/reports/quality-operational/`, `GET /api/v1/reports/data/?kind=quality-operational` | El backend entrega salidas por daño, vencimiento y devoluciones como hechos operativos; el frontend calcula la tasa y el costo proxy. Faltan doble autorización formal, causal normalizada, adjuntos y acta de descarte |
-| KPI 6 Tasa de Devoluciones + PQRSF | Separar en dos problemas | Devoluciones: parcial en backend. PQRSF: fuera de alcance actual | `GET /api/v1/reports/quality-operational/`, `GET /api/v1/reports/data/?kind=quality-operational` | El backend entrega devoluciones como hecho derivado; el frontend calcula tasa y tiempos. PQRSF requiere otro dominio, con formulario, cronómetro legal y trazabilidad propia |
-| KPI 7 Cumplimiento de Cadena de Frio | No implementar como KPI completo aun | Parcial: hay bandera de producto y alertas, pero no telemetria | No existe endpoint de sensores ni de lecturas | Faltan sensores, lecturas historicas, estado de cuarentena, reglas de excursion termica, integracion IoT y reporte por lote |
+| KPI 1 Rotacion de Inventario | No implementar como KPI formal aun | Parcial, sin costo/valoracion | No existe endpoint especifico. Hoy solo hay panel ejecutivo en `/api/v1/dashboard/overview/` y dataset historico en `/api/v1/reports/data/?kind=kpi` | Faltan costo unitario, inventario valorizado, snapshots de cierre y/o capa contable. Mejor como BI financiero o KPI de un subdominio de costing |
+| KPI 2 Indice de Productos Danados | Implementacion parcial con datos backend disponibles | Parcial, pero utilizable como hechos derivados | `/api/v1/dashboard/kpis/`, `/api/v1/reports/quality-operational/`, `/api/v1/reports/data/?kind=quality-operational` | El backend entrega movimientos de daño/vencimiento y el frontend debe calcular la tasa final. Faltan incidente formal de calidad, catálogo de causas y trazabilidad de recuperación |
+| KPI 3 Utilizacion de Almacen | Implementado en backend con ajuste de definicion | Viable con el modelo actual si se interpreta como ocupacion por capacidad logica | `/api/v1/dashboard/kpis/`, `/api/v1/reports/warehouse-utilization/`, `/api/v1/reports/data/?kind=warehouse-utilization`, `/api/v1/inventory/summary/` | Requiere mantener `Location.max_capacity` configurado y aclarar que la unidad es operacional, no fisica. La métrica ya sale por API de solo lectura |
+| KPI 4 Cumplimiento en Despacho OTIF | No implementar OTIF como calculo backend; exponer solo hechos operativos | Parcial: hay resumen de despacho y facturas, pero no dominio de pedidos | `/api/v1/dashboard/kpis/`, `/api/v1/reports/dispatch-operational/`, `/api/v1/reports/data/?kind=dispatch-operational` | Faltan ordenes, promesas de entrega, transportadora, guia, confirmacion de entrega y estados logisticos. El backend solo entrega hechos para que frontend o BI calcule OTIF |
+| KPI 5 Tasa de Descarte de Mercancia Defectuosa | Implementacion parcial con datos backend disponibles | Parcial, utilizable como hechos derivados | `/api/v1/dashboard/kpis/`, `/api/v1/reports/quality-operational/`, `/api/v1/reports/data/?kind=quality-operational` | El backend entrega salidas por daño, vencimiento y devoluciones como hechos operativos; el frontend calcula la tasa y el costo proxy. Faltan doble autorización formal, causal normalizada, adjuntos y acta de descarte |
+| KPI 6 Tasa de Devoluciones + PQRSF | Separar en dos problemas | Devoluciones: parcial en backend. PQRSF: fuera de alcance actual | `/api/v1/dashboard/kpis/`, `/api/v1/reports/quality-operational/`, `/api/v1/reports/data/?kind=quality-operational` | El backend entrega devoluciones como hecho derivado; el frontend calcula tasa y tiempos. PQRSF requiere otro dominio, con formulario, cronómetro legal y trazabilidad propia |
+| KPI 7 Cumplimiento de Cadena de Frio | No implementar como KPI completo aun | Parcial: hay bandera de producto y alertas, pero no telemetria | `/api/v1/dashboard/kpis/` y alertas operativas; no existe endpoint de sensores ni de lecturas | Faltan sensores, lecturas historicas, estado de cuarentena, reglas de excursion termica, integracion IoT y reporte por lote |
 
 ### **Lectura tecnica por KPI**
 
@@ -82,9 +82,14 @@ La via correcta es un subdominio de IoT/telemetria con lectura periodica, almace
 
 ### **Endpoints relacionados en el estado actual**
 
-Los siguientes endpoints ya existen y son la base de los reportes de solo lectura, aunque no cubren todos los KPIs del documento:
+Los siguientes endpoints ya existen y son la base de los reportes de solo lectura y del dashboard operacional, aunque no cubren todos los KPIs del documento:
 
-- `/api/v1/reports/kpi/` : panel operativo generico con movimientos de hoy, alertas activas y salidas del mes.
+- `/api/v1/dashboard/overview/` : agregador del panel ejecutivo con métricas, alertas, KPIs y movimientos recientes.
+- `/api/v1/dashboard/metrics/` : métricas superiores del panel.
+- `/api/v1/dashboard/alerts/` : alertas activas.
+- `/api/v1/dashboard/kpis/` : KPIs operativos con precisión explícita.
+- `/api/v1/dashboard/movements/` : movimientos recientes para la UI.
+- `/api/v1/reports/kpi/` : compatibilidad histórica con el panel operativo generico.
 - `/api/v1/reports/data/?kind=kpi` : dataset unificado para frontend, equivalente al panel anterior.
 - `/api/v1/reports/inventory/summary/` : resumen de inventario actual.
 - `/api/v1/reports/movements/summary/` : conteo de movimientos por tipo.
@@ -107,6 +112,8 @@ Los siguientes endpoints ya existen y son la base de los reportes de solo lectur
 - Separar descarte sanitario de salida operativa para KPI 5.
 - Separar devoluciones de PQRSF para KPI 6.
 - Introducir telemetria y cuarentena por lote para KPI 7.
+- Centralizar fórmulas y thresholds KPI en un único servicio de dominio para evitar drift entre dashboard y reports.
+- Mantener cache corto y contratos composables en dashboard para no convertir el agregado en un endpoint monolítico.
 
 ### **Conclusion operativa**
 
