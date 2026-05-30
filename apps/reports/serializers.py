@@ -1,5 +1,15 @@
 from __future__ import annotations
 
+"""Serializadores para los endpoints de `reports`.
+
+Nota: el serializer `KpiDashboardSerializer` representa el payload del panel
+legacy de KPI. El origen de la verdad de las métricas se encuentra en
+`apps.dashboard.services` (función `build_legacy_kpi_panel` y los builders
+del módulo `apps.dashboard.services`). Si se modifica la forma del panel en
+el servicio del dashboard, actualizar este serializer para mantener la
+compatibilidad con el endpoint `reports/kpi/` y con `ReportDatasetView`.
+"""
+
 from rest_framework import serializers
 
 
@@ -154,10 +164,11 @@ class PerOrderSampleSerializer(serializers.Serializer):
 
 
 class KpiDashboardSerializer(serializers.Serializer):
-    total_products = serializers.IntegerField()
-    active_alerts = serializers.IntegerField()
     movements_today = serializers.IntegerField()
-    low_stock_items = serializers.IntegerField()
+    low_stock_products_count = serializers.IntegerField()
+    active_alerts_unresolved = serializers.IntegerField()
+    dispatches_this_month = serializers.IntegerField()
+    generated_at = serializers.DateTimeField()
 
 
 class ReportDatasetSerializer(serializers.Serializer):

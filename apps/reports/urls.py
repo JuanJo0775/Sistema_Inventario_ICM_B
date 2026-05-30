@@ -18,12 +18,23 @@ from apps.reports.views import (
     WarehouseUtilizationReportView,
 )
 
+# Routes grouped by functional area for clarity:
+# - Inventory: inventario y vencimientos
+# - Movements: resúmenes, reportes y historial
+# - Operational summaries: warehouse, quality, discard, dispatch
+# - Exports / datasets: unified dataset endpoint
+# - KPI: legacy panel (delegates to apps.dashboard services)
+
 urlpatterns = [
+    # Inventory
     path(
         "inventory/summary/",
         InventorySummaryReportView.as_view(),
         name="reports-inventory-summary",
     ),
+    path("expiring/", ExpiringProductsReportView.as_view(), name="reports-expiring"),
+
+    # Movements
     path(
         "movements/summary/",
         MovementSummaryReportView.as_view(),
@@ -39,15 +50,8 @@ urlpatterns = [
         MovementHistoryReportView.as_view(),
         name="reports-movements-history",
     ),
-    path("data/", ReportDatasetView.as_view(), name="reports-data"),
-    path(
-        "sales/summary/", SalesSummaryReportView.as_view(), name="reports-sales-summary"
-    ),
-    path(
-        "top-products/",
-        TopDispatchedProductsReportView.as_view(),
-        name="reports-top-products",
-    ),
+
+    # Operational summaries
     path(
         "warehouse-utilization/",
         WarehouseUtilizationReportView.as_view(),
@@ -73,7 +77,21 @@ urlpatterns = [
         DispatchOrdersReportView.as_view(),
         name="reports-dispatch-operational-orders",
     ),
+
+    # Exports / dataset
+    path("data/", ReportDatasetView.as_view(), name="reports-data"),
+
+    # Sales / top products / invoices
+    path(
+        "sales/summary/", SalesSummaryReportView.as_view(), name="reports-sales-summary"
+    ),
+    path(
+        "top-products/",
+        TopDispatchedProductsReportView.as_view(),
+        name="reports-top-products",
+    ),
     path("invoices/", InvoiceHistoryReportView.as_view(), name="reports-invoices"),
+
+    # KPI (legacy panel) - delegated to dashboard service for ownership
     path("kpi/", KpiDashboardReportView.as_view(), name="reports-kpi"),
-    path("expiring/", ExpiringProductsReportView.as_view(), name="reports-expiring"),
 ]

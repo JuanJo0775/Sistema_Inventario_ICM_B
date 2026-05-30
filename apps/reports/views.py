@@ -1,4 +1,13 @@
-"""Vistas de reportes de solo lectura (RF-010)."""
+"""Vistas de reportes de solo lectura (RF-010).
+
+Nota operativa:
+- Las KPI y la lógica de cálculo pertenecen al read-model central en
+    `apps.dashboard.services`. Muchos endpoints de este módulo consumen
+    funciones de `apps.reports.selectors` que a su vez delegan a los
+    servicios del dashboard cuando corresponde (p. ej. el panel legacy `kpi`).
+- Mantener aquí solo la orquestación HTTP / paginación; las reglas de dominio
+    deben vivir en `services.py` y `selectors.py`.
+"""
 
 from __future__ import annotations
 
@@ -330,6 +339,15 @@ class InvoiceHistoryReportView(APIView):
 
 
 class KpiDashboardReportView(APIView):
+    """Endpoint legacy que expone el panel de KPI.
+
+    Este endpoint delega a `apps.reports.selectors.get_kpi_dashboard()`, que
+    a su vez usa `apps.dashboard.services.build_legacy_kpi_panel()` para
+    garantizar que la fuente de verdad de las KPI sea el dashboard central.
+    No añadir lógica de cálculo aquí; actualizar los servicios del dashboard
+    si necesita cambios en las métricas.
+    """
+
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
@@ -340,6 +358,8 @@ class KpiDashboardReportView(APIView):
         tags=[TAG_REPORTS],
     )
     def get(self, request):
+        # Delegación explícita: la función seleccionadora garantiza que se
+        # retorne el payload canónico generado por `apps.dashboard.services`.
         return Response(get_kpi_dashboard())
 
 
@@ -662,6 +682,10 @@ class ReportDatasetView(APIView):
             qs = get_invoice_history(filters_map)
             data = MovementSerializer(list(qs), many=True).data
         elif kind == "kpi":
+            # Nota: el dataset 'kpi' se delega al servicio del dashboard para
+            # mantener una única implementación de métricas. Si cambian las
+            # estructuras de salida, actualizar `KpiDashboardSerializer` y el
+            # servicio correspondiente en `apps/dashboard/services.py`.
             data = get_kpi_dashboard()
         elif kind == "expiring":
             days = int(request.query_params.get("days", 30))

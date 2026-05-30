@@ -9,11 +9,10 @@ from uuid import UUID
 from django.db.models import Count, Sum
 from django.utils import timezone
 
-from apps.alerts.models import Alert
 from apps.catalog.models import Category, Product
 from apps.catalog.selectors import get_lots_expiring_soon
+from apps.dashboard.services import build_legacy_kpi_panel
 from apps.inventory.models import Location
-from apps.inventory.selectors import get_low_stock_products
 from apps.movements.models import Movement, MovementType
 from apps.movements.selectors import get_dispatches_with_invoices
 from apps.movements.services import ledger_net_quantity_for_lot_location
@@ -660,23 +659,9 @@ def get_expiring_products(days: int = 30):
 
 
 def get_kpi_dashboard() -> dict[str, Any]:
-    """RF-010 — KPIs operativos para panel administrativo."""
-    now = timezone.now()
-    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    salidas = (
-        MovementType.SALIDA_VENTA_MAYOR,
-        MovementType.SALIDA_VENTA_MENOR,
-        MovementType.SALIDA_DANO,
-        MovementType.SALIDA_VENCIMIENTO,
-    )
-    return {
-        "movements_today": Movement.objects.filter(created_at__gte=today_start).count(),
-        "low_stock_products_count": get_low_stock_products(threshold=5).count(),
-        "active_alerts_unresolved": Alert.objects.filter(is_resolved=False).count(),
-        "dispatches_this_month": Movement.objects.filter(
-            created_at__gte=month_start,
-            movement_type__in=salidas,
-        ).count(),
-        "generated_at": now.isoformat(),
-    }
+    """RF-010 — KPIs operativos para panel administrativo.
+
+    Mantiene compatibilidad histórica, pero el cálculo queda centralizado en el
+    servicio de dashboard para evitar drift entre reports y dashboard.
+    """
+    return build_legacy_kpi_panel()
