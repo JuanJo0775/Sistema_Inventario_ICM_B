@@ -201,6 +201,36 @@ def update_user(
 
 
 @transaction.atomic
+def enable_user(
+    almacenista_user: User,
+    target_user_id: UUID | str,
+    *,
+    request: HttpRequest | None = None,
+) -> User:
+    """
+    RF-002 — Rehabilita un usuario previamente deshabilitado.
+
+    Returns:
+        Usuario rehabilitado (persistido).
+    """
+    from apps.authentication.models import User
+
+    _require_almacenista(almacenista_user)
+    target = User.objects.select_for_update().get(pk=target_user_id)
+    target.is_active = True
+    target.save(update_fields=["is_active", "updated_at"])
+    log_event(
+        AuditEventType.USER_ENABLED,
+        description=f"Usuario rehabilitado: {target.username}",
+        user=almacenista_user,
+        request=request,
+        user_affected=target,
+        detail={"enabled_username": target.username},
+    )
+    return target
+
+
+@transaction.atomic
 def update_user_password(
     almacenista_user: User,
     target_user_id: UUID | str,

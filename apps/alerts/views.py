@@ -112,6 +112,8 @@ class AlertListView(generics.ListAPIView):
         return get_active_alerts(_build_alert_filters(self.request.query_params))
 
     @extend_schema(
+        summary="Listar alertas activas",
+        description="Lista las alertas activas y permite exportarlas.",
         parameters=_ALERT_QUERY_PARAMS,
         responses={
             200: AlertSerializer(many=True),
@@ -141,6 +143,8 @@ class AlertHistoryView(generics.ListAPIView):
         return get_resolved_alerts(_build_alert_filters(self.request.query_params))
 
     @extend_schema(
+        summary="Historial de alertas resueltas",
+        description="Lista las alertas resueltas dentro de los filtros aplicados.",
         parameters=_ALERT_QUERY_PARAMS,
         responses={
             200: AlertSerializer(many=True),
@@ -158,6 +162,8 @@ class AlertStatsView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Métricas de alertas",
+        description="Obtiene métricas resumidas de alertas activas.",
         responses={200: dict, **standard_error_responses(include_403=True)},
         tags=[TAG_ALERTS],
     )
@@ -172,6 +178,8 @@ class AlertDetailView(generics.RetrieveAPIView):
     lookup_field = "pk"
 
     @extend_schema(
+        summary="Detalle de alerta",
+        description="Obtiene el detalle de una alerta específica.",
         responses={
             200: AlertSerializer,
             **standard_error_responses(include_403=True, include_404=True),
@@ -189,6 +197,8 @@ class AlertResolveView(APIView):
 
     @extend_schema(
         request=None,
+        summary="Resolver alerta",
+        description="Marca una alerta como resuelta.",
         responses={
             200: AlertSerializer,
             **standard_error_responses(include_403=True, include_404=True),
@@ -211,6 +221,8 @@ class AlertPollView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @extend_schema(
+        summary="Polling de alertas",
+        description="Consulta alertas nuevas desde un timestamp dado.",
         parameters=[
             OpenApiParameter(
                 name="since",

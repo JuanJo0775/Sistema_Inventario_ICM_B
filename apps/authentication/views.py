@@ -26,6 +26,7 @@ from apps.authentication.serializers import (
 from apps.authentication.services import (
     create_user,
     disable_user,
+    enable_user,
     update_user,
     update_user_password,
 )
@@ -118,6 +119,7 @@ class LogoutView(APIView):
 
 @extend_schema(
     summary="Perfil del usuario autenticado",
+    description="Devuelve el perfil del usuario autenticado sin exponer la contraseña.",
     tags=[TAG_AUTH],
     responses={
         200: UserSerializer,
@@ -151,7 +153,11 @@ class UserListCreateView(APIView):
     def get(self, request):
         from apps.authentication.selectors import get_all_users
 
-        users = get_all_users(request.user)
+        include_inactive = request.query_params.get("include_inactive", "").lower()
+        users = get_all_users(
+            request.user,
+            include_inactive=include_inactive in ("1", "true", "yes"),
+        )
         return Response(UserSerializer(users, many=True).data)
 
     @extend_schema(
@@ -181,6 +187,7 @@ class UserDetailView(APIView):
 
     @extend_schema(
         summary="Detalle de usuario",
+        description="Obtiene el detalle de un usuario por su identificador.",
         tags=[TAG_AUTH],
         responses={
             200: UserSerializer,
@@ -256,6 +263,29 @@ class UserDisableView(APIView):
     def post(self, request, pk):
         disable_user(request.user, pk, request=request)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserEnableView(APIView):
+    """POST — Rehabilitar usuario previamente deshabilitado (RF-002)."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Rehabilitar usuario",
+        description="RF-002 — Reactiva una cuenta de usuario previamente deshabilitada.",
+        tags=[TAG_AUTH],
+        request=None,
+        responses={
+            200: UserSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        from django.shortcuts import get_object_or_404
+
+        get_object_or_404(User, pk=pk)
+        user = enable_user(request.user, pk, request=request)
+        return Response(UserSerializer(user).data)
 
 
 @extend_schema(

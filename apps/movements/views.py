@@ -40,6 +40,7 @@ from shared.permissions import IsAlmacenista, IsAlmacenistaOrAuxiliar
 @extend_schema_view(
     get=extend_schema(
         summary="Listar movimientos",
+        description="Lista los movimientos del ledger con filtros opcionales.",
         responses={
             200: MovementSerializer(many=True),
             **standard_error_responses(),
@@ -69,6 +70,7 @@ class MovementListView(generics.ListAPIView):
 @extend_schema_view(
     get=extend_schema(
         summary="Listar entradas",
+        description="Lista las entradas de inventario registradas.",
         responses={
             200: MovementSerializer(many=True),
             **standard_error_responses(),
@@ -76,6 +78,7 @@ class MovementListView(generics.ListAPIView):
     ),
     post=extend_schema(
         summary="Registrar entrada",
+        description="Registra una nueva entrada de inventario.",
         request=EntryCreateSerializer,
         responses={
             201: MovementSerializer,
@@ -126,6 +129,7 @@ class EntryListCreateView(generics.ListCreateAPIView):
 @extend_schema_view(
     get=extend_schema(
         summary="Detalle de entrada",
+        description="Obtiene el detalle de una entrada de inventario.",
         responses={
             200: MovementSerializer,
             **standard_error_responses(include_404=True),
@@ -145,6 +149,7 @@ class EntryDetailView(generics.RetrieveAPIView):
 @extend_schema_view(
     get=extend_schema(
         summary="Listar despachos",
+        description="Lista los despachos registrados en el ledger.",
         responses={
             200: MovementSerializer(many=True),
             **standard_error_responses(),
@@ -152,6 +157,7 @@ class EntryDetailView(generics.RetrieveAPIView):
     ),
     post=extend_schema(
         summary="Registrar despacho",
+        description="Registra un nuevo despacho de inventario.",
         request=DispatchCreateSerializer,
         responses={
             201: MovementSerializer,
@@ -218,6 +224,7 @@ class DispatchListCreateView(generics.ListCreateAPIView):
 @extend_schema_view(
     get=extend_schema(
         summary="Detalle de despacho",
+        description="Obtiene el detalle de un despacho registrado.",
         responses={
             200: MovementSerializer,
             **standard_error_responses(include_404=True),
@@ -247,6 +254,7 @@ class DispatchInvoiceDownloadView(APIView):
 
     @extend_schema(
         summary="Descargar PDF de factura",
+        description="Descarga el PDF de factura asociado a un despacho.",
         responses={
             200: None,
             **standard_error_responses(include_404=True),
@@ -274,6 +282,7 @@ class DispatchInvoiceDownloadView(APIView):
 @extend_schema_view(
     get=extend_schema(
         summary="Listar traslados",
+        description="Lista los traslados internos registrados.",
         responses={
             200: MovementSerializer(many=True),
             **standard_error_responses(),
@@ -281,6 +290,7 @@ class DispatchInvoiceDownloadView(APIView):
     ),
     post=extend_schema(
         summary="Registrar traslado",
+        description="Registra un traslado interno entre ubicaciones.",
         request=TransferCreateSerializer,
         responses={
             201: MovementSerializer,
@@ -330,6 +340,7 @@ class TransferListCreateView(generics.ListCreateAPIView):
 @extend_schema_view(
     get=extend_schema(
         summary="Listar devoluciones",
+        description="Lista las devoluciones registradas en el ledger.",
         responses={
             200: MovementSerializer(many=True),
             **standard_error_responses(),
@@ -337,6 +348,7 @@ class TransferListCreateView(generics.ListCreateAPIView):
     ),
     post=extend_schema(
         summary="Registrar devolución",
+        description="Registra una devolución de inventario.",
         request=ReturnCreateSerializer,
         responses={
             201: MovementSerializer,
@@ -381,6 +393,7 @@ class ReturnListCreateView(generics.ListCreateAPIView):
 @extend_schema_view(
     get=extend_schema(
         summary="Listar ajustes",
+        description="Lista los ajustes de inventario registrados.",
         responses={
             200: MovementSerializer(many=True),
             **standard_error_responses(),
@@ -388,6 +401,7 @@ class ReturnListCreateView(generics.ListCreateAPIView):
     ),
     post=extend_schema(
         summary="Registrar ajuste",
+        description="Registra un ajuste de inventario.",
         request=AdjustmentCreateSerializer,
         responses={
             201: MovementSerializer,
@@ -434,6 +448,7 @@ class AdjustmentCorrectView(APIView):
 
     @extend_schema(
         summary="Corregir ajuste dentro de ventana de tiempo",
+        description="Corrige un ajuste dentro de la ventana permitida por la regla de negocio.",
         request=AdjustmentCorrectionSerializer,
         responses={
             201: MovementSerializer(many=True),
@@ -457,6 +472,7 @@ class AdjustmentCorrectView(APIView):
 @extend_schema_view(
     get=extend_schema(
         summary="Detalle de movimiento",
+        description="Obtiene el detalle de un movimiento del ledger.",
         responses={
             200: MovementSerializer,
             **standard_error_responses(include_404=True),
@@ -488,6 +504,7 @@ class MovementCorrectionView(APIView):
 
     @extend_schema(
         summary="Corrección de movimiento (URL)",
+        description="Corrige un movimiento usando su identificador en la URL.",
         request=CorrectionCreateSerializer,
         responses={
             201: MovementSerializer(many=True),
@@ -513,6 +530,7 @@ class ComboDispatchView(APIView):
 
     @extend_schema(
         summary="Despachar combo (descuenta stock por ítem)",
+        description="Despacha un combo completo y descuenta stock por cada ítem.",
         request=ComboDispatchSerializer,
         tags=[TAG_MOVEMENTS],
         responses={

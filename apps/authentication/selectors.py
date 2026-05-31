@@ -31,7 +31,7 @@ def get_user_by_id(user_id: UUID | str) -> User:
     return User.objects.get(pk=user_id)
 
 
-def get_all_users(executor: User) -> QuerySet[User]:
+def get_all_users(executor: User, *, include_inactive: bool = False) -> QuerySet[User]:
     """
     RF-002, BR-02 — Lista usuarios ordenados por fecha de creación.
 
@@ -39,11 +39,15 @@ def get_all_users(executor: User) -> QuerySet[User]:
 
     Args:
         executor: Usuario que ejecuta la consulta (debe ser almacenista).
+        include_inactive: Si True, incluye usuarios deshabilitados en el resultado.
 
     Returns:
         QuerySet de usuarios.
     """
-    return User.objects.all().order_by("-created_at", "-id")
+    qs = User.objects.all().order_by("-created_at", "-id")
+    if not include_inactive:
+        qs = qs.filter(is_active=True)
+    return qs
 
 
 def get_user_profile(user: User) -> dict[str, Any]:

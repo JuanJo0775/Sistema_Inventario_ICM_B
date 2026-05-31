@@ -34,6 +34,8 @@ class AuditLogListView(generics.ListAPIView):
         )
 
     @extend_schema(
+        summary="Listar auditoría",
+        description="Lista los registros de auditoría con filtros opcionales.",
         parameters=[
             OpenApiParameter(
                 name="event_type",
@@ -86,6 +88,8 @@ class AuditLogDetailView(generics.RetrieveAPIView):
         raise ImmutableRecordError()
 
     @extend_schema(
+        summary="Detalle de evento de auditoría",
+        description="Obtiene el detalle de un evento de auditoría.",
         responses={
             200: AuditLogSerializer,
             **standard_error_responses(include_403=True, include_404=True),

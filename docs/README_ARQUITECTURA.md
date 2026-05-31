@@ -99,6 +99,7 @@ icm_backend/
 │   │   ├── tests/                                              # Pruebas del subdominio
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
 │   │   │   ├── test_services.py                                # Política de acceso y restricciones de rol
+│   │   │   ├── test_user_enable.py                             # Cobertura crítica del módulo
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
 │   │   ├── models.py                                           # Entidades y constraints de persistencia
 │   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
@@ -113,6 +114,7 @@ icm_backend/
 │   ├── catalog/                                                # Catálogo, SKUs definidos por usuario y validación de productos
 │   │   ├── tests/                                              # Pruebas del subdominio
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_new_endpoints.py                           # Cobertura crítica del módulo
 │   │   │   ├── test_services.py                                # Cobertura crítica del módulo
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
 │   │   ├── models.py                                           # Entidades y constraints de persistencia
@@ -130,6 +132,7 @@ icm_backend/
 │   │   │   ├── test_commands.py                                # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_location_threshold.py                      # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_models.py                                  # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_new_endpoints.py                           # Cobertura crítica del módulo
 │   │   │   ├── test_selectors.py                               # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_storage_templates.py                       # Cobertura crítica del módulo
@@ -222,6 +225,7 @@ icm_backend/
 │   │   └── services.py                                         # Reglas de negocio y transacciones del dominio
 │   └── webhooks/                                               # Aplicación Django detectada automáticamente
 │       ├── tests/                                              # Pruebas del subdominio
+│       │   ├── test_endpoint_put.py                            # Reglas de negocio y transacciones del dominio
 │       │   ├── test_services.py                                # Cobertura crítica del módulo
 │       │   └── test_views.py                                   # Cobertura crítica del módulo
 │       ├── management/

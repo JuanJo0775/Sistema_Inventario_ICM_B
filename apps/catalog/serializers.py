@@ -20,6 +20,7 @@ class CategorySerializer(serializers.ModelSerializer):
             "requires_serial_number",
             "is_returnable",
             "description",
+            "is_active",
             "created_at",
             "updated_at",
         )
@@ -28,7 +29,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class SubcategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Subcategory
-        fields = ("id", "category", "name", "slug", "created_at", "updated_at")
+        fields = ("id", "category", "name", "slug", "is_active", "created_at", "updated_at")
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -232,6 +233,30 @@ class CategoryCreateSerializer(serializers.Serializer):
     is_returnable = serializers.BooleanField(required=False, default=False)
 
 
+class CategoryUpdateSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False)
+    description = serializers.CharField(required=False, allow_blank=True)
+    requires_serial_number = serializers.BooleanField(required=False)
+    is_returnable = serializers.BooleanField(required=False)
+
+
 class SubcategoryCreateSerializer(serializers.Serializer):
     category_id = serializers.UUIDField()
     name = serializers.CharField()
+
+
+class SubcategoryUpdateSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False)
+    category_id = serializers.UUIDField(required=False)
+
+
+class ComboUpdateItemSerializer(serializers.Serializer):
+    product_id = serializers.UUIDField()
+    quantity = serializers.IntegerField(default=1, min_value=1)
+
+
+class ComboUpdateSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False)
+    sku = serializers.CharField(required=False)
+    is_active = serializers.BooleanField(required=False)
+    items = ComboUpdateItemSerializer(many=True, required=False)

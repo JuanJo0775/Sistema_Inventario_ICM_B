@@ -10,6 +10,7 @@ from apps.authentication.views import (
     MeView,
     UserDetailView,
     UserDisableView,
+    UserEnableView,
     UserListCreateView,
 )
 
@@ -23,5 +24,8 @@ urlpatterns = [
     path("users/<uuid:pk>/", UserDetailView.as_view(), name="auth-user-detail"),
     path(
         "users/<uuid:pk>/disable/", UserDisableView.as_view(), name="auth-user-disable"
+    ),
+    path(
+        "users/<uuid:pk>/enable/", UserEnableView.as_view(), name="auth-user-enable"
     ),
 ]

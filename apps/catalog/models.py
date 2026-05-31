@@ -28,6 +28,7 @@ class Category(BaseModel):
         help_text="BR-05: categoría admite devoluciones (Electroterapia / electrónicos).",
     )
     description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = "Categoría"
@@ -48,6 +49,7 @@ class Subcategory(BaseModel):
         related_name="subcategories",
     )
     slug = models.SlugField(max_length=128)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = "Subcategoría"

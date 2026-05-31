@@ -28,6 +28,8 @@ class DashboardOverviewView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
+        summary="Resumen general del dashboard",
+        description="Devuelve el resumen general del dashboard ejecutivo.",
         parameters=[
             OpenApiParameter(
                 name="period_days",
@@ -64,6 +66,8 @@ class DashboardMetricsView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
+        summary="Métricas operativas",
+        description="Devuelve las métricas operativas del dashboard.",
         parameters=[
             OpenApiParameter(
                 name="period_days",
@@ -87,6 +91,8 @@ class DashboardAlertsView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
+        summary="Resumen de alertas",
+        description="Devuelve el resumen de alertas del dashboard.",
         parameters=[
             OpenApiParameter(
                 name="period_days",
@@ -119,6 +125,8 @@ class DashboardKPIsView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
+        summary="Resumen de KPI",
+        description="Devuelve el resumen de KPI del dashboard.",
         parameters=[
             OpenApiParameter(
                 name="period_days",
@@ -142,6 +150,8 @@ class DashboardMovementsView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
+        summary="Movimientos recientes",
+        description="Devuelve los movimientos recientes visibles en el dashboard.",
         parameters=[
             OpenApiParameter(
                 name="period_days",

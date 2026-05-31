@@ -125,6 +125,8 @@ class MovementSummaryReportView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Resumen de movimientos",
+        description="Resume la cantidad de movimientos por tipo en un rango dado.",
         parameters=[
             OpenApiParameter(
                 name="start",
@@ -156,6 +158,8 @@ class SalesSummaryReportView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Resumen de ventas",
+        description="Resume las ventas vinculadas a despachos en un rango dado.",
         parameters=[
             OpenApiParameter(
                 name="start",
@@ -187,6 +191,8 @@ class MovementHistoryReportView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Historial de movimientos",
+        description="Devuelve el historial de movimientos con filtros y exportación.",
         parameters=[
             OpenApiParameter(
                 name="product_id",
@@ -270,6 +276,8 @@ class InventorySummaryReportView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Resumen de inventario",
+        description="Resume el inventario actual por producto y ubicación.",
         responses={
             200: InventorySummaryResponseSerializer,
             **standard_error_responses(include_403=True),
@@ -284,6 +292,8 @@ class MovementReportView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Reporte de movimientos",
+        description="Reporte de movimientos filtrado por rango y tipo.",
         parameters=[
             OpenApiParameter(
                 name="start", type=str, location=OpenApiParameter.QUERY, required=True
@@ -313,6 +323,8 @@ class TopDispatchedProductsReportView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Top productos despachados",
+        description="Lista los productos más despachados en el periodo indicado.",
         parameters=[
             OpenApiParameter(
                 name="limit", type=int, location=OpenApiParameter.QUERY, required=False
@@ -342,6 +354,8 @@ class InvoiceHistoryReportView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Historial de facturas",
+        description="Lista las facturas asociadas a movimientos en el rango consultado.",
         parameters=[
             OpenApiParameter(
                 name="start", type=str, location=OpenApiParameter.QUERY, required=False
@@ -400,6 +414,8 @@ class KpiDashboardReportView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Panel KPI legado",
+        description="Devuelve el panel legado de KPI para compatibilidad.",
         responses={
             200: KpiDashboardSerializer,
             **standard_error_responses(include_403=True),
@@ -416,6 +432,8 @@ class WarehouseUtilizationReportView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Utilización de bodegas",
+        description="Devuelve la utilización agregada de bodegas.",
         responses={
             200: WarehouseUtilizationResponseSerializer,
             **standard_error_responses(include_403=True),
@@ -430,6 +448,8 @@ class QualityOperationalReportView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Resumen operativo de calidad",
+        description="Resume indicadores operativos de calidad.",
         parameters=[
             OpenApiParameter(
                 name="period_days",
@@ -454,6 +474,8 @@ class DiscardOperationalReportView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Resumen operativo de descarte",
+        description="Resume indicadores operativos de descarte.",
         parameters=[
             OpenApiParameter(
                 name="period_days",
@@ -478,6 +500,7 @@ class DispatchOperationalReportView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Resumen operativo de despacho",
         parameters=[
             OpenApiParameter(
                 name="period_days",
@@ -509,6 +532,8 @@ class ExpiringProductsReportView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Productos próximos a vencer",
+        description="Lista productos o lotes próximos a vencer.",
         parameters=[
             OpenApiParameter(
                 name="days", type=int, location=OpenApiParameter.QUERY, required=False
@@ -540,6 +565,8 @@ class DispatchOrdersReportView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Muestras de despachos por pedido",
+        description="Muestra muestras de despachos por pedido y factura.",
         parameters=[
             OpenApiParameter(
                 name="start",
@@ -593,6 +620,8 @@ class ReportDatasetView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
 
     @extend_schema(
+        summary="Dataset de reportes",
+        description="Entrega un dataset canónico para exportaciones del frontend.",
         parameters=[
             OpenApiParameter(
                 name="kind",

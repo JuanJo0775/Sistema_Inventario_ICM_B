@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from drf_spectacular.utils import extend_schema
-from rest_framework import status
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -29,6 +29,8 @@ class WebhookEndpointListCreateView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
+        summary="Listar endpoints de webhook",
+        description="Lista los endpoints de webhook configurados.",
         responses={
             200: WebhookEndpointSerializer(many=True),
             **standard_error_responses(include_403=True),
@@ -44,6 +46,8 @@ class WebhookEndpointListCreateView(APIView):
         )
 
     @extend_schema(
+        summary="Crear endpoint de webhook",
+        description="Crea un nuevo endpoint de webhook.",
         request=WebhookEndpointCreateSerializer,
         responses={
             201: WebhookEndpointSerializer,
@@ -74,6 +78,8 @@ class WebhookEndpointDetailView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
+        summary="Detalle de endpoint de webhook",
+        description="Obtiene el detalle de un endpoint de webhook.",
         responses={
             200: WebhookEndpointSerializer,
             **standard_error_responses(include_403=True, include_404=True),
@@ -86,6 +92,27 @@ class WebhookEndpointDetailView(APIView):
         )
 
     @extend_schema(
+        summary="Reemplazar endpoint de webhook",
+        description="Reemplaza completamente los datos de un endpoint de webhook.",
+        request=WebhookEndpointCreateSerializer,
+        responses={
+            200: WebhookEndpointSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+        tags=[TAG_WEBHOOKS],
+    )
+    def put(self, request, pk):
+        endpoint = get_object_or_404(WebhookEndpoint, pk=pk)
+        ser = WebhookEndpointCreateSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        for field, value in ser.validated_data.items():
+            setattr(endpoint, field, value)
+        endpoint.save()
+        return Response(WebhookEndpointSerializer(endpoint).data)
+
+    @extend_schema(
+        summary="Actualizar endpoint de webhook",
+        description="Actualiza parcialmente un endpoint de webhook.",
         request=WebhookEndpointCreateSerializer,
         responses={
             200: WebhookEndpointSerializer,
@@ -103,6 +130,11 @@ class WebhookEndpointDetailView(APIView):
         return Response(WebhookEndpointSerializer(endpoint).data)
 
     @extend_schema(
+        summary="Desactivar endpoint de webhook",
+        description=(
+            "Marca el endpoint como inactivo: deja de recibir eventos. "
+            "El registro NO se elimina de la base de datos ni se pierden las entregas registradas."
+        ),
         responses={
             204: None,
             **standard_error_responses(include_403=True, include_404=True),
@@ -122,6 +154,8 @@ class WebhookTestView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
+        summary="Probar endpoint de webhook",
+        description="Envía un payload de prueba al endpoint de webhook.",
         request=WebhookTestSerializer,
         responses={
             200: None,
@@ -154,6 +188,8 @@ class WebhookDeliveryListView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
+        summary="Historial de entregas de webhook",
+        description="Lista el historial de entregas de webhooks.",
         responses={
             200: WebhookDeliverySerializer(many=True),
             **standard_error_responses(include_403=True),
@@ -174,7 +210,22 @@ class WebhookStatsView(APIView):
 
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
-    @extend_schema(tags=[TAG_WEBHOOKS])
+    @extend_schema(
+        summary="Métricas de webhooks",
+        description="Obtiene métricas agregadas de entregas de webhooks.",
+        responses={
+            200: inline_serializer(
+                name="WebhookStatsResponse",
+                fields={
+                    "pending": serializers.IntegerField(),
+                    "delivered": serializers.IntegerField(),
+                    "failed": serializers.IntegerField(),
+                    "active_endpoints": serializers.IntegerField(),
+                },
+            )
+        },
+        tags=[TAG_WEBHOOKS],
+    )
     def get(self, request):
         return Response(
             {

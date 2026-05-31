@@ -70,6 +70,8 @@ class InventoryFullListView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @extend_schema(
+        summary="Inventario consolidado",
+        description="Devuelve el inventario consolidado por producto con filtros y exportación.",
         parameters=[
             OpenApiParameter(
                 name="category_id",
@@ -183,6 +185,8 @@ class LocationListCreateView(APIView):
         return [IsAuthenticated()]
 
     @extend_schema(
+        summary="Listar ubicaciones",
+        description="Lista las ubicaciones registradas.",
         responses={
             200: LocationSerializer(many=True),
             **standard_error_responses(),
@@ -190,12 +194,16 @@ class LocationListCreateView(APIView):
         tags=[TAG_INVENTORY],
     )
     def get(self, request):
-        data = LocationSerializer(
-            Location.objects.all().order_by("code"), many=True
-        ).data
+        qs = Location.objects.all().order_by("code")
+        include_inactive = request.query_params.get("include_inactive", "").lower()
+        if include_inactive not in ("1", "true", "yes"):
+            qs = qs.filter(is_active=True)
+        data = LocationSerializer(qs, many=True).data
         return Response(data)
 
     @extend_schema(
+        summary="Crear ubicación",
+        description="Crea una nueva ubicación de inventario.",
         request=LocationCreateSerializer,
         responses={
             201: LocationSerializer,
@@ -235,6 +243,8 @@ class StorageTemplateListCreateView(APIView):
         return [IsAuthenticated()]
 
     @extend_schema(
+        summary="Listar plantillas de almacenamiento",
+        description="Lista las plantillas de almacenamiento registradas.",
         responses={
             200: StorageTemplateSerializer(many=True),
             **standard_error_responses(),
@@ -253,6 +263,8 @@ class StorageTemplateListCreateView(APIView):
         return Response(data)
 
     @extend_schema(
+        summary="Crear plantilla de almacenamiento",
+        description="Crea una nueva plantilla de almacenamiento.",
         request=StorageTemplateCreateSerializer,
         responses={
             201: StorageTemplateSerializer,
@@ -279,6 +291,8 @@ class StorageTemplateDetailView(APIView):
         return [IsAuthenticated(), IsAlmacenista()]
 
     @extend_schema(
+        summary="Detalle de plantilla de almacenamiento",
+        description="Obtiene el detalle de una plantilla de almacenamiento.",
         responses={
             200: StorageTemplateSerializer,
             **standard_error_responses(include_404=True),
@@ -292,6 +306,29 @@ class StorageTemplateDetailView(APIView):
         return Response(StorageTemplateSerializer(template).data)
 
     @extend_schema(
+        summary="Reemplazar plantilla de almacenamiento",
+        description="Reemplaza completamente los datos de una plantilla de almacenamiento.",
+        request=StorageTemplateCreateSerializer,
+        responses={
+            200: StorageTemplateSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+        tags=[TAG_INVENTORY],
+    )
+    def put(self, request, pk):
+        from apps.inventory.models import StorageTemplate
+
+        get_object_or_404(StorageTemplate, pk=pk)
+        ser = StorageTemplateCreateSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        template = update_storage_template(
+            request.user, UUID(str(pk)), ser.validated_data
+        )
+        return Response(StorageTemplateSerializer(template).data)
+
+    @extend_schema(
+        summary="Actualizar plantilla de almacenamiento",
+        description="Actualiza parcialmente una plantilla de almacenamiento.",
         request=StorageTemplateCreateSerializer,
         responses={
             200: StorageTemplateSerializer,
@@ -308,6 +345,11 @@ class StorageTemplateDetailView(APIView):
         return Response(StorageTemplateSerializer(template).data)
 
     @extend_schema(
+        summary="Desactivar plantilla de almacenamiento",
+        description=(
+            "Marca la plantilla como inactiva. "
+            "El registro NO se elimina de la base de datos."
+        ),
         responses={
             204: OpenApiResponse(
                 description="Plantilla de almacenamiento desactivada."
@@ -330,6 +372,8 @@ class StorageTypeListCreateView(APIView):
         return [IsAuthenticated()]
 
     @extend_schema(
+        summary="Listar tipos de almacenamiento",
+        description="Lista los tipos de almacenamiento registrados.",
         responses={
             200: StorageTypeSerializer(many=True),
             **standard_error_responses(),
@@ -345,6 +389,8 @@ class StorageTypeListCreateView(APIView):
         return Response(data)
 
     @extend_schema(
+        summary="Crear tipo de almacenamiento",
+        description="Crea un nuevo tipo de almacenamiento.",
         request=StorageTypeCreateSerializer,
         responses={
             201: StorageTypeSerializer,
@@ -368,6 +414,8 @@ class StorageTypeDetailView(APIView):
         return [IsAuthenticated(), IsAlmacenista()]
 
     @extend_schema(
+        summary="Detalle de tipo de almacenamiento",
+        description="Obtiene el detalle de un tipo de almacenamiento.",
         responses={
             200: StorageTypeSerializer,
             **standard_error_responses(include_404=True),
@@ -381,6 +429,8 @@ class StorageTypeDetailView(APIView):
         return Response(StorageTypeSerializer(st).data)
 
     @extend_schema(
+        summary="Actualizar tipo de almacenamiento",
+        description="Actualiza un tipo de almacenamiento.",
         request=StorageTypeCreateSerializer,
         responses={
             200: StorageTypeSerializer,
@@ -395,6 +445,8 @@ class StorageTypeDetailView(APIView):
         return Response(StorageTypeSerializer(st).data)
 
     @extend_schema(
+        summary="Actualizar tipo de almacenamiento parcialmente",
+        description="Actualiza parcialmente un tipo de almacenamiento.",
         request=StorageTypeCreateSerializer,
         responses={
             200: StorageTypeSerializer,
@@ -409,6 +461,11 @@ class StorageTypeDetailView(APIView):
         return Response(StorageTypeSerializer(st).data)
 
     @extend_schema(
+        summary="Desactivar tipo de almacenamiento",
+        description=(
+            "Marca el tipo de almacenamiento como inactivo. "
+            "El registro NO se elimina de la base de datos."
+        ),
         responses={
             204: OpenApiResponse(
                 description="Tipo de almacenamiento desactivado exitosamente."
@@ -431,6 +488,8 @@ class LocationDetailView(APIView):
         return [IsAuthenticated(), IsAlmacenista()]
 
     @extend_schema(
+        summary="Detalle de ubicación",
+        description="Obtiene el detalle de una ubicación.",
         responses={
             200: LocationSerializer,
             **standard_error_responses(include_404=True),
@@ -442,6 +501,8 @@ class LocationDetailView(APIView):
         return Response(LocationSerializer(loc).data)
 
     @extend_schema(
+        summary="Actualizar ubicación",
+        description="Actualiza una ubicación.",
         request=LocationSerializer,
         responses={
             200: LocationSerializer,
@@ -456,6 +517,8 @@ class LocationDetailView(APIView):
         return Response(LocationSerializer(loc).data)
 
     @extend_schema(
+        summary="Actualizar ubicación parcialmente",
+        description="Actualiza parcialmente una ubicación.",
         request=LocationSerializer,
         responses={
             200: LocationSerializer,
@@ -470,6 +533,11 @@ class LocationDetailView(APIView):
         return Response(LocationSerializer(loc).data)
 
     @extend_schema(
+        summary="Desactivar ubicación",
+        description=(
+            "Marca la ubicación como inactiva. "
+            "El registro NO se elimina de la base de datos ni afecta el historial de movimientos."
+        ),
         responses={
             204: OpenApiResponse(description="Ubicación desactivada exitosamente."),
             **standard_error_responses(include_403=True, include_404=True),
@@ -487,6 +555,8 @@ class LocationStateTransitionView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
+        summary="Cambiar estado de ubicación",
+        description="Cambia el estado operativo de una ubicación.",
         request=LocationStateTransitionSerializer,
         responses={
             200: LocationSerializer,
@@ -509,6 +579,8 @@ class StockByProductView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @extend_schema(
+        summary="Stock por producto",
+        description="Consulta el stock consolidado de un producto por ubicación.",
         responses={
             200: StockByProductResponseSerializer,
             **standard_error_responses(include_404=True),
@@ -523,6 +595,8 @@ class StockByLocationView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @extend_schema(
+        summary="Stock por ubicación",
+        description="Consulta el stock de una ubicación específica.",
         responses={
             200: PaginatedStockByLocationListSerializer,
             **standard_error_responses(include_404=True),
@@ -543,6 +617,8 @@ class ReconstructStockView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
+        summary="Reconstruir stock",
+        description="Reconstruye el stock derivado desde el ledger para un producto y ubicación.",
         request=StockReconstructRequestSerializer,
         responses={
             200: StockReconstructResponseSerializer,
@@ -564,6 +640,8 @@ class ProductSearchView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @extend_schema(
+        summary="Buscar productos",
+        description="Busca productos por SKU, código de barras o nombre.",
         parameters=[
             OpenApiParameter(
                 name="q",
@@ -612,6 +690,8 @@ class StockThresholdView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
+        summary="Actualizar umbral de reorden",
+        description="Actualiza el umbral de reorden de un stock por ubicación.",
         request=StockThresholdSerializer,
         responses={
             200: StockByLocationSerializer,
