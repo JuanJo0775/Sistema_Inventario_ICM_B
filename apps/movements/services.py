@@ -1,4 +1,4 @@
-"""Servicios del ledger de movimientos (RF-005–RF-009, BR-04–BR-11, BR-13)."""
+"""Servicios del ledger de movimientos (RF-005–RF-009, BR-04–BR-11, BR-13, BR-14)."""
 
 from __future__ import annotations
 
@@ -26,6 +26,7 @@ from shared.exceptions import (
     DiscrepancyNoteRequiredError,
     ImmutableRecordError,
     InsufficientStockError,
+    LocationStateNotAllowedError,
     PrivacyConsentRequiredError,
     ProductNotReturnableError,
     SerialNumberRequiredError,
@@ -34,6 +35,53 @@ from shared.exceptions import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _ensure_location_allows_origin(location: Location, operation: str) -> None:
+    """BR-14 — Valida elegibilidad de ubicación como origen según estado operativo."""
+    if location.operational_status in {
+        Location.OperationalStatus.BLOCKED,
+        Location.OperationalStatus.ARCHIVED,
+    }:
+        raise LocationStateNotAllowedError(
+            f"La ubicación '{location.name}' no puede operar como origen en {operation}.",
+            detail={
+                "location_id": str(location.id),
+                "operational_status": location.operational_status,
+                "operation": operation,
+                "role": "origin",
+            },
+        )
+    if location.operational_status in {
+        Location.OperationalStatus.MAINTENANCE,
+        Location.OperationalStatus.RESTRICTED,
+    }:
+        raise LocationStateNotAllowedError(
+            f"La ubicación '{location.name}' está en estado {location.operational_status} y no puede despachar stock.",
+            detail={
+                "location_id": str(location.id),
+                "operational_status": location.operational_status,
+                "operation": operation,
+                "role": "origin",
+            },
+        )
+
+
+def _ensure_location_allows_destination(location: Location, operation: str) -> None:
+    """BR-14 — Valida elegibilidad de ubicación como destino según estado operativo."""
+    if location.operational_status in {
+        Location.OperationalStatus.BLOCKED,
+        Location.OperationalStatus.ARCHIVED,
+    }:
+        raise LocationStateNotAllowedError(
+            f"La ubicación '{location.name}' no puede recibir stock en {operation}.",
+            detail={
+                "location_id": str(location.id),
+                "operational_status": location.operational_status,
+                "operation": operation,
+                "role": "destination",
+            },
+        )
 
 
 def _lock_stock(product_id: UUID, location_id: UUID) -> StockByLocation:
@@ -202,6 +250,8 @@ def register_entry(
         .select_related("category")
         .get(pk=product_id)
     )
+    location = Location.objects.select_for_update().get(pk=location_id)
+    _ensure_location_allows_destination(location, "entry")
     if product.category.requires_serial_number and not (serial_number or "").strip():
         raise SerialNumberRequiredError()
     if (
@@ -275,8 +325,7 @@ def register_entry(
         cold_chain_acknowledged=cold,
         electrical_safety_acknowledged=electric,
     )
-    loc = Location.objects.get(pk=location_id)
-    check_and_create_alerts(product, loc)
+    check_and_create_alerts(product, location)
     return movement
 
 
@@ -299,7 +348,7 @@ def register_dispatch(
     privacy_notice_acknowledged: bool = False,
 ) -> list[Movement]:
     """
-    RF-006, BR-04, BR-08, BR-11, BR-13 — Salida con validación cruzada opcional y factura.
+    RF-006, BR-04, BR-08, BR-11, BR-13, BR-14 — Salida con validación cruzada opcional y factura.
 
     BR-08: si `scanned_code` y `order_sku` se envían, se valida contra `resolve_identifier`.
     Si ninguno se envía, despacho manual sin validación cruzada.
@@ -320,6 +369,8 @@ def register_dispatch(
 
     sc = (scanned_code or "").strip()
     osku = (order_sku or "").strip()
+    location = Location.objects.select_for_update().get(pk=location_id)
+    _ensure_location_allows_origin(location, "dispatch")
     if bool(sc) ^ bool(osku):
         raise CrossValidationFailedError(
             "Para validación cruzada envíe ambos `scanned_code` y `order_sku`, o ninguno para despacho manual.",
@@ -520,8 +571,7 @@ def register_dispatch(
         )
         movements_created.append(movement)
 
-    loc = Location.objects.get(pk=location_id)
-    check_and_create_alerts(product, loc)
+    check_and_create_alerts(product, location)
     for m in movements_created:
         m.refresh_from_db()
     return movements_created
@@ -541,7 +591,7 @@ def register_internal_transfer(
     related_movement: Movement | None = None,
 ) -> Movement:
     """
-    RF-007, BR-11 — Traslado interno entre ubicaciones.
+    RF-007, BR-11, BR-14 — Traslado interno entre ubicaciones.
 
     Raises:
         InsufficientStockError: Stock insuficiente en origen.
@@ -551,6 +601,18 @@ def register_internal_transfer(
         raise ValueError("Origen y destino deben ser distintos.")
 
     product = Product.objects.select_related("category").get(pk=product_id)
+    locations = {
+        loc.id: loc
+        for loc in Location.objects.select_for_update().filter(
+            pk__in=[origin_id, destination_id]
+        )
+    }
+    origin_location = locations.get(origin_id)
+    destination_location = locations.get(destination_id)
+    if origin_location is None or destination_location is None:
+        raise ValueError("Ubicación de origen o destino no existe.")
+    _ensure_location_allows_origin(origin_location, "internal_transfer")
+    _ensure_location_allows_destination(destination_location, "internal_transfer")
     cold, electric = _requires_ack_flags(product)
     if cold and not cold_chain_acknowledged:
         raise AlertAcknowledgementRequiredError(
@@ -657,7 +719,7 @@ def register_return(
     related_movement_id: UUID | None = None,
 ) -> Movement:
     """
-    RF-008 — Devolución que incrementa stock en ubicación (BR-04, BR-05, BR-11).
+    RF-008 — Devolución que incrementa stock en ubicación (BR-04, BR-05, BR-11, BR-14).
 
     Raises:
         ReturnNotAllowedError: BR-05.
@@ -668,6 +730,8 @@ def register_return(
         .select_related("category")
         .get(pk=product_id)
     )
+    location = Location.objects.select_for_update().get(pk=location_id)
+    _ensure_location_allows_destination(location, "return")
     if not _product_allows_returns(product):
         raise ProductNotReturnableError()
     if product.category.requires_serial_number and not (serial_number or "").strip():
@@ -713,8 +777,7 @@ def register_return(
         movement=movement,
         detail={"type": MovementType.DEVOLUCION},
     )
-    loc = Location.objects.get(pk=location_id)
-    check_and_create_alerts(product, loc)
+    check_and_create_alerts(product, location)
     return movement
 
 
@@ -727,7 +790,7 @@ def register_adjustment(
     justification: str,
 ) -> Movement:
     """
-    RF-009, BR-07 — Ajuste formal con delta explícito.
+    RF-009, BR-07, BR-14 — Ajuste formal con delta explícito.
 
     Raises:
         UnauthorizedDomainActionError: Solo almacenista.
@@ -741,10 +804,15 @@ def register_adjustment(
         raise AdjustmentJustificationRequiredError()
 
     row = _lock_stock(product_id, location_id)
+    location = Location.objects.select_for_update().get(pk=location_id)
     before = row.current_stock
     delta = int(new_quantity) - before
     if delta == 0:
         raise ValueError("El ajuste no cambia el stock.")
+    if delta < 0:
+        _ensure_location_allows_origin(location, "adjustment")
+    else:
+        _ensure_location_allows_destination(location, "adjustment")
     row.current_stock = int(new_quantity)
     row.last_movement_at = timezone.now()
     row.save(update_fields=["current_stock", "last_movement_at", "updated_at"])
@@ -975,7 +1043,8 @@ def dispatch_combo(
     if not items:
         raise ValueError(f"El combo {combo.sku} no tiene ítems registrados.")
 
-    location = Location.objects.get(pk=location_id)
+    location = Location.objects.select_for_update().get(pk=location_id)
+    _ensure_location_allows_origin(location, "combo_dispatch")
     movements_created: list[Movement] = []
 
     for item in items:

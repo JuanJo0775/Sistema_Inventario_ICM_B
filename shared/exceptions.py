@@ -178,6 +178,15 @@ class StockMismatchError(InventoryError):
     default_code = "STOCK_MISMATCH"
 
 
+class LocationStateNotAllowedError(DomainValidationError):
+    """BR-14: Ubicación en estado operativo no elegible para el movimiento solicitado."""
+
+    default_message = (
+        "La ubicación no está habilitada por su estado operativo para esta operación."
+    )
+    default_code = "LOCATION_STATE_NOT_ALLOWED"
+
+
 class ImmutableRecordError(ICMBaseException):
     """BR-10: Intento de modificar un registro inmutable o ventana de corrección cerrada."""
 

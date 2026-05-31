@@ -21,6 +21,7 @@ from shared.exceptions import (
     AdjustmentJustificationRequiredError,
     CrossValidationFailedError,
     DiscrepancyNoteRequiredError,
+    LocationStateNotAllowedError,
     ProductNotReturnableError,
     SerialNumberRequiredError,
 )
@@ -406,3 +407,203 @@ def test_dispatch_single_movement_nonexpiring_product(
     assert m.quantity == 5
     row = StockByLocation.objects.get(product=sample_product, location=loc)
     assert row.current_stock == 10
+
+
+@pytest.mark.django_db
+def test_dispatch_fails_when_origin_location_is_in_maintenance(
+    almacenista_user, sample_product, sample_locations
+):
+    loc = sample_locations[0]
+    loc.operational_status = "maintenance"
+    loc.save(update_fields=["operational_status", "updated_at"])
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=10)
+
+    with pytest.raises(LocationStateNotAllowedError):
+        register_dispatch(
+            almacenista_user,
+            sample_product.id,
+            loc.id,
+            1,
+            MovementType.SALIDA_VENTA_MENOR,
+            scanned_code=sample_product.barcode,
+            order_sku=sample_product.sku,
+            cold_chain_acknowledged=True,
+            electrical_safety_acknowledged=True,
+        )
+
+
+@pytest.mark.django_db
+def test_entry_allows_destination_location_in_maintenance(
+    almacenista_user, sample_product, sample_locations
+):
+    loc = sample_locations[0]
+    loc.operational_status = "maintenance"
+    loc.save(update_fields=["operational_status", "updated_at"])
+
+    movement = register_entry(
+        almacenista_user,
+        sample_product.id,
+        loc.id,
+        2,
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+
+    assert movement.destination_location_id == loc.id
+
+
+@pytest.mark.django_db
+def test_internal_transfer_fails_when_destination_is_blocked(
+    almacenista_user, sample_product, sample_locations
+):
+    origin, destination = sample_locations[0], sample_locations[1]
+    destination.operational_status = "blocked"
+    destination.save(update_fields=["operational_status", "updated_at"])
+    StockByLocation.objects.create(
+        product=sample_product,
+        location=origin,
+        current_stock=6,
+    )
+
+    with pytest.raises(LocationStateNotAllowedError):
+        register_internal_transfer(
+            almacenista_user,
+            sample_product.id,
+            origin.id,
+            destination.id,
+            2,
+            cold_chain_acknowledged=True,
+            electrical_safety_acknowledged=True,
+        )
+
+
+# ── Edge cases: archived ──────────────────────────────────────────────────────
+
+@pytest.mark.django_db
+def test_entry_fails_when_destination_is_archived(
+    almacenista_user, sample_product, sample_locations
+):
+    """Archived location blocks all inbound stock (entry)."""
+    loc = sample_locations[0]
+    loc.operational_status = "archived"
+    loc.save(update_fields=["operational_status", "updated_at"])
+
+    with pytest.raises(LocationStateNotAllowedError):
+        register_entry(
+            almacenista_user,
+            sample_product.id,
+            loc.id,
+            3,
+            cold_chain_acknowledged=True,
+            electrical_safety_acknowledged=True,
+        )
+
+
+@pytest.mark.django_db
+def test_dispatch_fails_when_origin_is_archived(
+    almacenista_user, sample_product, sample_locations
+):
+    """Archived location blocks all outbound stock (dispatch)."""
+    loc = sample_locations[0]
+    loc.operational_status = "archived"
+    loc.save(update_fields=["operational_status", "updated_at"])
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+
+    with pytest.raises(LocationStateNotAllowedError):
+        register_dispatch(
+            almacenista_user,
+            sample_product.id,
+            loc.id,
+            1,
+            MovementType.SALIDA_VENTA_MENOR,
+            cold_chain_acknowledged=True,
+            electrical_safety_acknowledged=True,
+        )
+
+
+@pytest.mark.django_db
+def test_return_fails_when_destination_is_archived(
+    almacenista_user, sample_locations
+):
+    """Archived location blocks returns (destination check)."""
+    from tests.factories import CategoryFactory, ProductFactory
+
+    cat = CategoryFactory(is_returnable=True)
+    product = ProductFactory(category=cat)
+    loc = sample_locations[0]
+    loc.operational_status = "archived"
+    loc.save(update_fields=["operational_status", "updated_at"])
+
+    with pytest.raises(LocationStateNotAllowedError):
+        register_return(
+            almacenista_user,
+            product.id,
+            loc.id,
+            1,
+        )
+
+
+@pytest.mark.django_db
+def test_return_fails_when_destination_is_blocked(
+    almacenista_user, sample_locations
+):
+    """Blocked location blocks returns (destination check)."""
+    from tests.factories import CategoryFactory, ProductFactory
+
+    cat = CategoryFactory(is_returnable=True)
+    product = ProductFactory(category=cat)
+    loc = sample_locations[0]
+    loc.operational_status = "blocked"
+    loc.save(update_fields=["operational_status", "updated_at"])
+
+    with pytest.raises(LocationStateNotAllowedError):
+        register_return(
+            almacenista_user,
+            product.id,
+            loc.id,
+            1,
+        )
+
+
+# ── Edge cases: restricted ────────────────────────────────────────────────────
+
+@pytest.mark.django_db
+def test_dispatch_fails_when_origin_is_restricted(
+    almacenista_user, sample_product, sample_locations
+):
+    """Restricted location blocks dispatch from origin."""
+    loc = sample_locations[0]
+    loc.operational_status = "restricted"
+    loc.save(update_fields=["operational_status", "updated_at"])
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+
+    with pytest.raises(LocationStateNotAllowedError):
+        register_dispatch(
+            almacenista_user,
+            sample_product.id,
+            loc.id,
+            1,
+            MovementType.SALIDA_VENTA_MENOR,
+            cold_chain_acknowledged=True,
+            electrical_safety_acknowledged=True,
+        )
+
+
+@pytest.mark.django_db
+def test_entry_allows_destination_in_restricted(
+    almacenista_user, sample_product, sample_locations
+):
+    """Restricted location still accepts inbound stock (only origin is blocked)."""
+    loc = sample_locations[0]
+    loc.operational_status = "restricted"
+    loc.save(update_fields=["operational_status", "updated_at"])
+
+    movement = register_entry(
+        almacenista_user,
+        sample_product.id,
+        loc.id,
+        2,
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+    assert movement.destination_location_id == loc.id
