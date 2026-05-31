@@ -6,13 +6,20 @@ from drf_spectacular.utils import extend_schema_serializer
 from rest_framework import serializers
 
 from apps.catalog.serializers import ProductSerializer
-from apps.inventory.models import Location, StockByLocation, StorageTemplate, StorageType
+from apps.inventory.models import (
+    Location,
+    StockByLocation,
+    StorageTemplate,
+    StorageType,
+)
 
 
 class StorageTypeCreateSerializer(serializers.Serializer):
     code = serializers.SlugField()
     name = serializers.CharField()
-    category = serializers.CharField(required=False, allow_blank=True, default="general")
+    category = serializers.CharField(
+        required=False, allow_blank=True, default="general"
+    )
     description = serializers.CharField(required=False, allow_blank=True, default="")
     capabilities = serializers.JSONField(required=False, default=dict)
     default_is_retail = serializers.BooleanField(required=False, default=False)
@@ -51,8 +58,12 @@ class StorageTemplateCreateSerializer(serializers.Serializer):
 
 class StorageTemplateSerializer(serializers.ModelSerializer):
     storage_type_id = serializers.UUIDField(required=False, allow_null=True)
-    storage_type_code = serializers.CharField(source="storage_type.code", read_only=True)
-    storage_type_name = serializers.CharField(source="storage_type.name", read_only=True)
+    storage_type_code = serializers.CharField(
+        source="storage_type.code", read_only=True
+    )
+    storage_type_name = serializers.CharField(
+        source="storage_type.name", read_only=True
+    )
 
     class Meta:
         model = StorageTemplate
@@ -104,15 +115,25 @@ class LocationCreateSerializer(serializers.Serializer):
         required=False,
         default=Location.CapacityMode.NONE,
     )
-    capacity_level = serializers.IntegerField(required=False, allow_null=True, min_value=1, max_value=5)
-    capacity_score = serializers.IntegerField(required=False, allow_null=True, min_value=1)
-    occupancy_estimate_pct = serializers.FloatField(required=False, allow_null=True, min_value=0.0, max_value=100.0)
+    capacity_level = serializers.IntegerField(
+        required=False, allow_null=True, min_value=1, max_value=5
+    )
+    capacity_score = serializers.IntegerField(
+        required=False, allow_null=True, min_value=1
+    )
+    occupancy_estimate_pct = serializers.FloatField(
+        required=False, allow_null=True, min_value=0.0, max_value=100.0
+    )
 
 
 class LocationSerializer(serializers.ModelSerializer):
     storage_type_id = serializers.UUIDField(required=False, allow_null=True)
-    storage_type_code = serializers.CharField(source="storage_type.code", read_only=True)
-    storage_type_name = serializers.CharField(source="storage_type.name", read_only=True)
+    storage_type_code = serializers.CharField(
+        source="storage_type.code", read_only=True
+    )
+    storage_type_name = serializers.CharField(
+        source="storage_type.name", read_only=True
+    )
     storage_template_id = serializers.UUIDField(required=False, allow_null=True)
     storage_template_code = serializers.CharField(
         source="storage_template.code", read_only=True
@@ -148,7 +169,9 @@ class LocationSerializer(serializers.ModelSerializer):
 
 
 class LocationStateTransitionSerializer(serializers.Serializer):
-    operational_status = serializers.ChoiceField(choices=Location.OperationalStatus.choices)
+    operational_status = serializers.ChoiceField(
+        choices=Location.OperationalStatus.choices
+    )
 
 
 class StockByLocationSerializer(serializers.ModelSerializer):

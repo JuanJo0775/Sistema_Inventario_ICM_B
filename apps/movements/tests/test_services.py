@@ -416,7 +416,9 @@ def test_dispatch_fails_when_origin_location_is_in_maintenance(
     loc = sample_locations[0]
     loc.operational_status = "maintenance"
     loc.save(update_fields=["operational_status", "updated_at"])
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=10)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=10
+    )
 
     with pytest.raises(LocationStateNotAllowedError):
         register_dispatch(
@@ -479,6 +481,7 @@ def test_internal_transfer_fails_when_destination_is_blocked(
 
 # ── Edge cases: archived ──────────────────────────────────────────────────────
 
+
 @pytest.mark.django_db
 def test_entry_fails_when_destination_is_archived(
     almacenista_user, sample_product, sample_locations
@@ -507,7 +510,9 @@ def test_dispatch_fails_when_origin_is_archived(
     loc = sample_locations[0]
     loc.operational_status = "archived"
     loc.save(update_fields=["operational_status", "updated_at"])
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=5
+    )
 
     with pytest.raises(LocationStateNotAllowedError):
         register_dispatch(
@@ -522,9 +527,7 @@ def test_dispatch_fails_when_origin_is_archived(
 
 
 @pytest.mark.django_db
-def test_return_fails_when_destination_is_archived(
-    almacenista_user, sample_locations
-):
+def test_return_fails_when_destination_is_archived(almacenista_user, sample_locations):
     """Archived location blocks returns (destination check)."""
     from tests.factories import CategoryFactory, ProductFactory
 
@@ -544,9 +547,7 @@ def test_return_fails_when_destination_is_archived(
 
 
 @pytest.mark.django_db
-def test_return_fails_when_destination_is_blocked(
-    almacenista_user, sample_locations
-):
+def test_return_fails_when_destination_is_blocked(almacenista_user, sample_locations):
     """Blocked location blocks returns (destination check)."""
     from tests.factories import CategoryFactory, ProductFactory
 
@@ -567,6 +568,7 @@ def test_return_fails_when_destination_is_blocked(
 
 # ── Edge cases: restricted ────────────────────────────────────────────────────
 
+
 @pytest.mark.django_db
 def test_dispatch_fails_when_origin_is_restricted(
     almacenista_user, sample_product, sample_locations
@@ -575,7 +577,9 @@ def test_dispatch_fails_when_origin_is_restricted(
     loc = sample_locations[0]
     loc.operational_status = "restricted"
     loc.save(update_fields=["operational_status", "updated_at"])
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=5
+    )
 
     with pytest.raises(LocationStateNotAllowedError):
         register_dispatch(

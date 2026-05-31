@@ -141,14 +141,20 @@ def create_location(
 
     storage_template = None
     if storage_template_id is not None:
-        storage_template = StorageTemplate.objects.filter(pk=storage_template_id).first()
+        storage_template = StorageTemplate.objects.filter(
+            pk=storage_template_id
+        ).first()
         if storage_template is None:
             raise DomainValidationError("La plantilla de almacenamiento no existe.")
         if not storage_template.is_active:
             raise DomainValidationError("La plantilla de almacenamiento está inactiva.")
 
     template_defaults = storage_template.defaults if storage_template else {}
-    if storage_type_id is None and storage_template and storage_template.storage_type_id:
+    if (
+        storage_type_id is None
+        and storage_template
+        and storage_template.storage_type_id
+    ):
         storage_type_id = storage_template.storage_type_id
     if is_retail is None and isinstance(template_defaults, dict):
         if "is_retail" in template_defaults:
@@ -156,7 +162,9 @@ def create_location(
     if max_capacity is None and isinstance(template_defaults, dict):
         if "max_capacity" in template_defaults:
             max_capacity = template_defaults.get("max_capacity")
-    if capacity_mode == Location.CapacityMode.NONE and isinstance(template_defaults, dict):
+    if capacity_mode == Location.CapacityMode.NONE and isinstance(
+        template_defaults, dict
+    ):
         if "capacity_mode" in template_defaults:
             capacity_mode = str(template_defaults.get("capacity_mode") or capacity_mode)
     if capacity_level is None and isinstance(template_defaults, dict):
@@ -176,7 +184,10 @@ def create_location(
     valid_capacity_modes = {choice[0] for choice in Location.CapacityMode.choices}
     if capacity_mode not in valid_capacity_modes:
         raise DomainValidationError("Modo de capacidad inválido.")
-    if capacity_level is not None and capacity_mode != Location.CapacityMode.RELATIVE_SCALE:
+    if (
+        capacity_level is not None
+        and capacity_mode != Location.CapacityMode.RELATIVE_SCALE
+    ):
         raise DomainValidationError(
             "capacity_level solo aplica cuando capacity_mode=relative_scale."
         )
@@ -184,7 +195,10 @@ def create_location(
         raise DomainValidationError("capacity_level debe estar entre 1 y 5.")
     if capacity_score is not None and int(capacity_score) <= 0:
         raise DomainValidationError("capacity_score debe ser mayor que 0.")
-    if occupancy_estimate_pct is not None and not 0 <= float(occupancy_estimate_pct) <= 100:
+    if (
+        occupancy_estimate_pct is not None
+        and not 0 <= float(occupancy_estimate_pct) <= 100
+    ):
         raise DomainValidationError("occupancy_estimate_pct debe estar entre 0 y 100.")
     if (
         capacity_mode == Location.CapacityMode.NONE
@@ -294,7 +308,10 @@ def update_location(executor: Any, location_id: UUID, data: dict[str, Any]) -> L
         if mode not in valid_modes:
             raise DomainValidationError("Modo de capacidad inválido.")
         loc.capacity_mode = mode
-        if mode != Location.CapacityMode.RELATIVE_SCALE and "capacity_level" not in data:
+        if (
+            mode != Location.CapacityMode.RELATIVE_SCALE
+            and "capacity_level" not in data
+        ):
             loc.capacity_level = None
     if "capacity_level" in data:
         level = data.get("capacity_level")
@@ -309,7 +326,9 @@ def update_location(executor: Any, location_id: UUID, data: dict[str, Any]) -> L
     if "occupancy_estimate_pct" in data:
         estimate = data.get("occupancy_estimate_pct")
         if estimate is not None and not 0 <= float(estimate) <= 100:
-            raise DomainValidationError("occupancy_estimate_pct debe estar entre 0 y 100.")
+            raise DomainValidationError(
+                "occupancy_estimate_pct debe estar entre 0 y 100."
+            )
         loc.occupancy_estimate_pct = estimate
     if (
         loc.capacity_level is not None
@@ -321,7 +340,10 @@ def update_location(executor: Any, location_id: UUID, data: dict[str, Any]) -> L
     if "is_active" in data:
         requested_active = bool(data["is_active"])
         loc.is_active = requested_active
-        if requested_active and loc.operational_status == Location.OperationalStatus.ARCHIVED:
+        if (
+            requested_active
+            and loc.operational_status == Location.OperationalStatus.ARCHIVED
+        ):
             loc.operational_status = Location.OperationalStatus.ACTIVE
         elif not requested_active:
             loc.operational_status = Location.OperationalStatus.ARCHIVED
@@ -532,6 +554,8 @@ def update_storage_template(
 
 
 @transaction.atomic
-def deactivate_storage_template(executor: Any, storage_template_id: UUID) -> StorageTemplate:
+def deactivate_storage_template(
+    executor: Any, storage_template_id: UUID
+) -> StorageTemplate:
     """Desactiva una plantilla de almacenamiento (solo almacenista)."""
     return update_storage_template(executor, storage_template_id, {"is_active": False})

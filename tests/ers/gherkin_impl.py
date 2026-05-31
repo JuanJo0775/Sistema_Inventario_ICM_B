@@ -1948,7 +1948,11 @@ def impl_rf004_s08(authenticated_almacenista_client: APIClient, db):
     """Crear tipo de almacenamiento y asignarlo a una ubicacion."""
     r_type = authenticated_almacenista_client.post(
         reverse("inventory-storage-types"),
-        {"code": "bodega-gherkin-s08", "name": "Bodega Gherkin S08", "category": "warehouse"},
+        {
+            "code": "bodega-gherkin-s08",
+            "name": "Bodega Gherkin S08",
+            "category": "warehouse",
+        },
         format="json",
     )
     assert r_type.status_code == status.HTTP_201_CREATED
@@ -2000,7 +2004,11 @@ def impl_rf004_s10(authenticated_almacenista_client: APIClient, db):
             "code": "tmpl-s10",
             "name": "Plantilla S10",
             "storage_type_id": r_type.data["id"],
-            "defaults": {"max_capacity": 40, "capacity_mode": "relative_scale", "capacity_level": 2},
+            "defaults": {
+                "max_capacity": 40,
+                "capacity_mode": "relative_scale",
+                "capacity_level": 2,
+            },
         },
         format="json",
     )
@@ -2024,7 +2032,9 @@ def impl_rf004_s11(
     from apps.inventory.models import StockByLocation
 
     loc = sample_locations[0]
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=5
+    )
 
     r_trans = authenticated_almacenista_client.post(
         reverse("inventory-location-state-transitions", kwargs={"pk": loc.id}),
@@ -2095,7 +2105,9 @@ def impl_rf004_s14(
     loc = sample_locations[0]
     loc.operational_status = "restricted"
     loc.save(update_fields=["operational_status", "updated_at"])
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=5
+    )
 
     r_disp = authenticated_almacenista_client.post(
         reverse("movements-dispatches"),
@@ -2148,7 +2160,11 @@ def impl_rf004_s15(authenticated_almacenista_client: APIClient, db):
     )
     assert r_rep.status_code == status.HTTP_200_OK
     row = next(
-        (item for item in r_rep.data["by_location"] if item["code"] == r_loc.data["code"]),
+        (
+            item
+            for item in r_rep.data["by_location"]
+            if item["code"] == r_loc.data["code"]
+        ),
         None,
     )
     assert row is not None
@@ -2160,11 +2176,19 @@ def impl_rf004_s16(authenticated_almacenista_client: APIClient, db):
     from apps.inventory.models import Location, StockByLocation, StorageType
     from tests.factories import ProductFactory
 
-    type_a = StorageType.objects.create(code="tipo-a-s16", name="Tipo A S16", is_active=True)
-    type_b = StorageType.objects.create(code="tipo-b-s16", name="Tipo B S16", is_active=True)
+    type_a = StorageType.objects.create(
+        code="tipo-a-s16", name="Tipo A S16", is_active=True
+    )
+    type_b = StorageType.objects.create(
+        code="tipo-b-s16", name="Tipo B S16", is_active=True
+    )
 
-    loc_a = Location.objects.create(code="LOC-A-S16", name="Loc A S16", storage_type=type_a, is_active=True)
-    loc_b = Location.objects.create(code="LOC-B-S16", name="Loc B S16", storage_type=type_b, is_active=True)
+    loc_a = Location.objects.create(
+        code="LOC-A-S16", name="Loc A S16", storage_type=type_a, is_active=True
+    )
+    loc_b = Location.objects.create(
+        code="LOC-B-S16", name="Loc B S16", storage_type=type_b, is_active=True
+    )
 
     prod_a = ProductFactory()
     prod_b = ProductFactory()
@@ -2187,13 +2211,21 @@ def impl_rf004_s17(authenticated_almacenista_client: APIClient, db):
     from tests.factories import ProductFactory
 
     loc_active = Location.objects.create(
-        code="LOC-ACT-S17", name="Loc Active S17", operational_status="active", is_active=True
+        code="LOC-ACT-S17",
+        name="Loc Active S17",
+        operational_status="active",
+        is_active=True,
     )
     loc_maint = Location.objects.create(
-        code="LOC-MNT-S17", name="Loc Maintenance S17", operational_status="maintenance", is_active=True
+        code="LOC-MNT-S17",
+        name="Loc Maintenance S17",
+        operational_status="maintenance",
+        is_active=True,
     )
     product = ProductFactory()
-    StockByLocation.objects.create(product=product, location=loc_active, current_stock=4)
+    StockByLocation.objects.create(
+        product=product, location=loc_active, current_stock=4
+    )
     StockByLocation.objects.create(product=product, location=loc_maint, current_stock=2)
 
     r = authenticated_almacenista_client.get(
@@ -2210,8 +2242,12 @@ def impl_rf004_s18(authenticated_almacenista_client: APIClient, db):
     from tests.factories import ProductFactory
 
     st = StorageType.objects.create(code="tipo-s18", name="Tipo S18", is_active=True)
-    loc1 = Location.objects.create(code="LOC-S18-1", name="Loc S18 1", storage_type=st, is_active=True)
-    loc2 = Location.objects.create(code="LOC-S18-2", name="Loc S18 2", storage_type=st, is_active=True)
+    loc1 = Location.objects.create(
+        code="LOC-S18-1", name="Loc S18 1", storage_type=st, is_active=True
+    )
+    loc2 = Location.objects.create(
+        code="LOC-S18-2", name="Loc S18 2", storage_type=st, is_active=True
+    )
     product = ProductFactory()
     StockByLocation.objects.create(product=product, location=loc1, current_stock=10)
     StockByLocation.objects.create(product=product, location=loc2, current_stock=7)

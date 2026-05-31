@@ -7,12 +7,12 @@ from apps.inventory.views import (
     LocationStateTransitionView,
     ProductSearchView,
     ReconstructStockView,
+    StockByLocationView,
+    StockByProductView,
     StorageTemplateDetailView,
     StorageTemplateListCreateView,
     StorageTypeDetailView,
     StorageTypeListCreateView,
-    StockByLocationView,
-    StockByProductView,
 )
 
 urlpatterns = [

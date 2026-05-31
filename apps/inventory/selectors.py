@@ -35,16 +35,16 @@ def get_stock_by_product(product_id: UUID) -> dict[str, Any]:
             "location_id": str(r.location_id),
             "location_code": r.location.code,
             "location_name": r.location.name,
-            "storage_type_id": str(r.location.storage_type_id)
-            if r.location.storage_type_id
-            else None,
-            "storage_type_code": getattr(r.location.storage_type, "code", None),
-            "storage_template_id": str(r.location.storage_template_id)
-            if r.location.storage_template_id
-            else None,
-            "storage_template_code": getattr(
-                r.location.storage_template, "code", None
+            "storage_type_id": (
+                str(r.location.storage_type_id) if r.location.storage_type_id else None
             ),
+            "storage_type_code": getattr(r.location.storage_type, "code", None),
+            "storage_template_id": (
+                str(r.location.storage_template_id)
+                if r.location.storage_template_id
+                else None
+            ),
+            "storage_template_code": getattr(r.location.storage_template, "code", None),
             "operational_status": r.location.operational_status,
             "capacity_mode": r.location.capacity_mode,
             "capacity_level": r.location.capacity_level,
@@ -160,7 +160,9 @@ def get_full_inventory(filters: dict[str, Any] | None = None) -> list[dict[str, 
         ).distinct()
     if filters.get("operational_status"):
         qs = qs.filter(
-            stock_by_location__location__operational_status=filters["operational_status"]
+            stock_by_location__location__operational_status=filters[
+                "operational_status"
+            ]
         ).distinct()
     qs = qs.prefetch_related(
         Prefetch(

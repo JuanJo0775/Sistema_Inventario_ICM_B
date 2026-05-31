@@ -457,6 +457,7 @@ def test_movement_history_filters_by_location_id(
     assert str(mov_a.id) in ids
     # Movement destined exclusively to loc_b must not appear in loc_a filter
     from apps.movements.models import Movement as _Movement
+
     loc_b_only_id = (
         _Movement.objects.filter(destination_location=loc_b)
         .exclude(destination_location=loc_a)

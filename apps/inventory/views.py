@@ -25,27 +25,27 @@ from apps.inventory.serializers import (
     PaginatedProductListSerializer,
     PaginatedStockByLocationListSerializer,
     ProductSerializer,
-    StorageTypeCreateSerializer,
-    StorageTemplateCreateSerializer,
-    StorageTemplateSerializer,
-    StorageTypeSerializer,
     StockByLocationSerializer,
     StockByProductResponseSerializer,
     StockReconstructRequestSerializer,
     StockReconstructResponseSerializer,
+    StorageTemplateCreateSerializer,
+    StorageTemplateSerializer,
+    StorageTypeCreateSerializer,
+    StorageTypeSerializer,
 )
 from apps.inventory.services import (
+    create_location,
     create_storage_template,
     create_storage_type,
-    create_location,
+    deactivate_location,
     deactivate_storage_template,
     deactivate_storage_type,
-    deactivate_location,
     transition_location_state,
     trigger_stock_reconstruction,
+    update_location,
     update_storage_template,
     update_storage_type,
-    update_location,
 )
 from shared.openapi import TAG_INVENTORY, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
@@ -173,7 +173,9 @@ class LocationListCreateView(APIView):
             max_capacity=d.get("max_capacity", None),
             storage_type_id=d.get("storage_type_id"),
             storage_template_id=d.get("storage_template_id"),
-            operational_status=d.get("operational_status", Location.OperationalStatus.ACTIVE),
+            operational_status=d.get(
+                "operational_status", Location.OperationalStatus.ACTIVE
+            ),
             capacity_mode=d.get("capacity_mode", Location.CapacityMode.NONE),
             capacity_level=d.get("capacity_level"),
             capacity_score=d.get("capacity_score"),
@@ -258,12 +260,16 @@ class StorageTemplateDetailView(APIView):
     def patch(self, request, pk):
         ser = StorageTemplateCreateSerializer(data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
-        template = update_storage_template(request.user, UUID(str(pk)), ser.validated_data)
+        template = update_storage_template(
+            request.user, UUID(str(pk)), ser.validated_data
+        )
         return Response(StorageTemplateSerializer(template).data)
 
     @extend_schema(
         responses={
-            204: OpenApiResponse(description="Plantilla de almacenamiento desactivada."),
+            204: OpenApiResponse(
+                description="Plantilla de almacenamiento desactivada."
+            ),
             **standard_error_responses(include_403=True, include_404=True),
         },
         tags=[TAG_INVENTORY],

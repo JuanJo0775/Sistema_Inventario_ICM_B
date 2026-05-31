@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from apps.inventory.models import Location, StockByLocation, StorageTemplate, StorageType
+from apps.inventory.models import (
+    Location,
+    StockByLocation,
+    StorageTemplate,
+    StorageType,
+)
 
 
 @admin.register(StorageType)

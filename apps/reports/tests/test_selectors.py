@@ -77,8 +77,8 @@ def test_get_lots_expiring_soon_filters_by_window():
 
 from apps.reports.selectors import (
     get_discard_operational_summary,
-    get_warehouse_occupancy_distribution,
     get_quality_operational_summary,
+    get_warehouse_occupancy_distribution,
     get_warehouse_utilization,
 )
 
