@@ -486,7 +486,9 @@ class TestProductDeactivateComboGuard:
     def test_delete_returns_409_when_in_active_combo(
         self, authenticated_almacenista_client, sample_product
     ):
-        combo = ProductCombo.objects.create(name="Kit Test", sku="KIT-G001", is_active=True)
+        combo = ProductCombo.objects.create(
+            name="Kit Test", sku="KIT-G001", is_active=True
+        )
         ComboItem.objects.create(combo=combo, product=sample_product, quantity=1)
         resp = authenticated_almacenista_client.delete(
             f"/api/v1/catalog/products/{sample_product.id}/"
@@ -500,7 +502,9 @@ class TestProductDeactivateComboGuard:
     def test_delete_succeeds_when_only_in_inactive_combo(
         self, authenticated_almacenista_client, sample_product
     ):
-        combo = ProductCombo.objects.create(name="Kit Inactivo", sku="KIT-G002", is_active=False)
+        combo = ProductCombo.objects.create(
+            name="Kit Inactivo", sku="KIT-G002", is_active=False
+        )
         ComboItem.objects.create(combo=combo, product=sample_product, quantity=1)
         resp = authenticated_almacenista_client.delete(
             f"/api/v1/catalog/products/{sample_product.id}/"
@@ -528,7 +532,9 @@ class TestProductDeactivateComboGuard:
             f"/api/v1/catalog/products/{sample_product.id}/"
         )
         assert resp.status_code == 204
-        log = AuditLog.objects.filter(event_type=AuditEventType.PRODUCT_DEACTIVATED).first()
+        log = AuditLog.objects.filter(
+            event_type=AuditEventType.PRODUCT_DEACTIVATED
+        ).first()
         assert log is not None
         assert sample_product.sku in log.description
 
@@ -579,7 +585,9 @@ class TestComboUpdateIsActiveIgnored:
             f"/api/v1/catalog/combos/{combo.id}/"
         )
         assert resp.status_code == 204
-        log = AuditLog.objects.filter(event_type=AuditEventType.COMBO_DEACTIVATED).first()
+        log = AuditLog.objects.filter(
+            event_type=AuditEventType.COMBO_DEACTIVATED
+        ).first()
         assert log is not None
         assert combo.sku in log.description
 

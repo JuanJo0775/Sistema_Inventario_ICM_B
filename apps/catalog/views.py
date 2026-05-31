@@ -241,7 +241,9 @@ class ProductListCreateView(generics.ListCreateAPIView):
         tags=[TAG_CATALOG],
         responses={
             204: None,
-            **standard_error_responses(include_403=True, include_404=True, include_409=True),
+            **standard_error_responses(
+                include_403=True, include_404=True, include_409=True
+            ),
         },
     ),
 )
