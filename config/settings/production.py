@@ -51,3 +51,6 @@ SIMPLE_JWT.update(
 )
 
 LOGGING["root"]["level"] = "INFO"
+
+# M-06: Restringir acceso a documentación OpenAPI solo a staff en producción.
+RESTRICT_API_SCHEMA = True

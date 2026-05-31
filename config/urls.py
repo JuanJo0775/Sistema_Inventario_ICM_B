@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import (
@@ -5,7 +6,15 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
+
+
+def _schema_permissions():
+    """En producción (RESTRICT_API_SCHEMA=True) solo staff; en dev/test, público."""
+    if getattr(settings, "RESTRICT_API_SCHEMA", False):
+        return [IsAdminUser]
+    return [AllowAny]
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -19,14 +28,14 @@ urlpatterns = [
     path("api/v1/audit/", include("apps.audit.urls")),
     path(
         "api/schema/",
-        SpectacularAPIView.as_view(permission_classes=[AllowAny]),
+        SpectacularAPIView.as_view(permission_classes=_schema_permissions()),
         name="schema",
     ),
     path(
         "api/docs/",
         SpectacularSwaggerView.as_view(
             url_name="schema",
-            permission_classes=[AllowAny],
+            permission_classes=_schema_permissions(),
         ),
         name="swagger-ui",
     ),
@@ -34,7 +43,7 @@ urlpatterns = [
         "api/redoc/",
         SpectacularRedocView.as_view(
             url_name="schema",
-            permission_classes=[AllowAny],
+            permission_classes=_schema_permissions(),
         ),
         name="redoc",
     ),
