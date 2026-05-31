@@ -3089,7 +3089,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_delete_category_with_active_products_returns_409 -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 105)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 106)
 
 
 ---
@@ -3125,7 +3125,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_delete_category_with_only_inactive_products_succeeds -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 117)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 118)
 
 
 ---
@@ -3161,7 +3161,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_delete_requires_almacenista -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 169)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 170)
 
 
 ---
@@ -3197,7 +3197,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_delete_soft_deletes_category -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 95)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 96)
 
 
 ---
@@ -3233,7 +3233,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_get_detail_404_on_missing -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 48)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 49)
 
 
 ---
@@ -3269,7 +3269,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_get_detail_returns_200 -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 37)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 38)
 
 
 ---
@@ -3305,7 +3305,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_list_excludes_inactive_by_default -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 139)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 140)
 
 
 ---
@@ -3341,7 +3341,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_list_includes_inactive_with_param -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 149)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 150)
 
 
 ---
@@ -3377,7 +3377,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_patch_requires_almacenista -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 159)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 160)
 
 
 ---
@@ -3413,7 +3413,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_patch_updates_flags -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 70)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 71)
 
 
 ---
@@ -3449,7 +3449,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_patch_updates_name -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 57)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 58)
 
 
 ---
@@ -3485,7 +3485,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_put_replaces_category -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 83)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 84)
 
 
 ---
@@ -3521,7 +3521,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_restore_category_reactivates -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 128)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 129)
 
 
 ---
@@ -3557,7 +3557,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_delete_soft_deletes -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 351)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 352)
 
 
 ---
@@ -3593,7 +3593,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_get_detail_returns_200 -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 292)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 293)
 
 
 ---
@@ -3629,7 +3629,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_list_excludes_inactive_by_default -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 378)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 379)
 
 
 ---
@@ -3665,7 +3665,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_list_includes_inactive_with_param -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 392)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 393)
 
 
 ---
@@ -3701,7 +3701,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_patch_updates_name -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 305)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 306)
 
 
 ---
@@ -3737,7 +3737,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_patch_with_items_replaces_all_items -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 318)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 319)
 
 
 ---
@@ -3773,7 +3773,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_put_replaces_combo -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 336)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 337)
 
 
 ---
@@ -3809,13 +3809,301 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_restore_reactivates -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 363)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 364)
 
 
 ---
 
 <!-- file: UNIT-0107.md -->
 **Código:** UNIT-0107
+
+# test_deactivate_via_delete_logs_combo_deactivated
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestComboUpdateIsActiveIgnored::test_deactivate_via_delete_logs_combo_deactivated`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestComboUpdateIsActiveIgnored::test_deactivate_via_delete_logs_combo_deactivated -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 580)
+
+
+---
+
+<!-- file: UNIT-0108.md -->
+**Código:** UNIT-0108
+
+# test_patch_name_still_works_when_is_active_sent
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestComboUpdateIsActiveIgnored::test_patch_name_still_works_when_is_active_sent`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestComboUpdateIsActiveIgnored::test_patch_name_still_works_when_is_active_sent -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 595)
+
+
+---
+
+<!-- file: UNIT-0109.md -->
+**Código:** UNIT-0109
+
+# test_patch_with_is_active_does_not_deactivate_combo
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestComboUpdateIsActiveIgnored::test_patch_with_is_active_does_not_deactivate_combo`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestComboUpdateIsActiveIgnored::test_patch_with_is_active_does_not_deactivate_combo -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 549)
+
+
+---
+
+<!-- file: UNIT-0110.md -->
+**Código:** UNIT-0110
+
+# test_patch_with_is_active_does_not_log_combo_deactivated
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestComboUpdateIsActiveIgnored::test_patch_with_is_active_does_not_log_combo_deactivated`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestComboUpdateIsActiveIgnored::test_patch_with_is_active_does_not_log_combo_deactivated -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 565)
+
+
+---
+
+<!-- file: UNIT-0111.md -->
+**Código:** UNIT-0111
+
+# test_delete_logs_product_deactivated_event
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestProductDeactivateComboGuard::test_delete_logs_product_deactivated_event`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestProductDeactivateComboGuard::test_delete_logs_product_deactivated_event -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 528)
+
+
+---
+
+<!-- file: UNIT-0112.md -->
+**Código:** UNIT-0112
+
+# test_delete_returns_409_when_in_active_combo
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestProductDeactivateComboGuard::test_delete_returns_409_when_in_active_combo`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestProductDeactivateComboGuard::test_delete_returns_409_when_in_active_combo -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 486)
+
+
+---
+
+<!-- file: UNIT-0113.md -->
+**Código:** UNIT-0113
+
+# test_delete_succeeds_when_not_in_any_combo
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestProductDeactivateComboGuard::test_delete_succeeds_when_not_in_any_combo`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestProductDeactivateComboGuard::test_delete_succeeds_when_not_in_any_combo -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 517)
+
+
+---
+
+<!-- file: UNIT-0114.md -->
+**Código:** UNIT-0114
+
+# test_delete_succeeds_when_only_in_inactive_combo
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestProductDeactivateComboGuard::test_delete_succeeds_when_only_in_inactive_combo`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestProductDeactivateComboGuard::test_delete_succeeds_when_only_in_inactive_combo -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 502)
+
+
+---
+
+<!-- file: UNIT-0115.md -->
+**Código:** UNIT-0115
 
 # test_delete_deactivates_product
 
@@ -3845,13 +4133,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_delete_deactivates_product -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 413)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 414)
 
 
 ---
 
-<!-- file: UNIT-0108.md -->
-**Código:** UNIT-0108
+<!-- file: UNIT-0116.md -->
+**Código:** UNIT-0116
 
 # test_delete_requires_almacenista
 
@@ -3881,13 +4169,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_delete_requires_almacenista -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 458)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 459)
 
 
 ---
 
-<!-- file: UNIT-0109.md -->
-**Código:** UNIT-0109
+<!-- file: UNIT-0117.md -->
+**Código:** UNIT-0117
 
 # test_list_excludes_inactive_by_default
 
@@ -3917,13 +4205,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_list_excludes_inactive_by_default -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 438)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 439)
 
 
 ---
 
-<!-- file: UNIT-0110.md -->
-**Código:** UNIT-0110
+<!-- file: UNIT-0118.md -->
+**Código:** UNIT-0118
 
 # test_list_includes_inactive_with_param
 
@@ -3953,13 +4241,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_list_includes_inactive_with_param -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 448)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 449)
 
 
 ---
 
-<!-- file: UNIT-0111.md -->
-**Código:** UNIT-0111
+<!-- file: UNIT-0119.md -->
+**Código:** UNIT-0119
 
 # test_restore_reactivates_product
 
@@ -3989,13 +4277,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_restore_reactivates_product -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 424)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 425)
 
 
 ---
 
-<!-- file: UNIT-0112.md -->
-**Código:** UNIT-0112
+<!-- file: UNIT-0120.md -->
+**Código:** UNIT-0120
 
 # test_restore_requires_almacenista
 
@@ -4025,13 +4313,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_restore_requires_almacenista -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 467)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 468)
 
 
 ---
 
-<!-- file: UNIT-0113.md -->
-**Código:** UNIT-0113
+<!-- file: UNIT-0121.md -->
+**Código:** UNIT-0121
 
 # test_delete_soft_deletes
 
@@ -4061,13 +4349,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_delete_soft_deletes -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 222)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 223)
 
 
 ---
 
-<!-- file: UNIT-0114.md -->
-**Código:** UNIT-0114
+<!-- file: UNIT-0122.md -->
+**Código:** UNIT-0122
 
 # test_delete_with_active_products_returns_409
 
@@ -4097,13 +4385,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_delete_with_active_products_returns_409 -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 233)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 234)
 
 
 ---
 
-<!-- file: UNIT-0115.md -->
-**Código:** UNIT-0115
+<!-- file: UNIT-0123.md -->
+**Código:** UNIT-0123
 
 # test_get_detail_returns_200
 
@@ -4133,13 +4421,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_get_detail_returns_200 -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 184)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 185)
 
 
 ---
 
-<!-- file: UNIT-0116.md -->
-**Código:** UNIT-0116
+<!-- file: UNIT-0124.md -->
+**Código:** UNIT-0124
 
 # test_list_excludes_inactive_by_default
 
@@ -4169,13 +4457,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_list_excludes_inactive_by_default -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 259)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 260)
 
 
 ---
 
-<!-- file: UNIT-0117.md -->
-**Código:** UNIT-0117
+<!-- file: UNIT-0125.md -->
+**Código:** UNIT-0125
 
 # test_list_includes_inactive_with_param
 
@@ -4205,13 +4493,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_list_includes_inactive_with_param -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 272)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 273)
 
 
 ---
 
-<!-- file: UNIT-0118.md -->
-**Código:** UNIT-0118
+<!-- file: UNIT-0126.md -->
+**Código:** UNIT-0126
 
 # test_patch_updates_name
 
@@ -4241,13 +4529,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_patch_updates_name -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 196)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 197)
 
 
 ---
 
-<!-- file: UNIT-0119.md -->
-**Código:** UNIT-0119
+<!-- file: UNIT-0127.md -->
+**Código:** UNIT-0127
 
 # test_put_updates_subcategory
 
@@ -4277,13 +4565,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_put_updates_subcategory -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 210)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 211)
 
 
 ---
 
-<!-- file: UNIT-0120.md -->
-**Código:** UNIT-0120
+<!-- file: UNIT-0128.md -->
+**Código:** UNIT-0128
 
 # test_restore_reactivates
 
@@ -4313,13 +4601,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_restore_reactivates -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 245)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 246)
 
 
 ---
 
-<!-- file: UNIT-0121.md -->
-**Código:** UNIT-0121
+<!-- file: UNIT-0129.md -->
+**Código:** UNIT-0129
 
 # test_catalog_service_exports_identifier_resolver
 
@@ -4354,8 +4642,8 @@ Código fuente: [apps/catalog/tests/test_services.py](../../apps/catalog/tests/t
 
 ---
 
-<!-- file: UNIT-0122.md -->
-**Código:** UNIT-0122
+<!-- file: UNIT-0130.md -->
+**Código:** UNIT-0130
 
 # test_create_product_auto_generates_stable_barcode
 
@@ -4390,8 +4678,8 @@ Código fuente: [apps/catalog/tests/test_services.py](../../apps/catalog/tests/t
 
 ---
 
-<!-- file: UNIT-0123.md -->
-**Código:** UNIT-0123
+<!-- file: UNIT-0131.md -->
+**Código:** UNIT-0131
 
 # test_update_product_backfills_missing_barcode
 
@@ -4426,8 +4714,8 @@ Código fuente: [apps/catalog/tests/test_services.py](../../apps/catalog/tests/t
 
 ---
 
-<!-- file: UNIT-0124.md -->
-**Código:** UNIT-0124
+<!-- file: UNIT-0132.md -->
+**Código:** UNIT-0132
 
 # test_update_product_keeps_existing_barcode
 
@@ -4462,8 +4750,8 @@ Código fuente: [apps/catalog/tests/test_services.py](../../apps/catalog/tests/t
 
 ---
 
-<!-- file: UNIT-0125.md -->
-**Código:** UNIT-0125
+<!-- file: UNIT-0133.md -->
+**Código:** UNIT-0133
 
 # test_catalog_views_are_available
 
@@ -4498,8 +4786,8 @@ Código fuente: [apps/catalog/tests/test_views.py](../../apps/catalog/tests/test
 
 ---
 
-<!-- file: UNIT-0126.md -->
-**Código:** UNIT-0126
+<!-- file: UNIT-0134.md -->
+**Código:** UNIT-0134
 
 # test_product_barcode_endpoint_returns_ready_to_consume_payload
 
@@ -4534,8 +4822,8 @@ Código fuente: [apps/catalog/tests/test_views.py](../../apps/catalog/tests/test
 
 ---
 
-<!-- file: UNIT-0127.md -->
-**Código:** UNIT-0127
+<!-- file: UNIT-0135.md -->
+**Código:** UNIT-0135
 
 # test_dashboard_kpis_expose_precision_metadata
 
@@ -4570,8 +4858,8 @@ Código fuente: [apps/dashboard/tests/test_views.py](../../apps/dashboard/tests/
 
 ---
 
-<!-- file: UNIT-0128.md -->
-**Código:** UNIT-0128
+<!-- file: UNIT-0136.md -->
+**Código:** UNIT-0136
 
 # test_dashboard_overview_returns_composable_payload
 
@@ -4606,8 +4894,8 @@ Código fuente: [apps/dashboard/tests/test_views.py](../../apps/dashboard/tests/
 
 ---
 
-<!-- file: UNIT-0129.md -->
-**Código:** UNIT-0129
+<!-- file: UNIT-0137.md -->
+**Código:** UNIT-0137
 
 # test_dashboard_service_overview_stays_structured
 
@@ -4642,8 +4930,8 @@ Código fuente: [apps/dashboard/tests/test_views.py](../../apps/dashboard/tests/
 
 ---
 
-<!-- file: UNIT-0130.md -->
-**Código:** UNIT-0130
+<!-- file: UNIT-0138.md -->
+**Código:** UNIT-0138
 
 # test_stock_by_location_admin_is_least_privilege_derived_stock
 
@@ -4678,8 +4966,8 @@ Código fuente: [apps/inventory/tests/test_admin.py](../../apps/inventory/tests/
 
 ---
 
-<!-- file: UNIT-0131.md -->
-**Código:** UNIT-0131
+<!-- file: UNIT-0139.md -->
+**Código:** UNIT-0139
 
 # test_verify_integrity_detects_divergence
 
@@ -4714,8 +5002,8 @@ Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0132.md -->
-**Código:** UNIT-0132
+<!-- file: UNIT-0140.md -->
+**Código:** UNIT-0140
 
 # test_verify_integrity_empty_stock
 
@@ -4750,8 +5038,8 @@ Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0133.md -->
-**Código:** UNIT-0133
+<!-- file: UNIT-0141.md -->
+**Código:** UNIT-0141
 
 # test_verify_integrity_fix_flag
 
@@ -4786,8 +5074,8 @@ Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0134.md -->
-**Código:** UNIT-0134
+<!-- file: UNIT-0142.md -->
+**Código:** UNIT-0142
 
 # test_verify_integrity_no_divergence
 
@@ -4822,8 +5110,8 @@ Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0135.md -->
-**Código:** UNIT-0135
+<!-- file: UNIT-0143.md -->
+**Código:** UNIT-0143
 
 # test_verify_integrity_no_fix_without_flag
 
@@ -4858,8 +5146,8 @@ Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0136.md -->
-**Código:** UNIT-0136
+<!-- file: UNIT-0144.md -->
+**Código:** UNIT-0144
 
 # test_effective_reorder_point_uses_global_when_no_override
 
@@ -4894,8 +5182,8 @@ Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inv
 
 ---
 
-<!-- file: UNIT-0137.md -->
-**Código:** UNIT-0137
+<!-- file: UNIT-0145.md -->
+**Código:** UNIT-0145
 
 # test_effective_reorder_point_uses_local_override
 
@@ -4930,8 +5218,8 @@ Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inv
 
 ---
 
-<!-- file: UNIT-0138.md -->
-**Código:** UNIT-0138
+<!-- file: UNIT-0146.md -->
+**Código:** UNIT-0146
 
 # test_global_threshold_generates_alert_without_local_override
 
@@ -4966,8 +5254,8 @@ Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inv
 
 ---
 
-<!-- file: UNIT-0139.md -->
-**Código:** UNIT-0139
+<!-- file: UNIT-0147.md -->
+**Código:** UNIT-0147
 
 # test_local_threshold_prevents_alert_when_stock_above_local
 
@@ -5002,8 +5290,8 @@ Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inv
 
 ---
 
-<!-- file: UNIT-0140.md -->
-**Código:** UNIT-0140
+<!-- file: UNIT-0148.md -->
+**Código:** UNIT-0148
 
 # test_patch_threshold_null_removes_override
 
@@ -5038,8 +5326,8 @@ Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inv
 
 ---
 
-<!-- file: UNIT-0141.md -->
-**Código:** UNIT-0141
+<!-- file: UNIT-0149.md -->
+**Código:** UNIT-0149
 
 # test_patch_threshold_via_api
 
@@ -5074,8 +5362,8 @@ Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inv
 
 ---
 
-<!-- file: UNIT-0142.md -->
-**Código:** UNIT-0142
+<!-- file: UNIT-0150.md -->
+**Código:** UNIT-0150
 
 # test_inventory_models_define_location_and_stock_cache
 
@@ -5110,8 +5398,8 @@ Código fuente: [apps/inventory/tests/test_models.py](../../apps/inventory/tests
 
 ---
 
-<!-- file: UNIT-0143.md -->
-**Código:** UNIT-0143
+<!-- file: UNIT-0151.md -->
+**Código:** UNIT-0151
 
 # test_active_locations_always_visible
 
@@ -5146,8 +5434,8 @@ Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0144.md -->
-**Código:** UNIT-0144
+<!-- file: UNIT-0152.md -->
+**Código:** UNIT-0152
 
 # test_list_excludes_inactive_by_default
 
@@ -5182,8 +5470,8 @@ Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0145.md -->
-**Código:** UNIT-0145
+<!-- file: UNIT-0153.md -->
+**Código:** UNIT-0153
 
 # test_list_includes_inactive_with_param
 
@@ -5218,8 +5506,8 @@ Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0146.md -->
-**Código:** UNIT-0146
+<!-- file: UNIT-0154.md -->
+**Código:** UNIT-0154
 
 # test_patch_still_works_after_put_added
 
@@ -5254,8 +5542,8 @@ Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0147.md -->
-**Código:** UNIT-0147
+<!-- file: UNIT-0155.md -->
+**Código:** UNIT-0155
 
 # test_put_404_on_nonexistent
 
@@ -5290,8 +5578,8 @@ Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0148.md -->
-**Código:** UNIT-0148
+<!-- file: UNIT-0156.md -->
+**Código:** UNIT-0156
 
 # test_put_replaces_template
 
@@ -5326,8 +5614,8 @@ Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0149.md -->
-**Código:** UNIT-0149
+<!-- file: UNIT-0157.md -->
+**Código:** UNIT-0157
 
 # test_put_requires_almacenista
 
@@ -5362,8 +5650,8 @@ Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0150.md -->
-**Código:** UNIT-0150
+<!-- file: UNIT-0158.md -->
+**Código:** UNIT-0158
 
 # test_negative_stock_constraint_enforced
 
@@ -5398,8 +5686,8 @@ Código fuente: [apps/inventory/tests/test_selectors.py](../../apps/inventory/te
 
 ---
 
-<!-- file: UNIT-0151.md -->
-**Código:** UNIT-0151
+<!-- file: UNIT-0159.md -->
+**Código:** UNIT-0159
 
 # test_search_products_performance_under_2s
 
@@ -5434,8 +5722,8 @@ Código fuente: [apps/inventory/tests/test_selectors.py](../../apps/inventory/te
 
 ---
 
-<!-- file: UNIT-0152.md -->
-**Código:** UNIT-0152
+<!-- file: UNIT-0160.md -->
+**Código:** UNIT-0160
 
 # test_stock_query_returns_per_location_and_total
 
@@ -5470,8 +5758,8 @@ Código fuente: [apps/inventory/tests/test_selectors.py](../../apps/inventory/te
 
 ---
 
-<!-- file: UNIT-0153.md -->
-**Código:** UNIT-0153
+<!-- file: UNIT-0161.md -->
+**Código:** UNIT-0161
 
 # test_get_current_stock_does_not_leak_other_locations
 
@@ -5506,8 +5794,8 @@ Código fuente: [apps/inventory/tests/test_services.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0154.md -->
-**Código:** UNIT-0154
+<!-- file: UNIT-0162.md -->
+**Código:** UNIT-0162
 
 # test_get_current_stock_does_not_leak_other_products
 
@@ -5542,8 +5830,8 @@ Código fuente: [apps/inventory/tests/test_services.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0155.md -->
-**Código:** UNIT-0155
+<!-- file: UNIT-0163.md -->
+**Código:** UNIT-0163
 
 # test_get_current_stock_returns_existing_stock
 
@@ -5578,8 +5866,8 @@ Código fuente: [apps/inventory/tests/test_services.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0156.md -->
-**Código:** UNIT-0156
+<!-- file: UNIT-0164.md -->
+**Código:** UNIT-0164
 
 # test_get_current_stock_returns_zero_when_no_row
 
@@ -5614,8 +5902,8 @@ Código fuente: [apps/inventory/tests/test_services.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0157.md -->
-**Código:** UNIT-0157
+<!-- file: UNIT-0165.md -->
+**Código:** UNIT-0165
 
 # test_trigger_stock_reconstruction_detects_discrepancy
 
@@ -5650,8 +5938,8 @@ Código fuente: [apps/inventory/tests/test_services.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0158.md -->
-**Código:** UNIT-0158
+<!-- file: UNIT-0166.md -->
+**Código:** UNIT-0166
 
 # test_location_patch_can_assign_storage_template
 
@@ -5686,8 +5974,8 @@ Código fuente: [apps/inventory/tests/test_storage_templates.py](../../apps/inve
 
 ---
 
-<!-- file: UNIT-0159.md -->
-**Código:** UNIT-0159
+<!-- file: UNIT-0167.md -->
+**Código:** UNIT-0167
 
 # test_storage_template_crud_and_location_defaults
 
@@ -5722,8 +6010,8 @@ Código fuente: [apps/inventory/tests/test_storage_templates.py](../../apps/inve
 
 ---
 
-<!-- file: UNIT-0160.md -->
-**Código:** UNIT-0160
+<!-- file: UNIT-0168.md -->
+**Código:** UNIT-0168
 
 # test_inactive_storage_type_rejected_on_create_location
 
@@ -5758,8 +6046,8 @@ Código fuente: [apps/inventory/tests/test_storage_types.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0161.md -->
-**Código:** UNIT-0161
+<!-- file: UNIT-0169.md -->
+**Código:** UNIT-0169
 
 # test_inactive_storage_type_rejected_on_patch_location
 
@@ -5794,8 +6082,8 @@ Código fuente: [apps/inventory/tests/test_storage_types.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0162.md -->
-**Código:** UNIT-0162
+<!-- file: UNIT-0170.md -->
+**Código:** UNIT-0170
 
 # test_location_capacity_relative_fields_in_create_and_patch
 
@@ -5830,8 +6118,8 @@ Código fuente: [apps/inventory/tests/test_storage_types.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0163.md -->
-**Código:** UNIT-0163
+<!-- file: UNIT-0171.md -->
+**Código:** UNIT-0171
 
 # test_location_patch_can_assign_storage_type
 
@@ -5866,8 +6154,8 @@ Código fuente: [apps/inventory/tests/test_storage_types.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0164.md -->
-**Código:** UNIT-0164
+<!-- file: UNIT-0172.md -->
+**Código:** UNIT-0172
 
 # test_location_state_transition_endpoint
 
@@ -5902,8 +6190,8 @@ Código fuente: [apps/inventory/tests/test_storage_types.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0165.md -->
-**Código:** UNIT-0165
+<!-- file: UNIT-0173.md -->
+**Código:** UNIT-0173
 
 # test_storage_type_crud_and_location_binding
 
@@ -5938,8 +6226,8 @@ Código fuente: [apps/inventory/tests/test_storage_types.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0166.md -->
-**Código:** UNIT-0166
+<!-- file: UNIT-0174.md -->
+**Código:** UNIT-0174
 
 # test_inventory_views_are_available
 
@@ -5974,8 +6262,8 @@ Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/
 
 ---
 
-<!-- file: UNIT-0167.md -->
-**Código:** UNIT-0167
+<!-- file: UNIT-0175.md -->
+**Código:** UNIT-0175
 
 # test_dispatch_combo_creates_audit_log
 
@@ -6010,8 +6298,8 @@ Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movemen
 
 ---
 
-<!-- file: UNIT-0168.md -->
-**Código:** UNIT-0168
+<!-- file: UNIT-0176.md -->
+**Código:** UNIT-0176
 
 # test_dispatch_combo_inactive_combo_returns_404
 
@@ -6046,8 +6334,8 @@ Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movemen
 
 ---
 
-<!-- file: UNIT-0169.md -->
-**Código:** UNIT-0169
+<!-- file: UNIT-0177.md -->
+**Código:** UNIT-0177
 
 # test_dispatch_combo_insufficient_stock
 
@@ -6082,8 +6370,8 @@ Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movemen
 
 ---
 
-<!-- file: UNIT-0170.md -->
-**Código:** UNIT-0170
+<!-- file: UNIT-0178.md -->
+**Código:** UNIT-0178
 
 # test_dispatch_combo_requires_authentication
 
@@ -6118,8 +6406,8 @@ Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movemen
 
 ---
 
-<!-- file: UNIT-0171.md -->
-**Código:** UNIT-0171
+<!-- file: UNIT-0179.md -->
+**Código:** UNIT-0179
 
 # test_dispatch_combo_success
 
@@ -6154,8 +6442,8 @@ Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movemen
 
 ---
 
-<!-- file: UNIT-0172.md -->
-**Código:** UNIT-0172
+<!-- file: UNIT-0180.md -->
+**Código:** UNIT-0180
 
 # test_movement_type_labels
 
@@ -6190,8 +6478,8 @@ Código fuente: [apps/movements/tests/test_models.py](../../apps/movements/tests
 
 ---
 
-<!-- file: UNIT-0173.md -->
-**Código:** UNIT-0173
+<!-- file: UNIT-0181.md -->
+**Código:** UNIT-0181
 
 # test_adjustment_requires_justification
 
@@ -6226,8 +6514,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0174.md -->
-**Código:** UNIT-0174
+<!-- file: UNIT-0182.md -->
+**Código:** UNIT-0182
 
 # test_correct_entrada_within_window
 
@@ -6262,8 +6550,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0175.md -->
-**Código:** UNIT-0175
+<!-- file: UNIT-0183.md -->
+**Código:** UNIT-0183
 
 # test_correct_movement_outside_window_raises
 
@@ -6298,8 +6586,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0176.md -->
-**Código:** UNIT-0176
+<!-- file: UNIT-0184.md -->
+**Código:** UNIT-0184
 
 # test_correct_salida_within_window
 
@@ -6334,8 +6622,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0177.md -->
-**Código:** UNIT-0177
+<!-- file: UNIT-0185.md -->
+**Código:** UNIT-0185
 
 # test_correction_within_window_creates_reversal_and_fixed
 
@@ -6370,8 +6658,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0178.md -->
-**Código:** UNIT-0178
+<!-- file: UNIT-0186.md -->
+**Código:** UNIT-0186
 
 # test_dispatch_chooses_earliest_lot_when_expiring_product
 
@@ -6406,8 +6694,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0179.md -->
-**Código:** UNIT-0179
+<!-- file: UNIT-0187.md -->
+**Código:** UNIT-0187
 
 # test_dispatch_consumes_across_multiple_lots
 
@@ -6442,8 +6730,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0180.md -->
-**Código:** UNIT-0180
+<!-- file: UNIT-0188.md -->
+**Código:** UNIT-0188
 
 # test_dispatch_cross_validation_fails_wrong_sku
 
@@ -6478,8 +6766,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0181.md -->
-**Código:** UNIT-0181
+<!-- file: UNIT-0189.md -->
+**Código:** UNIT-0189
 
 # test_dispatch_fails_when_origin_is_archived
 
@@ -6514,8 +6802,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0182.md -->
-**Código:** UNIT-0182
+<!-- file: UNIT-0190.md -->
+**Código:** UNIT-0190
 
 # test_dispatch_fails_when_origin_is_restricted
 
@@ -6550,8 +6838,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0183.md -->
-**Código:** UNIT-0183
+<!-- file: UNIT-0191.md -->
+**Código:** UNIT-0191
 
 # test_dispatch_fails_when_origin_location_is_in_maintenance
 
@@ -6586,8 +6874,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0184.md -->
-**Código:** UNIT-0184
+<!-- file: UNIT-0192.md -->
+**Código:** UNIT-0192
 
 # test_dispatch_single_movement_nonexpiring_product
 
@@ -6622,8 +6910,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0185.md -->
-**Código:** UNIT-0185
+<!-- file: UNIT-0193.md -->
+**Código:** UNIT-0193
 
 # test_entry_allows_destination_in_restricted
 
@@ -6658,8 +6946,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0186.md -->
-**Código:** UNIT-0186
+<!-- file: UNIT-0194.md -->
+**Código:** UNIT-0194
 
 # test_entry_allows_destination_location_in_maintenance
 
@@ -6694,8 +6982,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0187.md -->
-**Código:** UNIT-0187
+<!-- file: UNIT-0195.md -->
+**Código:** UNIT-0195
 
 # test_entry_discrepancy_note_required_when_qty_mismatch
 
@@ -6730,8 +7018,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0188.md -->
-**Código:** UNIT-0188
+<!-- file: UNIT-0196.md -->
+**Código:** UNIT-0196
 
 # test_entry_electroterapia_without_serial_fails
 
@@ -6766,8 +7054,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0189.md -->
-**Código:** UNIT-0189
+<!-- file: UNIT-0197.md -->
+**Código:** UNIT-0197
 
 # test_entry_fails_when_destination_is_archived
 
@@ -6802,8 +7090,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0190.md -->
-**Código:** UNIT-0190
+<!-- file: UNIT-0198.md -->
+**Código:** UNIT-0198
 
 # test_entry_increments_stock_and_creates_ledger_record
 
@@ -6838,8 +7126,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0191.md -->
-**Código:** UNIT-0191
+<!-- file: UNIT-0199.md -->
+**Código:** UNIT-0199
 
 # test_entry_with_lot_persists_lot_on_movement
 
@@ -6874,8 +7162,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0192.md -->
-**Código:** UNIT-0192
+<!-- file: UNIT-0200.md -->
+**Código:** UNIT-0200
 
 # test_internal_transfer_does_not_change_global_stock
 
@@ -6910,8 +7198,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0193.md -->
-**Código:** UNIT-0193
+<!-- file: UNIT-0201.md -->
+**Código:** UNIT-0201
 
 # test_internal_transfer_fails_when_destination_is_blocked
 
@@ -6946,8 +7234,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0194.md -->
-**Código:** UNIT-0194
+<!-- file: UNIT-0202.md -->
+**Código:** UNIT-0202
 
 # test_register_entry_raises_lot_code_required_for_expiring_product
 
@@ -6982,8 +7270,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0195.md -->
-**Código:** UNIT-0195
+<!-- file: UNIT-0203.md -->
+**Código:** UNIT-0203
 
 # test_register_entry_raises_lot_expiration_date_required
 
@@ -7018,8 +7306,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0196.md -->
-**Código:** UNIT-0196
+<!-- file: UNIT-0204.md -->
+**Código:** UNIT-0204
 
 # test_return_blocked_for_non_returnable_category
 
@@ -7054,8 +7342,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0197.md -->
-**Código:** UNIT-0197
+<!-- file: UNIT-0205.md -->
+**Código:** UNIT-0205
 
 # test_return_fails_when_destination_is_archived
 
@@ -7090,8 +7378,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0198.md -->
-**Código:** UNIT-0198
+<!-- file: UNIT-0206.md -->
+**Código:** UNIT-0206
 
 # test_return_fails_when_destination_is_blocked
 
@@ -7126,8 +7414,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0199.md -->
-**Código:** UNIT-0199
+<!-- file: UNIT-0207.md -->
+**Código:** UNIT-0207
 
 # test_stock_can_be_reconstructed_from_ledger
 
@@ -7162,8 +7450,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0200.md -->
-**Código:** UNIT-0200
+<!-- file: UNIT-0208.md -->
+**Código:** UNIT-0208
 
 # test_movement_views_are_available
 
@@ -7198,8 +7486,8 @@ Código fuente: [apps/movements/tests/test_views.py](../../apps/movements/tests/
 
 ---
 
-<!-- file: UNIT-0201.md -->
-**Código:** UNIT-0201
+<!-- file: UNIT-0209.md -->
+**Código:** UNIT-0209
 
 # test_alerts_export_csv
 
@@ -7234,8 +7522,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0202.md -->
-**Código:** UNIT-0202
+<!-- file: UNIT-0210.md -->
+**Código:** UNIT-0210
 
 # test_expiring_products_export_csv
 
@@ -7270,8 +7558,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0203.md -->
-**Código:** UNIT-0203
+<!-- file: UNIT-0211.md -->
+**Código:** UNIT-0211
 
 # test_expiring_products_export_xlsx
 
@@ -7306,8 +7594,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0204.md -->
-**Código:** UNIT-0204
+<!-- file: UNIT-0212.md -->
+**Código:** UNIT-0212
 
 # test_export_empty_param_returns_json
 
@@ -7342,8 +7630,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0205.md -->
-**Código:** UNIT-0205
+<!-- file: UNIT-0213.md -->
+**Código:** UNIT-0213
 
 # test_export_unknown_param_returns_json
 
@@ -7378,8 +7666,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0206.md -->
-**Código:** UNIT-0206
+<!-- file: UNIT-0214.md -->
+**Código:** UNIT-0214
 
 # test_inventory_export_csv
 
@@ -7414,8 +7702,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0207.md -->
-**Código:** UNIT-0207
+<!-- file: UNIT-0215.md -->
+**Código:** UNIT-0215
 
 # test_inventory_export_xlsx
 
@@ -7450,8 +7738,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0208.md -->
-**Código:** UNIT-0208
+<!-- file: UNIT-0216.md -->
+**Código:** UNIT-0216
 
 # test_movement_history_export_csv
 
@@ -7486,8 +7774,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0209.md -->
-**Código:** UNIT-0209
+<!-- file: UNIT-0217.md -->
+**Código:** UNIT-0217
 
 # test_movement_history_export_xlsx
 
@@ -7522,8 +7810,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0210.md -->
-**Código:** UNIT-0210
+<!-- file: UNIT-0218.md -->
+**Código:** UNIT-0218
 
 # test_movement_history_json_unchanged
 
@@ -7558,8 +7846,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0211.md -->
-**Código:** UNIT-0211
+<!-- file: UNIT-0219.md -->
+**Código:** UNIT-0219
 
 # test_reports_app_has_no_domain_models
 
@@ -7594,8 +7882,8 @@ Código fuente: [apps/reports/tests/test_models.py](../../apps/reports/tests/tes
 
 ---
 
-<!-- file: UNIT-0212.md -->
-**Código:** UNIT-0212
+<!-- file: UNIT-0220.md -->
+**Código:** UNIT-0220
 
 # test_get_discard_operational_summary_excludes_returns
 
@@ -7630,8 +7918,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0213.md -->
-**Código:** UNIT-0213
+<!-- file: UNIT-0221.md -->
+**Código:** UNIT-0221
 
 # test_get_lots_expiring_soon_filters_by_window
 
@@ -7666,8 +7954,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0214.md -->
-**Código:** UNIT-0214
+<!-- file: UNIT-0222.md -->
+**Código:** UNIT-0222
 
 # test_get_quality_operational_summary_groups_damage_and_returns
 
@@ -7702,8 +7990,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0215.md -->
-**Código:** UNIT-0215
+<!-- file: UNIT-0223.md -->
+**Código:** UNIT-0223
 
 # test_get_warehouse_occupancy_distribution_returns_expected_sections
 
@@ -7738,8 +8026,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0216.md -->
-**Código:** UNIT-0216
+<!-- file: UNIT-0224.md -->
+**Código:** UNIT-0224
 
 # test_get_warehouse_utilization_supports_relative_capacity_and_distributions
 
@@ -7774,8 +8062,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0217.md -->
-**Código:** UNIT-0217
+<!-- file: UNIT-0225.md -->
+**Código:** UNIT-0225
 
 # test_get_warehouse_utilization_uses_capacity_and_stock
 
@@ -7810,8 +8098,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0218.md -->
-**Código:** UNIT-0218
+<!-- file: UNIT-0226.md -->
+**Código:** UNIT-0226
 
 # test_rotation_by_category_counts_units
 
@@ -7846,8 +8134,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0219.md -->
-**Código:** UNIT-0219
+<!-- file: UNIT-0227.md -->
+**Código:** UNIT-0227
 
 # test_generate_kpis_returns_dashboard_keys
 
@@ -7882,8 +8170,8 @@ Código fuente: [apps/reports/tests/test_services.py](../../apps/reports/tests/t
 
 ---
 
-<!-- file: UNIT-0220.md -->
-**Código:** UNIT-0220
+<!-- file: UNIT-0228.md -->
+**Código:** UNIT-0228
 
 # test_get_expiring_products_returns_lot_rows
 
@@ -7918,8 +8206,8 @@ Código fuente: [apps/reports/tests/test_services.py](../../apps/reports/tests/t
 
 ---
 
-<!-- file: UNIT-0221.md -->
-**Código:** UNIT-0221
+<!-- file: UNIT-0229.md -->
+**Código:** UNIT-0229
 
 # test_dispatch_orders_endpoint_returns_samples
 
@@ -7954,8 +8242,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0222.md -->
-**Código:** UNIT-0222
+<!-- file: UNIT-0230.md -->
+**Código:** UNIT-0230
 
 # test_movement_history_filters_by_location_id
 
@@ -7990,8 +8278,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0223.md -->
-**Código:** UNIT-0223
+<!-- file: UNIT-0231.md -->
+**Código:** UNIT-0231
 
 # test_reports_dataset_view_is_available
 
@@ -8026,8 +8314,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0224.md -->
-**Código:** UNIT-0224
+<!-- file: UNIT-0232.md -->
+**Código:** UNIT-0232
 
 # test_reports_dataset_view_supports_discard_operational
 
@@ -8062,8 +8350,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0225.md -->
-**Código:** UNIT-0225
+<!-- file: UNIT-0233.md -->
+**Código:** UNIT-0233
 
 # test_reports_dataset_view_supports_dispatch_operational
 
@@ -8098,8 +8386,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0226.md -->
-**Código:** UNIT-0226
+<!-- file: UNIT-0234.md -->
+**Código:** UNIT-0234
 
 # test_reports_dataset_view_supports_quality_operational
 
@@ -8134,8 +8422,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0227.md -->
-**Código:** UNIT-0227
+<!-- file: UNIT-0235.md -->
+**Código:** UNIT-0235
 
 # test_reports_dataset_view_supports_warehouse_occupancy_distribution
 
@@ -8170,8 +8458,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0228.md -->
-**Código:** UNIT-0228
+<!-- file: UNIT-0236.md -->
+**Código:** UNIT-0236
 
 # test_reports_dataset_view_supports_warehouse_utilization
 
@@ -8206,8 +8494,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0229.md -->
-**Código:** UNIT-0229
+<!-- file: UNIT-0237.md -->
+**Código:** UNIT-0237
 
 # test_reports_discard_operational_view_returns_summary
 
@@ -8242,8 +8530,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0230.md -->
-**Código:** UNIT-0230
+<!-- file: UNIT-0238.md -->
+**Código:** UNIT-0238
 
 # test_reports_dispatch_operational_view_returns_summary
 
@@ -8278,8 +8566,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0231.md -->
-**Código:** UNIT-0231
+<!-- file: UNIT-0239.md -->
+**Código:** UNIT-0239
 
 # test_reports_expiring_view_returns_lots
 
@@ -8314,8 +8602,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0232.md -->
-**Código:** UNIT-0232
+<!-- file: UNIT-0240.md -->
+**Código:** UNIT-0240
 
 # test_reports_quality_operational_view_returns_summary
 
@@ -8350,8 +8638,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0233.md -->
-**Código:** UNIT-0233
+<!-- file: UNIT-0241.md -->
+**Código:** UNIT-0241
 
 # test_reports_views_are_available
 
@@ -8386,8 +8674,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0234.md -->
-**Código:** UNIT-0234
+<!-- file: UNIT-0242.md -->
+**Código:** UNIT-0242
 
 # test_reports_warehouse_utilization_view_returns_summary
 
@@ -8422,8 +8710,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0235.md -->
-**Código:** UNIT-0235
+<!-- file: UNIT-0243.md -->
+**Código:** UNIT-0243
 
 # test_warehouse_utilization_by_storage_type_grouping
 
@@ -8458,8 +8746,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0236.md -->
-**Código:** UNIT-0236
+<!-- file: UNIT-0244.md -->
+**Código:** UNIT-0244
 
 # test_patch_still_works_independently
 
@@ -8494,8 +8782,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0237.md -->
-**Código:** UNIT-0237
+<!-- file: UNIT-0245.md -->
+**Código:** UNIT-0245
 
 # test_put_404_on_nonexistent
 
@@ -8530,8 +8818,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0238.md -->
-**Código:** UNIT-0238
+<!-- file: UNIT-0246.md -->
+**Código:** UNIT-0246
 
 # test_put_replaces_endpoint
 
@@ -8566,8 +8854,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0239.md -->
-**Código:** UNIT-0239
+<!-- file: UNIT-0247.md -->
+**Código:** UNIT-0247
 
 # test_put_requires_all_fields
 
@@ -8602,8 +8890,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0240.md -->
-**Código:** UNIT-0240
+<!-- file: UNIT-0248.md -->
+**Código:** UNIT-0248
 
 # test_put_requires_almacenista
 
@@ -8638,8 +8926,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0241.md -->
-**Código:** UNIT-0241
+<!-- file: UNIT-0249.md -->
+**Código:** UNIT-0249
 
 # test_deliver_connection_error_schedules_retry
 
@@ -8674,8 +8962,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0242.md -->
-**Código:** UNIT-0242
+<!-- file: UNIT-0250.md -->
+**Código:** UNIT-0250
 
 # test_deliver_max_retries_marks_as_failed
 
@@ -8710,8 +8998,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0243.md -->
-**Código:** UNIT-0243
+<!-- file: UNIT-0251.md -->
+**Código:** UNIT-0251
 
 # test_deliver_success
 
@@ -8746,8 +9034,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0244.md -->
-**Código:** UNIT-0244
+<!-- file: UNIT-0252.md -->
+**Código:** UNIT-0252
 
 # test_queue_creates_delivery_for_subscribed_endpoint
 
@@ -8782,8 +9070,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0245.md -->
-**Código:** UNIT-0245
+<!-- file: UNIT-0253.md -->
+**Código:** UNIT-0253
 
 # test_queue_creates_multiple_deliveries_for_multiple_endpoints
 
@@ -8818,8 +9106,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0246.md -->
-**Código:** UNIT-0246
+<!-- file: UNIT-0254.md -->
+**Código:** UNIT-0254
 
 # test_queue_skips_inactive_endpoints
 
@@ -8854,8 +9142,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0247.md -->
-**Código:** UNIT-0247
+<!-- file: UNIT-0255.md -->
+**Código:** UNIT-0255
 
 # test_queue_skips_unsubscribed_event
 
@@ -8890,8 +9178,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0248.md -->
-**Código:** UNIT-0248
+<!-- file: UNIT-0256.md -->
+**Código:** UNIT-0256
 
 # test_sign_payload_differs_with_different_key
 
@@ -8926,8 +9214,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0249.md -->
-**Código:** UNIT-0249
+<!-- file: UNIT-0257.md -->
+**Código:** UNIT-0257
 
 # test_sign_payload_format
 
@@ -8962,8 +9250,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0250.md -->
-**Código:** UNIT-0250
+<!-- file: UNIT-0258.md -->
+**Código:** UNIT-0258
 
 # test_sign_payload_is_deterministic
 
@@ -8998,8 +9286,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0251.md -->
-**Código:** UNIT-0251
+<!-- file: UNIT-0259.md -->
+**Código:** UNIT-0259
 
 # test_administrador_cannot_manage_webhooks
 
@@ -9034,8 +9322,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0252.md -->
-**Código:** UNIT-0252
+<!-- file: UNIT-0260.md -->
+**Código:** UNIT-0260
 
 # test_auxiliar_cannot_manage_webhooks
 
@@ -9070,8 +9358,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0253.md -->
-**Código:** UNIT-0253
+<!-- file: UNIT-0261.md -->
+**Código:** UNIT-0261
 
 # test_create_endpoint
 
@@ -9106,8 +9394,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0254.md -->
-**Código:** UNIT-0254
+<!-- file: UNIT-0262.md -->
+**Código:** UNIT-0262
 
 # test_delete_endpoint_deactivates_it
 
@@ -9142,8 +9430,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0255.md -->
-**Código:** UNIT-0255
+<!-- file: UNIT-0263.md -->
+**Código:** UNIT-0263
 
 # test_deliveries_list
 
@@ -9178,8 +9466,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0256.md -->
-**Código:** UNIT-0256
+<!-- file: UNIT-0264.md -->
+**Código:** UNIT-0264
 
 # test_list_endpoints
 
@@ -9214,8 +9502,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0257.md -->
-**Código:** UNIT-0257
+<!-- file: UNIT-0265.md -->
+**Código:** UNIT-0265
 
 # test_stats_view
 
@@ -9250,8 +9538,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0258.md -->
-**Código:** UNIT-0258
+<!-- file: UNIT-0266.md -->
+**Código:** UNIT-0266
 
 # test_change_report_detects_additions_and_removals
 
@@ -9286,8 +9574,8 @@ Código fuente: [tests/test_generate_project_structure.py](../../tests/test_gene
 
 ---
 
-<!-- file: UNIT-0259.md -->
-**Código:** UNIT-0259
+<!-- file: UNIT-0267.md -->
+**Código:** UNIT-0267
 
 # test_semantic_comment_for_services_is_specific
 
@@ -9322,8 +9610,8 @@ Código fuente: [tests/test_generate_project_structure.py](../../tests/test_gene
 
 ---
 
-<!-- file: UNIT-0260.md -->
-**Código:** UNIT-0260
+<!-- file: UNIT-0268.md -->
+**Código:** UNIT-0268
 
 # test_tree_ignores_noise_and_keeps_relevant_nodes
 
@@ -9358,8 +9646,8 @@ Código fuente: [tests/test_generate_project_structure.py](../../tests/test_gene
 
 ---
 
-<!-- file: UNIT-0261.md -->
-**Código:** UNIT-0261
+<!-- file: UNIT-0269.md -->
+**Código:** UNIT-0269
 
 # test_validate_destination_passes_for_non_blocked
 
@@ -9394,8 +9682,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0262.md -->
-**Código:** UNIT-0262
+<!-- file: UNIT-0270.md -->
+**Código:** UNIT-0270
 
 # test_validate_destination_raises_for_blocked_archived
 
@@ -9430,8 +9718,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0263.md -->
-**Código:** UNIT-0263
+<!-- file: UNIT-0271.md -->
+**Código:** UNIT-0271
 
 # test_validate_origin_passes_for_active
 
@@ -9466,8 +9754,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0264.md -->
-**Código:** UNIT-0264
+<!-- file: UNIT-0272.md -->
+**Código:** UNIT-0272
 
 # test_validate_origin_raises_for_blocked_archived
 
@@ -9502,8 +9790,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0265.md -->
-**Código:** UNIT-0265
+<!-- file: UNIT-0273.md -->
+**Código:** UNIT-0273
 
 # test_validate_origin_raises_for_maintenance_restricted
 
