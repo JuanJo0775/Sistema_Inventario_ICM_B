@@ -21,8 +21,7 @@ def forwards(apps, schema_editor):
 
 
 def backwards(apps, schema_editor):
-    # La migración solo rellena datos faltantes; revertirla no aporta valor operativo.
-    return None
+    pass  # El backfill de barcodes es idempotente; no se revierte.
 
 
 class Migration(migrations.Migration):

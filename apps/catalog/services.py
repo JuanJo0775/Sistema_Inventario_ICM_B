@@ -154,31 +154,14 @@ def create_combo(
     products = {str(p.id): p for p in Product.objects.filter(id__in=product_ids)}
     if len(products) != len(set(product_ids)):
         raise ValueError("Uno o más product_id no existen.")
-    from apps.inventory.selectors import consolidated_stock_total
-
     for row in items:
         pid = str(row["product_id"])
         p = products[pid]
-        qty_needed = int(row.get("quantity", 1))
 
         if not p.is_active:
             from shared.exceptions import DomainValidationError
 
             raise DomainValidationError(f"Producto {p.sku} no está activo.")
-
-        current_stock = consolidated_stock_total(p.id)
-        if current_stock <= 0:
-            from shared.exceptions import InsufficientStockError
-
-            raise InsufficientStockError(
-                f"El producto {p.sku} no tiene stock disponible (Stock: {current_stock}). No se puede incluir en el combo."
-            )
-        if qty_needed > current_stock:
-            from shared.exceptions import InsufficientStockError
-
-            raise InsufficientStockError(
-                f"No hay suficiente stock para el producto {p.sku}. Solicitado: {qty_needed}, Disponible: {current_stock}."
-            )
     combo = ProductCombo.objects.create(
         name=name,
         sku=sku,

@@ -118,12 +118,7 @@ class Product(BaseModel):
         ]
 
     def clean(self) -> None:
-        """
-        RF-003, BR-12 — Validación de formato de SKU definido por el usuario.
-
-        Criterio: el SKU debe seguir el patrón 1–4 letras, guion, 1–4 dígitos. Se
-        ejecuta en Admin y ModelForm; la API también valida en `catalog.services`.
-        """
+        """BR-12 — Valida formato de SKU (Admin y ModelForm). La API valida en catalog.services."""
         sku = normalize_sku(self.sku or "")
         if not sku:
             raise ValidationError({"sku": "El SKU es obligatorio."})
