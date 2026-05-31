@@ -31,7 +31,21 @@ Equivalentes adicionales de la matriz:
 - Cliente = rol no nativo; denegado por defecto.
 - Invitado = usuario anonimo (sin JWT).
 
-Clase de permiso combinada `IsAlmacenistaOrAdministrador`: usada en reportes y alertas, permite lectura compartida al `almacenista` y al `administrador`.
+### Clases de permiso utilizadas en el sistema
+
+| Clase | Archivo | Roles que pasan | Uso principal |
+|---|---|---|---|
+| `IsAlmacenista` | `shared/permissions.py` | `almacenista` | Escrituras criticas: usuarios, catalogo, movimientos, webhooks, dashboard |
+| `IsAuxiliarDespacho` | `shared/permissions.py` | `auxiliar_despacho` | No se usa directamente en vistas; se delega a `IsAlmacenistaOrAuxiliar` |
+| `IsAdministrador` | `shared/permissions.py` | `administrador` | **No se usa en ningun endpoint actual.** Solo lectura via `IsAlmacenistaOrAdministrador` |
+| `IsAlmacenistaOrAuxiliar` | `shared/permissions.py` | `almacenista`, `auxiliar_despacho` | Entradas, despachos, traslados, correcciones |
+| `IsAlmacenistaOrAdministrador` | `shared/permissions.py` | `almacenista`, `administrador` | Reportes, alertas (lectura), auditoria |
+| `IsAlmacenistaOrReadOnly` | `apps/catalog/permissions.py` | Lectura: todos autenticados; Escritura: solo `almacenista` | Detalle de productos, categorias, combos en catalogo |
+| `IsAuthenticated` | DRF built-in | Cualquier usuario con JWT valido | Endpoints de lectura abierta: inventario, movimientos, perfil, logout |
+| `IsWithinOperatingHours` | `shared/permissions.py` | Todos, pero restringe `auxiliar_despacho` a franja horaria | Aplicado globalmente en DRF config; la restriccion solo aplica al auxiliar |
+| `AllowAny` | DRF built-in | Cualquiera sin JWT | Solo `GET /auth/health/` |
+
+> ℹ️ El rol `administrador` nunca aparece solo como permiso en ningun vista. Su acceso siempre es via `IsAlmacenistaOrAdministrador` que le permite solo lectura.
 
 ## 3. Resumen ejecutivo del modelo de seguridad
 
@@ -240,7 +254,7 @@ Leyenda:
 | Autenticacion | Leer estado | `GET /api/v1/auth/health/` | Permitido | Permitido | Permitido | Denegado | Permitido | Publico; no requiere JWT |
 | Autenticacion | Iniciar sesion | `POST /api/v1/auth/login/` | Parcial o condicionado | Parcial o condicionado | Parcial o condicionado | Denegado | Parcial o condicionado | Requiere credenciales; operador ademas respeta horario |
 | Autenticacion | Renovar token | `POST /api/v1/auth/token/refresh/` | Parcial o condicionado | Parcial o condicionado | Parcial o condicionado | Denegado | Parcial o condicionado | Requiere refresh valido; operador respeta horario |
-| Autenticacion | Cerrar sesion | `POST /api/v1/auth/logout/` | Denegado | Denegado | Denegado | Denegado | Denegado | Requiere JWT; invalida refresh |
+| Autenticacion | Cerrar sesion | `POST /api/v1/auth/logout/` | Permitido | Permitido | Permitido | Denegado | Denegado | Requiere JWT valido (`IsAuthenticated`); invalida refresh enviado en body |
 | Autenticacion | Ver perfil propio | `GET /api/v1/auth/me/` | Permitido | Permitido | Permitido | Denegado | Denegado | Solo autenticado |
 | Usuarios | Listar usuarios | `GET /api/v1/auth/users/` | Permitido | Permitido | Denegado | Denegado | Denegado | Vista permite admin o almacenista |
 | Usuarios | Crear usuario | `POST /api/v1/auth/users/` | Denegado | Permitido | Denegado | Denegado | Denegado | La vista acepta admin, pero el servicio exige almacenista |

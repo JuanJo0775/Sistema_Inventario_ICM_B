@@ -124,8 +124,8 @@ Para probar los endpoints, haga clic en el botón **Authorize**, use el esquema 
 
 ---
 ### **Documentación Adicional**
-- **Referencia:** `docs\ERS_ICM_Requisitos.md`
-- **Arquitectura:** `docs\README_ARQUITECTURA.md`
+- **Referencia:** `docs/ERS_ICM_Requisitos.md`
+- **Arquitectura:** `docs/README_ARQUITECTURA.md`
 - **Nota:** el stock se maneja como un ledger inmutable con stock derivado.
     """.strip(),
     "VERSION": "1.0.0",
@@ -156,7 +156,7 @@ Para probar los endpoints, haga clic en el botón **Authorize**, use el esquema 
         {"name": TAG_REPORTS, "description": "Read-only reports and KPIs."},
         {"name": TAG_ALERTS, "description": "Operational alerts and real-time polling."},
         {"name": TAG_AUDIT, "description": "Audit logs (read-only, immutable)."},
-        {"name": TAG_WEBHOOKS, "description": "Webhook endpoints and delivery management (admin only)."},
+        {"name": TAG_WEBHOOKS, "description": "Webhook endpoints and delivery management (almacenista only — IsAlmacenista)."},
     ],
     # Botón "Authorize" en Swagger UI y componente de Error Uniforme
     "APPEND_COMPONENTS": {
