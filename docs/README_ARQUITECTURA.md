@@ -175,7 +175,7 @@ icm_backend/
 │   │   │   ├── test_commands.py                                # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
 │   │   │   ├── test_new_alert_types.py                         # Reglas de negocio y transacciones del dominio
-│   │   │   ├── test_services.py                                # Cobertura crítica del módulo
+│   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
 │   │   ├── management/
 │   │   │   └── commands/                                       # Comandos administrativos del módulo

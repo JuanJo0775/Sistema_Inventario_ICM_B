@@ -161,6 +161,14 @@ def sync_expiry_alerts_for_product(product_id: UUID, *, user=None) -> None:
                 message=f"El producto vence en {days_left} días (ventana 60).",
             )
     if days_left <= 30:
+        # Cerrar EXPIRATION_60 si quedó abierta al cruzar la ventana de 30 días
+        Alert.objects.filter(
+            product_id=product_id,
+            lot__isnull=True,
+            alert_type=AlertType.EXPIRATION_60,
+            location__isnull=True,
+            is_resolved=False,
+        ).update(is_resolved=True, resolved_at=timezone.now())
         severity, category = _severity_and_category(AlertType.EXPIRATION_30)
         alert, _created = Alert.objects.get_or_create(
             product_id=product_id,
@@ -404,14 +412,36 @@ def scan_all_stock_alerts(*, dry_run: bool = False) -> int:
 
 
 def scan_all_location_alerts(*, dry_run: bool = False) -> int:
-    """Escanea ubicaciones BLOCKED/ARCHIVED con stock y genera alertas correspondientes."""
+    """Escanea ubicaciones BLOCKED/ARCHIVED con stock y genera alertas correspondientes.
+
+    También procesa ubicaciones con alertas LOCATION_BLOCKED_WITH_STOCK abiertas que
+    ya no están bloqueadas, garantizando que el cron resuelva estados stale.
+    """
     blocked_statuses = (
         Location.OperationalStatus.BLOCKED,
         Location.OperationalStatus.ARCHIVED,
     )
-    locations = Location.objects.filter(operational_status__in=blocked_statuses)
+    blocked_locations = Location.objects.filter(operational_status__in=blocked_statuses)
+    blocked_ids = set(blocked_locations.values_list("id", flat=True))
+
+    # Ubicaciones con alertas abiertas que ya NO están bloqueadas (stale)
+    stale_ids = (
+        Alert.objects.filter(
+            alert_type=AlertType.LOCATION_BLOCKED_WITH_STOCK,
+            is_resolved=False,
+        )
+        .exclude(location_id__in=blocked_ids)
+        .values_list("location_id", flat=True)
+        .distinct()
+    )
+    stale_locations = Location.objects.filter(pk__in=stale_ids)
+
+    all_locations = list(blocked_locations) + [
+        loc for loc in stale_locations if loc.id not in blocked_ids
+    ]
+
     count = 0
-    for location in locations:
+    for location in all_locations:
         if not dry_run:
             sync_location_blocked_alerts_for_location(location)
         count += 1

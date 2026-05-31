@@ -22,6 +22,8 @@ from shared.exceptions import (
     CrossValidationFailedError,
     DiscrepancyNoteRequiredError,
     LocationStateNotAllowedError,
+    LotCodeRequiredError,
+    LotExpirationDateRequiredError,
     ProductNotReturnableError,
     SerialNumberRequiredError,
 )
@@ -611,3 +613,46 @@ def test_entry_allows_destination_in_restricted(
         electrical_safety_acknowledged=True,
     )
     assert movement.destination_location_id == loc.id
+
+
+@pytest.mark.django_db
+def test_register_entry_raises_lot_code_required_for_expiring_product(
+    almacenista_user, sample_locations
+):
+    """Fix #1: omitir lot_code en producto con requires_expiration=True debe lanzar
+    LotCodeRequiredError (422), no InsufficientStockError (409)."""
+    product = ProductFactory(requires_expiration=True, sku="EXP-0001")
+    loc = sample_locations[0]
+
+    with pytest.raises(LotCodeRequiredError):
+        register_entry(
+            almacenista_user,
+            product.id,
+            loc.id,
+            5,
+            # lot_code deliberadamente omitido
+            cold_chain_acknowledged=True,
+            electrical_safety_acknowledged=True,
+        )
+
+
+@pytest.mark.django_db
+def test_register_entry_raises_lot_expiration_date_required(
+    almacenista_user, sample_locations
+):
+    """Fix #1: omitir lot_expiration_date en producto con requires_expiration=True debe lanzar
+    LotExpirationDateRequiredError (422)."""
+    product = ProductFactory(requires_expiration=True, sku="EXP-0002")
+    loc = sample_locations[0]
+
+    with pytest.raises(LotExpirationDateRequiredError):
+        register_entry(
+            almacenista_user,
+            product.id,
+            loc.id,
+            5,
+            lot_code="L-TEST",
+            lot_expiration_date=None,
+            cold_chain_acknowledged=True,
+            electrical_safety_acknowledged=True,
+        )

@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.utils.text import slugify
 
 import apps.alerts.services as alert_services
@@ -95,14 +95,16 @@ def ensure_stock_row_for_tests(
 
 
 def _generate_unique_code(name: str) -> str:
-    """Genera un slug único para el `code` basado en el nombre de la ubicación."""
-    base = slugify(name) or "ubicacion"
-    code = base
-    n = 0
-    while Location.objects.filter(code=code).exists():
-        n += 1
-        code = f"{base}-{n}"
-    return code
+    """Genera un slug a partir del nombre; la unicidad se garantiza con retry en create_location."""
+    return slugify(name) or "ubicacion"
+
+
+def _from_template(current: Any, defaults: dict, key: str, cast=None) -> Any:
+    """Lee `key` de `defaults` solo si `current` es None."""
+    if current is not None or not isinstance(defaults, dict) or key not in defaults:
+        return current
+    val = defaults[key]
+    return cast(val) if cast is not None and val is not None else val
 
 
 @transaction.atomic
@@ -157,26 +159,17 @@ def create_location(
         and storage_template.storage_type_id
     ):
         storage_type_id = storage_template.storage_type_id
-    if is_retail is None and isinstance(template_defaults, dict):
-        if "is_retail" in template_defaults:
-            is_retail = bool(template_defaults.get("is_retail"))
-    if max_capacity is None and isinstance(template_defaults, dict):
-        if "max_capacity" in template_defaults:
-            max_capacity = template_defaults.get("max_capacity")
-    if capacity_mode == Location.CapacityMode.NONE and isinstance(
-        template_defaults, dict
-    ):
-        if "capacity_mode" in template_defaults:
-            capacity_mode = str(template_defaults.get("capacity_mode") or capacity_mode)
-    if capacity_level is None and isinstance(template_defaults, dict):
-        if "capacity_level" in template_defaults:
-            capacity_level = template_defaults.get("capacity_level")
-    if capacity_score is None and isinstance(template_defaults, dict):
-        if "capacity_score" in template_defaults:
-            capacity_score = template_defaults.get("capacity_score")
-    if occupancy_estimate_pct is None and isinstance(template_defaults, dict):
-        if "occupancy_estimate_pct" in template_defaults:
-            occupancy_estimate_pct = template_defaults.get("occupancy_estimate_pct")
+    is_retail = _from_template(is_retail, template_defaults, "is_retail", bool)
+    max_capacity = _from_template(max_capacity, template_defaults, "max_capacity")
+    if capacity_mode == Location.CapacityMode.NONE:
+        capacity_mode = str(
+            _from_template(None, template_defaults, "capacity_mode") or capacity_mode
+        )
+    capacity_level = _from_template(capacity_level, template_defaults, "capacity_level")
+    capacity_score = _from_template(capacity_score, template_defaults, "capacity_score")
+    occupancy_estimate_pct = _from_template(
+        occupancy_estimate_pct, template_defaults, "occupancy_estimate_pct"
+    )
 
     valid_statuses = {choice[0] for choice in Location.OperationalStatus.choices}
     if operational_status not in valid_statuses:
@@ -226,10 +219,8 @@ def create_location(
     else:
         final_is_retail = detected_retail
 
-    code = _generate_unique_code(name)
-
-    return Location.objects.create(
-        code=code,
+    base_code = _generate_unique_code(name)
+    create_kwargs = dict(
         name=name,
         description=description or "",
         is_retail=final_is_retail,
@@ -243,6 +234,19 @@ def create_location(
         occupancy_estimate_pct=occupancy_estimate_pct,
         is_active=operational_status != Location.OperationalStatus.ARCHIVED,
     )
+    for attempt in range(3):
+        code = base_code if attempt == 0 else f"{base_code}-{attempt}"
+        sid = transaction.savepoint()
+        try:
+            loc = Location.objects.create(code=code, **create_kwargs)
+            transaction.savepoint_commit(sid)
+            return loc
+        except IntegrityError:
+            transaction.savepoint_rollback(sid)
+            if attempt == 2:
+                raise DomainValidationError(
+                    "No se pudo generar un código único para la ubicación."
+                )
 
 
 @transaction.atomic

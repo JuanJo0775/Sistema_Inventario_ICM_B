@@ -711,15 +711,14 @@ def get_expiring_products(days: int = 30):
     """RF-010, RF-011 — Lotes que vencen en los próximos `days` días."""
     rows: list[dict[str, Any]] = []
     for lot in get_lots_expiring_soon(days=days):
-        location_ids = set(
-            Movement.objects.filter(
+        location_ids = {
+            lid
+            for row in Movement.objects.filter(
                 product_id=lot.product_id, lot_id=lot.id
-            ).values_list("origin_location_id", flat=True)
-        ) | set(
-            Movement.objects.filter(
-                product_id=lot.product_id, lot_id=lot.id
-            ).values_list("destination_location_id", flat=True)
-        )
+            ).values_list("origin_location_id", "destination_location_id")
+            for lid in row
+            if lid is not None
+        }
         for location_id in {x for x in location_ids if x is not None}:
             qty = ledger_net_quantity_for_lot_location(
                 product_id=lot.product_id, lot_id=lot.id, location_id=location_id

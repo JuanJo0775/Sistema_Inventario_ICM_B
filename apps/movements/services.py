@@ -27,6 +27,8 @@ from shared.exceptions import (
     ImmutableRecordError,
     InsufficientStockError,
     LocationStateNotAllowedError,
+    LotCodeRequiredError,
+    LotExpirationDateRequiredError,
     PrivacyConsentRequiredError,
     ProductNotReturnableError,
     SerialNumberRequiredError,
@@ -275,18 +277,11 @@ def register_entry(
         )
 
     lot = None
-    product = (
-        Product.objects.select_for_update()
-        .select_related("category")
-        .get(pk=product_id)
-    )
     if product.requires_expiration:
         if not (lot_code or "").strip():
-            raise InsufficientStockError(
-                "Lote requerido para producto con vencimiento."
-            )
+            raise LotCodeRequiredError()
         if lot_expiration_date is None:
-            raise InsufficientStockError("Fecha de vencimiento del lote requerida.")
+            raise LotExpirationDateRequiredError()
         lot, created = Lot.objects.select_for_update().get_or_create(
             product=product,
             code=(lot_code or "").strip(),
@@ -878,6 +873,8 @@ def correct_movement_within_window(
     if new_origin == new_dest:
         raise ValueError("Origen y destino deben ser distintos.")
 
+    # Los ACKs se propagan del movimiento original: el usuario ya los reconoció
+    # al crear el traslado inicial. La corrección no debe exigirlos de nuevo (BR-06).
     rev = register_internal_transfer(
         user,
         original.product_id,
@@ -995,20 +992,68 @@ def ledger_net_quantity_for_lot_location(
 def available_lots_at_location(
     *, product_id: UUID, location_id: UUID
 ) -> list[dict[str, Any]]:
-    """Retorna lotes con stock positivo en una ubicación, ordenados por vencimiento."""
-    lots = list(
+    """Retorna lotes con stock positivo en una ubicación, ordenados por vencimiento.
+
+    Usa una única consulta al ledger en lugar de N consultas (una por lote).
+    """
+    from django.db import models as _models
+
+    lots_qs = (
         Lot.objects.filter(product_id=product_id)
         .select_related("product")
         .order_by("expiration_date", "code")
     )
-    out: list[dict[str, Any]] = []
-    for lot in lots:
-        available = ledger_net_quantity_for_lot_location(
-            product_id=product_id, lot_id=lot.id, location_id=location_id
-        )
-        if available > 0:
-            out.append({"lot": lot, "available": int(available)})
-    return out
+    lots: dict[UUID, Lot] = {lot.id: lot for lot in lots_qs}
+    if not lots:
+        return []
+
+    inventory: dict[UUID, int] = {lid: 0 for lid in lots}
+    _salida_types = {
+        MovementType.SALIDA_VENTA_MAYOR,
+        MovementType.SALIDA_VENTA_MENOR,
+        MovementType.SALIDA_DANO,
+        MovementType.SALIDA_VENCIMIENTO,
+        MovementType.SALIDA_COMBO,
+    }
+    qs = Movement.objects.filter(
+        product_id=product_id,
+        lot_id__in=lots.keys(),
+    ).filter(
+        _models.Q(origin_location_id=location_id)
+        | _models.Q(destination_location_id=location_id)
+    )
+    for m in qs.iterator():
+        lid = m.lot_id
+        if lid not in inventory:
+            continue
+        if (
+            m.movement_type == MovementType.ENTRADA
+            and m.destination_location_id == location_id
+        ):
+            inventory[lid] += m.quantity
+        elif m.movement_type in _salida_types and m.origin_location_id == location_id:
+            inventory[lid] -= m.quantity
+        elif m.movement_type == MovementType.TRASLADO:
+            if m.origin_location_id == location_id:
+                inventory[lid] -= m.quantity
+            if m.destination_location_id == location_id:
+                inventory[lid] += m.quantity
+        elif m.movement_type == MovementType.AJUSTE:
+            if m.destination_location_id == location_id:
+                inventory[lid] += m.quantity
+            if m.origin_location_id == location_id:
+                inventory[lid] -= m.quantity
+        elif (
+            m.movement_type == MovementType.DEVOLUCION
+            and m.destination_location_id == location_id
+        ):
+            inventory[lid] += m.quantity
+
+    return [
+        {"lot": lots[lid], "available": inventory[lid]}
+        for lid in sorted(lots, key=lambda x: (lots[x].expiration_date, lots[x].code))
+        if inventory[lid] > 0
+    ]
 
 
 @transaction.atomic
