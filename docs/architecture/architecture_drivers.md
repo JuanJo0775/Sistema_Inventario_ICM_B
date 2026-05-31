@@ -35,14 +35,16 @@ Este documento sintetiza los drivers reales que condicionan la arquitectura del 
 
 ## 3. Drivers de calidad relevantes
 
-| Driver | Prioridad | Justificación |
-|---|---|---|
-| Seguridad | Alta | La API expone operaciones sensibles de inventario, usuarios y auditoría; un acceso indebido compromete datos y operación. |
-| Consistencia / integridad | Alta | El stock incorrecto impacta directamente recepción, despacho, reportes y decisiones operativas. |
-| Mantenibilidad | Alta | La arquitectura evoluciona por dominios y necesita cambios aislados sin mezclar reglas en vistas o serializers. |
-| Rendimiento | Medio | El volumen actual es moderado, pero reportes y consultas de stock deben mantenerse ágiles. |
-| Disponibilidad | Medio | El sistema es monolítico y no está diseñado para alta disponibilidad distribuida en este alcance. |
-| Observabilidad | Medio | Existe auditoría y logging, pero todavía no hay un stack completo de métricas y trazas distribuidas. |
+| Driver | Prioridad | Justificación | ADRs vinculados |
+|---|:---:|---|---|
+| Consistencia e Integridad Transaccional | Alta | El ledger inmutable (`Movement`) y el stock derivado (`StockByLocation`) deben permanecer coherentes bajo concurrencia. Cualquier divergencia compromete la validez de todo el inventario: stock incorrecto impacta recepciones, despachos, reportes y decisiones gerenciales en cascada. `@transaction.atomic` y `select_for_update()` son las tácticas implementadas. | ADR-003, ADR-005 |
+| Seguridad y Control de Acceso | Alta | La API expone operaciones críticas sobre inventario, usuarios y datos de auditoría. El RBAC con tres roles (almacenista, auxiliar_despacho, administrador) y la restricción horaria (BR-03, ventana 07:00–17:00) deben evaluarse en cada request. Un fallo en la cadena de permisos puede conceder acceso indebido a operaciones que alteran el estado del sistema o exponen datos sensibles. | ADR-004, ADR-007 |
+| Mantenibilidad | Alta | La separación estricta de capas (models → serializers → views → services → selectors → permissions) es la táctica que permite evolucionar el sistema por dominio sin propagar cambios entre apps. Si la lógica de negocio migra a `views.py` o `serializers.py`, el acoplamiento aumenta y los cambios dejan de estar contenidos. Umbral observable: ≤ 6 archivos y ≤ 2 apps modificadas por cambio funcional aislado. | ADR-001, ADR-002 |
+| Rendimiento | Media | El sistema atiende jornadas con hasta 50 usuarios concurrentes. Las operaciones críticas tienen umbrales operativos definidos: consulta de stock (p95 < 500ms), registro de movimiento (< 1s), reporte KPI (< 3s con 10.000 movimientos). Los selectores de solo lectura (`selectors.py`) y los índices compuestos son las tácticas implementadas. | ADR-002, ADR-003 |
+| Disponibilidad | Media | El sistema es un monolito contenerizado sin alta disponibilidad distribuida (REST-02). La disponibilidad se sustenta en health checks de Docker Compose, política de reinicio automático y entrypoint con verificación de migraciones. Objetivo: uptime ≥ 99.5% en jornada operativa (07:00–17:00); recuperación ante caída < 5 minutos. | ADR-008, ADR-012 |
+| Observabilidad y Auditabilidad | Media | El sistema implementa `AuditLog` inmutable como mecanismo primario de trazabilidad operativa, requerido por la Ley 1581 y las reglas de negocio (BR-10). La observabilidad técnica (logs estructurados, métricas de latencia, trazas distribuidas) se encuentra en madurez baja y constituye la principal deuda técnica del sistema. Objetivo: 100% de operaciones críticas auditadas; consulta de historial < 2s para 30 días. | ADR-005 |
+
+> **Referencia completa:** Los escenarios ATAM formales de cada driver —con Fuente del Estímulo, Estímulo, Entorno, Artefacto, Respuesta Esperada y Medida de Respuesta— están documentados en [docs/architecture/utility_tree.md § Tabla ATAM de Drivers de Calidad](utility_tree.md#tabla-atam-de-drivers-de-calidad).
 
 ## 4. Componentes más condicionados por los drivers
 
