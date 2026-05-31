@@ -5,8 +5,15 @@ from datetime import timedelta
 import pytest
 from django.utils import timezone
 
-from apps.alerts.models import Alert, AlertCategory, AlertSeverity, AlertType
+from apps.alerts.models import (
+    ALERT_TYPE_DEFAULTS,
+    Alert,
+    AlertCategory,
+    AlertSeverity,
+    AlertType,
+)
 from apps.alerts.services import (
+    _severity_and_category,
     resolve_alert,
     scan_all_location_alerts,
     sync_expiry_alerts_for_product,
@@ -161,3 +168,73 @@ def test_scan_resolves_stale_alerts_on_unblocked_location():
         alert_type=AlertType.LOCATION_BLOCKED_WITH_STOCK,
         is_resolved=False,
     ).exists(), "La alerta debe quedar resuelta tras el scan con la ubicación activa"
+
+
+# ─── Tests parametrizados de severidad y categoría canónicas ────────────────
+
+
+@pytest.mark.parametrize(
+    "alert_type, per_location, expected_severity, expected_category",
+    [
+        (AlertType.LOW_STOCK, False, AlertSeverity.HIGH, AlertCategory.STOCK),
+        (AlertType.LOW_STOCK, True, AlertSeverity.MEDIUM, AlertCategory.STOCK),
+        (
+            AlertType.EXPIRATION_30,
+            False,
+            AlertSeverity.CRITICAL,
+            AlertCategory.EXPIRATION,
+        ),
+        (AlertType.EXPIRATION_60, False, AlertSeverity.HIGH, AlertCategory.EXPIRATION),
+        (
+            AlertType.LOT_EXPIRED,
+            False,
+            AlertSeverity.CRITICAL,
+            AlertCategory.EXPIRATION,
+        ),
+        (
+            AlertType.COLD_CHAIN_MISSING,
+            False,
+            AlertSeverity.HIGH,
+            AlertCategory.LOCATION,
+        ),
+        (
+            AlertType.LOCATION_BLOCKED_WITH_STOCK,
+            False,
+            AlertSeverity.HIGH,
+            AlertCategory.LOCATION,
+        ),
+        (
+            AlertType.STOCK_MISMATCH,
+            False,
+            AlertSeverity.CRITICAL,
+            AlertCategory.INTEGRITY,
+        ),
+        (AlertType.STOCK_ZERO, False, AlertSeverity.MEDIUM, AlertCategory.STOCK),
+    ],
+)
+def test_severity_and_category_canonical(
+    alert_type, per_location, expected_severity, expected_category
+):
+    """Verifica que _severity_and_category devuelve los valores canónicos del mapa."""
+    severity, category = _severity_and_category(alert_type, per_location=per_location)
+    assert (
+        severity == expected_severity
+    ), f"{alert_type}(per_location={per_location}): esperaba severity={expected_severity}, obtuvo={severity}"
+    assert (
+        category == expected_category
+    ), f"{alert_type}(per_location={per_location}): esperaba category={expected_category}, obtuvo={category}"
+
+
+def test_severity_unknown_type_returns_defaults():
+    """Tipos desconocidos devuelven MEDIUM/STOCK como fallback."""
+    severity, category = _severity_and_category("TIPO_INEXISTENTE")
+    assert severity == AlertSeverity.MEDIUM
+    assert category == AlertCategory.STOCK
+
+
+def test_alert_type_defaults_map_covers_all_alert_types():
+    """Todos los AlertType deben estar cubiertos en ALERT_TYPE_DEFAULTS."""
+    all_types = {t.value for t in AlertType}
+    covered = set(ALERT_TYPE_DEFAULTS.keys())
+    missing = all_types - covered
+    assert not missing, f"AlertTypes sin mapeo en ALERT_TYPE_DEFAULTS: {missing}"

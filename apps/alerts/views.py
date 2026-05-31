@@ -4,6 +4,7 @@ from uuid import UUID
 
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import generics, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -70,9 +71,15 @@ def _build_alert_filters(query_params) -> dict:
     if cat := query_params.get("category"):
         filters["category"] = cat
     if pid := query_params.get("product_id"):
-        filters["product_id"] = UUID(str(pid))
+        try:
+            filters["product_id"] = UUID(str(pid))
+        except (ValueError, AttributeError):
+            raise ValidationError({"product_id": "UUID inválido."})
     if lid := query_params.get("location_id"):
-        filters["location_id"] = UUID(str(lid))
+        try:
+            filters["location_id"] = UUID(str(lid))
+        except (ValueError, AttributeError):
+            raise ValidationError({"location_id": "UUID inválido."})
     if df := query_params.get("date_from"):
         filters["date_from"] = df
     if dt := query_params.get("date_to"):
