@@ -20,13 +20,13 @@ from apps.webhooks.serializers import (
 from apps.webhooks.services import _attempt_delivery
 from shared.openapi import TAG_WEBHOOKS, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
-from shared.permissions import IsAdministrador
+from shared.permissions import IsAlmacenista
 
 
 class WebhookEndpointListCreateView(APIView):
     """GET/POST — Lista y crea endpoints de webhook (solo administradores)."""
 
-    permission_classes = (IsAuthenticated, IsAdministrador)
+    permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
         responses={200: WebhookEndpointSerializer(many=True), **standard_error_responses(include_403=True)},
@@ -61,7 +61,7 @@ class WebhookEndpointListCreateView(APIView):
 class WebhookEndpointDetailView(APIView):
     """GET/PATCH/DELETE — Detalle de un endpoint de webhook."""
 
-    permission_classes = (IsAuthenticated, IsAdministrador)
+    permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
         responses={200: WebhookEndpointSerializer, **standard_error_responses(include_403=True, include_404=True)},
@@ -98,7 +98,7 @@ class WebhookEndpointDetailView(APIView):
 class WebhookTestView(APIView):
     """POST — Envía un payload de prueba al endpoint."""
 
-    permission_classes = (IsAuthenticated, IsAdministrador)
+    permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
         request=WebhookTestSerializer,
@@ -125,7 +125,7 @@ class WebhookTestView(APIView):
 class WebhookDeliveryListView(APIView):
     """GET — Historial de entregas de webhooks."""
 
-    permission_classes = (IsAuthenticated, IsAdministrador)
+    permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
         responses={200: WebhookDeliverySerializer(many=True), **standard_error_responses(include_403=True)},
@@ -141,7 +141,7 @@ class WebhookDeliveryListView(APIView):
 class WebhookStatsView(APIView):
     """GET — Métricas de entregas de webhooks."""
 
-    permission_classes = (IsAuthenticated, IsAdministrador)
+    permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(tags=[TAG_WEBHOOKS])
     def get(self, request):

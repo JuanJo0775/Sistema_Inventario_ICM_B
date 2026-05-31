@@ -1063,7 +1063,9 @@ GET /api/v1/audit/<uuid>/    → detalle log
 
 ## Webhooks
 
-Solo `administrador`. Permite notificar a sistemas externos cuando ocurren eventos críticos.
+Solo `almacenista` (`IsAlmacenista` — rol rector del sistema). Permite notificar a sistemas externos cuando ocurren eventos críticos.
+
+> El rol `administrador` es de solo lectura y **no tiene acceso** a los webhooks.
 
 ### Crear endpoint de webhook
 
@@ -1299,9 +1301,19 @@ Los listados están paginados. Respuesta estándar:
 
 ---
 
-## Roles y acceso rápido
+## Descripción de roles
 
-| Acción | almacenista | auxiliar_despacho | administrador |
+> ⚠️ Los nombres de rol en código NO coinciden con la intuición habitual. Leer con atención.
+
+| Rol (`role`) | Permiso DRF | Descripción |
+|---|---|---|
+| `almacenista` | `IsAlmacenista` | **Control total.** Rol rector del sistema (BR-02). Gestiona usuarios, catálogo, inventario, movimientos, webhooks y dashboard. |
+| `auxiliar_despacho` | `IsAuxiliarDespacho` | Operaciones de campo dentro de franja horaria 07:00–12:00 y 14:00–17:00 (BR-03). |
+| `administrador` | `IsAdministrador` | **Solo lectura.** Puede ver reportes, alertas y auditoría. No puede crear ni modificar nada operativo. |
+
+## Acceso rápido por acción
+
+| Acción | `almacenista` | `auxiliar_despacho` | `administrador` |
 |---|---|---|---|
 | Login | ✅ | ✅ (horario) | ✅ |
 | Crear usuarios | ✅ | ❌ | ❌ |
@@ -1317,9 +1329,9 @@ Los listados están paginados. Respuesta estándar:
 | Ver alertas | ✅ | ❌ | ✅ |
 | Polling alertas | ✅ | ✅ | ✅ |
 | Ver auditoría | ✅ | ❌ | ✅ |
-| Gestionar webhooks | ❌ | ❌ | ✅ |
+| Gestionar webhooks | ✅ | ❌ | ❌ |
 
-Para la matriz completa, ver [README_MATRIZ_PERMISOS.md](README_MATRIZ_PERMISOS.md).
+Para la matriz completa de cada endpoint, ver [README_MATRIZ_PERMISOS.md](README_MATRIZ_PERMISOS.md).
 
 ---
 

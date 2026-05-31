@@ -15,21 +15,23 @@ Fuentes principales:
 - [Permisos compartidos](../../shared/permissions.py)
 - [Modelo de usuario](../../apps/authentication/models.py)
 
-## 2. Supuestos de lectura de la matriz
+## 2. Roles del sistema — lectura importante
 
-El codigo solo define tres roles nativos en el modelo `User`:
+El codigo define tres roles nativos en el modelo `User` (campo `role`):
 
-- `administrador`
-- `almacenista`
-- `auxiliar_despacho`
+| Rol en codigo | Permiso DRF | Descripcion real | Columna en la matriz |
+|---|---|---|---|
+| `almacenista` | `IsAlmacenista` | **Rol rector del sistema.** Control total operativo y administrativo (BR-02). Crea usuarios, gestiona catalogo, ejecuta todos los movimientos, administra webhooks. | **Supervisor** |
+| `auxiliar_despacho` | `IsAuxiliarDespacho` | Operaciones de campo (entradas, despachos, traslados) dentro de franja horaria (BR-03). | **Operador** |
+| `administrador` | `IsAdministrador` | **Solo lectura.** Accede a reportes, alertas y auditoria. No puede crear movimientos, usuarios ni configurar integraciones. | **Admin** |
 
-Para cumplir la matriz solicitada, se usan estos equivalentes funcionales:
+> ⚠️ **Nota critica:** El rol `almacenista` es el "administrador funcional" del negocio. El rol `administrador` es unicamente un observador de lectura. Esta convencion es interna al codigo; la columna "Admin" en la matriz corresponde al rol `administrador` (lectura), no al `almacenista` (control total).
 
-- Admin = `administrador`
-- Supervisor = `almacenista`
-- Operador = `auxiliar_despacho`
-- Cliente = rol no nativo en el modelo actual; se documenta como supuesto externo y queda denegado salvo que el consumidor use una cuenta real del sistema
-- Invitado = usuario anonimo
+Equivalentes adicionales de la matriz:
+- Cliente = rol no nativo; denegado por defecto.
+- Invitado = usuario anonimo (sin JWT).
+
+Clase de permiso combinada `IsAlmacenistaOrAdministrador`: usada en reportes y alertas, permite lectura compartida al `almacenista` y al `administrador`.
 
 ## 3. Resumen ejecutivo del modelo de seguridad
 
@@ -359,18 +361,19 @@ Leyenda:
 
 ### 11.9 Webhooks — NUEVO
 
-> El modulo webhooks es de uso exclusivo del administrador para configurar notificaciones a sistemas externos.
+> El modulo webhooks requiere rol **almacenista** (rol rector del sistema, BR-02).
+> El `administrador` es solo lectura y NO puede gestionar webhooks.
 
 | Recurso | Accion | Endpoint | Admin | Supervisor | Operador | Cliente | Invitado | Observaciones |
 |---|---|---|---|---|---|---|---|---|
-| Endpoints de webhook | Listar | `GET /api/v1/webhooks/endpoints/` | Permitido | Denegado | Denegado | Denegado | Denegado | Solo administrador |
-| Endpoints de webhook | Crear | `POST /api/v1/webhooks/endpoints/` | Permitido | Denegado | Denegado | Denegado | Denegado | Solo administrador; requiere url, secret y events |
-| Endpoint detalle | Leer | `GET /api/v1/webhooks/endpoints/<uuid:pk>/` | Permitido | Denegado | Denegado | Denegado | Denegado | Solo administrador |
-| Endpoint detalle | Actualizar | `PATCH /api/v1/webhooks/endpoints/<uuid:pk>/` | Permitido | Denegado | Denegado | Denegado | Denegado | Solo administrador |
-| Endpoint detalle | Desactivar | `DELETE /api/v1/webhooks/endpoints/<uuid:pk>/` | Permitido | Denegado | Denegado | Denegado | Denegado | Baja logica (is_active=False); solo administrador |
-| Prueba de webhook | Ejecutar | `POST /api/v1/webhooks/endpoints/<uuid:pk>/test/` | Permitido | Denegado | Denegado | Denegado | Denegado | Envia payload de prueba; solo administrador |
-| Historial de entregas | Leer | `GET /api/v1/webhooks/deliveries/` | Permitido | Denegado | Denegado | Denegado | Denegado | Solo administrador |
-| Estadisticas | Leer | `GET /api/v1/webhooks/stats/` | Permitido | Denegado | Denegado | Denegado | Denegado | Conteos pending/delivered/failed; solo administrador |
+| Endpoints de webhook | Listar | `GET /api/v1/webhooks/endpoints/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista (`IsAlmacenista`) |
+| Endpoints de webhook | Crear | `POST /api/v1/webhooks/endpoints/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista; requiere url, secret y events |
+| Endpoint detalle | Leer | `GET /api/v1/webhooks/endpoints/<uuid:pk>/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista |
+| Endpoint detalle | Actualizar | `PATCH /api/v1/webhooks/endpoints/<uuid:pk>/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista |
+| Endpoint detalle | Desactivar | `DELETE /api/v1/webhooks/endpoints/<uuid:pk>/` | Denegado | Permitido | Denegado | Denegado | Denegado | Baja logica (is_active=False); solo almacenista |
+| Prueba de webhook | Ejecutar | `POST /api/v1/webhooks/endpoints/<uuid:pk>/test/` | Denegado | Permitido | Denegado | Denegado | Denegado | Envia payload de prueba; solo almacenista |
+| Historial de entregas | Leer | `GET /api/v1/webhooks/deliveries/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista |
+| Estadisticas | Leer | `GET /api/v1/webhooks/stats/` | Denegado | Permitido | Denegado | Denegado | Denegado | Conteos pending/delivered/failed; solo almacenista |
 
 ## 12. Acciones especiales no expuestas como endpoint publico
 

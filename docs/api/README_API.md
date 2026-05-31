@@ -419,7 +419,8 @@ Disponible para `almacenista` y `administrador`. Los logs son inmutables (sin en
 
 ### 10.9 Webhooks (`/api/v1/webhooks/`) — NUEVO
 
-> Solo disponible para `administrador`.
+> Solo disponible para `almacenista` (rol rector del sistema, `IsAlmacenista`).
+> El rol `administrador` es de solo lectura y **no puede** gestionar webhooks.
 
 | Método | Ruta | Descripción |
 |---|---|---|
