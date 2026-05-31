@@ -18,11 +18,9 @@ from apps.webhooks.serializers import (
     WebhookTestSerializer,
 )
 from apps.webhooks.services import _attempt_delivery
-from shared.openapi import standard_error_responses
+from shared.openapi import TAG_WEBHOOKS, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAdministrador
-
-TAG_WEBHOOKS = "webhooks"
 
 
 class WebhookEndpointListCreateView(APIView):

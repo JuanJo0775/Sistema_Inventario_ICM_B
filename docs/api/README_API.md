@@ -17,9 +17,14 @@ La API cubre los dominios funcionales del backend:
 - inventario
 - movimientos
 - dashboard operacional
-- reportes
-- alertas
+- reportes (con exportación CSV/XLSX)
+- alertas (con polling realtime)
 - auditoría
+- webhooks (notificaciones a sistemas externos)
+
+> **Documentos relacionados:**
+> - Referencia completa de endpoints con ejemplos: [REFERENCIA_ENDPOINTS.md](REFERENCIA_ENDPOINTS.md)
+> - Matriz de permisos por rol: [README_MATRIZ_PERMISOS.md](README_MATRIZ_PERMISOS.md)
 
 La comunicación con el frontend se realiza exclusivamente por API REST bajo el prefijo `/api/v1/`.
 
@@ -74,17 +79,22 @@ Archivos de referencia:
 
 ### 4.2 Tags oficiales
 
-Los tags se definen centralmente en [shared/openapi.py](shared/openapi.py) y deben reutilizarse sin inventar nombres nuevos.
+Los tags se definen centralmente en [shared/openapi.py](../../shared/openapi.py) y deben reutilizarse sin inventar nombres nuevos.
 
-- `Autenticación`
-- `Sistema`
-- `Catálogo`
-- `Inventario`
-- `Movimientos`
-- `Dashboard`
-- `Reportes`
-- `Alertas`
-- `Auditoría`
+| Tag constante | Valor en OpenAPI | Descripción |
+|---|---|---|
+| `TAG_AUTH` | `auth` | Autenticación JWT y gestión de usuarios |
+| `TAG_SYSTEM` | `system` | Verificación de disponibilidad |
+| `TAG_CATALOG` | `catalog` | Categorías, productos y combos |
+| `TAG_INVENTORY` | `inventory` | Ubicaciones y stock |
+| `TAG_MOVEMENTS` | `movements` | Ledger de movimientos de inventario |
+| `TAG_DASHBOARD` | `dashboard` | Read model operacional para UI ejecutiva |
+| `TAG_REPORTS` | `reports` | Reportes históricos, exportación y datasets |
+| `TAG_ALERTS` | `alerts` | Alertas operativas y polling |
+| `TAG_AUDIT` | `audit` | Logs de auditoría inmutables |
+| `webhooks` | `webhooks` | Gestión de webhooks (definido en `apps/webhooks/views.py`) |
+
+> **Nota:** El tag `webhooks` aún no está en `shared/openapi.py`. Cuando se formalice, debe registrarse allí.
 
 ### 4.3 Frontera de dashboard y reportes
 
@@ -249,60 +259,197 @@ El backend usa `djangorestframework-simplejwt` con rotación de refresh tokens y
 
 ## 10. Contratos por módulo
 
-### 10.1 Autenticación
+Para el catálogo completo con ejemplos request/response, ver [REFERENCIA_ENDPOINTS.md](REFERENCIA_ENDPOINTS.md).
 
-- `POST /api/v1/auth/login/`
-- `POST /api/v1/auth/token/refresh/`
-- `POST /api/v1/auth/logout/`
-- `GET /api/v1/auth/me/`
-- `POST /api/v1/auth/users/`
-- `PATCH /api/v1/auth/users/<id>/`
-- `POST /api/v1/auth/users/<id>/disable/`
+### 10.1 Autenticación (`/api/v1/auth/`)
 
-### 10.2 Catálogo
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/auth/health/` | Verificación de servicio (sin auth) |
+| `POST` | `/auth/login/` | Obtener tokens JWT |
+| `POST` | `/auth/token/refresh/` | Renovar access token |
+| `POST` | `/auth/logout/` | Invalidar refresh token |
+| `GET` | `/auth/me/` | Perfil del usuario autenticado |
+| `GET/POST` | `/auth/users/` | Listar / crear usuarios |
+| `GET/PUT/PATCH` | `/auth/users/<uuid:pk>/` | Detalle / actualizar usuario |
+| `POST` | `/auth/users/<uuid:pk>/disable/` | Deshabilitar cuenta |
 
-- categorías
-- subcategorías
-- productos
-- combos
-- resolución de identificadores por SKU, barcode o nombre
-- el detalle de producto expone `barcode`, `barcode_type`, `barcode_payload`, `barcode_svg` y `barcode_svg_data_uri` para consumo directo del frontend e impresión de etiquetas
-- `GET /api/v1/catalog/products/<id>/barcode/` devuelve el payload listo para renderizar/impresión del barcode del producto
+### 10.2 Catálogo (`/api/v1/catalog/`)
 
-### 10.3 Inventario
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET/POST` | `/catalog/categories/` | Categorías |
+| `GET/PUT/PATCH` | `/catalog/categories/<uuid:pk>/` | Detalle categoría |
+| `GET/POST` | `/catalog/subcategories/` | Subcategorías |
+| `GET/PUT/PATCH` | `/catalog/subcategories/<uuid:pk>/` | Detalle subcategoría |
+| `GET/POST` | `/catalog/products/` | Productos |
+| `GET/PUT/PATCH` | `/catalog/products/<uuid:pk>/` | Detalle producto |
+| `GET` | `/catalog/products/<uuid:pk>/barcode/` | Payload de código de barras (SVG, Data URI) |
+| `GET` | `/catalog/resolve/` | Resolución por SKU, barcode o nombre |
+| `GET/POST` | `/catalog/combos/` | Combos (kits de productos) |
+| `GET` | `/catalog/combos/<uuid:pk>/` | Detalle combo |
 
-- consulta de stock por producto
-- consulta de stock por ubicación
-- búsqueda de productos
+> El detalle de producto expone `barcode`, `barcode_type`, `barcode_payload`, `barcode_svg` y `barcode_svg_data_uri` para impresión de etiquetas.
 
-### 10.4 Movimientos
+### 10.3 Inventario (`/api/v1/inventory/`)
 
-- entradas
-- salidas
-- traslados
-- devoluciones
-- ajustes
-- correcciones dentro de ventana
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/inventory/` | Inventario consolidado por producto. Soporta `?export=csv\|xlsx` |
+| `GET/POST` | `/inventory/locations/` | Listar / crear ubicaciones |
+| `GET/PUT/PATCH/DELETE` | `/inventory/locations/<uuid:pk>/` | Detalle / actualizar / desactivar |
+| `POST` | `/inventory/locations/<uuid:pk>/state-transitions/` | Cambiar estado operativo |
+| `GET/POST` | `/inventory/storage-types/` | Tipos de almacenamiento |
+| `GET/PUT/PATCH/DELETE` | `/inventory/storage-types/<uuid:pk>/` | Detalle tipo almacenamiento |
+| `GET/POST` | `/inventory/storage-templates/` | Plantillas de ubicación |
+| `GET/PUT/PATCH/DELETE` | `/inventory/storage-templates/<uuid:pk>/` | Detalle plantilla |
+| `POST` | `/inventory/reconstruct/` | Reconstruir stock desde ledger |
+| `GET` | `/inventory/products/<uuid:product_id>/stock/` | Stock por producto (alias) |
+| `GET` | `/inventory/stock/product/<uuid:product_id>/` | Stock por producto |
+| `GET` | `/inventory/stock/location/<uuid:location_id>/` | Stock por ubicación |
+| `PATCH` | `/inventory/stock/<uuid:pk>/threshold/` | **[NUEVO]** Actualizar umbral de reorden por ubicación |
+| `GET` | `/inventory/search/` | Búsqueda de productos (`?q=`, `?category=`, `?subcategory=`) |
 
-### 10.5 Reportes
+**Exportación de inventario consolidado:** `GET /inventory/?export=csv` o `?export=xlsx` devuelve el inventario en el formato indicado con filas aplanadas por producto/ubicación.
 
-- resumen de movimientos
-- resumen de ventas
-- historial de movimientos
-- utilización de almacén por capacidad configurada
-- resumen operativo de calidad y devoluciones derivadas para frontend
-- resumen operativo de descarte para frontend
-- resumen operativo de despacho e invoices vinculadas para frontend
+**Umbral de stock por ubicación:** `PATCH /inventory/stock/<pk>/threshold/` con `{"location_reorder_point": 5}` o `null` para volver al umbral global del producto. La respuesta incluye `effective_reorder_point`.
 
-### 10.6 Alertas
+### 10.4 Movimientos (`/api/v1/movements/`)
 
-- alertas activas
-- alertas de stock mínimo
-- alertas de vencimiento
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/movements/` | Ledger completo (paginado) |
+| `GET` | `/movements/<uuid:pk>/` | Detalle de un movimiento |
+| `POST` | `/movements/<uuid:pk>/corrections/` | Corrección dentro de ventana BR-06 |
+| `GET/POST` | `/movements/entries/` | Entradas de mercancía |
+| `GET` | `/movements/entries/<uuid:pk>/` | Detalle entrada |
+| `GET/POST` | `/movements/dispatches/` | Despachos (venta mayor/menor) |
+| `GET` | `/movements/dispatches/<uuid:pk>/` | Detalle despacho |
+| `GET` | `/movements/dispatches/<uuid:pk>/invoice/` | Descarga PDF de factura |
+| `GET/POST` | `/movements/transfers/` | Traslados internos |
+| `GET/POST` | `/movements/returns/` | Devoluciones |
+| `GET/POST` | `/movements/adjustments/` | Ajustes de inventario |
+| `POST` | `/movements/adjustments/correct/` | Corrección de ajuste |
+| `POST` | `/movements/combo-dispatch/` | Despacho de combo completo |
 
-### 10.7 Auditoría
+**Corrección BR-06:** Disponible para `TRASLADO`, `ENTRADA`, `SALIDA_VENTA_MAYOR`, `SALIDA_VENTA_MENOR`. Ventana de 5 minutos desde la creación. Solo el autor puede corregir.
 
-- consulta de eventos de auditoría
+### 10.5 Dashboard (`/api/v1/dashboard/`)
+
+> Solo disponible para `almacenista`. Read model operacional para UI ejecutiva.
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/dashboard/overview/` | Resumen general del inventario |
+| `GET` | `/dashboard/metrics/` | Métricas de movimientos del día |
+| `GET` | `/dashboard/alerts/` | Resumen de alertas críticas |
+| `GET` | `/dashboard/kpis/` | KPIs operativos con valores numéricos |
+| `GET` | `/dashboard/movements/` | Movimientos recientes para UI |
+
+Todos los endpoints aceptan `?period_days=N` (1–365) y algunos `?expiring_days=N`.
+
+### 10.6 Reportes (`/api/v1/reports/`)
+
+> Disponible para `almacenista` y `administrador`.
+
+| Método | Ruta | Descripción | Exportación |
+|---|---|---|---|
+| `GET` | `/reports/inventory/summary/` | Resumen de inventario por categoría | — |
+| `GET` | `/reports/movements/summary/` | Resumen de movimientos (rango obligatorio) | — |
+| `GET` | `/reports/movements/report/` | Reporte detallado de movimientos | — |
+| `GET` | `/reports/movements/history/` | Historial filtrable (máx. 200 registros) | `?export=csv\|xlsx` |
+| `GET` | `/reports/sales/summary/` | Totales de ventas por período | — |
+| `GET` | `/reports/top-products/` | Top productos más despachados | — |
+| `GET` | `/reports/invoices/` | Historial de facturas | — |
+| `GET` | `/reports/expiring/` | Lotes próximos a vencer (`?days=N`) | `?export=csv\|xlsx` |
+| `GET` | `/reports/warehouse-utilization/` | Utilización de almacén por capacidad | — |
+| `GET` | `/reports/quality-operational/` | Resumen operativo de calidad | — |
+| `GET` | `/reports/discard-operational/` | Resumen operativo de descartes | — |
+| `GET` | `/reports/dispatch-operational/` | Resumen operativo de despachos | — |
+| `GET` | `/reports/dispatch-operational/orders/` | Órdenes de despacho con filtros | — |
+| `GET` | `/reports/kpi/` | Panel KPI (delegado al servicio de dashboard) | — |
+| `GET` | `/reports/data/` | Dataset unificado exportable | — |
+
+**Cómo exportar:** Agregar `?export=csv` o `?export=xlsx` a los endpoints que lo soportan. El archivo se descarga directamente. Los CSV usan `StreamingHttpResponse` (seguros para grandes datasets). Los XLSX tienen límite de 10 000 filas; si se supera, se incluye una advertencia en la última fila y el header `X-Export-Truncated: true`.
+
+### 10.7 Alertas (`/api/v1/alerts/`)
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/alerts/` | Alertas activas (con filtros). Soporta `?export=csv\|xlsx` |
+| `GET` | `/alerts/poll/` | **[NUEVO]** Polling de alertas nuevas desde un timestamp |
+| `GET` | `/alerts/history/` | Historial de alertas resueltas |
+| `GET` | `/alerts/stats/` | Conteos de alertas activas por severidad y categoría |
+| `GET` | `/alerts/<pk>/` | Detalle de una alerta |
+| `POST` | `/alerts/<pk>/resolve/` | Marcar alerta como resuelta |
+
+**Polling de alertas:** `GET /alerts/poll/?since=<ISO-8601>&severity=CRITICAL,HIGH`
+- `since`: timestamp ISO-8601 (UTC). Si se omite, retorna las últimas 24 h.
+- `severity`: filtro opcional separado por coma (CRITICAL, HIGH, MEDIUM, LOW, INFO).
+- Respuesta incluye `server_timestamp` para usar como próximo `since`.
+- Retorna máximo 50 alertas por request, ordenadas por `created_at` descendente.
+
+Ejemplo de respuesta:
+```json
+{
+  "server_timestamp": "2026-05-31T14:00:00.000000+00:00",
+  "count": 3,
+  "results": [{ "id": 1, "alert_type": "LOW_STOCK", ... }]
+}
+```
+
+Patrón de polling recomendado:
+```js
+// Inicializar
+let since = new Date().toISOString();
+// Cada 30 segundos:
+const res = await fetch(`/api/v1/alerts/poll/?since=${since}`);
+const data = await res.json();
+since = data.server_timestamp;  // usar el timestamp del servidor
+```
+
+### 10.8 Auditoría (`/api/v1/audit/`)
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/audit/` | Lista de logs de auditoría (paginado) |
+| `GET` | `/audit/<uuid:pk>/` | Detalle de un log |
+
+Disponible para `almacenista` y `administrador`. Los logs son inmutables (sin endpoints de escritura).
+
+### 10.9 Webhooks (`/api/v1/webhooks/`) — NUEVO
+
+> Solo disponible para `administrador`.
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET/POST` | `/webhooks/endpoints/` | Listar / crear endpoints suscritos |
+| `GET/PATCH/DELETE` | `/webhooks/endpoints/<uuid:pk>/` | Detalle / actualizar / desactivar |
+| `POST` | `/webhooks/endpoints/<uuid:pk>/test/` | Enviar payload de prueba al endpoint |
+| `GET` | `/webhooks/deliveries/` | Historial de entregas (paginado) |
+| `GET` | `/webhooks/stats/` | Métricas: pendientes, entregados, fallidos |
+
+**Cómo funcionan:**
+1. El administrador crea un `WebhookEndpoint` con `url`, `secret` y lista de `events` suscritos.
+2. Cuando el sistema genera una alerta de los eventos suscritos, se encola una `WebhookDelivery`.
+3. El cron `deliver_webhooks` (cada 1-2 min) envía los webhooks pendientes como `POST` al endpoint externo.
+4. Cada entrega incluye el header `X-ICM-Signature: sha256=<HMAC-SHA256>` para que el receptor verifique la autenticidad.
+
+**Eventos disponibles para suscripción:**
+
+| Evento | Cuándo se dispara |
+|---|---|
+| `LOW_STOCK` | Cuando el stock de un producto cae al nivel o por debajo del umbral de reorden |
+| `STOCK_INTEGRITY_DIVERGENCE` | Cuando `verify_stock_integrity` detecta divergencia entre caché y ledger |
+
+**Cómo verificar la firma (receptor):**
+```python
+import hashlib, hmac
+expected = "sha256=" + hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+assert expected == request.headers["X-ICM-Signature"]
+```
+
+**Política de reintentos:** Backoff exponencial (1 min → 5 min → 30 min). Después de `max_retries` intentos fallidos, el delivery queda en estado `FAILED`. No se desactiva el endpoint automáticamente.
 
 ## 11. Trazabilidad con el resto de la arquitectura
 

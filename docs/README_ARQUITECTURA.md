@@ -2035,6 +2035,10 @@ Documentacion complementaria de este analisis:
 | RF-010 | Reportes/KPI | `apps/reports/selectors.py`, `apps/reports/views.py` | BR-10, BR-11, BR-13 |
 | RF-011 | Alertas | `apps/alerts/services.py`, `apps/alerts/models.py` | BR-04, BR-10, BR-11 |
 | RF-012 | Auditoria | `apps/audit/models.py`, `apps/audit/services.py`, `apps/audit/views.py` | BR-01, BR-06, BR-07, BR-10 |
+| RF-NEW-01 | Exportacion CSV/XLSX | `shared/exporters.py`, `apps/reports/views.py`, `apps/inventory/views.py`, `apps/alerts/views.py` | RF-010 |
+| RF-NEW-02 | Umbrales de stock por ubicacion | `apps/inventory/models.py::StockByLocation.location_reorder_point`, `apps/alerts/services.py::check_and_create_minimum_stock_alert` | RF-011, BR-11 |
+| RF-NEW-03 | Webhooks (notificacion externa) | `apps/webhooks/models.py`, `apps/webhooks/services.py`, `apps/webhooks/management/commands/deliver_webhooks.py` | RF-011 |
+| RF-NEW-04 | Polling de alertas | `apps/alerts/views.py::AlertPollView`, `GET /api/v1/alerts/poll/` | RF-011 |
 
 ## 16. Matriz de Trazabilidad Completa (BR -> Implementacion)
 

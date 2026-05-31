@@ -16,6 +16,7 @@ TAG_DASHBOARD = "dashboard"
 TAG_REPORTS = "reports"
 TAG_ALERTS = "alerts"
 TAG_AUDIT = "audit"
+TAG_WEBHOOKS = "webhooks"
 
 from typing import Any
 
@@ -153,8 +154,9 @@ Para probar los endpoints, haga clic en el botón **Authorize**, use el esquema 
             "description": "Operational read model for executive UI and KPIs.",
         },
         {"name": TAG_REPORTS, "description": "Read-only reports and KPIs."},
-        {"name": TAG_ALERTS, "description": "Operational alerts."},
-        {"name": TAG_AUDIT, "description": "Audit logs (read-only)."},
+        {"name": TAG_ALERTS, "description": "Operational alerts and real-time polling."},
+        {"name": TAG_AUDIT, "description": "Audit logs (read-only, immutable)."},
+        {"name": TAG_WEBHOOKS, "description": "Webhook endpoints and delivery management (admin only)."},
     ],
     # Botón "Authorize" en Swagger UI y componente de Error Uniforme
     "APPEND_COMPONENTS": {

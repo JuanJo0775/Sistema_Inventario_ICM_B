@@ -87,7 +87,7 @@ El proyecto estará disponible en:
 Para asegurar la calidad del código, puedes usar los siguientes comandos en tu día a día:
 
 ```bash
-# Ejecutar todos los tests
+# Ejecutar todos los tests (330 tests esperados)
 pytest
 
 # Ejecutar tests de una aplicación específica
@@ -101,7 +101,38 @@ black apps/ shared/ config/
 isort apps/ shared/ config/
 ```
 
-## 10. CI/CD y operación de despliegue
+## 10. Management Commands del sistema
+
+El sistema incluye los siguientes comandos de gestión operativa:
+
+```bash
+# Escanear y generar alertas de stock/vencimiento (idempotente)
+python manage.py scan_alerts
+python manage.py scan_alerts --types stock,expiry,location
+python manage.py scan_alerts --dry-run   # simular sin cambios
+
+# Verificar integridad de stock (caché vs. ledger)
+python manage.py verify_stock_integrity
+python manage.py verify_stock_integrity --fix  # reparar divergencias
+
+# Entregar webhooks pendientes en la cola (seguro para cron paralelo)
+python manage.py deliver_webhooks
+python manage.py deliver_webhooks --batch-size 100
+
+# Archivar logs de auditoría antiguos
+python manage.py archive_old_audit_logs --older-than-days 365
+python manage.py archive_old_audit_logs --dry-run  # ver cuántos sin modificar
+```
+
+**Cron recomendado en producción:**
+```
+*/2  * * * *  python manage.py deliver_webhooks           # cada 2 min
+0    */6 * * *  python manage.py scan_alerts               # cada 6 horas
+0    2   * * *  python manage.py verify_stock_integrity    # diario 2am
+0    3   1 * *  python manage.py archive_old_audit_logs    # mensual
+```
+
+## 11. CI/CD y operación de despliegue
 
 Si vas a participar en despliegues o soporte operativo, revisa el runbook completo:
 

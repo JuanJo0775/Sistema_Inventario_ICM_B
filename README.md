@@ -52,17 +52,21 @@ Documentación funcional y arquitectónica disponible en el repositorio:
 - [README_ADR.md](docs/adr/README_ADR.md): índice y trazabilidad de decisiones arquitectónicas.
 - [README_TEST.md](docs/test/README_TEST.md): estrategia de testing, tipos de pruebas, convenciones y ejemplos de escenarios Gherkin automatizados.
 - [README_CICD.md](docs/CI/README_CICD.md): runbook operativo de CI/CD (gates, deploy, promoción, backup, rollback, seguridad y secretos).
+- **[REFERENCIA_ENDPOINTS.md](docs/api/REFERENCIA_ENDPOINTS.md)**: referencia completa de endpoints con ejemplos request/response para el equipo de frontend.
+- [README_MATRIZ_PERMISOS.md](docs/api/README_MATRIZ_PERMISOS.md): matriz de permisos por rol para todos los endpoints.
 
 ## Stack tecnológico
 
 - Python 3.11+
 - Django 4.2+ (rango declarado en `requirements/base.txt`)
 - Django REST Framework
-- PostgreSQL
-- JWT con djangorestframework-simplejwt
+- PostgreSQL 15
+- JWT con djangorestframework-simplejwt (rotación + blacklist)
 - OpenAPI 3 con **drf-spectacular** (Swagger UI y ReDoc)
-- pytest + pytest-django
+- pytest + pytest-django (330 tests — 0 fallos)
 - Docker + Docker Compose
+- openpyxl (exportación XLSX)
+- WeasyPrint (facturas PDF)
 
 ## Configuración por variables de entorno
 

@@ -268,16 +268,22 @@ Leyenda:
 
 | Recurso | Accion | Endpoint | Admin | Supervisor | Operador | Cliente | Invitado | Observaciones |
 |---|---|---|---|---|---|---|---|---|
-| Inventario consolidado | Leer | `GET /api/v1/inventory/` | Permitido | Permitido | Permitido | Denegado | Denegado | Filtros por categoria, ubicacion y stock |
+| Inventario consolidado | Leer / Exportar | `GET /api/v1/inventory/` | Permitido | Permitido | Permitido | Denegado | Denegado | Filtros por categoria, ubicacion y stock. Soporta `?export=csv\|xlsx` |
 | Ubicaciones | Leer | `GET /api/v1/inventory/locations/` | Permitido | Permitido | Permitido | Denegado | Denegado | Solo autenticado |
 | Ubicaciones | Crear | `POST /api/v1/inventory/locations/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista |
 | Ubicacion detalle | Leer | `GET /api/v1/inventory/locations/<uuid:pk>/` | Permitido | Permitido | Permitido | Denegado | Denegado | Solo autenticado |
 | Ubicacion detalle | Actualizar total | `PUT /api/v1/inventory/locations/<uuid:pk>/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista |
 | Ubicacion detalle | Actualizar parcial | `PATCH /api/v1/inventory/locations/<uuid:pk>/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista |
-| Ubicacion detalle | Eliminar / desactivar | `DELETE /api/v1/inventory/locations/<uuid:pk>/` | Denegado | Permitido | Denegado | Denegado | Denegado | Baja logica |
-| Reconstruccion de stock | Ejecutar | `POST /api/v1/inventory/reconstruct/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista |
+| Ubicacion detalle | Eliminar / desactivar | `DELETE /api/v1/inventory/locations/<uuid:pk>/` | Denegado | Permitido | Denegado | Denegado | Denegado | Baja logica; archiva la ubicacion |
+| Transicion de estado | Ejecutar | `POST /api/v1/inventory/locations/<uuid:pk>/state-transitions/` | Denegado | Permitido | Denegado | Denegado | Denegado | Cambia operational_status; solo almacenista |
+| Tipos de almacenamiento | Leer | `GET /api/v1/inventory/storage-types/` | Permitido | Permitido | Permitido | Denegado | Denegado | Solo autenticado |
+| Tipos de almacenamiento | Crear/Actualizar/Eliminar | `POST/PUT/PATCH/DELETE /api/v1/inventory/storage-types/<uuid:pk>/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista; tipos sistema no se eliminan |
+| Plantillas de ubicacion | Leer | `GET /api/v1/inventory/storage-templates/` | Permitido | Permitido | Permitido | Denegado | Denegado | Solo autenticado |
+| Plantillas de ubicacion | Crear/Actualizar/Eliminar | `POST/PUT/PATCH/DELETE /api/v1/inventory/storage-templates/<uuid:pk>/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista |
+| Reconstruccion de stock | Ejecutar | `POST /api/v1/inventory/reconstruct/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista; recalcula desde ledger |
 | Stock por producto | Leer | `GET /api/v1/inventory/products/<uuid:product_id>/stock/` | Permitido | Permitido | Permitido | Denegado | Denegado | Alias disponible en `/stock/product/` |
 | Stock por ubicacion | Leer | `GET /api/v1/inventory/stock/location/<uuid:location_id>/` | Permitido | Permitido | Permitido | Denegado | Denegado | Solo autenticado |
+| Umbral de stock por ubicacion | Actualizar | `PATCH /api/v1/inventory/stock/<uuid:pk>/threshold/` | Denegado | Permitido | Denegado | Denegado | Denegado | **[NUEVO]** Override local de reorder_point; solo almacenista |
 | Busqueda de productos | Buscar | `GET /api/v1/inventory/search/` | Permitido | Permitido | Permitido | Denegado | Denegado | Query params `q`, `category`, `subcategory` |
 
 ### 11.4 Movimientos
@@ -320,19 +326,27 @@ Leyenda:
 | Resumen inventario | Leer | `GET /api/v1/reports/inventory/summary/` | Permitido | Permitido | Denegado | Denegado | Denegado | Solo almacenista o administrador |
 | Resumen movimientos | Leer | `GET /api/v1/reports/movements/summary/` | Permitido | Permitido | Denegado | Denegado | Denegado | Rango obligatorio |
 | Reporte movimientos | Leer | `GET /api/v1/reports/movements/report/` | Permitido | Permitido | Denegado | Denegado | Denegado | Filtros de rango y tipo |
-| Historial movimientos | Leer | `GET /api/v1/reports/movements/history/` | Permitido | Permitido | Denegado | Denegado | Denegado | Limite interno de 200 registros |
+| Historial movimientos | Leer / Exportar | `GET /api/v1/reports/movements/history/` | Permitido | Permitido | Denegado | Denegado | Denegado | Limite 200 registros; soporta `?export=csv\|xlsx` |
 | Dataset exportable | Exportar | `GET /api/v1/reports/data/` | Permitido | Permitido | Denegado | Denegado | Denegado | Dataset unificado para exportaciones frontend |
 | Resumen ventas | Leer | `GET /api/v1/reports/sales/summary/` | Permitido | Permitido | Denegado | Denegado | Denegado | Rango obligatorio |
 | Top productos | Leer | `GET /api/v1/reports/top-products/` | Permitido | Permitido | Denegado | Denegado | Denegado | Limite y periodo configurables |
 | Facturas | Leer | `GET /api/v1/reports/invoices/` | Permitido | Permitido | Denegado | Denegado | Denegado | Soporta paginacion |
-| KPI dashboard | Leer | `GET /api/v1/reports/kpi/` | Permitido | Permitido | Denegado | Denegado | Denegado | Panel operacional |
-| Productos por vencer | Leer | `GET /api/v1/reports/expiring/` | Permitido | Permitido | Denegado | Denegado | Denegado | Parametro `days` |
+| KPI dashboard | Leer | `GET /api/v1/reports/kpi/` | Permitido | Permitido | Denegado | Denegado | Denegado | Panel operacional; delegado a dashboard service |
+| Productos por vencer | Leer / Exportar | `GET /api/v1/reports/expiring/` | Permitido | Permitido | Denegado | Denegado | Denegado | Parametro `days` (1-365); soporta `?export=csv\|xlsx` |
+| Utilizacion de almacen | Leer | `GET /api/v1/reports/warehouse-utilization/` | Permitido | Permitido | Denegado | Denegado | Denegado | Distribucion por estado operativo y tipo de almacen |
+| Calidad operativa | Leer | `GET /api/v1/reports/quality-operational/` | Permitido | Permitido | Denegado | Denegado | Denegado | Resumen de devoluciones y calidad |
+| Descarte operativo | Leer | `GET /api/v1/reports/discard-operational/` | Permitido | Permitido | Denegado | Denegado | Denegado | Resumen de descartes por dano y vencimiento |
+| Despacho operativo | Leer | `GET /api/v1/reports/dispatch-operational/` | Permitido | Permitido | Denegado | Denegado | Denegado | Resumen de despachos e invoices |
+| Ordenes de despacho | Leer | `GET /api/v1/reports/dispatch-operational/orders/` | Permitido | Permitido | Denegado | Denegado | Denegado | Filtros: `start`, `end`, `invoice_number` |
 
 ### 11.7 Alertas
 
 | Recurso | Accion | Endpoint | Admin | Supervisor | Operador | Cliente | Invitado | Observaciones |
 |---|---|---|---|---|---|---|---|---|
-| Alertas activas | Leer | `GET /api/v1/alerts/` | Permitido | Permitido | Denegado | Denegado | Denegado | Solo almacenista o administrador |
+| Alertas activas | Leer / Exportar | `GET /api/v1/alerts/` | Permitido | Permitido | Denegado | Denegado | Denegado | Solo almacenista o administrador; soporta `?export=csv\|xlsx` |
+| Polling de alertas | Leer | `GET /api/v1/alerts/poll/` | Permitido | Permitido | Permitido | Denegado | Denegado | **[NUEVO]** Cualquier autenticado; params: `since`, `severity` |
+| Historial de alertas | Leer | `GET /api/v1/alerts/history/` | Permitido | Permitido | Denegado | Denegado | Denegado | Alertas resueltas; mismo filtro que `/alerts/` |
+| Estadisticas de alertas | Leer | `GET /api/v1/alerts/stats/` | Permitido | Permitido | Denegado | Denegado | Denegado | Conteos por severidad y categoria |
 | Alerta detalle | Leer | `GET /api/v1/alerts/<uuid:pk>/` | Permitido | Permitido | Denegado | Denegado | Denegado | Solo almacenista o administrador |
 | Alerta | Resolver | `POST /api/v1/alerts/<uuid:pk>/resolve/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista |
 
@@ -342,6 +356,21 @@ Leyenda:
 |---|---|---|---|---|---|---|---|---|
 | Logs de auditoria | Leer | `GET /api/v1/audit/` | Permitido | Permitido | Denegado | Denegado | Denegado | Solo almacenista o administrador |
 | Log de auditoria | Leer | `GET /api/v1/audit/<uuid:pk>/` | Permitido | Permitido | Denegado | Denegado | Denegado | Solo almacenista o administrador |
+
+### 11.9 Webhooks — NUEVO
+
+> El modulo webhooks es de uso exclusivo del administrador para configurar notificaciones a sistemas externos.
+
+| Recurso | Accion | Endpoint | Admin | Supervisor | Operador | Cliente | Invitado | Observaciones |
+|---|---|---|---|---|---|---|---|---|
+| Endpoints de webhook | Listar | `GET /api/v1/webhooks/endpoints/` | Permitido | Denegado | Denegado | Denegado | Denegado | Solo administrador |
+| Endpoints de webhook | Crear | `POST /api/v1/webhooks/endpoints/` | Permitido | Denegado | Denegado | Denegado | Denegado | Solo administrador; requiere url, secret y events |
+| Endpoint detalle | Leer | `GET /api/v1/webhooks/endpoints/<uuid:pk>/` | Permitido | Denegado | Denegado | Denegado | Denegado | Solo administrador |
+| Endpoint detalle | Actualizar | `PATCH /api/v1/webhooks/endpoints/<uuid:pk>/` | Permitido | Denegado | Denegado | Denegado | Denegado | Solo administrador |
+| Endpoint detalle | Desactivar | `DELETE /api/v1/webhooks/endpoints/<uuid:pk>/` | Permitido | Denegado | Denegado | Denegado | Denegado | Baja logica (is_active=False); solo administrador |
+| Prueba de webhook | Ejecutar | `POST /api/v1/webhooks/endpoints/<uuid:pk>/test/` | Permitido | Denegado | Denegado | Denegado | Denegado | Envia payload de prueba; solo administrador |
+| Historial de entregas | Leer | `GET /api/v1/webhooks/deliveries/` | Permitido | Denegado | Denegado | Denegado | Denegado | Solo administrador |
+| Estadisticas | Leer | `GET /api/v1/webhooks/stats/` | Permitido | Denegado | Denegado | Denegado | Denegado | Conteos pending/delivered/failed; solo administrador |
 
 ## 12. Acciones especiales no expuestas como endpoint publico
 
