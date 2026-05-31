@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import (
@@ -11,6 +12,7 @@ from drf_spectacular.utils import (
     extend_schema_view,
 )
 from rest_framework import generics, status
+from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -233,12 +235,13 @@ class ProductListCreateView(generics.ListCreateAPIView):
         description=(
             "Marca el producto como inactivo. "
             "El registro NO se elimina de la base de datos ni afecta el historial de movimientos. "
+            "Devuelve HTTP 409 si el producto pertenece a uno o más combos activos. "
             "Para reactivarlo use POST /products/{id}/restore/."
         ),
         tags=[TAG_CATALOG],
         responses={
             204: None,
-            **standard_error_responses(include_403=True, include_404=True),
+            **standard_error_responses(include_403=True, include_404=True, include_409=True),
         },
     ),
 )
@@ -259,7 +262,10 @@ class ProductDetailView(generics.RetrieveUpdateAPIView):
 
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
-        deactivate_product(request.user, instance.pk, request=request)
+        try:
+            deactivate_product(request.user, instance.pk, request=request)
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -413,23 +419,28 @@ class CategoryDetailView(APIView):
         return Response(CategorySerializer(self._get_category(pk)).data)
 
     def put(self, request, pk):
-        self._get_category(pk)
         ser = CategoryUpdateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        cat = update_category(request.user, pk, ser.validated_data, request=request)
+        try:
+            cat = update_category(request.user, pk, ser.validated_data, request=request)
+        except ObjectDoesNotExist:
+            raise NotFound()
         return Response(CategorySerializer(cat).data)
 
     def patch(self, request, pk):
-        self._get_category(pk)
         ser = CategoryUpdateSerializer(data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
-        cat = update_category(request.user, pk, ser.validated_data, request=request)
+        try:
+            cat = update_category(request.user, pk, ser.validated_data, request=request)
+        except ObjectDoesNotExist:
+            raise NotFound()
         return Response(CategorySerializer(cat).data)
 
     def delete(self, request, pk):
-        self._get_category(pk)
         try:
             deactivate_category(request.user, pk, request=request)
+        except ObjectDoesNotExist:
+            raise NotFound()
         except ValueError as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -508,27 +519,32 @@ class SubcategoryDetailView(APIView):
         return Response(SubcategorySerializer(self._get_subcategory(pk)).data)
 
     def put(self, request, pk):
-        self._get_subcategory(pk)
         ser = SubcategoryUpdateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        subcat = update_subcategory(
-            request.user, pk, ser.validated_data, request=request
-        )
+        try:
+            subcat = update_subcategory(
+                request.user, pk, ser.validated_data, request=request
+            )
+        except ObjectDoesNotExist:
+            raise NotFound()
         return Response(SubcategorySerializer(subcat).data)
 
     def patch(self, request, pk):
-        self._get_subcategory(pk)
         ser = SubcategoryUpdateSerializer(data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
-        subcat = update_subcategory(
-            request.user, pk, ser.validated_data, request=request
-        )
+        try:
+            subcat = update_subcategory(
+                request.user, pk, ser.validated_data, request=request
+            )
+        except ObjectDoesNotExist:
+            raise NotFound()
         return Response(SubcategorySerializer(subcat).data)
 
     def delete(self, request, pk):
-        self._get_subcategory(pk)
         try:
             deactivate_subcategory(request.user, pk, request=request)
+        except ObjectDoesNotExist:
+            raise NotFound()
         except ValueError as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -547,7 +563,7 @@ class SubcategoryRestoreView(APIView):
         },
     )
     def post(self, request, pk):
-        get_object_or_404(Subcategory, pk=pk)
+        get_object_or_404(Subcategory.objects.select_related("category"), pk=pk)
         subcat = activate_subcategory(request.user, pk, request=request)
         return Response(SubcategorySerializer(subcat).data)
 
@@ -605,22 +621,28 @@ class ComboDetailView(APIView):
         return Response(ComboSerializer(self._get_combo(pk)).data)
 
     def put(self, request, pk):
-        self._get_combo(pk)
         ser = ComboUpdateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        combo = update_combo(request.user, pk, ser.validated_data, request=request)
+        try:
+            combo = update_combo(request.user, pk, ser.validated_data, request=request)
+        except ObjectDoesNotExist:
+            raise NotFound()
         return Response(ComboSerializer(combo).data)
 
     def patch(self, request, pk):
-        self._get_combo(pk)
         ser = ComboUpdateSerializer(data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
-        combo = update_combo(request.user, pk, ser.validated_data, request=request)
+        try:
+            combo = update_combo(request.user, pk, ser.validated_data, request=request)
+        except ObjectDoesNotExist:
+            raise NotFound()
         return Response(ComboSerializer(combo).data)
 
     def delete(self, request, pk):
-        self._get_combo(pk)
-        deactivate_combo(request.user, pk, request=request)
+        try:
+            deactivate_combo(request.user, pk, request=request)
+        except ObjectDoesNotExist:
+            raise NotFound()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

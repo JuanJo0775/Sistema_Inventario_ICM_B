@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 
+from apps.audit.models import AuditEventType, AuditLog
 from apps.catalog.models import Category, ComboItem, Product, ProductCombo, Subcategory
 from apps.catalog.services import create_category, create_combo, create_subcategory
 from tests.factories import CategoryFactory, ProductFactory
@@ -473,3 +474,127 @@ class TestProductSoftDeleteAndRestore:
             f"/api/v1/catalog/products/{sample_product.id}/restore/"
         )
         assert resp.status_code == 403
+
+
+# ===========================================================================
+# PRODUCT — guard: no desactivar si pertenece a combo activo
+# ===========================================================================
+
+
+class TestProductDeactivateComboGuard:
+    @pytest.mark.django_db
+    def test_delete_returns_409_when_in_active_combo(
+        self, authenticated_almacenista_client, sample_product
+    ):
+        combo = ProductCombo.objects.create(name="Kit Test", sku="KIT-G001", is_active=True)
+        ComboItem.objects.create(combo=combo, product=sample_product, quantity=1)
+        resp = authenticated_almacenista_client.delete(
+            f"/api/v1/catalog/products/{sample_product.id}/"
+        )
+        assert resp.status_code == 409
+        assert "combo" in resp.data["detail"].lower()
+        sample_product.refresh_from_db()
+        assert sample_product.is_active is True
+
+    @pytest.mark.django_db
+    def test_delete_succeeds_when_only_in_inactive_combo(
+        self, authenticated_almacenista_client, sample_product
+    ):
+        combo = ProductCombo.objects.create(name="Kit Inactivo", sku="KIT-G002", is_active=False)
+        ComboItem.objects.create(combo=combo, product=sample_product, quantity=1)
+        resp = authenticated_almacenista_client.delete(
+            f"/api/v1/catalog/products/{sample_product.id}/"
+        )
+        assert resp.status_code == 204
+        sample_product.refresh_from_db()
+        assert sample_product.is_active is False
+
+    @pytest.mark.django_db
+    def test_delete_succeeds_when_not_in_any_combo(
+        self, authenticated_almacenista_client, sample_product
+    ):
+        resp = authenticated_almacenista_client.delete(
+            f"/api/v1/catalog/products/{sample_product.id}/"
+        )
+        assert resp.status_code == 204
+        sample_product.refresh_from_db()
+        assert sample_product.is_active is False
+
+    @pytest.mark.django_db
+    def test_delete_logs_product_deactivated_event(
+        self, authenticated_almacenista_client, sample_product
+    ):
+        resp = authenticated_almacenista_client.delete(
+            f"/api/v1/catalog/products/{sample_product.id}/"
+        )
+        assert resp.status_code == 204
+        log = AuditLog.objects.filter(event_type=AuditEventType.PRODUCT_DEACTIVATED).first()
+        assert log is not None
+        assert sample_product.sku in log.description
+
+
+# ===========================================================================
+# COMBO — is_active ignorado en PUT/PATCH; solo cambia vía DELETE/restore
+# ===========================================================================
+
+
+class TestComboUpdateIsActiveIgnored:
+    @pytest.mark.django_db
+    def test_patch_with_is_active_does_not_deactivate_combo(
+        self, authenticated_almacenista_client, sample_product
+    ):
+        """is_active no es un campo editable vía PATCH; debe ser ignorado."""
+        combo = _make_combo("KIT-A001", sample_product, "Kit Active Test")
+        assert combo.is_active is True
+        resp = authenticated_almacenista_client.patch(
+            f"/api/v1/catalog/combos/{combo.id}/",
+            {"is_active": False},
+            format="json",
+        )
+        assert resp.status_code == 200
+        combo.refresh_from_db()
+        assert combo.is_active is True
+
+    @pytest.mark.django_db
+    def test_patch_with_is_active_does_not_log_combo_deactivated(
+        self, authenticated_almacenista_client, sample_product
+    ):
+        """Audit event COMBO_DEACTIVATED solo debe existir vía DELETE, nunca vía PATCH."""
+        combo = _make_combo("KIT-A002", sample_product, "Kit Audit Check")
+        authenticated_almacenista_client.patch(
+            f"/api/v1/catalog/combos/{combo.id}/",
+            {"is_active": False},
+            format="json",
+        )
+        assert not AuditLog.objects.filter(
+            event_type=AuditEventType.COMBO_DEACTIVATED
+        ).exists()
+
+    @pytest.mark.django_db
+    def test_deactivate_via_delete_logs_combo_deactivated(
+        self, authenticated_almacenista_client, sample_product
+    ):
+        combo = _make_combo("KIT-A003", sample_product, "Kit Audit Test")
+        resp = authenticated_almacenista_client.delete(
+            f"/api/v1/catalog/combos/{combo.id}/"
+        )
+        assert resp.status_code == 204
+        log = AuditLog.objects.filter(event_type=AuditEventType.COMBO_DEACTIVATED).first()
+        assert log is not None
+        assert combo.sku in log.description
+
+    @pytest.mark.django_db
+    def test_patch_name_still_works_when_is_active_sent(
+        self, authenticated_almacenista_client, sample_product
+    ):
+        """Otros campos sí se actualizan aunque venga is_active en el payload."""
+        combo = _make_combo("KIT-A004", sample_product, "Nombre Viejo")
+        resp = authenticated_almacenista_client.patch(
+            f"/api/v1/catalog/combos/{combo.id}/",
+            {"name": "Nombre Nuevo", "is_active": False},
+            format="json",
+        )
+        assert resp.status_code == 200
+        combo.refresh_from_db()
+        assert combo.name == "Nombre Nuevo"
+        assert combo.is_active is True

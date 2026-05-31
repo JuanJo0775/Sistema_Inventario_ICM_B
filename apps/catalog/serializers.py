@@ -264,7 +264,8 @@ class ComboUpdateItemSerializer(serializers.Serializer):
 
 
 class ComboUpdateSerializer(serializers.Serializer):
+    """Campos editables de un combo. is_active no se acepta; usar DELETE/restore."""
+
     name = serializers.CharField(required=False)
     sku = serializers.CharField(required=False)
-    is_active = serializers.BooleanField(required=False)
     items = ComboUpdateItemSerializer(many=True, required=False)

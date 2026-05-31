@@ -490,7 +490,8 @@ def update_combo(
     RF-003 — Actualiza combo. Si se envían `items`, reemplaza completamente los ComboItem.
 
     Args:
-        data: name, sku, is_active (todos opcionales). items: si presente, reemplaza lista completa.
+        data: name, sku (todos opcionales). items: si presente, reemplaza lista completa.
+              is_active NO se acepta aquí; usar DELETE/POST restore para activar/desactivar.
     """
     _require_almacenista(user)
     combo = ProductCombo.objects.select_for_update().get(pk=combo_id)
@@ -500,8 +501,6 @@ def update_combo(
         new_sku = data["sku"].strip()
         validate_sku_format(new_sku)
         combo.sku = new_sku
-    if "is_active" in data:
-        combo.is_active = bool(data["is_active"])
     combo.save()
 
     if "items" in data:
@@ -584,9 +583,22 @@ def deactivate_product(
     *,
     request: HttpRequest | None = None,
 ) -> None:
-    """Desactiva un producto (soft delete explícito)."""
+    """
+    Desactiva un producto (soft delete explícito).
+
+    Raises:
+        ValueError: Si el producto pertenece a uno o más combos activos.
+    """
     _require_almacenista(user)
     product = Product.objects.select_for_update().get(pk=product_id)
+    active_combo_count = ComboItem.objects.filter(
+        product=product, combo__is_active=True
+    ).count()
+    if active_combo_count:
+        raise ValueError(
+            f"No se puede desactivar el producto porque pertenece a {active_combo_count} "
+            f"combo(s) activo(s)."
+        )
     product.is_active = False
     product.save(update_fields=["is_active"])
     log_event(
