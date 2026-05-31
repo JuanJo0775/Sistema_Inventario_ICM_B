@@ -77,6 +77,7 @@ def test_get_lots_expiring_soon_filters_by_window():
 
 from apps.reports.selectors import (
     get_discard_operational_summary,
+    get_warehouse_occupancy_distribution,
     get_quality_operational_summary,
     get_warehouse_utilization,
 )
@@ -102,6 +103,69 @@ def test_get_warehouse_utilization_uses_capacity_and_stock(db):
     assert row["capacity_units"] == 25
     assert row["utilization_pct"] == 20.0
     assert row["capacity_configured"] is True
+
+
+@pytest.mark.django_db
+def test_get_warehouse_utilization_supports_relative_capacity_and_distributions(db):
+    from apps.inventory.models import Location, StockByLocation, StorageType
+    from tests.factories import ProductFactory
+
+    product = ProductFactory()
+    storage_type = StorageType.objects.create(
+        code="shelf",
+        name="Estantería",
+        category="general",
+    )
+    location = Location.objects.create(
+        code="REL-1",
+        name="Relativa 1",
+        storage_type=storage_type,
+        capacity_mode="relative_scale",
+        capacity_level=4,
+        capacity_score=20,
+        operational_status="maintenance",
+        is_active=True,
+    )
+    StockByLocation.objects.create(product=product, location=location, current_stock=10)
+
+    data = get_warehouse_utilization()
+
+    row = next(item for item in data["by_location"] if item["code"] == "REL-1")
+    assert row["capacity_mode"] == "relative_scale"
+    assert row["capacity_level"] == 4
+    assert row["capacity_score"] == 20
+    assert row["utilization_pct"] == 50.0
+
+    storage_bucket = next(
+        item for item in data["by_storage_type"] if item["storage_type_code"] == "shelf"
+    )
+    assert storage_bucket["locations"] >= 1
+    assert storage_bucket["occupied_units"] >= 10
+
+    status_bucket = next(
+        item
+        for item in data["by_operational_status"]
+        if item["operational_status"] == "maintenance"
+    )
+    assert status_bucket["locations"] >= 1
+
+
+@pytest.mark.django_db
+def test_get_warehouse_occupancy_distribution_returns_expected_sections(db):
+    from apps.inventory.models import Location
+
+    Location.objects.create(
+        code="DIST-1",
+        name="Distribución 1",
+        max_capacity=10,
+        is_active=True,
+    )
+
+    data = get_warehouse_occupancy_distribution()
+
+    assert "overall" in data
+    assert "by_storage_type" in data
+    assert "by_operational_status" in data
 
 
 def test_get_quality_operational_summary_groups_damage_and_returns(

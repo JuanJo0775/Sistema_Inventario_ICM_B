@@ -32,13 +32,44 @@ class SalesSummaryResponseSerializer(serializers.Serializer):
 
 
 class InventorySummaryItemSerializer(serializers.Serializer):
-    product_id = serializers.UUIDField()
-    sku = serializers.CharField()
-    name = serializers.CharField()
-    total_stock = serializers.IntegerField()
+    category_id = serializers.UUIDField()
+    category = serializers.CharField()
+    total_units = serializers.IntegerField()
 
 
-class MovementReportItemSerializer(serializers.Serializer):
+class InventorySummaryResponseSerializer(serializers.Serializer):
+    by_category = InventorySummaryItemSerializer(many=True)
+    products_with_zero_stock = serializers.IntegerField()
+    approximate_value = serializers.FloatField(allow_null=True)
+    approximate_value_note = serializers.CharField()
+
+
+class MovementReportProductItemSerializer(serializers.Serializer):
+    product__sku = serializers.CharField()
+    product__name = serializers.CharField()
+    total_qty = serializers.IntegerField()
+
+
+class MovementReportUserItemSerializer(serializers.Serializer):
+    executed_by__username = serializers.CharField()
+    movements = serializers.IntegerField()
+
+
+class MovementReportPeriodSerializer(serializers.Serializer):
+    start = serializers.DateTimeField()
+    end = serializers.DateTimeField()
+
+
+class MovementReportResponseSerializer(serializers.Serializer):
+    counts = serializers.DictField(child=serializers.IntegerField())
+    by_product = MovementReportProductItemSerializer(many=True)
+    by_user = MovementReportUserItemSerializer(many=True)
+    period = MovementReportPeriodSerializer()
+
+
+class LegacyMovementReportItemSerializer(serializers.Serializer):
+    """Contrato histórico por ítem; mantenido para compatibilidad temporal."""
+
     movement_type = serializers.CharField()
     count = serializers.IntegerField()
     total_quantity = serializers.IntegerField()
@@ -74,6 +105,26 @@ class WarehouseUtilizationLocationSerializer(serializers.Serializer):
     utilization_pct = serializers.FloatField(allow_null=True)
     is_retail = serializers.BooleanField()
     capacity_configured = serializers.BooleanField()
+    capacity_mode = serializers.CharField()
+    capacity_level = serializers.IntegerField(allow_null=True)
+    capacity_score = serializers.IntegerField(allow_null=True)
+    occupancy_estimate_pct = serializers.FloatField(allow_null=True)
+    operational_status = serializers.CharField()
+    storage_type_code = serializers.CharField(allow_null=True)
+    storage_type_name = serializers.CharField(allow_null=True)
+
+
+class WarehouseUtilizationStorageTypeSerializer(serializers.Serializer):
+    storage_type_code = serializers.CharField()
+    storage_type_name = serializers.CharField()
+    locations = serializers.IntegerField()
+    occupied_units = serializers.IntegerField()
+
+
+class WarehouseUtilizationOperationalStatusSerializer(serializers.Serializer):
+    operational_status = serializers.CharField()
+    locations = serializers.IntegerField()
+    occupied_units = serializers.IntegerField()
 
 
 class WarehouseUtilizationSummarySerializer(serializers.Serializer):
@@ -88,6 +139,8 @@ class WarehouseUtilizationSummarySerializer(serializers.Serializer):
 class WarehouseUtilizationResponseSerializer(serializers.Serializer):
     overall = WarehouseUtilizationSummarySerializer()
     by_location = WarehouseUtilizationLocationSerializer(many=True)
+    by_storage_type = WarehouseUtilizationStorageTypeSerializer(many=True)
+    by_operational_status = WarehouseUtilizationOperationalStatusSerializer(many=True)
 
 
 class QualityOperationalItemSerializer(serializers.Serializer):

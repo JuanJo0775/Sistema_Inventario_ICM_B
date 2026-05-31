@@ -31,6 +31,7 @@ from apps.reports.selectors import (
     get_invoice_history,
     get_kpi_dashboard,
     get_movement_report,
+    get_warehouse_occupancy_distribution,
     get_quality_operational_summary,
     get_top_dispatched_products,
     get_warehouse_utilization,
@@ -42,9 +43,9 @@ from apps.reports.serializers import (
     DiscardOperationalSummarySerializer,
     DispatchOperationalSummarySerializer,
     ExpiringLotReportItemSerializer,
-    InventorySummaryItemSerializer,
+    InventorySummaryResponseSerializer,
     KpiDashboardSerializer,
-    MovementReportItemSerializer,
+    MovementReportResponseSerializer,
     MovementSummaryResponseSerializer,
     PerOrderSampleSerializer,
     QualityOperationalResponseSerializer,
@@ -171,6 +172,13 @@ class MovementHistoryReportView(APIView):
                 required=False,
             ),
             OpenApiParameter(
+                name="location_id",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="UUID de la ubicación (origen o destino).",
+            ),
+            OpenApiParameter(
                 name="start",
                 type=str,
                 location=OpenApiParameter.QUERY,
@@ -204,6 +212,8 @@ class MovementHistoryReportView(APIView):
         )
         raw_pid = request.query_params.get("product_id")
         product_id = UUID(str(raw_pid)) if raw_pid else None
+        raw_lid = request.query_params.get("location_id")
+        location_id = UUID(str(raw_lid)) if raw_lid else None
         qs = movement_history(
             product_id=product_id,
             user_id=(
@@ -211,6 +221,7 @@ class MovementHistoryReportView(APIView):
                 if request.query_params.get("user_id")
                 else None
             ),
+            location_id=location_id,
             start=start,
             end=end,
         )[:200]
@@ -222,7 +233,7 @@ class InventorySummaryReportView(APIView):
 
     @extend_schema(
         responses={
-            200: InventorySummaryItemSerializer(many=True),
+            200: InventorySummaryResponseSerializer,
             **standard_error_responses(include_403=True),
         },
         tags=[TAG_REPORTS],
@@ -247,7 +258,7 @@ class MovementReportView(APIView):
             ),
         ],
         responses={
-            200: MovementReportItemSerializer(many=True),
+            200: MovementReportResponseSerializer,
             **standard_error_responses(include_403=True),
         },
         tags=[TAG_REPORTS],
@@ -542,7 +553,7 @@ class ReportDatasetView(APIView):
                 required=True,
                 description=(
                     "Tipo de dataset: inventory-summary, movements-summary, movements-report, "
-                    "warehouse-utilization, quality-operational, discard-operational, dispatch-operational, "
+                    "warehouse-utilization, warehouse-occupancy-distribution, quality-operational, discard-operational, dispatch-operational, "
                     "movements-history, sales-summary, top-products, invoices, kpi, expiring."
                 ),
             ),
@@ -623,6 +634,8 @@ class ReportDatasetView(APIView):
             data = get_inventory_summary()
         elif kind == "warehouse-utilization":
             data = get_warehouse_utilization()
+        elif kind == "warehouse-occupancy-distribution":
+            data = get_warehouse_occupancy_distribution()
         elif kind == "quality-operational":
             period_days = int(request.query_params.get("period_days", 30))
             data = get_quality_operational_summary(period_days=period_days)
@@ -651,6 +664,8 @@ class ReportDatasetView(APIView):
             )
             raw_pid = request.query_params.get("product_id")
             product_id = UUID(str(raw_pid)) if raw_pid else None
+            raw_lid = request.query_params.get("location_id")
+            location_id = UUID(str(raw_lid)) if raw_lid else None
             qs = movement_history(
                 product_id=product_id,
                 user_id=(
@@ -658,6 +673,7 @@ class ReportDatasetView(APIView):
                     if request.query_params.get("user_id")
                     else None
                 ),
+                location_id=location_id,
                 start=start,
                 end=end,
             )[:200]
@@ -700,7 +716,7 @@ class ReportDatasetView(APIView):
                 {
                     "detail": (
                         "kind debe ser uno de: inventory-summary, movements-summary, "
-                        "warehouse-utilization, quality-operational, discard-operational, dispatch-operational, movements-report, "
+                        "warehouse-utilization, warehouse-occupancy-distribution, quality-operational, discard-operational, dispatch-operational, movements-report, "
                         "movements-history, sales-summary, top-products, invoices, kpi, expiring."
                     )
                 }

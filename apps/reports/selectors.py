@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
+from django.db import models
 from django.db.models import Count, Sum
 from django.utils import timezone
 
@@ -149,6 +150,7 @@ def movement_history(
     *,
     product_id: UUID | str | None = None,
     user_id: int | None = None,
+    location_id: UUID | str | None = None,
     start: datetime | None = None,
     end: datetime | None = None,
 ):
@@ -158,6 +160,11 @@ def movement_history(
         qs = qs.filter(product_id=UUID(str(product_id)))
     if user_id is not None:
         qs = qs.filter(executed_by_id=user_id)
+    if location_id:
+        lid = UUID(str(location_id))
+        qs = qs.filter(
+            models.Q(origin_location_id=lid) | models.Q(destination_location_id=lid)
+        )
     if start:
         qs = qs.filter(created_at__gte=start)
     if end:
@@ -304,6 +311,8 @@ def get_warehouse_utilization() -> dict[str, Any]:
     )
 
     by_location: list[dict[str, Any]] = []
+    by_storage_type: dict[str, dict[str, Any]] = {}
+    by_operational_status: dict[str, dict[str, Any]] = {}
     configured_occupied = 0
     configured_capacity = 0
     unconfigured_occupied = 0
@@ -312,20 +321,70 @@ def get_warehouse_utilization() -> dict[str, Any]:
 
     for location in locations:
         occupied_units = int(getattr(location, "occupied_units", 0) or 0)
-        capacity_units = (
-            int(location.max_capacity) if location.max_capacity is not None else None
-        )
-        capacity_configured = capacity_units is not None and capacity_units > 0
+        utilization_pct = None
+        capacity_configured = False
+        capacity_units = None
+
+        if (
+            location.capacity_mode
+            in [Location.CapacityMode.ABSOLUTE_LEGACY, Location.CapacityMode.NONE]
+            and location.max_capacity is not None
+            and int(location.max_capacity) > 0
+        ):
+            capacity_units = int(location.max_capacity)
+            capacity_configured = True
+            utilization_pct = round((occupied_units / capacity_units) * 100, 2)
+        elif (
+            location.capacity_mode == Location.CapacityMode.RELATIVE_SCALE
+            and location.capacity_score is not None
+            and int(location.capacity_score) > 0
+        ):
+            capacity_units = int(location.capacity_score)
+            capacity_configured = True
+            utilization_pct = round((occupied_units / capacity_units) * 100, 2)
+        elif location.occupancy_estimate_pct is not None:
+            utilization_pct = round(float(location.occupancy_estimate_pct), 2)
 
         if capacity_configured:
             configured_locations += 1
             configured_occupied += occupied_units
             configured_capacity += capacity_units
-            utilization_pct = round((occupied_units / capacity_units) * 100, 2)
         else:
             unconfigured_locations += 1
             unconfigured_occupied += occupied_units
-            utilization_pct = None
+
+        storage_bucket_key = (
+            location.storage_type.code
+            if getattr(location, "storage_type", None) and location.storage_type.code
+            else "untyped"
+        )
+        storage_bucket_label = (
+            location.storage_type.name
+            if getattr(location, "storage_type", None) and location.storage_type.name
+            else "Sin tipo"
+        )
+        storage_bucket = by_storage_type.setdefault(
+            storage_bucket_key,
+            {
+                "storage_type_code": storage_bucket_key,
+                "storage_type_name": storage_bucket_label,
+                "locations": 0,
+                "occupied_units": 0,
+            },
+        )
+        storage_bucket["locations"] += 1
+        storage_bucket["occupied_units"] += occupied_units
+
+        status_bucket = by_operational_status.setdefault(
+            location.operational_status,
+            {
+                "operational_status": location.operational_status,
+                "locations": 0,
+                "occupied_units": 0,
+            },
+        )
+        status_bucket["locations"] += 1
+        status_bucket["occupied_units"] += occupied_units
 
         by_location.append(
             {
@@ -337,6 +396,21 @@ def get_warehouse_utilization() -> dict[str, Any]:
                 "utilization_pct": utilization_pct,
                 "is_retail": bool(location.is_retail),
                 "capacity_configured": capacity_configured,
+                "capacity_mode": location.capacity_mode,
+                "capacity_level": location.capacity_level,
+                "capacity_score": location.capacity_score,
+                "occupancy_estimate_pct": location.occupancy_estimate_pct,
+                "operational_status": location.operational_status,
+                "storage_type_code": (
+                    location.storage_type.code
+                    if getattr(location, "storage_type", None)
+                    else None
+                ),
+                "storage_type_name": (
+                    location.storage_type.name
+                    if getattr(location, "storage_type", None)
+                    else None
+                ),
             }
         )
 
@@ -355,6 +429,27 @@ def get_warehouse_utilization() -> dict[str, Any]:
             "unconfigured_occupied_units": unconfigured_occupied,
         },
         "by_location": by_location,
+        "by_storage_type": sorted(
+            by_storage_type.values(), key=lambda item: item["storage_type_code"]
+        ),
+        "by_operational_status": sorted(
+            by_operational_status.values(), key=lambda item: item["operational_status"]
+        ),
+    }
+
+
+def get_warehouse_occupancy_distribution() -> dict[str, Any]:
+    """
+    RF-010 — Distribución de ocupación por tipo de almacenamiento y estado operativo.
+
+    Reutiliza el cálculo de utilización para exponer un payload frontend-ready
+    enfocado en distribución, sin alterar el comportamiento del KPI legacy.
+    """
+    utilization = get_warehouse_utilization()
+    return {
+        "overall": utilization["overall"],
+        "by_storage_type": utilization["by_storage_type"],
+        "by_operational_status": utilization["by_operational_status"],
     }
 
 

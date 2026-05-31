@@ -78,6 +78,22 @@ def test_reports_dataset_view_supports_warehouse_utilization(
         if item["code"] == "BODEGA-KPI-2"
     )
     assert row["capacity_units"] == 10
+    assert "by_storage_type" in response.data["data"]
+    assert "by_operational_status" in response.data["data"]
+
+
+def test_reports_dataset_view_supports_warehouse_occupancy_distribution(
+    authenticated_almacenista_client,
+):
+    response = authenticated_almacenista_client.get(
+        "/api/v1/reports/data/",
+        {"kind": "warehouse-occupancy-distribution"},
+    )
+    assert response.status_code == 200
+    assert response.data["report"] == "warehouse-occupancy-distribution"
+    assert "overall" in response.data["data"]
+    assert "by_storage_type" in response.data["data"]
+    assert "by_operational_status" in response.data["data"]
 
 
 def test_reports_quality_operational_view_returns_summary(
@@ -357,3 +373,96 @@ def test_dispatch_orders_endpoint_returns_samples(
     assert any(
         item.get("invoice_number") == "ORD-100" for item in response.data["results"]
     )
+
+
+def test_warehouse_utilization_by_storage_type_grouping(
+    authenticated_almacenista_client, db
+):
+    """by_storage_type debe agrupar ubicaciones por tipo y sumar unidades ocupadas."""
+    from apps.inventory.models import Location, StockByLocation, StorageType
+    from tests.factories import ProductFactory
+
+    storage_type = StorageType.objects.create(
+        code="bodega-test-grouping",
+        name="Bodega Test Grouping",
+        category="warehouse",
+        is_active=True,
+    )
+    loc_a = Location.objects.create(
+        code="BODEGA-GT-A",
+        name="Bodega GT A",
+        storage_type=storage_type,
+        is_active=True,
+    )
+    loc_b = Location.objects.create(
+        code="BODEGA-GT-B",
+        name="Bodega GT B",
+        storage_type=storage_type,
+        is_active=True,
+    )
+    product = ProductFactory()
+    StockByLocation.objects.create(product=product, location=loc_a, current_stock=10)
+    StockByLocation.objects.create(product=product, location=loc_b, current_stock=7)
+
+    response = authenticated_almacenista_client.get(
+        "/api/v1/reports/warehouse-utilization/"
+    )
+    assert response.status_code == 200
+
+    bucket = next(
+        (
+            b
+            for b in response.data["by_storage_type"]
+            if b["storage_type_code"] == "bodega-test-grouping"
+        ),
+        None,
+    )
+    assert bucket is not None, "Expected storage type bucket not found"
+    assert bucket["locations"] == 2
+    assert bucket["occupied_units"] == 17
+
+
+def test_movement_history_filters_by_location_id(
+    authenticated_almacenista_client, almacenista_user, sample_locations, db
+):
+    """El historial de movimientos debe filtrarse correctamente por location_id."""
+    from apps.movements.models import Movement, MovementType
+    from tests.factories import ProductFactory
+
+    product = ProductFactory()
+    loc_a = sample_locations[0]
+    loc_b = sample_locations[1]
+
+    mov_a = Movement.objects.create(
+        movement_type=MovementType.ENTRADA,
+        product=product,
+        quantity=5,
+        destination_location=loc_a,
+        executed_by=almacenista_user,
+    )
+    Movement.objects.create(
+        movement_type=MovementType.ENTRADA,
+        product=product,
+        quantity=3,
+        destination_location=loc_b,
+        executed_by=almacenista_user,
+    )
+
+    response = authenticated_almacenista_client.get(
+        "/api/v1/reports/movements/history/",
+        {"location_id": str(loc_a.id)},
+    )
+    assert response.status_code == 200
+    ids = [item["id"] for item in response.data]
+    assert str(mov_a.id) in ids
+    # Movement destined exclusively to loc_b must not appear in loc_a filter
+    from apps.movements.models import Movement as _Movement
+    loc_b_only_id = (
+        _Movement.objects.filter(destination_location=loc_b)
+        .exclude(destination_location=loc_a)
+        .exclude(origin_location=loc_a)
+        .values_list("id", flat=True)
+        .first()
+    )
+    if loc_b_only_id:
+        assert str(loc_b_only_id) not in ids
