@@ -6,7 +6,6 @@ import pytest
 
 from apps.inventory.models import Location, StorageTemplate, StorageType
 
-
 # ===========================================================================
 # Storage Templates — PUT (reemplazo completo)
 # ===========================================================================
@@ -34,9 +33,7 @@ class TestStorageTemplatePut:
         return resp.data["id"]
 
     @pytest.mark.django_db
-    def test_put_replaces_template(
-        self, authenticated_almacenista_client, template_id
-    ):
+    def test_put_replaces_template(self, authenticated_almacenista_client, template_id):
         resp = authenticated_almacenista_client.put(
             f"/api/v1/inventory/storage-templates/{template_id}/",
             {
@@ -55,6 +52,7 @@ class TestStorageTemplatePut:
     @pytest.mark.django_db
     def test_put_requires_almacenista(self, administrador_user):
         import uuid
+
         from rest_framework.test import APIClient
 
         client = APIClient()
@@ -69,6 +67,7 @@ class TestStorageTemplatePut:
     @pytest.mark.django_db
     def test_put_404_on_nonexistent(self, almacenista_user):
         import uuid
+
         from rest_framework.test import APIClient
 
         client = APIClient()

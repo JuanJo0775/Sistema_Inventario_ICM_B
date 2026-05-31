@@ -25,7 +25,5 @@ urlpatterns = [
     path(
         "users/<uuid:pk>/disable/", UserDisableView.as_view(), name="auth-user-disable"
     ),
-    path(
-        "users/<uuid:pk>/enable/", UserEnableView.as_view(), name="auth-user-enable"
-    ),
+    path("users/<uuid:pk>/enable/", UserEnableView.as_view(), name="auth-user-enable"),
 ]

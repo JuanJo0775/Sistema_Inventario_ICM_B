@@ -9,7 +9,6 @@ from apps.authentication.services import disable_user, enable_user
 from shared.exceptions import UnauthorizedCredentialManagementError
 from tests.factories import AlmacenistaFactory, UserFactory
 
-
 # ===========================================================================
 # enable_user — servicio
 # ===========================================================================
@@ -82,13 +81,16 @@ class TestUserEnableEndpoint:
     @pytest.mark.django_db
     def test_enable_404_on_nonexistent_user(self, authenticated_almacenista_client):
         import uuid
+
         resp = authenticated_almacenista_client.post(
             f"/api/v1/auth/users/{uuid.uuid4()}/enable/"
         )
         assert resp.status_code == 404
 
     @pytest.mark.django_db
-    def test_disable_then_enable_roundtrip(self, authenticated_almacenista_client, almacenista_user):
+    def test_disable_then_enable_roundtrip(
+        self, authenticated_almacenista_client, almacenista_user
+    ):
         target = UserFactory(is_active=True)
         # Disable
         resp_disable = authenticated_almacenista_client.post(

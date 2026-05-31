@@ -39,8 +39,14 @@ class AuditEventType(models.TextChoices):
     CATEGORY_ACTIVATED = "CATEGORY_ACTIVATED", "Categoría de catálogo reactivada"
     SUBCATEGORY_CREATED = "SUBCATEGORY_CREATED", "Subcategoría de catálogo creada"
     SUBCATEGORY_UPDATED = "SUBCATEGORY_UPDATED", "Subcategoría de catálogo actualizada"
-    SUBCATEGORY_DEACTIVATED = "SUBCATEGORY_DEACTIVATED", "Subcategoría de catálogo desactivada"
-    SUBCATEGORY_ACTIVATED = "SUBCATEGORY_ACTIVATED", "Subcategoría de catálogo reactivada"
+    SUBCATEGORY_DEACTIVATED = (
+        "SUBCATEGORY_DEACTIVATED",
+        "Subcategoría de catálogo desactivada",
+    )
+    SUBCATEGORY_ACTIVATED = (
+        "SUBCATEGORY_ACTIVATED",
+        "Subcategoría de catálogo reactivada",
+    )
     MOVEMENT_CORRECTED = "MOVEMENT_CORRECTED", "Movimiento corregido (BR-06)"
     RETURN_APPROVED = "RETURN_APPROVED", "Devolución aprobada"
     RETURN_REJECTED = "RETURN_REJECTED", "Devolución rechazada"

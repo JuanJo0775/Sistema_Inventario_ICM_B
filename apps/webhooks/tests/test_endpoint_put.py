@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import pytest
 
-
 VALID_EVENTS = ["movement.created", "alert.triggered"]
 VALID_SECRET = "s3cr3t-seguro"  # mínimo 8 caracteres
 
@@ -61,6 +60,7 @@ class TestWebhookEndpointPut:
     @pytest.mark.django_db
     def test_put_requires_almacenista(self, authenticated_administrador_client):
         import uuid
+
         put_resp = authenticated_administrador_client.put(
             f"/api/v1/webhooks/endpoints/{uuid.uuid4()}/",
             {"url": "https://x.com", "secret": VALID_SECRET, "events": VALID_EVENTS},
@@ -71,6 +71,7 @@ class TestWebhookEndpointPut:
     @pytest.mark.django_db
     def test_put_404_on_nonexistent(self, authenticated_almacenista_client):
         import uuid
+
         put_resp = authenticated_almacenista_client.put(
             f"/api/v1/webhooks/endpoints/{uuid.uuid4()}/",
             {

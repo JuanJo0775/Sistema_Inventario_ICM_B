@@ -8,7 +8,6 @@ from apps.catalog.models import Category, ComboItem, Product, ProductCombo, Subc
 from apps.catalog.services import create_category, create_combo, create_subcategory
 from tests.factories import CategoryFactory, ProductFactory
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -37,7 +36,9 @@ class TestCategoryDetail:
     @pytest.mark.django_db
     def test_get_detail_returns_200(self, authenticated_almacenista_client):
         cat = CategoryFactory()
-        resp = authenticated_almacenista_client.get(f"/api/v1/catalog/categories/{cat.id}/")
+        resp = authenticated_almacenista_client.get(
+            f"/api/v1/catalog/categories/{cat.id}/"
+        )
         assert resp.status_code == 200
         assert resp.data["id"] == str(cat.id)
         assert resp.data["name"] == cat.name
@@ -46,6 +47,7 @@ class TestCategoryDetail:
     @pytest.mark.django_db
     def test_get_detail_404_on_missing(self, authenticated_almacenista_client):
         import uuid
+
         resp = authenticated_almacenista_client.get(
             f"/api/v1/catalog/categories/{uuid.uuid4()}/"
         )
@@ -287,7 +289,9 @@ class TestSubcategoryDetail:
 
 class TestComboDetail:
     @pytest.mark.django_db
-    def test_get_detail_returns_200(self, authenticated_almacenista_client, sample_product):
+    def test_get_detail_returns_200(
+        self, authenticated_almacenista_client, sample_product
+    ):
         combo = _make_combo("KIT-0001", sample_product)
         resp = authenticated_almacenista_client.get(
             f"/api/v1/catalog/combos/{combo.id}/"
@@ -329,9 +333,7 @@ class TestComboDetail:
         assert items[0].quantity == 3
 
     @pytest.mark.django_db
-    def test_put_replaces_combo(
-        self, authenticated_almacenista_client, sample_product
-    ):
+    def test_put_replaces_combo(self, authenticated_almacenista_client, sample_product):
         combo = _make_combo("KIT-0004", sample_product, "Kit Viejo")
         new_product = ProductFactory()
         resp = authenticated_almacenista_client.put(
@@ -346,7 +348,9 @@ class TestComboDetail:
         assert resp.data["name"] == "Kit Nuevo"
 
     @pytest.mark.django_db
-    def test_delete_soft_deletes(self, authenticated_almacenista_client, sample_product):
+    def test_delete_soft_deletes(
+        self, authenticated_almacenista_client, sample_product
+    ):
         combo = _make_combo("KIT-0005", sample_product)
         resp = authenticated_almacenista_client.delete(
             f"/api/v1/catalog/combos/{combo.id}/"
@@ -356,7 +360,9 @@ class TestComboDetail:
         assert combo.is_active is False
 
     @pytest.mark.django_db
-    def test_restore_reactivates(self, authenticated_almacenista_client, sample_product):
+    def test_restore_reactivates(
+        self, authenticated_almacenista_client, sample_product
+    ):
         combo = _make_combo("KIT-0006", sample_product)
         combo.is_active = False
         combo.save()

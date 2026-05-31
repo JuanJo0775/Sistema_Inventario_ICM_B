@@ -363,21 +363,30 @@ class ComboListCreateView(generics.ListCreateAPIView):
         summary="Detalle de categoría",
         description="Obtiene el detalle de una categoría.",
         tags=[TAG_CATALOG],
-        responses={200: CategorySerializer, **standard_error_responses(include_404=True)},
+        responses={
+            200: CategorySerializer,
+            **standard_error_responses(include_404=True),
+        },
     ),
     put=extend_schema(
         summary="Actualizar categoría",
         description="Reemplaza los datos editables de una categoría.",
         request=CategoryUpdateSerializer,
         tags=[TAG_CATALOG],
-        responses={200: CategorySerializer, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            200: CategorySerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     ),
     patch=extend_schema(
         summary="Actualizar categoría parcialmente",
         description="Actualiza solo los campos enviados de una categoría.",
         request=CategoryUpdateSerializer,
         tags=[TAG_CATALOG],
-        responses={200: CategorySerializer, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            200: CategorySerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     ),
     delete=extend_schema(
         summary="Desactivar categoría",
@@ -388,7 +397,10 @@ class ComboListCreateView(generics.ListCreateAPIView):
             "Para reactivarla use POST /categories/{id}/restore/."
         ),
         tags=[TAG_CATALOG],
-        responses={204: None, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            204: None,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     ),
 )
 class CategoryDetailView(APIView):
@@ -430,7 +442,10 @@ class CategoryRestoreView(APIView):
         summary="Restaurar categoría",
         description="Reactiva una categoría previamente desactivada.",
         tags=[TAG_CATALOG],
-        responses={200: CategorySerializer, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            200: CategorySerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     )
     def post(self, request, pk):
         get_object_or_404(Category, pk=pk)
@@ -443,21 +458,30 @@ class CategoryRestoreView(APIView):
         summary="Detalle de subcategoría",
         description="Obtiene el detalle de una subcategoría.",
         tags=[TAG_CATALOG],
-        responses={200: SubcategorySerializer, **standard_error_responses(include_404=True)},
+        responses={
+            200: SubcategorySerializer,
+            **standard_error_responses(include_404=True),
+        },
     ),
     put=extend_schema(
         summary="Actualizar subcategoría",
         description="Reemplaza los datos editables de una subcategoría.",
         request=SubcategoryUpdateSerializer,
         tags=[TAG_CATALOG],
-        responses={200: SubcategorySerializer, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            200: SubcategorySerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     ),
     patch=extend_schema(
         summary="Actualizar subcategoría parcialmente",
         description="Actualiza solo los campos enviados de una subcategoría.",
         request=SubcategoryUpdateSerializer,
         tags=[TAG_CATALOG],
-        responses={200: SubcategorySerializer, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            200: SubcategorySerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     ),
     delete=extend_schema(
         summary="Desactivar subcategoría",
@@ -468,7 +492,10 @@ class CategoryRestoreView(APIView):
             "Para reactivarla use POST /subcategories/{id}/restore/."
         ),
         tags=[TAG_CATALOG],
-        responses={204: None, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            204: None,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     ),
 )
 class SubcategoryDetailView(APIView):
@@ -484,14 +511,18 @@ class SubcategoryDetailView(APIView):
         self._get_subcategory(pk)
         ser = SubcategoryUpdateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        subcat = update_subcategory(request.user, pk, ser.validated_data, request=request)
+        subcat = update_subcategory(
+            request.user, pk, ser.validated_data, request=request
+        )
         return Response(SubcategorySerializer(subcat).data)
 
     def patch(self, request, pk):
         self._get_subcategory(pk)
         ser = SubcategoryUpdateSerializer(data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
-        subcat = update_subcategory(request.user, pk, ser.validated_data, request=request)
+        subcat = update_subcategory(
+            request.user, pk, ser.validated_data, request=request
+        )
         return Response(SubcategorySerializer(subcat).data)
 
     def delete(self, request, pk):
@@ -510,7 +541,10 @@ class SubcategoryRestoreView(APIView):
         summary="Restaurar subcategoría",
         description="Reactiva una subcategoría previamente desactivada.",
         tags=[TAG_CATALOG],
-        responses={200: SubcategorySerializer, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            200: SubcategorySerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     )
     def post(self, request, pk):
         get_object_or_404(Subcategory, pk=pk)
@@ -530,14 +564,20 @@ class SubcategoryRestoreView(APIView):
         description="Reemplaza los datos de un combo. Si se envían `items`, reemplaza toda la lista de componentes.",
         request=ComboUpdateSerializer,
         tags=[TAG_CATALOG],
-        responses={200: ComboSerializer, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            200: ComboSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     ),
     patch=extend_schema(
         summary="Actualizar combo parcialmente",
         description="Actualiza solo los campos enviados. Si se envían `items`, reemplaza toda la lista.",
         request=ComboUpdateSerializer,
         tags=[TAG_CATALOG],
-        responses={200: ComboSerializer, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            200: ComboSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     ),
     delete=extend_schema(
         summary="Desactivar combo",
@@ -547,7 +587,10 @@ class SubcategoryRestoreView(APIView):
             "Para reactivarlo use POST /combos/{id}/restore/."
         ),
         tags=[TAG_CATALOG],
-        responses={204: None, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            204: None,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     ),
 )
 class ComboDetailView(APIView):
@@ -588,7 +631,10 @@ class ComboRestoreView(APIView):
         summary="Restaurar combo",
         description="Reactiva un combo de productos previamente desactivado.",
         tags=[TAG_CATALOG],
-        responses={200: ComboSerializer, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            200: ComboSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     )
     def post(self, request, pk):
         get_object_or_404(ProductCombo, pk=pk)
@@ -603,7 +649,10 @@ class ProductRestoreView(APIView):
         summary="Restaurar producto",
         description="Reactiva un producto previamente desactivado.",
         tags=[TAG_CATALOG],
-        responses={200: ProductDetailSerializer, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            200: ProductDetailSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
     )
     def post(self, request, pk):
         get_object_or_404(Product, pk=pk)

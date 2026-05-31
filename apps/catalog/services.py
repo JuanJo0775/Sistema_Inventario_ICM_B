@@ -392,7 +392,11 @@ def update_subcategory(
     from django.utils.text import slugify
 
     _require_almacenista(user)
-    subcat = Subcategory.objects.select_for_update().select_related("category").get(pk=subcategory_id)
+    subcat = (
+        Subcategory.objects.select_for_update()
+        .select_related("category")
+        .get(pk=subcategory_id)
+    )
     if "category_id" in data:
         subcat.category_id = data["category_id"]
     if "name" in data:
@@ -401,9 +405,11 @@ def update_subcategory(
             base = slugify(new_name) or "subcategoria"
             slug = base
             n = 0
-            while Subcategory.objects.filter(
-                category_id=subcat.category_id, slug=slug
-            ).exclude(pk=subcat.pk).exists():
+            while (
+                Subcategory.objects.filter(category_id=subcat.category_id, slug=slug)
+                .exclude(pk=subcat.pk)
+                .exists()
+            ):
                 n += 1
                 slug = f"{base}-{n}"
             subcat.name = new_name
@@ -428,7 +434,11 @@ def deactivate_subcategory(
 ) -> None:
     """Desactiva una subcategoría. Falla con ValueError si tiene productos activos."""
     _require_almacenista(user)
-    subcat = Subcategory.objects.select_for_update().select_related("category").get(pk=subcategory_id)
+    subcat = (
+        Subcategory.objects.select_for_update()
+        .select_related("category")
+        .get(pk=subcategory_id)
+    )
     active_count = Product.objects.filter(subcategory=subcat, is_active=True).count()
     if active_count:
         raise ValueError(
@@ -504,6 +514,7 @@ def update_combo(
             p = products[str(row["product_id"])]
             if not p.is_active:
                 from shared.exceptions import DomainValidationError
+
                 raise DomainValidationError(f"Producto {p.sku} no está activo.")
         combo.combo_items.all().delete()
         for row in items:
@@ -596,7 +607,11 @@ def activate_product(
 ) -> Product:
     """Reactiva un producto previamente desactivado."""
     _require_almacenista(user)
-    product = Product.objects.select_related("category", "subcategory").select_for_update().get(pk=product_id)
+    product = (
+        Product.objects.select_related("category", "subcategory")
+        .select_for_update()
+        .get(pk=product_id)
+    )
     product.is_active = True
     product.save(update_fields=["is_active"])
     log_event(
