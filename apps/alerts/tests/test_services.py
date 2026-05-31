@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from apps.alerts.models import Alert, AlertType
-from apps.alerts.services import resolve_alert
+from apps.alerts.models import Alert, AlertCategory, AlertSeverity, AlertType
+from apps.alerts.services import resolve_alert, sync_stock_alerts_for_product
 from shared.exceptions import UnauthorizedDomainActionError
 from tests.factories import LotFactory, ProductFactory
 
@@ -52,3 +52,37 @@ def test_sync_expiry_alerts_for_product_creates_lot_alert(db):
         product=product, lot=lot, alert_type=AlertType.EXPIRATION_60
     )
     assert alert.message.startswith("El lote L-ALERT")
+    assert alert.severity == AlertSeverity.HIGH
+    assert alert.category == AlertCategory.EXPIRATION
+
+
+@pytest.mark.django_db
+def test_sync_stock_alerts_sets_severity_and_category():
+    product = ProductFactory(reorder_point=10)
+    sync_stock_alerts_for_product(product.id)
+    alert = Alert.objects.filter(
+        product=product, alert_type=AlertType.LOW_STOCK, is_resolved=False
+    ).first()
+    assert alert is not None
+    assert alert.severity == AlertSeverity.HIGH
+    assert alert.category == AlertCategory.STOCK
+
+
+@pytest.mark.django_db
+def test_sync_expiry_30_days_sets_critical(db):
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    from apps.alerts.services import sync_expiry_alerts_for_product
+
+    product = ProductFactory(requires_expiration=True)
+    LotFactory(
+        product=product,
+        expiration_date=timezone.now().date() + timedelta(days=15),
+        code="L-30",
+    )
+    sync_expiry_alerts_for_product(product.id)
+    alert = Alert.objects.get(product=product, alert_type=AlertType.EXPIRATION_30)
+    assert alert.severity == AlertSeverity.CRITICAL
+    assert alert.category == AlertCategory.EXPIRATION

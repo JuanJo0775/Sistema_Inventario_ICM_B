@@ -23,6 +23,8 @@ class AlertSerializer(serializers.ModelSerializer):
             "lot_expiration_date",
             "location",
             "alert_type",
+            "severity",
+            "category",
             "message",
             "is_resolved",
             "resolved_at",

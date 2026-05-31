@@ -8,6 +8,7 @@ from uuid import UUID
 from django.db import transaction
 from django.utils.text import slugify
 
+import apps.alerts.services as alert_services
 from apps.alerts.models import Alert, AlertType
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
@@ -368,7 +369,14 @@ def transition_location_state(
     new_status: str,
 ) -> Location:
     """RF-004 — Cambia el estado operativo formal de una ubicación (solo almacenista)."""
-    return update_location(executor, location_id, {"operational_status": new_status})
+    location = update_location(
+        executor, location_id, {"operational_status": new_status}
+    )
+    try:
+        alert_services.sync_location_blocked_alerts_for_location(location)
+    except Exception:
+        pass
+    return location
 
 
 @transaction.atomic

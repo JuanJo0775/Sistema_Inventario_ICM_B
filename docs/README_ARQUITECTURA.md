@@ -130,6 +130,8 @@ icm_backend/
 │   │   │   ├── test_models.py                                  # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_selectors.py                               # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_services.py                                # Cobertura crítica del módulo
+│   │   │   ├── test_storage_templates.py                       # Cobertura crítica del módulo
+│   │   │   ├── test_storage_types.py                           # Cobertura crítica del módulo
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
 │   │   ├── models.py                                           # Entidades y constraints de persistencia
 │   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
@@ -170,9 +172,14 @@ icm_backend/
 │   │   └── admin.py                                            # Registro administrativo y soporte operacional
 │   ├── alerts/                                                 # Alertas operativas y monitoreo preventivo
 │   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_commands.py                                # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_new_alert_types.py                         # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_services.py                                # Cobertura crítica del módulo
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── management/
+│   │   │   └── commands/                                       # Comandos administrativos del módulo
+│   │   │       └── scan_alerts.py                              # Comando Django para automatización operativa
 │   │   ├── models.py                                           # Entidades y constraints de persistencia
 │   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
 │   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
@@ -247,6 +254,10 @@ icm_backend/
 │   │   └── README_CICD.md                                      # Documento técnico relevante
 │   ├── evidence/                                               # Documento arquitectónico relevante
 │   │   └── README.md                                           # Documento técnico relevante
+│   ├── storage/                                                # Documento arquitectónico relevante
+│   │   ├── README_LOCATION_STATES.md                           # Documento técnico relevante
+│   │   ├── README_STORAGE_DOMAIN.md                            # Documento técnico relevante
+│   │   └── README_STORAGE_TYPES.md                             # Documento técnico relevante
 │   └── GUIA_ONBOARDING.md                                      # Documento técnico relevante
 ├── requirements/                                               # Dependencias por entorno
 │   ├── base.txt

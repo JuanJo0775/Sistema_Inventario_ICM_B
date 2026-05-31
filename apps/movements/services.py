@@ -181,8 +181,11 @@ def check_and_create_alerts(product: Product, location: Location | None = None) 
     try:
         if location is not None:
             alert_services.check_and_create_minimum_stock_alert(product, location)
+            alert_services.sync_cold_chain_alerts(product, location)
         alert_services.sync_stock_alerts_for_product(product.id)
+        alert_services.sync_stock_zero_alerts(product.id)
         alert_services.sync_expiry_alerts_for_product(product.id)
+        alert_services.sync_lot_expired_alerts(product.id)
     except Exception:
         logger.exception("check_and_create_alerts falló para product_id=%s", product.id)
 

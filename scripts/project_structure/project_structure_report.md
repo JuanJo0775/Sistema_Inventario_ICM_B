@@ -7,8 +7,7 @@ Actual: icm_backend
 ## Resumen
 - Nuevos nodos relevantes: 0
 - Eliminados: 0
-- Reorganizaciones: 2
+- Reorganizaciones: 0
 
-## Reorganizaciones
-- apps/dashboard/admin.py -> apps/reports/admin.py
-- apps/dashboard/permissions.py -> apps/reports/permissions.py
+## Estado
+- Sin cambios estructurales relevantes detectados respecto al README actual.
