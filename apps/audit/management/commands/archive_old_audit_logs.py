@@ -64,8 +64,9 @@ class Command(BaseCommand):
 
         while True:
             batch = list(
-                AuditLog.objects.filter(created_at__lt=older_than)
-                .order_by("created_at")[:batch_size]
+                AuditLog.objects.filter(created_at__lt=older_than).order_by(
+                    "created_at"
+                )[:batch_size]
             )
             if not batch:
                 break
@@ -84,7 +85,9 @@ class Command(BaseCommand):
                     )
                     for log in batch
                 ]
-                AuditLogArchive.objects.bulk_create(archive_records, ignore_conflicts=True)
+                AuditLogArchive.objects.bulk_create(
+                    archive_records, ignore_conflicts=True
+                )
                 batch_ids = [log.id for log in batch]
                 AuditLog.objects.filter(id__in=batch_ids).delete()
 

@@ -29,18 +29,26 @@ class WebhookEndpointListCreateView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
-        responses={200: WebhookEndpointSerializer(many=True), **standard_error_responses(include_403=True)},
+        responses={
+            200: WebhookEndpointSerializer(many=True),
+            **standard_error_responses(include_403=True),
+        },
         tags=[TAG_WEBHOOKS],
     )
     def get(self, request):
         qs = WebhookEndpoint.objects.all().order_by("-created_at")
         paginator = ICMPageNumberPagination()
         page = paginator.paginate_queryset(list(qs), request, view=self)
-        return paginator.get_paginated_response(WebhookEndpointSerializer(page, many=True).data)
+        return paginator.get_paginated_response(
+            WebhookEndpointSerializer(page, many=True).data
+        )
 
     @extend_schema(
         request=WebhookEndpointCreateSerializer,
-        responses={201: WebhookEndpointSerializer, **standard_error_responses(include_403=True)},
+        responses={
+            201: WebhookEndpointSerializer,
+            **standard_error_responses(include_403=True),
+        },
         tags=[TAG_WEBHOOKS],
     )
     def post(self, request):
@@ -55,7 +63,9 @@ class WebhookEndpointListCreateView(APIView):
             max_retries=d.get("max_retries", 3),
             created_by=request.user,
         )
-        return Response(WebhookEndpointSerializer(endpoint).data, status=status.HTTP_201_CREATED)
+        return Response(
+            WebhookEndpointSerializer(endpoint).data, status=status.HTTP_201_CREATED
+        )
 
 
 class WebhookEndpointDetailView(APIView):
@@ -64,15 +74,23 @@ class WebhookEndpointDetailView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
-        responses={200: WebhookEndpointSerializer, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            200: WebhookEndpointSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
         tags=[TAG_WEBHOOKS],
     )
     def get(self, request, pk):
-        return Response(WebhookEndpointSerializer(get_object_or_404(WebhookEndpoint, pk=pk)).data)
+        return Response(
+            WebhookEndpointSerializer(get_object_or_404(WebhookEndpoint, pk=pk)).data
+        )
 
     @extend_schema(
         request=WebhookEndpointCreateSerializer,
-        responses={200: WebhookEndpointSerializer, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            200: WebhookEndpointSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
         tags=[TAG_WEBHOOKS],
     )
     def patch(self, request, pk):
@@ -85,7 +103,10 @@ class WebhookEndpointDetailView(APIView):
         return Response(WebhookEndpointSerializer(endpoint).data)
 
     @extend_schema(
-        responses={204: None, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            204: None,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
         tags=[TAG_WEBHOOKS],
     )
     def delete(self, request, pk):
@@ -102,7 +123,10 @@ class WebhookTestView(APIView):
 
     @extend_schema(
         request=WebhookTestSerializer,
-        responses={200: None, **standard_error_responses(include_403=True, include_404=True)},
+        responses={
+            200: None,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
         tags=[TAG_WEBHOOKS],
     )
     def post(self, request, pk):
@@ -119,7 +143,9 @@ class WebhookTestView(APIView):
         )
         delivery.save()
         _attempt_delivery(delivery)
-        return Response({"status": delivery.status, "response_code": delivery.response_code})
+        return Response(
+            {"status": delivery.status, "response_code": delivery.response_code}
+        )
 
 
 class WebhookDeliveryListView(APIView):
@@ -128,14 +154,19 @@ class WebhookDeliveryListView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
-        responses={200: WebhookDeliverySerializer(many=True), **standard_error_responses(include_403=True)},
+        responses={
+            200: WebhookDeliverySerializer(many=True),
+            **standard_error_responses(include_403=True),
+        },
         tags=[TAG_WEBHOOKS],
     )
     def get(self, request):
         qs = WebhookDelivery.objects.select_related("endpoint").order_by("-created_at")
         paginator = ICMPageNumberPagination()
         page = paginator.paginate_queryset(list(qs), request, view=self)
-        return paginator.get_paginated_response(WebhookDeliverySerializer(page, many=True).data)
+        return paginator.get_paginated_response(
+            WebhookDeliverySerializer(page, many=True).data
+        )
 
 
 class WebhookStatsView(APIView):
@@ -147,9 +178,17 @@ class WebhookStatsView(APIView):
     def get(self, request):
         return Response(
             {
-                "pending": WebhookDelivery.objects.filter(status=WebhookDelivery.Status.PENDING).count(),
-                "delivered": WebhookDelivery.objects.filter(status=WebhookDelivery.Status.DELIVERED).count(),
-                "failed": WebhookDelivery.objects.filter(status=WebhookDelivery.Status.FAILED).count(),
-                "active_endpoints": WebhookEndpoint.objects.filter(is_active=True).count(),
+                "pending": WebhookDelivery.objects.filter(
+                    status=WebhookDelivery.Status.PENDING
+                ).count(),
+                "delivered": WebhookDelivery.objects.filter(
+                    status=WebhookDelivery.Status.DELIVERED
+                ).count(),
+                "failed": WebhookDelivery.objects.filter(
+                    status=WebhookDelivery.Status.FAILED
+                ).count(),
+                "active_endpoints": WebhookEndpoint.objects.filter(
+                    is_active=True
+                ).count(),
             }
         )

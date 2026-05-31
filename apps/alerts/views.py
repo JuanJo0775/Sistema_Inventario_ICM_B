@@ -23,9 +23,18 @@ from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenista, IsAlmacenistaOrAdministrador
 
 _ALERT_EXPORT_HEADERS = [
-    "id", "product_sku", "lot_code", "lot_expiration_date", "location",
-    "alert_type", "severity", "category", "message",
-    "is_resolved", "resolved_at", "created_at",
+    "id",
+    "product_sku",
+    "lot_code",
+    "lot_expiration_date",
+    "location",
+    "alert_type",
+    "severity",
+    "category",
+    "message",
+    "is_resolved",
+    "resolved_at",
+    "created_at",
 ]
 
 _ALERT_QUERY_PARAMS = [
@@ -233,8 +242,10 @@ class AlertPollView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         else:
-            from django.utils import timezone as tz
             from datetime import timedelta
+
+            from django.utils import timezone as tz
+
             since = tz.now() - timedelta(hours=24)
 
         qs = Alert.objects.select_related("product", "location").filter(
@@ -249,6 +260,7 @@ class AlertPollView(APIView):
         qs = qs.order_by("-created_at")[:50]
 
         from django.utils import timezone as tz
+
         return Response(
             {
                 "server_timestamp": tz.now().isoformat(),

@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('inventory', '0008_storagetemplate_location_storage_template'),
+        ("inventory", "0008_storagetemplate_location_storage_template"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='stockbylocation',
-            name='location_reorder_point',
-            field=models.PositiveIntegerField(blank=True, help_text='Override local de umbral de reorden. Si null, usa reorder_point del producto.', null=True),
+            model_name="stockbylocation",
+            name="location_reorder_point",
+            field=models.PositiveIntegerField(
+                blank=True,
+                help_text="Override local de umbral de reorden. Si null, usa reorder_point del producto.",
+                null=True,
+            ),
         ),
     ]

@@ -36,7 +36,9 @@ def _create_alert(product, location, created_offset_seconds=0):
 
 
 @pytest.mark.django_db
-def test_poll_returns_alerts_after_since(authenticated_almacenista_client, product_location):
+def test_poll_returns_alerts_after_since(
+    authenticated_almacenista_client, product_location
+):
     """Solo se retornan alertas creadas DESPUÉS de `since`."""
     product, location = product_location
     past_alert = _create_alert(product, location, created_offset_seconds=-120)
@@ -58,7 +60,9 @@ def test_poll_returns_alerts_after_since(authenticated_almacenista_client, produ
 
 
 @pytest.mark.django_db
-def test_poll_without_since_defaults_24h(authenticated_almacenista_client, product_location):
+def test_poll_without_since_defaults_24h(
+    authenticated_almacenista_client, product_location
+):
     """Sin `since`, retorna las últimas 24 horas."""
     product, location = product_location
     recent_alert = _create_alert(product, location)
@@ -89,13 +93,17 @@ def test_poll_severity_filter(authenticated_almacenista_client, product_location
     """El filtro `?severity=CRITICAL` solo retorna alertas de esa severidad."""
     product, location = product_location
     high_alert = Alert.objects.create(
-        product=product, location=location,
-        alert_type=AlertType.LOW_STOCK, severity=AlertSeverity.HIGH,
+        product=product,
+        location=location,
+        alert_type=AlertType.LOW_STOCK,
+        severity=AlertSeverity.HIGH,
         message="Alto",
     )
     critical_alert = Alert.objects.create(
-        product=product, location=location,
-        alert_type=AlertType.STOCK_ZERO, severity=AlertSeverity.CRITICAL,
+        product=product,
+        location=location,
+        alert_type=AlertType.STOCK_ZERO,
+        severity=AlertSeverity.CRITICAL,
         message="Crítico",
     )
 

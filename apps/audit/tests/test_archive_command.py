@@ -56,11 +56,17 @@ def test_archive_dry_run_makes_no_changes(db):
     old_log = _create_log(400)
 
     out = StringIO()
-    call_command("archive_old_audit_logs", "--older-than-days=365", "--dry-run", stdout=out)
+    call_command(
+        "archive_old_audit_logs", "--older-than-days=365", "--dry-run", stdout=out
+    )
 
     assert AuditLog.objects.filter(pk=old_log.pk).exists()
     assert not AuditLogArchive.objects.exists()
-    assert "dry-run" in out.getvalue().lower() or "dry_run" in out.getvalue().lower() or "DRY" in out.getvalue()
+    assert (
+        "dry-run" in out.getvalue().lower()
+        or "dry_run" in out.getvalue().lower()
+        or "DRY" in out.getvalue()
+    )
 
 
 @pytest.mark.django_db

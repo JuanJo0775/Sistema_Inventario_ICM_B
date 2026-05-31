@@ -154,9 +154,15 @@ Para probar los endpoints, haga clic en el botón **Authorize**, use el esquema 
             "description": "Operational read model for executive UI and KPIs.",
         },
         {"name": TAG_REPORTS, "description": "Read-only reports and KPIs."},
-        {"name": TAG_ALERTS, "description": "Operational alerts and real-time polling."},
+        {
+            "name": TAG_ALERTS,
+            "description": "Operational alerts and real-time polling.",
+        },
         {"name": TAG_AUDIT, "description": "Audit logs (read-only, immutable)."},
-        {"name": TAG_WEBHOOKS, "description": "Webhook endpoints and delivery management (almacenista only — IsAlmacenista)."},
+        {
+            "name": TAG_WEBHOOKS,
+            "description": "Webhook endpoints and delivery management (almacenista only — IsAlmacenista).",
+        },
     ],
     # Botón "Authorize" en Swagger UI y componente de Error Uniforme
     "APPEND_COMPONENTS": {

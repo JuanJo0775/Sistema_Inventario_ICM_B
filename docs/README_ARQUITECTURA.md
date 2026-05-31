@@ -127,6 +127,8 @@ icm_backend/
 │   ├── inventory/                                              # Consulta de stock en tiempo real
 │   │   ├── tests/                                              # Pruebas del subdominio
 │   │   │   ├── test_admin.py                                   # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_commands.py                                # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_location_threshold.py                      # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_models.py                                  # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_selectors.py                               # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
@@ -147,6 +149,7 @@ icm_backend/
 │   │   └── admin.py                                            # Registro administrativo y soporte operacional
 │   ├── movements/                                              # Ledger inmutable y consistencia de inventario
 │   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_combo_dispatch.py                          # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
 │   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
@@ -161,6 +164,7 @@ icm_backend/
 │   │   └── admin.py                                            # Registro administrativo y soporte operacional
 │   ├── reports/                                                # Reportes e indicadores operativos
 │   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_exports.py                                 # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
 │   │   │   ├── test_selectors.py                               # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_services.py                                # Cobertura crítica del módulo
@@ -178,6 +182,7 @@ icm_backend/
 │   │   │   ├── test_commands.py                                # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
 │   │   │   ├── test_new_alert_types.py                         # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_polling.py                                 # Cobertura crítica del módulo
 │   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
 │   │   ├── management/
@@ -193,9 +198,13 @@ icm_backend/
 │   │   └── admin.py                                            # Registro administrativo y soporte operacional
 │   ├── audit/                                                  # Trazabilidad e histórico de eventos
 │   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_archive_command.py                         # Cobertura crítica del módulo
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
 │   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── management/
+│   │   │   └── commands/                                       # Comandos administrativos del módulo
+│   │   │       └── archive_old_audit_logs.py                   # Comando Django para automatización operativa
 │   │   ├── models.py                                           # Entidades y constraints de persistencia
 │   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
 │   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
@@ -204,13 +213,26 @@ icm_backend/
 │   │   ├── selectors.py                                        # Consultas de auditoría
 │   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
 │   │   └── admin.py                                            # Registro administrativo y soporte operacional
-│   └── dashboard/                                              # Aplicación Django detectada automáticamente
+│   ├── dashboard/                                              # Aplicación Django detectada automáticamente
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   └── test_views.py                                   # Reglas de negocio y transacciones del dominio
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   └── services.py                                         # Reglas de negocio y transacciones del dominio
+│   └── webhooks/                                               # Aplicación Django detectada automáticamente
 │       ├── tests/                                              # Pruebas del subdominio
-│       │   └── test_views.py                                   # Reglas de negocio y transacciones del dominio
+│       │   ├── test_services.py                                # Cobertura crítica del módulo
+│       │   └── test_views.py                                   # Cobertura crítica del módulo
+│       ├── management/
+│       │   └── commands/                                       # Comandos administrativos del módulo
+│       │       └── deliver_webhooks.py                         # Comando Django para automatización operativa
+│       ├── models.py                                           # Entidades y constraints de persistencia
 │       ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
 │       ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
 │       ├── urls.py                                             # Ruteo HTTP y composición de endpoints
-│       └── services.py                                         # Reglas de negocio y transacciones del dominio
+│       ├── services.py                                         # Reglas de negocio y transacciones del dominio
+│       └── admin.py                                            # Registro administrativo y soporte operacional
 ├── config/                                                     # Configuración central del proyecto Django
 │   ├── settings/                                               # Configuración compartida y sobreescrituras por entorno
 │   │   ├── base.py                                             # Configuración base compartida
@@ -285,6 +307,9 @@ icm_backend/
 │   ├── openapi.py                                              # Tags OpenAPI y contratos compartidos
 │   ├── utils/                                                  # Utilidades transversales
 │   │   └── validators.py                                       # Validadores reutilizables
+│   ├── audit.py
+│   ├── exporters.py
+│   ├── location_validators.py
 │   └── operating_hours.py
 ├── tests/                                                      # Tests de integración cross-módulo
 │   ├── factories.py                                            # Factories de datos de prueba

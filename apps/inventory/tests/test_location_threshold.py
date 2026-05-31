@@ -93,7 +93,9 @@ def test_patch_threshold_via_api(authenticated_almacenista_client, threshold_set
 
 
 @pytest.mark.django_db
-def test_patch_threshold_null_removes_override(authenticated_almacenista_client, threshold_setup):
+def test_patch_threshold_null_removes_override(
+    authenticated_almacenista_client, threshold_setup
+):
     """PATCH con null elimina el override; effective_reorder_point vuelve al global."""
     stock = threshold_setup["stock"]
     stock.location_reorder_point = 3

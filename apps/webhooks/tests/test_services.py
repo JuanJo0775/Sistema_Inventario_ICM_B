@@ -53,7 +53,9 @@ def test_queue_creates_delivery_for_subscribed_endpoint(endpoint):
     count = queue_webhook_event("STOCK_CRITICO", {"product_id": "abc"})
     assert count == 1
     assert WebhookDelivery.objects.filter(
-        endpoint=endpoint, event_type="STOCK_CRITICO", status=WebhookDelivery.Status.PENDING
+        endpoint=endpoint,
+        event_type="STOCK_CRITICO",
+        status=WebhookDelivery.Status.PENDING,
     ).exists()
 
 
@@ -72,12 +74,20 @@ def test_queue_skips_unsubscribed_event(endpoint):
 @pytest.mark.django_db
 def test_queue_creates_multiple_deliveries_for_multiple_endpoints(db, admin_user):
     WebhookEndpoint.objects.create(
-        url="https://a.example.com/hook", secret="k1", events=["STOCK_CRITICO"],
-        is_active=True, max_retries=3, created_by=admin_user,
+        url="https://a.example.com/hook",
+        secret="k1",
+        events=["STOCK_CRITICO"],
+        is_active=True,
+        max_retries=3,
+        created_by=admin_user,
     )
     WebhookEndpoint.objects.create(
-        url="https://b.example.com/hook", secret="k2", events=["STOCK_CRITICO"],
-        is_active=True, max_retries=3, created_by=admin_user,
+        url="https://b.example.com/hook",
+        secret="k2",
+        events=["STOCK_CRITICO"],
+        is_active=True,
+        max_retries=3,
+        created_by=admin_user,
     )
     count = queue_webhook_event("STOCK_CRITICO", {})
     assert count == 2

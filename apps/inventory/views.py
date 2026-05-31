@@ -54,8 +54,13 @@ from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenista
 
 _INVENTORY_EXPORT_HEADERS = [
-    "sku", "name", "reorder_point", "total",
-    "location_code", "location_name", "quantity",
+    "sku",
+    "name",
+    "reorder_point",
+    "total",
+    "location_code",
+    "location_name",
+    "quantity",
 ]
 
 
@@ -149,7 +154,16 @@ class InventoryFullListView(APIView):
                     "quantity": loc["quantity"],
                 }
                 for item in data
-                for loc in item.get("by_location", [{"location_code": "", "location_name": "", "quantity": item["total"]}])
+                for loc in item.get(
+                    "by_location",
+                    [
+                        {
+                            "location_code": "",
+                            "location_name": "",
+                            "quantity": item["total"],
+                        }
+                    ],
+                )
             ]
             if export == "csv":
                 return export_to_csv(_INVENTORY_EXPORT_HEADERS, rows, "inventory.csv")
@@ -607,6 +621,7 @@ class StockThresholdView(APIView):
     )
     def patch(self, request, pk):
         from django.shortcuts import get_object_or_404
+
         row = get_object_or_404(StockByLocation, pk=pk)
         ser = StockThresholdSerializer(data=request.data)
         ser.is_valid(raise_exception=True)

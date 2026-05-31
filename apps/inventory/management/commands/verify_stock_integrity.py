@@ -62,6 +62,7 @@ class Command(BaseCommand):
 
         try:
             from apps.webhooks.services import queue_webhook_event
+
             queue_webhook_event(
                 "STOCK_INTEGRITY_DIVERGENCE",
                 {"divergences": len(divergences)},

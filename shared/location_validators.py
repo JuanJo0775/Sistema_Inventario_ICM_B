@@ -6,7 +6,9 @@ from apps.inventory.models import Location
 from shared.exceptions import LocationStateNotAllowedError
 
 
-def validate_location_for_origin(location: Location, operation: str = "operación") -> None:
+def validate_location_for_origin(
+    location: Location, operation: str = "operación"
+) -> None:
     """BR-14 — Valida que la ubicación pueda actuar como origen de un movimiento."""
     if location.operational_status in {
         Location.OperationalStatus.BLOCKED,
@@ -37,7 +39,9 @@ def validate_location_for_origin(location: Location, operation: str = "operació
         )
 
 
-def validate_location_for_destination(location: Location, operation: str = "operación") -> None:
+def validate_location_for_destination(
+    location: Location, operation: str = "operación"
+) -> None:
     """BR-14 — Valida que la ubicación pueda actuar como destino de un movimiento."""
     if location.operational_status in {
         Location.OperationalStatus.BLOCKED,

@@ -37,11 +37,12 @@ from shared.exceptions import (
 )
 from shared.location_validators import (
     validate_location_for_destination as _ensure_location_allows_destination,
+)
+from shared.location_validators import (
     validate_location_for_origin as _ensure_location_allows_origin,
 )
 
 logger = logging.getLogger(__name__)
-
 
 
 def _lock_stock(product_id: UUID, location_id: UUID) -> StockByLocation:

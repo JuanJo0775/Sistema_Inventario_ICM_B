@@ -24,10 +24,19 @@ def combo_setup(db, almacenista_user):
     ComboItem.objects.create(combo=combo, product=product_a, quantity=2)
     ComboItem.objects.create(combo=combo, product=product_b, quantity=3)
 
-    StockByLocation.objects.create(product=product_a, location=location, current_stock=10)
-    StockByLocation.objects.create(product=product_b, location=location, current_stock=10)
+    StockByLocation.objects.create(
+        product=product_a, location=location, current_stock=10
+    )
+    StockByLocation.objects.create(
+        product=product_b, location=location, current_stock=10
+    )
 
-    return {"combo": combo, "location": location, "product_a": product_a, "product_b": product_b}
+    return {
+        "combo": combo,
+        "location": location,
+        "product_a": product_a,
+        "product_b": product_b,
+    }
 
 
 @pytest.mark.django_db
@@ -56,12 +65,14 @@ def test_dispatch_combo_success(authenticated_almacenista_client, combo_setup):
     stock_b = StockByLocation.objects.get(
         product=combo_setup["product_b"], location=location
     ).current_stock
-    assert stock_a == 8   # 10 - 2
-    assert stock_b == 7   # 10 - 3
+    assert stock_a == 8  # 10 - 2
+    assert stock_b == 7  # 10 - 3
 
 
 @pytest.mark.django_db
-def test_dispatch_combo_insufficient_stock(authenticated_almacenista_client, combo_setup):
+def test_dispatch_combo_insufficient_stock(
+    authenticated_almacenista_client, combo_setup
+):
     """POST combo-dispatch sin stock suficiente → 409."""
     combo = combo_setup["combo"]
     location = combo_setup["location"]
@@ -82,12 +93,16 @@ def test_dispatch_combo_insufficient_stock(authenticated_almacenista_client, com
 
 
 @pytest.mark.django_db
-def test_dispatch_combo_creates_audit_log(authenticated_almacenista_client, combo_setup):
+def test_dispatch_combo_creates_audit_log(
+    authenticated_almacenista_client, combo_setup
+):
     """POST combo-dispatch exitoso → AuditLog con tipo MOVEMENT_CREATED."""
     combo = combo_setup["combo"]
     location = combo_setup["location"]
 
-    before_count = AuditLog.objects.filter(event_type=AuditEventType.MOVEMENT_CREATED).count()
+    before_count = AuditLog.objects.filter(
+        event_type=AuditEventType.MOVEMENT_CREATED
+    ).count()
 
     url = reverse("movements-combo-dispatch")
     authenticated_almacenista_client.post(
@@ -96,12 +111,16 @@ def test_dispatch_combo_creates_audit_log(authenticated_almacenista_client, comb
         format="json",
     )
 
-    after_count = AuditLog.objects.filter(event_type=AuditEventType.MOVEMENT_CREATED).count()
+    after_count = AuditLog.objects.filter(
+        event_type=AuditEventType.MOVEMENT_CREATED
+    ).count()
     assert after_count > before_count
 
 
 @pytest.mark.django_db
-def test_dispatch_combo_inactive_combo_returns_404(authenticated_almacenista_client, combo_setup):
+def test_dispatch_combo_inactive_combo_returns_404(
+    authenticated_almacenista_client, combo_setup
+):
     """POST combo-dispatch con combo inactivo → 404."""
     combo = combo_setup["combo"]
     combo.is_active = False
@@ -110,7 +129,10 @@ def test_dispatch_combo_inactive_combo_returns_404(authenticated_almacenista_cli
     url = reverse("movements-combo-dispatch")
     response = authenticated_almacenista_client.post(
         url,
-        data={"combo_id": str(combo.id), "location_id": str(combo_setup["location"].id)},
+        data={
+            "combo_id": str(combo.id),
+            "location_id": str(combo_setup["location"].id),
+        },
         format="json",
     )
 
@@ -124,7 +146,10 @@ def test_dispatch_combo_requires_authentication(api_client, combo_setup):
     url = reverse("movements-combo-dispatch")
     response = api_client.post(
         url,
-        data={"combo_id": str(combo.id), "location_id": str(combo_setup["location"].id)},
+        data={
+            "combo_id": str(combo.id),
+            "location_id": str(combo_setup["location"].id),
+        },
         format="json",
     )
     assert response.status_code == 401

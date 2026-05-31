@@ -50,7 +50,9 @@ def test_create_endpoint(almacenista_client):
         format="json",
     )
     assert response.status_code == 201
-    assert WebhookEndpoint.objects.filter(url="https://hook.example.com/events").exists()
+    assert WebhookEndpoint.objects.filter(
+        url="https://hook.example.com/events"
+    ).exists()
 
 
 @pytest.mark.django_db
@@ -78,7 +80,11 @@ def test_administrador_cannot_manage_webhooks(api_client, db, endpoint):
     url = reverse("webhooks-endpoints")
     response = api_client.post(
         url,
-        data={"url": "https://example.com", "secret": "key", "events": ["STOCK_CRITICO"]},
+        data={
+            "url": "https://example.com",
+            "secret": "key",
+            "events": ["STOCK_CRITICO"],
+        },
         format="json",
     )
     assert response.status_code == 403

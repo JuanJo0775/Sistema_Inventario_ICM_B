@@ -65,7 +65,9 @@ def test_movement_history_export_xlsx(authenticated_almacenista_client, export_s
 
 
 @pytest.mark.django_db
-def test_movement_history_json_unchanged(authenticated_almacenista_client, export_setup):
+def test_movement_history_json_unchanged(
+    authenticated_almacenista_client, export_setup
+):
     """Sin ?format= (o ?format=json) devuelve JSON normal."""
     url = reverse("reports-movements-history")
     response = authenticated_almacenista_client.get(url)
@@ -161,7 +163,9 @@ def test_alerts_export_csv(authenticated_almacenista_client, db):
 
 
 @pytest.mark.django_db
-def test_export_unknown_param_returns_json(authenticated_almacenista_client, export_setup):
+def test_export_unknown_param_returns_json(
+    authenticated_almacenista_client, export_setup
+):
     """?export=pdf (valor desconocido) → respuesta JSON normal, no error.
 
     El parámetro ?export= ignora silenciosamente valores no reconocidos y
@@ -178,7 +182,9 @@ def test_export_unknown_param_returns_json(authenticated_almacenista_client, exp
 
 
 @pytest.mark.django_db
-def test_export_empty_param_returns_json(authenticated_almacenista_client, export_setup):
+def test_export_empty_param_returns_json(
+    authenticated_almacenista_client, export_setup
+):
     """?export= (valor vacío) → respuesta JSON normal."""
     url = reverse("reports-movements-history") + "?export="
     response = authenticated_almacenista_client.get(url)

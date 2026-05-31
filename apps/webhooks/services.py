@@ -31,7 +31,8 @@ def queue_webhook_event(event_type: str, payload: dict) -> int:
     # Filtrar en Python para compatibilidad con SQLite en tests
     # En producción (PostgreSQL) events__contains=[event_type] también funciona
     endpoints = [
-        ep for ep in WebhookEndpoint.objects.filter(is_active=True)
+        ep
+        for ep in WebhookEndpoint.objects.filter(is_active=True)
         if event_type in (ep.events or [])
     ]
     if not endpoints:
@@ -144,8 +145,13 @@ def _attempt_delivery(delivery: WebhookDelivery) -> None:
         )
         delivery.save(
             update_fields=[
-                "status", "attempts", "last_attempt_at",
-                "next_retry_at", "response_code", "response_body", "updated_at",
+                "status",
+                "attempts",
+                "last_attempt_at",
+                "next_retry_at",
+                "response_code",
+                "response_body",
+                "updated_at",
             ]
         )
 

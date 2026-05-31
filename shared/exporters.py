@@ -28,9 +28,7 @@ def export_to_csv(
     writer = csv.DictWriter(pseudo_buffer, fieldnames=headers, extrasaction="ignore")
 
     def row_generator():
-        yield writer.writeheader() or pseudo_buffer.write(
-            ",".join(headers) + "\r\n"
-        )
+        yield writer.writeheader() or pseudo_buffer.write(",".join(headers) + "\r\n")
         for row in rows:
             yield writer.writerow(row)
 
@@ -79,12 +77,16 @@ def export_to_xlsx(
         if count >= XLSX_ROW_LIMIT:
             truncated = True
             break
-        ws.append([str(row.get(h, "")) if row.get(h, "") is not None else "" for h in headers])
+        ws.append(
+            [str(row.get(h, "")) if row.get(h, "") is not None else "" for h in headers]
+        )
         count += 1
 
     if truncated:
         ws.append(
-            [f"[Exportación limitada a {XLSX_ROW_LIMIT} filas. Use ?format=csv para el dataset completo.]"]
+            [
+                f"[Exportación limitada a {XLSX_ROW_LIMIT} filas. Use ?format=csv para el dataset completo.]"
+            ]
             + [""] * (len(headers) - 1)
         )
 
