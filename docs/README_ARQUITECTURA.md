@@ -129,10 +129,13 @@ icm_backend/
 │   │   │   ├── test_admin.py                                   # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_models.py                                  # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_selectors.py                               # Reglas de negocio y transacciones del dominio
-│   │   │   ├── test_services.py                                # Cobertura crítica del módulo
+│   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_storage_templates.py                       # Cobertura crítica del módulo
 │   │   │   ├── test_storage_types.py                           # Cobertura crítica del módulo
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── management/
+│   │   │   └── commands/                                       # Comandos administrativos del módulo
+│   │   │       └── verify_stock_integrity.py                   # Comando Django para automatización operativa
 │   │   ├── models.py                                           # Entidades y constraints de persistencia
 │   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
 │   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
@@ -280,8 +283,9 @@ icm_backend/
 │   ├── mixins.py                                               # Mixins transversales para vistas
 │   ├── pagination.py                                           # Paginación reutilizable
 │   ├── openapi.py                                              # Tags OpenAPI y contratos compartidos
-│   └── utils/                                                  # Utilidades transversales
-│       └── validators.py                                       # Validadores reutilizables
+│   ├── utils/                                                  # Utilidades transversales
+│   │   └── validators.py                                       # Validadores reutilizables
+│   └── operating_hours.py
 ├── tests/                                                      # Tests de integración cross-módulo
 │   ├── factories.py                                            # Factories de datos de prueba
 │   ├── ers/                                                    # Suite Gherkin dinámica alineada al ERS
