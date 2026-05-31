@@ -155,3 +155,33 @@ def test_alerts_export_csv(authenticated_almacenista_client, db):
     content = b"".join(response.streaming_content).decode("utf-8")
     reader = csv.DictReader(io.StringIO(content))
     assert "alert_type" in reader.fieldnames
+
+
+# ── Parámetro export inválido ─────────────────────────────────────────────────
+
+
+@pytest.mark.django_db
+def test_export_unknown_param_returns_json(authenticated_almacenista_client, export_setup):
+    """?export=pdf (valor desconocido) → respuesta JSON normal, no error.
+
+    El parámetro ?export= ignora silenciosamente valores no reconocidos y
+    devuelve la respuesta JSON por defecto. Esta es la decisión de diseño:
+    no romper clientes que envíen parámetros desconocidos.
+    """
+    url = reverse("reports-movements-history") + "?export=pdf"
+    response = authenticated_almacenista_client.get(url)
+
+    assert response.status_code == 200
+    assert response["Content-Type"].startswith("application/json")
+    data = response.json()
+    assert isinstance(data, list)
+
+
+@pytest.mark.django_db
+def test_export_empty_param_returns_json(authenticated_almacenista_client, export_setup):
+    """?export= (valor vacío) → respuesta JSON normal."""
+    url = reverse("reports-movements-history") + "?export="
+    response = authenticated_almacenista_client.get(url)
+
+    assert response.status_code == 200
+    assert response["Content-Type"].startswith("application/json")
