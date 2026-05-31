@@ -9,7 +9,7 @@ from uuid import UUID
 
 from django.core.files.base import ContentFile
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Case, F, IntegerField, Q, Sum, When
 from django.utils import timezone
 
 from apps.alerts import services as alert_services
@@ -842,22 +842,92 @@ def register_adjustment(
     return movement
 
 
+_CORRECTABLE_TYPES = {
+    MovementType.TRASLADO,
+    MovementType.ENTRADA,
+    MovementType.SALIDA_VENTA_MAYOR,
+    MovementType.SALIDA_VENTA_MENOR,
+}
+
+
+def _reverse_entrada_stock(user, original: Movement) -> Movement:
+    """Reversa el efecto de stock de una ENTRADA creando una SALIDA_DANO interna."""
+    origin = _lock_stock(original.product_id, original.destination_location_id)
+    before = origin.current_stock
+    after = before - original.quantity
+    if after < 0:
+        raise InsufficientStockError(
+            detail={
+                "location_id": str(original.destination_location_id),
+                "available": before,
+                "requested": original.quantity,
+            }
+        )
+    origin.current_stock = after
+    origin.last_movement_at = timezone.now()
+    origin.save(update_fields=["current_stock", "last_movement_at", "updated_at"])
+    return Movement.objects.create(
+        movement_type=MovementType.SALIDA_DANO,
+        product_id=original.product_id,
+        lot=original.lot,
+        origin_location_id=original.destination_location_id,
+        quantity=original.quantity,
+        stock_previo_origen=before,
+        stock_resultante_origen=after,
+        executed_by=user,
+        related_movement=original,
+    )
+
+
+def _reverse_salida_stock(user, original: Movement) -> Movement:
+    """Reversa el efecto de stock de una SALIDA creando una ENTRADA interna."""
+    dest = _lock_stock(original.product_id, original.origin_location_id)
+    before = dest.current_stock
+    after = before + original.quantity
+    dest.current_stock = after
+    dest.last_movement_at = timezone.now()
+    dest.save(update_fields=["current_stock", "last_movement_at", "updated_at"])
+    return Movement.objects.create(
+        movement_type=MovementType.ENTRADA,
+        product_id=original.product_id,
+        lot=original.lot,
+        destination_location_id=original.origin_location_id,
+        quantity=original.quantity,
+        stock_previo_destino=before,
+        stock_resultante_destino=after,
+        executed_by=user,
+        related_movement=original,
+    )
+
+
 @transaction.atomic
 def correct_movement_within_window(
     user, movement_id: UUID, corrected_data: dict[str, Any]
 ) -> list[Movement]:
     """
-    BR-06 — Autocorrección de traslado dentro de 5 minutos desde `created_at` (PROMPT FASE LÓGICA).
+    BR-06 — Autocorrección dentro de 5 minutos para TRASLADO, ENTRADA y SALIDA_VENTA_*.
 
-    Implementación: traslado inverso + traslado corregido; sin mutar el movimiento original (BR-10).
+    Implementación: reversal interno (sin mutar el original, BR-10) + movimiento corregido.
+
+    corrected_data keys:
+      - TRASLADO: origin_id, destination_id, quantity
+      - ENTRADA:  location_id, quantity  (+ lot_code, serial_number, etc. opcionales)
+      - SALIDA:   location_id, quantity, movement_type
 
     Raises:
         UnauthorizedDomainActionError: Usuario distinto al autor.
         ImmutableRecordError: Ventana de 5 minutos cerrada.
+        DomainValidationError: Tipo de movimiento no corregible.
     """
+    from shared.exceptions import DomainValidationError
+
     original = Movement.objects.select_related("product").get(pk=movement_id)
-    if original.movement_type != MovementType.TRASLADO:
-        raise ValueError("Solo se soporta corrección de traslados en esta versión.")
+
+    if original.movement_type not in _CORRECTABLE_TYPES:
+        raise DomainValidationError(
+            f"Las correcciones dentro de ventana aplican solo para: "
+            f"{', '.join(_CORRECTABLE_TYPES)}. Tipo recibido: {original.movement_type}."
+        )
     if original.executed_by_id != user.id:
         raise UnauthorizedDomainActionError(
             "Solo el autor del movimiento puede corregirlo."
@@ -867,38 +937,66 @@ def correct_movement_within_window(
             "La ventana de autocorrección (5 minutos) ya cerró para este movimiento."
         )
 
-    new_origin = UUID(str(corrected_data["origin_id"]))
-    new_dest = UUID(str(corrected_data["destination_id"]))
-    new_qty = int(corrected_data["quantity"])
-    if new_origin == new_dest:
-        raise ValueError("Origen y destino deben ser distintos.")
+    if original.movement_type == MovementType.TRASLADO:
+        new_origin = UUID(str(corrected_data["origin_id"]))
+        new_dest = UUID(str(corrected_data["destination_id"]))
+        new_qty = int(corrected_data["quantity"])
+        if new_origin == new_dest:
+            raise DomainValidationError("Origen y destino deben ser distintos.")
 
-    # Los ACKs se propagan del movimiento original: el usuario ya los reconoció
-    # al crear el traslado inicial. La corrección no debe exigirlos de nuevo (BR-06).
-    rev = register_internal_transfer(
-        user,
-        original.product_id,
-        UUID(str(original.destination_location_id)),
-        UUID(str(original.origin_location_id)),
-        int(original.quantity),
-        cold_chain_acknowledged=True,
-        electrical_safety_acknowledged=True,
-    )
+        # Los ACKs se propagan del original: el usuario ya los reconoció (BR-06).
+        rev = register_internal_transfer(
+            user,
+            original.product_id,
+            UUID(str(original.destination_location_id)),
+            UUID(str(original.origin_location_id)),
+            int(original.quantity),
+            cold_chain_acknowledged=True,
+            electrical_safety_acknowledged=True,
+        )
+        fixed = register_internal_transfer(
+            user,
+            original.product_id,
+            new_origin,
+            new_dest,
+            new_qty,
+            cold_chain_acknowledged=True,
+            electrical_safety_acknowledged=True,
+            related_movement=original,
+        )
 
-    fixed = register_internal_transfer(
-        user,
-        original.product_id,
-        new_origin,
-        new_dest,
-        new_qty,
-        cold_chain_acknowledged=True,
-        electrical_safety_acknowledged=True,
-        related_movement=original,
-    )
+    elif original.movement_type == MovementType.ENTRADA:
+        rev = _reverse_entrada_stock(user, original)
+        fixed = register_entry(
+            user,
+            product_id=original.product_id,
+            location_id=UUID(str(corrected_data["location_id"])),
+            quantity=int(corrected_data["quantity"]),
+            lot_code=corrected_data.get("lot_code"),
+            lot_expiration_date=corrected_data.get("lot_expiration_date"),
+            serial_number=corrected_data.get("serial_number"),
+            cold_chain_acknowledged=True,
+            electrical_safety_acknowledged=True,
+        )
+
+    else:
+        # SALIDA_VENTA_MAYOR / SALIDA_VENTA_MENOR
+        rev = _reverse_salida_stock(user, original)
+        fixed_list = register_dispatch(
+            user,
+            product_id=original.product_id,
+            location_id=UUID(str(corrected_data["location_id"])),
+            quantity=int(corrected_data["quantity"]),
+            movement_type=corrected_data.get("movement_type", original.movement_type),
+            cold_chain_acknowledged=True,
+            electrical_safety_acknowledged=True,
+            privacy_notice_acknowledged=True,
+        )
+        fixed = fixed_list[0] if isinstance(fixed_list, list) else fixed_list
 
     log_event(
         AuditEventType.MOVEMENT_CORRECTED,
-        description="Corrección de traslado (BR-06)",
+        description=f"Corrección de {original.movement_type} (BR-06)",
         user=user,
         movement=fixed,
         detail={"original_id": str(original.id), "reversal_movement_id": str(rev.id)},
@@ -906,87 +1004,88 @@ def correct_movement_within_window(
     return [rev, fixed]
 
 
-def ledger_net_quantity_for_location(*, product_id: UUID, location_id: UUID) -> int:
+_SALIDA_TYPES = [
+    MovementType.SALIDA_VENTA_MAYOR,
+    MovementType.SALIDA_VENTA_MENOR,
+    MovementType.SALIDA_DANO,
+    MovementType.SALIDA_VENCIMIENTO,
+    MovementType.SALIDA_COMBO,
+]
+
+
+def _ledger_net_qty(
+    *, product_id: UUID, location_id: UUID, lot_id: UUID | None = None
+) -> int:
     """
-    Suma algebraica inferida desde el ledger para verificación de consistencia (BR-11).
+    Calcula el stock neto de un producto en una ubicación mediante SQL agregado (O(1) query).
 
     Convención: entradas suman en destino; salidas restan en origen; traslados afectan ambos;
     devoluciones con destino suman; ajustes según origen/destino.
     """
-    total = 0
-    qs = Movement.objects.filter(product_id=product_id).order_by("created_at")
-    for m in qs.iterator():
-        if (
-            m.movement_type == MovementType.ENTRADA
-            and m.destination_location_id == location_id
-        ):
-            total += m.quantity
-        elif m.movement_type in {
-            MovementType.SALIDA_VENTA_MAYOR,
-            MovementType.SALIDA_VENTA_MENOR,
-            MovementType.SALIDA_DANO,
-            MovementType.SALIDA_VENCIMIENTO,
-            MovementType.SALIDA_COMBO,
-        }:
-            if m.origin_location_id == location_id:
-                total -= m.quantity
-        elif m.movement_type == MovementType.TRASLADO:
-            if m.origin_location_id == location_id:
-                total -= m.quantity
-            if m.destination_location_id == location_id:
-                total += m.quantity
-        elif m.movement_type == MovementType.AJUSTE:
-            if m.destination_location_id == location_id:
-                total += m.quantity
-            if m.origin_location_id == location_id:
-                total -= m.quantity
-        elif (
-            m.movement_type == MovementType.DEVOLUCION
-            and m.destination_location_id == location_id
-        ):
-            total += m.quantity
-    return total
+    qs = Movement.objects.filter(product_id=product_id)
+    if lot_id is not None:
+        qs = qs.filter(lot_id=lot_id)
+
+    result = qs.aggregate(
+        net=Sum(
+            Case(
+                When(
+                    movement_type=MovementType.ENTRADA,
+                    destination_location_id=location_id,
+                    then=F("quantity"),
+                ),
+                When(
+                    movement_type__in=_SALIDA_TYPES,
+                    origin_location_id=location_id,
+                    then=-F("quantity"),
+                ),
+                # TRASLADO resta en origen
+                When(
+                    movement_type=MovementType.TRASLADO,
+                    origin_location_id=location_id,
+                    then=-F("quantity"),
+                ),
+                # TRASLADO suma en destino
+                When(
+                    movement_type=MovementType.TRASLADO,
+                    destination_location_id=location_id,
+                    then=F("quantity"),
+                ),
+                When(
+                    movement_type=MovementType.AJUSTE,
+                    destination_location_id=location_id,
+                    then=F("quantity"),
+                ),
+                When(
+                    movement_type=MovementType.AJUSTE,
+                    origin_location_id=location_id,
+                    then=-F("quantity"),
+                ),
+                When(
+                    movement_type=MovementType.DEVOLUCION,
+                    destination_location_id=location_id,
+                    then=F("quantity"),
+                ),
+                default=0,
+                output_field=IntegerField(),
+            )
+        )
+    )
+    return result["net"] or 0
+
+
+def ledger_net_quantity_for_location(*, product_id: UUID, location_id: UUID) -> int:
+    """Suma algebraica inferida desde el ledger para verificación de consistencia (BR-11)."""
+    return _ledger_net_qty(product_id=product_id, location_id=location_id)
 
 
 def ledger_net_quantity_for_lot_location(
     *, product_id: UUID, lot_id: UUID, location_id: UUID
 ) -> int:
     """Suma algebraica del ledger para un lote específico en una ubicación."""
-    total = 0
-    qs = Movement.objects.filter(product_id=product_id, lot_id=lot_id).order_by(
-        "created_at"
+    return _ledger_net_qty(
+        product_id=product_id, location_id=location_id, lot_id=lot_id
     )
-    for m in qs.iterator():
-        if (
-            m.movement_type == MovementType.ENTRADA
-            and m.destination_location_id == location_id
-        ):
-            total += m.quantity
-        elif m.movement_type in {
-            MovementType.SALIDA_VENTA_MAYOR,
-            MovementType.SALIDA_VENTA_MENOR,
-            MovementType.SALIDA_DANO,
-            MovementType.SALIDA_VENCIMIENTO,
-            MovementType.SALIDA_COMBO,
-        }:
-            if m.origin_location_id == location_id:
-                total -= m.quantity
-        elif m.movement_type == MovementType.TRASLADO:
-            if m.origin_location_id == location_id:
-                total -= m.quantity
-            if m.destination_location_id == location_id:
-                total += m.quantity
-        elif m.movement_type == MovementType.AJUSTE:
-            if m.destination_location_id == location_id:
-                total += m.quantity
-            if m.origin_location_id == location_id:
-                total -= m.quantity
-        elif (
-            m.movement_type == MovementType.DEVOLUCION
-            and m.destination_location_id == location_id
-        ):
-            total += m.quantity
-    return total
 
 
 def available_lots_at_location(
@@ -994,66 +1093,78 @@ def available_lots_at_location(
 ) -> list[dict[str, Any]]:
     """Retorna lotes con stock positivo en una ubicación, ordenados por vencimiento.
 
-    Usa una única consulta al ledger en lugar de N consultas (una por lote).
+    Usa SQL agregado (O(1) query) en lugar de iterar el ledger completo.
     """
-    from django.db import models as _models
-
-    lots_qs = (
-        Lot.objects.filter(product_id=product_id)
-        .select_related("product")
-        .order_by("expiration_date", "code")
+    rows = (
+        Movement.objects.filter(product_id=product_id)
+        .filter(
+            Q(origin_location_id=location_id) | Q(destination_location_id=location_id)
+        )
+        .exclude(lot_id=None)
+        .values("lot_id")
+        .annotate(
+            available=Sum(
+                Case(
+                    When(
+                        movement_type=MovementType.ENTRADA,
+                        destination_location_id=location_id,
+                        then=F("quantity"),
+                    ),
+                    When(
+                        movement_type__in=_SALIDA_TYPES,
+                        origin_location_id=location_id,
+                        then=-F("quantity"),
+                    ),
+                    When(
+                        movement_type=MovementType.TRASLADO,
+                        origin_location_id=location_id,
+                        then=-F("quantity"),
+                    ),
+                    When(
+                        movement_type=MovementType.TRASLADO,
+                        destination_location_id=location_id,
+                        then=F("quantity"),
+                    ),
+                    When(
+                        movement_type=MovementType.AJUSTE,
+                        destination_location_id=location_id,
+                        then=F("quantity"),
+                    ),
+                    When(
+                        movement_type=MovementType.AJUSTE,
+                        origin_location_id=location_id,
+                        then=-F("quantity"),
+                    ),
+                    When(
+                        movement_type=MovementType.DEVOLUCION,
+                        destination_location_id=location_id,
+                        then=F("quantity"),
+                    ),
+                    default=0,
+                    output_field=IntegerField(),
+                )
+            )
+        )
+        .filter(available__gt=0)
     )
-    lots: dict[UUID, Lot] = {lot.id: lot for lot in lots_qs}
-    if not lots:
+
+    lot_ids = [r["lot_id"] for r in rows]
+    if not lot_ids:
         return []
 
-    inventory: dict[UUID, int] = {lid: 0 for lid in lots}
-    _salida_types = {
-        MovementType.SALIDA_VENTA_MAYOR,
-        MovementType.SALIDA_VENTA_MENOR,
-        MovementType.SALIDA_DANO,
-        MovementType.SALIDA_VENCIMIENTO,
-        MovementType.SALIDA_COMBO,
+    lot_map = {
+        lot.id: lot
+        for lot in Lot.objects.filter(id__in=lot_ids).select_related("product")
     }
-    qs = Movement.objects.filter(
-        product_id=product_id,
-        lot_id__in=lots.keys(),
-    ).filter(
-        _models.Q(origin_location_id=location_id)
-        | _models.Q(destination_location_id=location_id)
-    )
-    for m in qs.iterator():
-        lid = m.lot_id
-        if lid not in inventory:
-            continue
-        if (
-            m.movement_type == MovementType.ENTRADA
-            and m.destination_location_id == location_id
-        ):
-            inventory[lid] += m.quantity
-        elif m.movement_type in _salida_types and m.origin_location_id == location_id:
-            inventory[lid] -= m.quantity
-        elif m.movement_type == MovementType.TRASLADO:
-            if m.origin_location_id == location_id:
-                inventory[lid] -= m.quantity
-            if m.destination_location_id == location_id:
-                inventory[lid] += m.quantity
-        elif m.movement_type == MovementType.AJUSTE:
-            if m.destination_location_id == location_id:
-                inventory[lid] += m.quantity
-            if m.origin_location_id == location_id:
-                inventory[lid] -= m.quantity
-        elif (
-            m.movement_type == MovementType.DEVOLUCION
-            and m.destination_location_id == location_id
-        ):
-            inventory[lid] += m.quantity
 
-    return [
-        {"lot": lots[lid], "available": inventory[lid]}
-        for lid in sorted(lots, key=lambda x: (lots[x].expiration_date, lots[x].code))
-        if inventory[lid] > 0
-    ]
+    return sorted(
+        [
+            {"lot": lot_map[r["lot_id"]], "available": r["available"]}
+            for r in rows
+            if r["lot_id"] in lot_map
+        ],
+        key=lambda x: (x["lot"].expiration_date, x["lot"].code),
+    )
 
 
 @transaction.atomic

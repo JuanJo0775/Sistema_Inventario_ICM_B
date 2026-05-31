@@ -102,6 +102,8 @@ class Movement(models.Model):
             models.Index(fields=("origin_location", "created_at")),
             models.Index(fields=("destination_location", "created_at")),
             models.Index(fields=("invoice_number",)),
+            models.Index(fields=("lot",), name="movements_movement_lot_idx"),
+            models.Index(fields=("product", "lot"), name="movements_mov_prod_lot_idx"),
         ]
         constraints = [
             models.UniqueConstraint(
