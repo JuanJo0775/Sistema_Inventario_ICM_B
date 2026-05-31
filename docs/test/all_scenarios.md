@@ -1244,6 +1244,8 @@ Validar el criterio de aceptación Gherkin del ERS ICM para RF004 — escenario 
 - El sistema muestra un mensaje claro indicando que no se encontraron resultados para ese criterio de búsqueda
 - No genera ningún error ni interrupción en la interfaz
 
+---
+
 ## Resultado esperado (Then)
 
 Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
@@ -1254,6 +1256,583 @@ Ejecutar:
 
 ```bash
 pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S07 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF004-S08.md -->
+# Crear tipo de almacenamiento y asignarlo a una ubicación
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF004_S08`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF004 — escenario 8.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF004` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- El usuario autenticado tiene rol Almacenista
+
+**When (Cuando):**
+- Crea un StorageType con code=bodega-grande, name=Bodega Grande y category=warehouse
+- Crea una Location indicando el storage_type_id del paso anterior
+
+**Then (Entonces):**
+- Ambas peticiones retornan HTTP 201
+- La ubicación expone storage_type_code=bodega-grande en su respuesta
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S08 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF004-S09.md -->
+# Tipo de almacenamiento inactivo rechazado al crear ubicación
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF004_S09`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF004 — escenario 9.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF004` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe un StorageType que fue desactivado por el Almacenista (is_active=False)
+
+**When (Cuando):**
+- El Almacenista intenta crear una ubicación asignando ese storage_type_id
+
+**Then (Entonces):**
+- El sistema retorna HTTP 400 o 422
+- El mensaje de error indica que el tipo de almacenamiento está inactivo y no puede asignarse
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S09 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF004-S10.md -->
+# Plantilla de almacenamiento aplica defaults al crear ubicación
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF004_S10`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF004 — escenario 10.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF004` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una StorageTemplate activa con defaults: max_capacity=40, capacity_mode=relative_scale, capacity_level=2
+
+**When (Cuando):**
+- El Almacenista crea una ubicación indicando únicamente el storage_template_id
+
+**Then (Entonces):**
+- El sistema retorna HTTP 201
+- La ubicación hereda max_capacity=40, capacity_mode=relative_scale y capacity_level=2 desde la plantilla
+- El storage_type de la plantilla queda asignado a la ubicación si la plantilla lo tenía configurado
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S10 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF004-S11.md -->
+# Transición a estado mantenimiento bloquea despacho desde esa ubicación
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF004_S11`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF004 — escenario 11.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF004` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una ubicación activa con stock disponible de un producto
+
+**When (Cuando):**
+- El Almacenista transiciona la ubicación al estado maintenance via el endpoint de transiciones de estado
+- Luego se intenta registrar un despacho de stock desde esa ubicación
+
+**Then (Entonces):**
+- La transición retorna HTTP 200 con operational_status=maintenance e is_active=true
+- El despacho retorna HTTP 422 con código de error LOCATION_STATE_NOT_ALLOWED
+- El stock de la ubicación no se modifica
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S11 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF004-S12.md -->
+# Archivar una ubicación fuerza is_active=False
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF004_S12`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF004 — escenario 12.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF004` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una ubicación activa
+
+**When (Cuando):**
+- El Almacenista transiciona la ubicación al estado archived
+
+**Then (Entonces):**
+- El sistema retorna HTTP 200
+- La respuesta muestra operational_status=archived e is_active=false
+- La ubicación no aparece en listados de ubicaciones activas
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S12 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF004-S13.md -->
+# Ubicación archivada rechaza entradas de stock
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF004_S13`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF004 — escenario 13.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF004` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una ubicación con estado archived
+
+**When (Cuando):**
+- Se intenta registrar una entrada de mercancía hacia esa ubicación
+
+**Then (Entonces):**
+- El sistema retorna HTTP 422 con código LOCATION_STATE_NOT_ALLOWED
+- El stock de la ubicación no cambia
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S13 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF004-S14.md -->
+# Ubicación restringida bloquea despacho pero permite entrada
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF004_S14`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF004 — escenario 14.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF004` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una ubicación con estado restricted y con stock disponible de un producto
+
+**When (Cuando):**
+- Se intenta registrar un despacho de stock desde esa ubicación (debe fallar)
+- Se intenta registrar una entrada de stock hacia esa ubicación (debe funcionar)
+
+**Then (Entonces):**
+- El despacho retorna HTTP 422 con código LOCATION_STATE_NOT_ALLOWED
+- La entrada retorna HTTP 201 y el stock de la ubicación incrementa correctamente
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S14 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF004-S15.md -->
+# Capacidad relativa se guarda y se expone en la ubicación y en reportes
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF004_S15`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF004 — escenario 15.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF004` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- El Almacenista va a configurar una ubicación con escala relativa de capacidad
+
+**When (Cuando):**
+- Crea la ubicación con capacity_mode=relative_scale, capacity_level=3 y capacity_score=30
+
+**Then (Entonces):**
+- El sistema retorna HTTP 201 con esos campos en la respuesta
+- El endpoint GET /api/v1/reports/warehouse-utilization/ incluye esa ubicación con capacity_level=3 en by_location
+- La capacidad relativa es informativa y no bloquea movimientos
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S15 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF004-S16.md -->
+# Filtro de inventario por storage_type_id muestra solo productos de ese tipo
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF004_S16`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF004 — escenario 16.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF004` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existen dos tipos de almacenamiento (Tipo A y Tipo B) con ubicaciones y stock de productos distintos en cada uno
+
+**When (Cuando):**
+- Se consulta GET /api/v1/inventory/?storage_type_id=<id_tipo_A>
+
+**Then (Entonces):**
+- Solo aparecen productos que tienen stock en ubicaciones del Tipo A
+- Productos exclusivos del Tipo B no aparecen en la respuesta
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S16 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF004-S17.md -->
+# Filtro de inventario por estado operativo muestra solo ubicaciones en ese estado
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF004_S17`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF004 — escenario 17.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF004` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Una ubicación con estado active y una con estado maintenance, ambas con stock del mismo producto
+
+**When (Cuando):**
+- Se consulta GET /api/v1/inventory/?operational_status=maintenance
+
+**Then (Entonces):**
+- Solo aparece el producto con stock en la ubicación en mantenimiento
+- La ubicación activa no influye en los resultados
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S17 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF004-S18.md -->
+# Reporte de utilización agrupa ubicaciones por tipo de almacenamiento
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF004_S18`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF004 — escenario 18.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF004` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existen dos ubicaciones asignadas al mismo StorageType, cada una con stock registrado
+
+**When (Cuando):**
+- Se consulta GET /api/v1/reports/warehouse-utilization/
+
+**Then (Entonces):**
+- La sección by_storage_type contiene un bucket para ese tipo con locations=2 y occupied_units igual a la suma del stock de ambas ubicaciones
+- La sección by_operational_status contiene un bucket correspondiente al estado operativo de esas ubicaciones
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF004_S18 -v
 ```
 
 Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
@@ -5094,12 +5673,12 @@ La siguiente tabla presenta un resumen de todos los requisitos especificados en 
 | RF-001 | Inicio de Sesión con Credenciales Únicas | Autenticación | BR-01, BR-03 |
 | RF-002 | Gestión de Credenciales de Usuario | Autenticación | BR-01, BR-02 |
 | RF-003 | Registro de Producto en el Catálogo (SKU) | Gestión de Inventario | BR-04, BR-11, BR-12, BR-13 |
-| RF-004 | Consulta y Búsqueda de Inventario en Tiempo Real | Gestión de Inventario | BR-11, BR-13 |
-| RF-005 | Recepción de Mercancía | Recepción de Mercancía | BR-04, BR-09, BR-10, BR-11, BR-13 |
-| RF-006 | Despacho y Salidas de Inventario | Despacho y Salidas | BR-08, BR-10, BR-11, BR-13 |
-| RF-007 | Movimientos Internos entre Ubicaciones | Movimientos Internos | BR-06, BR-10, BR-11 |
-| RF-008 | Registro de Devoluciones de Productos | Devoluciones | BR-02, BR-05, BR-10 |
-| RF-009 | Ajustes de Inventario | Ajustes de Inventario | BR-06, BR-07, BR-10, BR-11 |
+| RF-004 | Consulta y Búsqueda de Inventario en Tiempo Real | Gestión de Inventario | BR-11, BR-13, BR-14, BR-15 |
+| RF-005 | Recepción de Mercancía | Recepción de Mercancía | BR-04, BR-09, BR-10, BR-11, BR-13, BR-14 |
+| RF-006 | Despacho y Salidas de Inventario | Despacho y Salidas | BR-08, BR-10, BR-11, BR-13, BR-14 |
+| RF-007 | Movimientos Internos entre Ubicaciones | Movimientos Internos | BR-06, BR-10, BR-11, BR-14 |
+| RF-008 | Registro de Devoluciones de Productos | Devoluciones | BR-02, BR-05, BR-10, BR-14 |
+| RF-009 | Ajustes de Inventario | Ajustes de Inventario | BR-06, BR-07, BR-10, BR-11, BR-14 |
 | RF-010 | Reportes e Indicadores Operativos | Reportes e Indicadores | BR-10, BR-11, BR-13 |
 | RF-011 | Alertas Proactivas del Sistema | Alertas Proactivas | BR-04, BR-10, BR-11 |
 | RF-012 | Log de Auditoría y Trazabilidad | Auditoría y Trazabilidad | BR-01, BR-06, BR-07, BR-10 |
@@ -5118,7 +5697,7 @@ Los requisitos funcionales cubren la totalidad de los módulos identificados en 
 
 La redacción de los criterios de aceptación en formato Gherkin responde a una decisión deliberada orientada a facilitar el trabajo de la asignatura de Pruebas de Software: cada escenario puede ser convertido directamente en un caso de prueba sin necesidad de reinterpretación, lo que reduce el margen de error entre lo que el sistema debe hacer y lo que efectivamente se verifica en las fases de prueba.
 
-Este documento debe ser considerado un artefacto vivo durante el desarrollo del proyecto: cualquier cambio …
+Este documento debe ser considerado un artefacto vivo dura…
 
 ## Resultado esperado (Then)
 

@@ -718,6 +718,43 @@ assert product.sku in pdf_content
 
 ---
 
+#### BR-14: Estado Operativo de Ubicación Restringe Movimientos
+
+**Descripción**: El estado operativo de una ubicación (`OperationalStatus`) determina qué operaciones de stock puede ejecutar. Las ubicaciones en estado `archived` o `blocked` no admiten ningún movimiento. Las en estado `maintenance` o `restricted` no pueden operar como origen de despachos, traslados ni ajustes reductores, pero sí pueden recibir stock como destino. Solo el Almacenista puede cambiar el estado operativo.
+
+**Matriz de elegibilidad**:
+
+| Estado | Entrada (destino) | Despacho (origen) | Traslado destino | Devolución (destino) |
+|--------|:-----------------:|:-----------------:|:----------------:|:--------------------:|
+| active | ✅ | ✅ | ✅ | ✅ |
+| maintenance | ✅ | ❌ | ✅ | ✅ |
+| restricted | ✅ | ❌ | ✅ | ✅ |
+| blocked | ❌ | ❌ | ❌ | ❌ |
+| archived | ❌ | ❌ | ❌ | ❌ |
+
+**Implementación**:
+- `inventory.models.Location.OperationalStatus` — enum con los cinco estados.
+- `movements.services._ensure_location_allows_origin` — gate para operaciones de salida.
+- `movements.services._ensure_location_allows_destination` — gate para operaciones de entrada.
+- `shared.exceptions.LocationStateNotAllowedError` — excepción de dominio (HTTP 422).
+
+**Referencia**: RF-004, RF-005, RF-006, RF-007, RF-008, RF-009
+
+---
+
+#### BR-15: Tipo de Almacenamiento Activo como Requisito de Asignación
+
+**Descripción**: Un `StorageType` con `is_active=False` no puede asignarse a nuevas ubicaciones ni reasignarse a las existentes. La desactivación es soft (el tipo permanece en BD para no romper FKs existentes). Solo el Almacenista puede crear, modificar o desactivar tipos de almacenamiento.
+
+**Implementación**:
+- `inventory.services.create_location` — valida `storage_type.is_active` antes de asignar.
+- `inventory.services.update_location` — igual validación al cambiar `storage_type_id`.
+- `shared.exceptions.DomainValidationError` — lanzada con mensaje descriptivo (HTTP 422).
+
+**Referencia**: RF-004
+
+---
+
 ### 3.1.4 Auditoría y Reportes
 
 #### Reglas de Auditoría Derivadas de BR-10
@@ -756,6 +793,8 @@ assert product.sku in pdf_content
 | BR-11 | Stock por Ubicación + Ledger | Inventory | `StockByLocation` + `Movement` atómico + `reconstruct_stock_from_ledger` | Tests: sincronización y reconstrucción correcta |
 | BR-12 | SKU patrón | Catalog | Validador en `Product.sku` (`validate_sku_format`) | Tests: rechazo "ELECTRO001", aceptación "ELEC-0001" |
 | BR-13 | Factura PDF + Numeración | Movements | `generate_invoice_pdf` + secuencia atómica | Tests: PDF existe, numeración correcta |
+| BR-14 | Estado Operativo de Ubicación | Inventory/Movements | `_ensure_location_allows_origin` + `_ensure_location_allows_destination` en `movements/services.py`; `Location.OperationalStatus` en `inventory/models.py` | Tests: archived/blocked bloquean todo, maintenance/restricted bloquean origen |
+| BR-15 | StorageType Activo como Requisito | Inventory | Validación en `create_location`/`update_location`; `StorageType.is_active` | Tests: tipo inactivo rechazado en asignación |
 
 ---
 
@@ -1899,6 +1938,8 @@ Acceso: `GET /api/v1/docs/` → Swagger UI.
 - [ ] BR-11: Stock derivado sincronizado + reconstruible desde ledger.
 - [ ] BR-12: SKU validado contra el patrón 1–4 letras, guion, 1–4 dígitos.
 - [ ] BR-13: Facturas numeradas secuencialmente + PDF generado.
+- [ ] BR-14: Estado operativo de ubicación validado antes de cada movimiento (archived/blocked rechazan todo, maintenance/restricted rechazan origen).
+- [ ] BR-15: StorageType inactivo rechazado al asignar a ubicaciones nuevas o existentes.
 
 ### Transacciones y Consistencia
 
@@ -1970,12 +2011,12 @@ Documentacion complementaria de este analisis:
 | RF-001 | Autenticacion | `apps/authentication/views.py`, `apps/authentication/services.py`, `shared/permissions.py` | BR-01, BR-03 |
 | RF-002 | Credenciales | `apps/authentication/services.py`, `apps/authentication/views.py`, `apps/audit/services.py` | BR-01, BR-02 |
 | RF-003 | Catalogo | `apps/catalog/models.py`, `apps/catalog/services.py`, `apps/catalog/views.py` | BR-04, BR-12, BR-13 |
-| RF-004 | Consulta inventario | `apps/inventory/selectors.py`, `apps/inventory/views.py`, `apps/inventory/models.py` | BR-11, BR-13 |
-| RF-005 | Recepcion (entradas) | `apps/movements/services.py::register_entry`, `apps/movements/views.py`, `apps/inventory/models.py` | BR-04, BR-09, BR-10, BR-11, BR-13 |
-| RF-006 | Despacho/salidas | `apps/movements/services.py::register_dispatch`, `apps/catalog/services.py`, `apps/movements/models.py` | BR-08, BR-10, BR-11, BR-13 |
-| RF-007 | Traslados internos | `apps/movements/services.py::register_internal_transfer`, `apps/inventory/models.py` | BR-06, BR-10, BR-11 |
-| RF-008 | Devoluciones | `apps/movements/services.py::register_return`, `apps/movements/services.py::approve_return` | BR-02, BR-05, BR-10 |
-| RF-009 | Ajustes | `apps/movements/services.py::register_adjustment`, `apps/movements/services.py::correct_movement_within_window` | BR-06, BR-07, BR-10, BR-11 |
+| RF-004 | Consulta inventario | `apps/inventory/selectors.py`, `apps/inventory/views.py`, `apps/inventory/models.py` | BR-11, BR-13, BR-14, BR-15 |
+| RF-005 | Recepcion (entradas) | `apps/movements/services.py::register_entry`, `apps/movements/views.py`, `apps/inventory/models.py` | BR-04, BR-09, BR-10, BR-11, BR-13, BR-14 |
+| RF-006 | Despacho/salidas | `apps/movements/services.py::register_dispatch`, `apps/catalog/services.py`, `apps/movements/models.py` | BR-08, BR-10, BR-11, BR-13, BR-14 |
+| RF-007 | Traslados internos | `apps/movements/services.py::register_internal_transfer`, `apps/inventory/models.py` | BR-06, BR-10, BR-11, BR-14 |
+| RF-008 | Devoluciones | `apps/movements/services.py::register_return`, `apps/movements/services.py::approve_return` | BR-02, BR-05, BR-10, BR-14 |
+| RF-009 | Ajustes | `apps/movements/services.py::register_adjustment`, `apps/movements/services.py::correct_movement_within_window` | BR-06, BR-07, BR-10, BR-11, BR-14 |
 | RF-010 | Reportes/KPI | `apps/reports/selectors.py`, `apps/reports/views.py` | BR-10, BR-11, BR-13 |
 | RF-011 | Alertas | `apps/alerts/services.py`, `apps/alerts/models.py` | BR-04, BR-10, BR-11 |
 | RF-012 | Auditoria | `apps/audit/models.py`, `apps/audit/services.py`, `apps/audit/views.py` | BR-01, BR-06, BR-07, BR-10 |
@@ -1997,6 +2038,8 @@ Documentacion complementaria de este analisis:
 | BR-11 Stock por ubicacion | `StockByLocation` + traslados sin cambio global + ledger como fuente de verdad | Tests de consolidado y reconstruccion |
 | BR-12 SKU definido por usuario | Validadores y reglas en `catalog/services.py` y `catalog/models.py` | Tests de SKU inválido |
 | BR-13 Barcode alias + factura PDF | `resolve_identifier`, flujo fallback manual, numeracion secuencial y PDF en despacho | Tests de identificacion y facturacion |
+| BR-14 Estado operativo de ubicacion | `_ensure_location_allows_origin` + `_ensure_location_allows_destination` en `movements/services.py` | Tests de estados archived, blocked, maintenance, restricted |
+| BR-15 StorageType activo como requisito | Validacion en `create_location`/`update_location`; `StorageType.is_active` | Tests de tipo inactivo rechazado |
 
 ## 17. Matriz de Trazabilidad Completa (RNF -> Decisiones tecnicas)
 

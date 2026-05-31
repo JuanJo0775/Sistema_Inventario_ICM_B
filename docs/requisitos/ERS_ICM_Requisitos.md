@@ -53,6 +53,8 @@ Las siguientes reglas de negocio fueron identificadas durante las sesiones de el
 * BR-11 (Stock por ubicación): El stock total es la sumatoria dinámica de las cantidades en Vitrina, Bodega 1 y Bodega 2. Los traslados internos no modifican el stock total global.
 * BR-12 (SKU definido por usuario): El SKU es asignado por el usuario y debe seguir el patrón 1–4 letras, un guion, y 1–4 dígitos (ej: `AB-1234`). No es obligatorio aplicar un prefijo específico.
 * BR-13 (Código de barras como alias de escaneo y factura digital): Cada producto puede tener registrado un código de barras físico como alias de escaneo. La ausencia del lector físico no debe bloquear ningún flujo del sistema. Todo despacho confirmado genera automáticamente una factura digital con numeración secuencial, almacenada de forma persistente y descargable en PDF.
+* BR-14 (Estado operativo de ubicación restringe movimientos): El estado operativo de una ubicación determina qué operaciones de stock puede ejecutar. Las ubicaciones en estado `archived` o `blocked` no admiten ningún movimiento de entrada ni salida. Las ubicaciones en estado `maintenance` o `restricted` no pueden operar como origen de despachos, traslados o ajustes de reducción, pero sí pueden recibir stock como destino. Solo el Almacenista puede cambiar el estado operativo de una ubicación. Esta restricción es informativa respecto a la capacidad, pero operativa y no negociable respecto al estado.
+* BR-15 (Tipo de almacenamiento activo como requisito de asignación): Un tipo de almacenamiento (`StorageType`) con estado inactivo no puede asignarse a nuevas ubicaciones ni reasignarse a ubicaciones existentes. La desactivación de un tipo no afecta las ubicaciones que ya lo tenían asignado, las cuales conservan su tipo sin restricción adicional. Solo el Almacenista puede crear, modificar o desactivar tipos de almacenamiento y plantillas de configuración.
 
 # **5. Requisitos Funcionales**
 
@@ -378,10 +380,14 @@ Feature: Registro de producto en el catálogo
 
 El sistema debe ofrecer una interfaz de consulta del estado actual del stock que permita al usuario navegar el catálogo mediante filtros dinámicos multinivel, desde la categoría general hasta el SKU específico. La búsqueda debe ser accesible tanto por código de barras o SKU como por nombre con autocompletado, de modo que ambas vías sean igualmente eficientes. El sistema debe mostrar el stock desagregado por ubicación (Vitrina, Bodega 1, Bodega 2) y el stock total consolidado. Esta funcionalidad es crítica durante la atención al cliente en negociaciones comerciales, donde el vendedor necesita consultar disponibilidad en tiempo real sin interrumpir el flujo de conversación.
 
+Adicionalmente, el sistema extiende el dominio de almacenamiento con tipos configurables (`StorageType`) que clasifican las ubicaciones (bodega grande, vitrina, cuarto frío, etc.) y plantillas reutilizables (`StorageTemplate`) que permiten crear ubicaciones con parámetros predefinidos. Cada ubicación tiene un estado operativo formal que determina qué operaciones de stock puede realizar. La capacidad relativa de cada ubicación es informativa y no bloquea movimientos. El almacenista puede consultar el inventario filtrado por tipo de ubicación, estado operativo o categoría de producto, y los reportes de utilización presentan distribución por tipo de almacenamiento y por estado.
+
 **Reglas de Negocio Aplicables**
 
 * BR-11: El stock total es la sumatoria dinámica de las cantidades registradas en Vitrina, Bodega 1 y Bodega 2. Debe reflejar el estado real en todo momento.
 * BR-13: El código de barras actúa como alias de escaneo que el sistema resuelve internamente al SKU correspondiente, permitiendo búsquedas por esa vía de forma equivalente a cualquier otra.
+* BR-14: El estado operativo de la ubicación (active, maintenance, restricted, blocked, archived) determina si puede operar como origen o destino de movimientos. Ver detalle en BR-14.
+* BR-15: Un StorageType desactivado no puede asignarse a nuevas ubicaciones ni reasignarse a las existentes. Ver detalle en BR-15.
 
 **Criterios de Aceptación (Formato Gherkin)**
 
@@ -484,6 +490,167 @@ Feature: Consulta y búsqueda de inventario en tiempo real
 **Then (Entonces):**
 - El sistema muestra un mensaje claro indicando que no se encontraron resultados para ese criterio de búsqueda
 - No genera ningún error ni interrupción en la interfaz
+
+---
+
+### Scenario 8: Crear tipo de almacenamiento y asignarlo a una ubicación
+
+**Given (Dado que):**
+- El usuario autenticado tiene rol Almacenista
+
+**When (Cuando):**
+- Crea un StorageType con code=bodega-grande, name=Bodega Grande y category=warehouse
+- Crea una Location indicando el storage_type_id del paso anterior
+
+**Then (Entonces):**
+- Ambas peticiones retornan HTTP 201
+- La ubicación expone storage_type_code=bodega-grande en su respuesta
+
+---
+
+### Scenario 9: Tipo de almacenamiento inactivo rechazado al crear ubicación
+
+**Given (Dado que):**
+- Existe un StorageType que fue desactivado por el Almacenista (is_active=False)
+
+**When (Cuando):**
+- El Almacenista intenta crear una ubicación asignando ese storage_type_id
+
+**Then (Entonces):**
+- El sistema retorna HTTP 400 o 422
+- El mensaje de error indica que el tipo de almacenamiento está inactivo y no puede asignarse
+
+---
+
+### Scenario 10: Plantilla de almacenamiento aplica defaults al crear ubicación
+
+**Given (Dado que):**
+- Existe una StorageTemplate activa con defaults: max_capacity=40, capacity_mode=relative_scale, capacity_level=2
+
+**When (Cuando):**
+- El Almacenista crea una ubicación indicando únicamente el storage_template_id
+
+**Then (Entonces):**
+- El sistema retorna HTTP 201
+- La ubicación hereda max_capacity=40, capacity_mode=relative_scale y capacity_level=2 desde la plantilla
+- El storage_type de la plantilla queda asignado a la ubicación si la plantilla lo tenía configurado
+
+---
+
+### Scenario 11: Transición a estado mantenimiento bloquea despacho desde esa ubicación
+
+**Given (Dado que):**
+- Existe una ubicación activa con stock disponible de un producto
+
+**When (Cuando):**
+- El Almacenista transiciona la ubicación al estado maintenance via el endpoint de transiciones de estado
+- Luego se intenta registrar un despacho de stock desde esa ubicación
+
+**Then (Entonces):**
+- La transición retorna HTTP 200 con operational_status=maintenance e is_active=true
+- El despacho retorna HTTP 422 con código de error LOCATION_STATE_NOT_ALLOWED
+- El stock de la ubicación no se modifica
+
+---
+
+### Scenario 12: Archivar una ubicación fuerza is_active=False
+
+**Given (Dado que):**
+- Existe una ubicación activa
+
+**When (Cuando):**
+- El Almacenista transiciona la ubicación al estado archived
+
+**Then (Entonces):**
+- El sistema retorna HTTP 200
+- La respuesta muestra operational_status=archived e is_active=false
+- La ubicación no aparece en listados de ubicaciones activas
+
+---
+
+### Scenario 13: Ubicación archivada rechaza entradas de stock
+
+**Given (Dado que):**
+- Existe una ubicación con estado archived
+
+**When (Cuando):**
+- Se intenta registrar una entrada de mercancía hacia esa ubicación
+
+**Then (Entonces):**
+- El sistema retorna HTTP 422 con código LOCATION_STATE_NOT_ALLOWED
+- El stock de la ubicación no cambia
+
+---
+
+### Scenario 14: Ubicación restringida bloquea despacho pero permite entrada
+
+**Given (Dado que):**
+- Existe una ubicación con estado restricted y con stock disponible de un producto
+
+**When (Cuando):**
+- Se intenta registrar un despacho de stock desde esa ubicación (debe fallar)
+- Se intenta registrar una entrada de stock hacia esa ubicación (debe funcionar)
+
+**Then (Entonces):**
+- El despacho retorna HTTP 422 con código LOCATION_STATE_NOT_ALLOWED
+- La entrada retorna HTTP 201 y el stock de la ubicación incrementa correctamente
+
+---
+
+### Scenario 15: Capacidad relativa se guarda y se expone en la ubicación y en reportes
+
+**Given (Dado que):**
+- El Almacenista va a configurar una ubicación con escala relativa de capacidad
+
+**When (Cuando):**
+- Crea la ubicación con capacity_mode=relative_scale, capacity_level=3 y capacity_score=30
+
+**Then (Entonces):**
+- El sistema retorna HTTP 201 con esos campos en la respuesta
+- El endpoint GET /api/v1/reports/warehouse-utilization/ incluye esa ubicación con capacity_level=3 en by_location
+- La capacidad relativa es informativa y no bloquea movimientos
+
+---
+
+### Scenario 16: Filtro de inventario por storage_type_id muestra solo productos de ese tipo
+
+**Given (Dado que):**
+- Existen dos tipos de almacenamiento (Tipo A y Tipo B) con ubicaciones y stock de productos distintos en cada uno
+
+**When (Cuando):**
+- Se consulta GET /api/v1/inventory/?storage_type_id=<id_tipo_A>
+
+**Then (Entonces):**
+- Solo aparecen productos que tienen stock en ubicaciones del Tipo A
+- Productos exclusivos del Tipo B no aparecen en la respuesta
+
+---
+
+### Scenario 17: Filtro de inventario por estado operativo muestra solo ubicaciones en ese estado
+
+**Given (Dado que):**
+- Una ubicación con estado active y una con estado maintenance, ambas con stock del mismo producto
+
+**When (Cuando):**
+- Se consulta GET /api/v1/inventory/?operational_status=maintenance
+
+**Then (Entonces):**
+- Solo aparece el producto con stock en la ubicación en mantenimiento
+- La ubicación activa no influye en los resultados
+
+---
+
+### Scenario 18: Reporte de utilización agrupa ubicaciones por tipo de almacenamiento
+
+**Given (Dado que):**
+- Existen dos ubicaciones asignadas al mismo StorageType, cada una con stock registrado
+
+**When (Cuando):**
+- Se consulta GET /api/v1/reports/warehouse-utilization/
+
+**Then (Entonces):**
+- La sección by_storage_type contiene un bucket para ese tipo con locations=2 y occupied_units igual a la suma del stock de ambas ubicaciones
+- La sección by_operational_status contiene un bucket correspondiente al estado operativo de esas ubicaciones
 
 ## **RF-005 — Recepción de Mercancía (Entradas al Inventario)**
 
@@ -1884,12 +2051,12 @@ La siguiente tabla presenta un resumen de todos los requisitos especificados en 
 | RF-001 | Inicio de Sesión con Credenciales Únicas | Autenticación | BR-01, BR-03 |
 | RF-002 | Gestión de Credenciales de Usuario | Autenticación | BR-01, BR-02 |
 | RF-003 | Registro de Producto en el Catálogo (SKU) | Gestión de Inventario | BR-04, BR-11, BR-12, BR-13 |
-| RF-004 | Consulta y Búsqueda de Inventario en Tiempo Real | Gestión de Inventario | BR-11, BR-13 |
-| RF-005 | Recepción de Mercancía | Recepción de Mercancía | BR-04, BR-09, BR-10, BR-11, BR-13 |
-| RF-006 | Despacho y Salidas de Inventario | Despacho y Salidas | BR-08, BR-10, BR-11, BR-13 |
-| RF-007 | Movimientos Internos entre Ubicaciones | Movimientos Internos | BR-06, BR-10, BR-11 |
-| RF-008 | Registro de Devoluciones de Productos | Devoluciones | BR-02, BR-05, BR-10 |
-| RF-009 | Ajustes de Inventario | Ajustes de Inventario | BR-06, BR-07, BR-10, BR-11 |
+| RF-004 | Consulta y Búsqueda de Inventario en Tiempo Real | Gestión de Inventario | BR-11, BR-13, BR-14, BR-15 |
+| RF-005 | Recepción de Mercancía | Recepción de Mercancía | BR-04, BR-09, BR-10, BR-11, BR-13, BR-14 |
+| RF-006 | Despacho y Salidas de Inventario | Despacho y Salidas | BR-08, BR-10, BR-11, BR-13, BR-14 |
+| RF-007 | Movimientos Internos entre Ubicaciones | Movimientos Internos | BR-06, BR-10, BR-11, BR-14 |
+| RF-008 | Registro de Devoluciones de Productos | Devoluciones | BR-02, BR-05, BR-10, BR-14 |
+| RF-009 | Ajustes de Inventario | Ajustes de Inventario | BR-06, BR-07, BR-10, BR-11, BR-14 |
 | RF-010 | Reportes e Indicadores Operativos | Reportes e Indicadores | BR-10, BR-11, BR-13 |
 | RF-011 | Alertas Proactivas del Sistema | Alertas Proactivas | BR-04, BR-10, BR-11 |
 | RF-012 | Log de Auditoría y Trazabilidad | Auditoría y Trazabilidad | BR-01, BR-06, BR-07, BR-10 |

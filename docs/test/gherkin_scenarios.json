@@ -280,7 +280,139 @@
     "rf": "RF004",
     "scenario_number": 7,
     "title": "Búsqueda de un producto inexistente en el catálogo",
-    "given_when_then": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol\n\n**When (Cuando):**\n- Realiza una búsqueda por nombre, SKU o código de barras que no corresponde a ningún producto registrado\n\n**Then (Entonces):**\n- El sistema muestra un mensaje claro indicando que no se encontraron resultados para ese criterio de búsqueda\n- No genera ningún error ni interrupción en la interfaz",
+    "given_when_then": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol\n\n**When (Cuando):**\n- Realiza una búsqueda por nombre, SKU o código de barras que no corresponde a ningún producto registrado\n\n**Then (Entonces):**\n- El sistema muestra un mensaje claro indicando que no se encontraron resultados para ese criterio de búsqueda\n- No genera ningún error ni interrupción en la interfaz\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S08",
+    "rf": "RF004",
+    "scenario_number": 8,
+    "title": "Crear tipo de almacenamiento y asignarlo a una ubicación",
+    "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol Almacenista\n\n**When (Cuando):**\n- Crea un StorageType con code=bodega-grande, name=Bodega Grande y category=warehouse\n- Crea una Location indicando el storage_type_id del paso anterior\n\n**Then (Entonces):**\n- Ambas peticiones retornan HTTP 201\n- La ubicación expone storage_type_code=bodega-grande en su respuesta\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S09",
+    "rf": "RF004",
+    "scenario_number": 9,
+    "title": "Tipo de almacenamiento inactivo rechazado al crear ubicación",
+    "given_when_then": "**Given (Dado que):**\n- Existe un StorageType que fue desactivado por el Almacenista (is_active=False)\n\n**When (Cuando):**\n- El Almacenista intenta crear una ubicación asignando ese storage_type_id\n\n**Then (Entonces):**\n- El sistema retorna HTTP 400 o 422\n- El mensaje de error indica que el tipo de almacenamiento está inactivo y no puede asignarse\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S10",
+    "rf": "RF004",
+    "scenario_number": 10,
+    "title": "Plantilla de almacenamiento aplica defaults al crear ubicación",
+    "given_when_then": "**Given (Dado que):**\n- Existe una StorageTemplate activa con defaults: max_capacity=40, capacity_mode=relative_scale, capacity_level=2\n\n**When (Cuando):**\n- El Almacenista crea una ubicación indicando únicamente el storage_template_id\n\n**Then (Entonces):**\n- El sistema retorna HTTP 201\n- La ubicación hereda max_capacity=40, capacity_mode=relative_scale y capacity_level=2 desde la plantilla\n- El storage_type de la plantilla queda asignado a la ubicación si la plantilla lo tenía configurado\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S11",
+    "rf": "RF004",
+    "scenario_number": 11,
+    "title": "Transición a estado mantenimiento bloquea despacho desde esa ubicación",
+    "given_when_then": "**Given (Dado que):**\n- Existe una ubicación activa con stock disponible de un producto\n\n**When (Cuando):**\n- El Almacenista transiciona la ubicación al estado maintenance via el endpoint de transiciones de estado\n- Luego se intenta registrar un despacho de stock desde esa ubicación\n\n**Then (Entonces):**\n- La transición retorna HTTP 200 con operational_status=maintenance e is_active=true\n- El despacho retorna HTTP 422 con código de error LOCATION_STATE_NOT_ALLOWED\n- El stock de la ubicación no se modifica\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S12",
+    "rf": "RF004",
+    "scenario_number": 12,
+    "title": "Archivar una ubicación fuerza is_active=False",
+    "given_when_then": "**Given (Dado que):**\n- Existe una ubicación activa\n\n**When (Cuando):**\n- El Almacenista transiciona la ubicación al estado archived\n\n**Then (Entonces):**\n- El sistema retorna HTTP 200\n- La respuesta muestra operational_status=archived e is_active=false\n- La ubicación no aparece en listados de ubicaciones activas\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S13",
+    "rf": "RF004",
+    "scenario_number": 13,
+    "title": "Ubicación archivada rechaza entradas de stock",
+    "given_when_then": "**Given (Dado que):**\n- Existe una ubicación con estado archived\n\n**When (Cuando):**\n- Se intenta registrar una entrada de mercancía hacia esa ubicación\n\n**Then (Entonces):**\n- El sistema retorna HTTP 422 con código LOCATION_STATE_NOT_ALLOWED\n- El stock de la ubicación no cambia\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S14",
+    "rf": "RF004",
+    "scenario_number": 14,
+    "title": "Ubicación restringida bloquea despacho pero permite entrada",
+    "given_when_then": "**Given (Dado que):**\n- Existe una ubicación con estado restricted y con stock disponible de un producto\n\n**When (Cuando):**\n- Se intenta registrar un despacho de stock desde esa ubicación (debe fallar)\n- Se intenta registrar una entrada de stock hacia esa ubicación (debe funcionar)\n\n**Then (Entonces):**\n- El despacho retorna HTTP 422 con código LOCATION_STATE_NOT_ALLOWED\n- La entrada retorna HTTP 201 y el stock de la ubicación incrementa correctamente\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S15",
+    "rf": "RF004",
+    "scenario_number": 15,
+    "title": "Capacidad relativa se guarda y se expone en la ubicación y en reportes",
+    "given_when_then": "**Given (Dado que):**\n- El Almacenista va a configurar una ubicación con escala relativa de capacidad\n\n**When (Cuando):**\n- Crea la ubicación con capacity_mode=relative_scale, capacity_level=3 y capacity_score=30\n\n**Then (Entonces):**\n- El sistema retorna HTTP 201 con esos campos en la respuesta\n- El endpoint GET /api/v1/reports/warehouse-utilization/ incluye esa ubicación con capacity_level=3 en by_location\n- La capacidad relativa es informativa y no bloquea movimientos\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S16",
+    "rf": "RF004",
+    "scenario_number": 16,
+    "title": "Filtro de inventario por storage_type_id muestra solo productos de ese tipo",
+    "given_when_then": "**Given (Dado que):**\n- Existen dos tipos de almacenamiento (Tipo A y Tipo B) con ubicaciones y stock de productos distintos en cada uno\n\n**When (Cuando):**\n- Se consulta GET /api/v1/inventory/?storage_type_id=<id_tipo_A>\n\n**Then (Entonces):**\n- Solo aparecen productos que tienen stock en ubicaciones del Tipo A\n- Productos exclusivos del Tipo B no aparecen en la respuesta\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S17",
+    "rf": "RF004",
+    "scenario_number": 17,
+    "title": "Filtro de inventario por estado operativo muestra solo ubicaciones en ese estado",
+    "given_when_then": "**Given (Dado que):**\n- Una ubicación con estado active y una con estado maintenance, ambas con stock del mismo producto\n\n**When (Cuando):**\n- Se consulta GET /api/v1/inventory/?operational_status=maintenance\n\n**Then (Entonces):**\n- Solo aparece el producto con stock en la ubicación en mantenimiento\n- La ubicación activa no influye en los resultados\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S18",
+    "rf": "RF004",
+    "scenario_number": 18,
+    "title": "Reporte de utilización agrupa ubicaciones por tipo de almacenamiento",
+    "given_when_then": "**Given (Dado que):**\n- Existen dos ubicaciones asignadas al mismo StorageType, cada una con stock registrado\n\n**When (Cuando):**\n- Se consulta GET /api/v1/reports/warehouse-utilization/\n\n**Then (Entonces):**\n- La sección by_storage_type contiene un bucket para ese tipo con locations=2 y occupied_units igual a la suma del stock de ambas ubicaciones\n- La sección by_operational_status contiene un bucket correspondiente al estado operativo de esas ubicaciones",
     "source": "docs/requisitos/ERS_ICM_Requisitos.md",
     "automation_scope": {
       "reason": "",
@@ -1132,7 +1264,7 @@
     "rf": "RNF006",
     "scenario_number": 3,
     "title": "El equipo documenta la autorización de ICM antes de usar datos reales en pruebas",
-    "given_when_then": "**Given (Dado que):**\n- El equipo de desarrollo va a ejecutar pruebas de aceptación usando datos operativos reales de ICM en el Corte 3\n\n**When (Cuando):**\n- Se planifica la fase de pruebas de aceptación\n\n**Then (Entonces):**\n- El equipo debe contar con un documento de autorización expresa firmado por ICM que permita el uso de sus datos operativos en el contexto académico del proyecto\n- Las pruebas con datos reales no deben ejecutarse hasta que esa autorización esté formalmente obtenida\n\n# **7. Resumen de Trazabilidad Requisitos — Módulos**\n\nLa siguiente tabla presenta un resumen de todos los requisitos especificados en este documento, con su módulo de pertenencia y las reglas de negocio que les aplican directamente. Esta tabla constituye el punto de partida para la Matriz de Trazabilidad Requisitos-Pruebas que debe ser elaborada por la asignatura de Pruebas de Software como entregable del Corte 1.\n\n| **ID** | **Nombre** | **Módulo** | **Reglas de Negocio** |\n| --- | --- | --- | --- |\n| RF-001 | Inicio de Sesión con Credenciales Únicas | Autenticación | BR-01, BR-03 |\n| RF-002 | Gestión de Credenciales de Usuario | Autenticación | BR-01, BR-02 |\n| RF-003 | Registro de Producto en el Catálogo (SKU) | Gestión de Inventario | BR-04, BR-11, BR-12, BR-13 |\n| RF-004 | Consulta y Búsqueda de Inventario en Tiempo Real | Gestión de Inventario | BR-11, BR-13 |\n| RF-005 | Recepción de Mercancía | Recepción de Mercancía | BR-04, BR-09, BR-10, BR-11, BR-13 |\n| RF-006 | Despacho y Salidas de Inventario | Despacho y Salidas | BR-08, BR-10, BR-11, BR-13 |\n| RF-007 | Movimientos Internos entre Ubicaciones | Movimientos Internos | BR-06, BR-10, BR-11 |\n| RF-008 | Registro de Devoluciones de Productos | Devoluciones | BR-02, BR-05, BR-10 |\n| RF-009 | Ajustes de Inventario | Ajustes de Inventario | BR-06, BR-07, BR-10, BR-11 |\n| RF-010 | Reportes e Indicadores Operativos | Reportes e Indicadores | BR-10, BR-11, BR-13 |\n| RF-011 | Alertas Proactivas del Sistema | Alertas Proactivas | BR-04, BR-10, BR-11 |\n| RF-012 | Log de Auditoría y Trazabilidad | Auditoría y Trazabilidad | BR-01, BR-06, BR-07, BR-10 |\n| RNF-001 | Usabilidad e Interfaz Intuitiva | Transversal | — |\n| RNF-002 | Disponibilidad del Sistema | Transversal | BR-03 |\n| RNF-003 | Seguridad e Integridad de Datos | Transversal | BR-01, BR-02, BR-10 |\n| RNF-004 | Rendimiento en Consultas y Operaciones | Transversal | — |\n| RNF-005 | Mantenibilidad y Estándares Técnicos | Transversal | — |\n| RNF-006 | Cumplimiento Legal: Ley 1581 de 2012 | Transversal | — |\n\n# **8. Conclusiones**\n\nEl presente documento centraliza la especificación completa de dieciocho requisitos —doce funcionales y seis no funcionales— para el sistema de gestión de inventario y operaciones de Import Corporal Medical. Cada requisito ha sido elaborado a partir de la información recogida durante el proceso de elicitación con los responsables operativos de ICM y alineado con las condiciones académicas del Proyecto Nuclear 3.\n\nLos requisitos funcionales cubren la totalidad de los módulos identificados en la elicitación: autenticación y gestión de credenciales, gestión de inventario, recepción de mercancía, despacho y salidas, movimientos internos, devoluciones, ajustes de inventario, reportes e indicadores, alertas proactivas y auditoría. Los requisitos no funcionales complementan esta especificación con atributos de calidad medibles en usabilidad, disponibilidad, seguridad, rendimiento, mantenibilidad y cumplimiento legal.\n\nLa redacción de los criterios de aceptación en formato Gherkin responde a una decisión deliberada orientada a facilitar el trabajo de la asignatura de Pruebas de Software: cada escenario puede ser convertido directamente en un caso de prueba sin necesidad de reinterpretación, lo que reduce el margen de error entre lo que el sistema debe hacer y lo que efectivamente se verifica en las fases de prueba.\n\nEste documento debe ser considerado un artefacto vivo durante el desarrollo del proyecto: cualquier cambio en los requisitos acordado con el cliente funcional (estudiantes de Ingeniería Industrial) debe quedar registrado mediante una nueva versión del documento, garantizando la trazabilidad de los cambios a lo largo de los tres cortes académicos del período I-2026.\n\n# **9. Referencias Bibliográficas**\n\n* [1] Pressman, R. S. y Maxim, B. R. (2021). Ingeniería del software: Un enfoque práctico (9.ª ed.). McGraw-Hill.\n* [2] Bass, L., Clements, P. y Kazman, R. (2021). Software Architecture in Practice (4.ª ed.). Addison-Wesley.\n* [3] Myers, G. J., Sandler, C. y Badgett, T. (2011). The Art of Software Testing (3.ª ed.). Wiley.\n* [4] Ballou, R. H. (2004). Logística: Administración de la cadena de suministro (5.ª ed.). Pearson Educación.\n* [5] Schwaber, K. y Sutherland, J. (2020). La Guía Scrum. Recuperado de https://scrumguides.org\n* [6] Congreso de Colombia. (2012). Ley 1581 de 2012 — Protección de Datos Personales. Diario Oficial.\n* [7] IEEE. (1998). IEEE Std 830-1998: IEEE Recommended Practice for Software Requirements Specifications. Institute of Electrical and Electronics Engineers.",
+    "given_when_then": "**Given (Dado que):**\n- El equipo de desarrollo va a ejecutar pruebas de aceptación usando datos operativos reales de ICM en el Corte 3\n\n**When (Cuando):**\n- Se planifica la fase de pruebas de aceptación\n\n**Then (Entonces):**\n- El equipo debe contar con un documento de autorización expresa firmado por ICM que permita el uso de sus datos operativos en el contexto académico del proyecto\n- Las pruebas con datos reales no deben ejecutarse hasta que esa autorización esté formalmente obtenida\n\n# **7. Resumen de Trazabilidad Requisitos — Módulos**\n\nLa siguiente tabla presenta un resumen de todos los requisitos especificados en este documento, con su módulo de pertenencia y las reglas de negocio que les aplican directamente. Esta tabla constituye el punto de partida para la Matriz de Trazabilidad Requisitos-Pruebas que debe ser elaborada por la asignatura de Pruebas de Software como entregable del Corte 1.\n\n| **ID** | **Nombre** | **Módulo** | **Reglas de Negocio** |\n| --- | --- | --- | --- |\n| RF-001 | Inicio de Sesión con Credenciales Únicas | Autenticación | BR-01, BR-03 |\n| RF-002 | Gestión de Credenciales de Usuario | Autenticación | BR-01, BR-02 |\n| RF-003 | Registro de Producto en el Catálogo (SKU) | Gestión de Inventario | BR-04, BR-11, BR-12, BR-13 |\n| RF-004 | Consulta y Búsqueda de Inventario en Tiempo Real | Gestión de Inventario | BR-11, BR-13, BR-14, BR-15 |\n| RF-005 | Recepción de Mercancía | Recepción de Mercancía | BR-04, BR-09, BR-10, BR-11, BR-13, BR-14 |\n| RF-006 | Despacho y Salidas de Inventario | Despacho y Salidas | BR-08, BR-10, BR-11, BR-13, BR-14 |\n| RF-007 | Movimientos Internos entre Ubicaciones | Movimientos Internos | BR-06, BR-10, BR-11, BR-14 |\n| RF-008 | Registro de Devoluciones de Productos | Devoluciones | BR-02, BR-05, BR-10, BR-14 |\n| RF-009 | Ajustes de Inventario | Ajustes de Inventario | BR-06, BR-07, BR-10, BR-11, BR-14 |\n| RF-010 | Reportes e Indicadores Operativos | Reportes e Indicadores | BR-10, BR-11, BR-13 |\n| RF-011 | Alertas Proactivas del Sistema | Alertas Proactivas | BR-04, BR-10, BR-11 |\n| RF-012 | Log de Auditoría y Trazabilidad | Auditoría y Trazabilidad | BR-01, BR-06, BR-07, BR-10 |\n| RNF-001 | Usabilidad e Interfaz Intuitiva | Transversal | — |\n| RNF-002 | Disponibilidad del Sistema | Transversal | BR-03 |\n| RNF-003 | Seguridad e Integridad de Datos | Transversal | BR-01, BR-02, BR-10 |\n| RNF-004 | Rendimiento en Consultas y Operaciones | Transversal | — |\n| RNF-005 | Mantenibilidad y Estándares Técnicos | Transversal | — |\n| RNF-006 | Cumplimiento Legal: Ley 1581 de 2012 | Transversal | — |\n\n# **8. Conclusiones**\n\nEl presente documento centraliza la especificación completa de dieciocho requisitos —doce funcionales y seis no funcionales— para el sistema de gestión de inventario y operaciones de Import Corporal Medical. Cada requisito ha sido elaborado a partir de la información recogida durante el proceso de elicitación con los responsables operativos de ICM y alineado con las condiciones académicas del Proyecto Nuclear 3.\n\nLos requisitos funcionales cubren la totalidad de los módulos identificados en la elicitación: autenticación y gestión de credenciales, gestión de inventario, recepción de mercancía, despacho y salidas, movimientos internos, devoluciones, ajustes de inventario, reportes e indicadores, alertas proactivas y auditoría. Los requisitos no funcionales complementan esta especificación con atributos de calidad medibles en usabilidad, disponibilidad, seguridad, rendimiento, mantenibilidad y cumplimiento legal.\n\nLa redacción de los criterios de aceptación en formato Gherkin responde a una decisión deliberada orientada a facilitar el trabajo de la asignatura de Pruebas de Software: cada escenario puede ser convertido directamente en un caso de prueba sin necesidad de reinterpretación, lo que reduce el margen de error entre lo que el sistema debe hacer y lo que efectivamente se verifica en las fases de prueba.\n\nEste documento debe ser considerado un artefacto vivo durante el desarrollo del proyecto: cualquier cambio en los requisitos acordado con el cliente funcional (estudiantes de Ingeniería Industrial) debe quedar registrado mediante una nueva versión del documento, garantizando la trazabilidad de los cambios a lo largo de los tres cortes académicos del período I-2026.\n\n# **9. Referencias Bibliográficas**\n\n* [1] Pressman, R. S. y Maxim, B. R. (2021). Ingeniería del software: Un enfoque práctico (9.ª ed.). McGraw-Hill.\n* [2] Bass, L., Clements, P. y Kazman, R. (2021). Software Architecture in Practice (4.ª ed.). Addison-Wesley.\n* [3] Myers, G. J., Sandler, C. y Badgett, T. (2011). The Art of Software Testing (3.ª ed.). Wiley.\n* [4] Ballou, R. H. (2004). Logística: Administración de la cadena de suministro (5.ª ed.). Pearson Educación.\n* [5] Schwaber, K. y Sutherland, J. (2020). La Guía Scrum. Recuperado de https://scrumguides.org\n* [6] Congreso de Colombia. (2012). Ley 1581 de 2012 — Protección de Datos Personales. Diario Oficial.\n* [7] IEEE. (1998). IEEE Std 830-1998: IEEE Recommended Practice for Software Requirements Specifications. Institute of Electrical and Electronics Engineers.",
     "source": "docs/requisitos/ERS_ICM_Requisitos.md",
     "automation_scope": {
       "reason": "",

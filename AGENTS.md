@@ -8,7 +8,7 @@ Propósito: proporcionar una guía rápida y completa en la raíz del repositori
 
 | Documento | Propósito |
 |-----------|-----------|
-| `docs/README_ARQUITECTURA.md` | Arquitectura modular, ledger + stock derivado, BR-01…BR-13, SOLID, testing, Docker |
+| `docs/README_ARQUITECTURA.md` | Arquitectura modular, ledger + stock derivado, BR-01…BR-15, SOLID, testing, Docker |
 | `docs/requisitos/ERS_ICM_Requisitos.md` | Requisitos funcionales, criterios Gherkin y trazabilidad |
 | `docs/api/README_API.md` | Especificación `/api/v1/`, JWT, tags OpenAPI, checklist de publicación |
 | `docs/test/README_TEST.md` | Guía oficial de pruebas: suite Gherkin, unit/integration y comandos de regeneración |

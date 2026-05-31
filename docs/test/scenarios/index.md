@@ -25,6 +25,17 @@
 | RF004-S05 | Consulta de producto con alerta de cadena de frío | Implementado | [RF004-S05.md](./RF004-S05.md) |
 | RF004-S06 | Consulta de producto con alerta de seguridad eléctrica | Implementado | [RF004-S06.md](./RF004-S06.md) |
 | RF004-S07 | Búsqueda de un producto inexistente en el catálogo | Implementado | [RF004-S07.md](./RF004-S07.md) |
+| RF004-S08 | Crear tipo de almacenamiento y asignarlo a una ubicación | Implementado | [RF004-S08.md](./RF004-S08.md) |
+| RF004-S09 | Tipo de almacenamiento inactivo rechazado al crear ubicación | Implementado | [RF004-S09.md](./RF004-S09.md) |
+| RF004-S10 | Plantilla de almacenamiento aplica defaults al crear ubicación | Implementado | [RF004-S10.md](./RF004-S10.md) |
+| RF004-S11 | Transición a estado mantenimiento bloquea despacho desde esa ubicación | Implementado | [RF004-S11.md](./RF004-S11.md) |
+| RF004-S12 | Archivar una ubicación fuerza is_active=False | Implementado | [RF004-S12.md](./RF004-S12.md) |
+| RF004-S13 | Ubicación archivada rechaza entradas de stock | Implementado | [RF004-S13.md](./RF004-S13.md) |
+| RF004-S14 | Ubicación restringida bloquea despacho pero permite entrada | Implementado | [RF004-S14.md](./RF004-S14.md) |
+| RF004-S15 | Capacidad relativa se guarda y se expone en la ubicación y en reportes | Implementado | [RF004-S15.md](./RF004-S15.md) |
+| RF004-S16 | Filtro de inventario por storage_type_id muestra solo productos de ese tipo | Implementado | [RF004-S16.md](./RF004-S16.md) |
+| RF004-S17 | Filtro de inventario por estado operativo muestra solo ubicaciones en ese estado | Implementado | [RF004-S17.md](./RF004-S17.md) |
+| RF004-S18 | Reporte de utilización agrupa ubicaciones por tipo de almacenamiento | Implementado | [RF004-S18.md](./RF004-S18.md) |
 | RF005-S01 | Recepción exitosa de producto estándar sin discrepancia | Implementado | [RF005-S01.md](./RF005-S01.md) |
 | RF005-S02 | Recepción con discrepancia entre cantidad recibida y facturada | Implementado | [RF005-S02.md](./RF005-S02.md) |
 | RF005-S03 | Recepción exitosa con discrepancia documentada | Implementado | [RF005-S03.md](./RF005-S03.md) |

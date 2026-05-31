@@ -2,7 +2,7 @@
 
 Este documento enlaza pruebas automatizadas con **requisitos** y **criterios de aceptación en estilo Gherkin** del `docs/requisitos/ERS_ICM_Requisitos.md`, complementados con el contexto de negocio del `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (BR, roles, ubicaciones).
 
-**Cobertura 1:1 ERS:** la suite `tests/ers/test_gherkin_dynamic.py` (95 nodos) y `tests/ers/gherkin_impl.py` son la fuente principal; cada escenario tiene su ficha en `docs/test/scenarios/<ID>.md`.
+**Cobertura 1:1 ERS:** la suite `tests/ers/test_gherkin_dynamic.py` (106 nodos) y `tests/ers/gherkin_impl.py` son la fuente principal; cada escenario tiene su ficha en `docs/test/scenarios/<ID>.md`.
 
 **Fuentes de verdad (orden):** ERS + informe de elicitación → código → tests.
 
@@ -41,6 +41,30 @@ Este documento enlaza pruebas automatizadas con **requisitos** y **criterios de 
 |----------|-----------|
 | Stock derivado del ledger; no edición arbitraria en Admin (coherente con ERS BR-11 e informe: ledger fuente de verdad) | `apps/inventory/tests/test_admin.py::test_stock_by_location_admin_is_least_privilege_derived_stock` |
 | Consultas de stock / totales | `apps/inventory/tests/test_selectors.py`, `apps/inventory/tests/test_services.py`, `apps/inventory/tests/test_views.py` |
+
+---
+
+## RF-004 / BR-14 — Estado operativo de ubicación restringe movimientos
+
+| Criterio ERS (Scenarios 11–14) | Cobertura |
+|--------------------------------|-----------|
+| S11 — Mantenimiento bloquea despacho | `apps/movements/tests/test_services.py::test_dispatch_fails_when_origin_location_is_in_maintenance` + `tests/ers/test_gherkin_dynamic.py::test_RF004_S11` |
+| S12 — Archivar fuerza is_active=False | `tests/ers/test_gherkin_dynamic.py::test_RF004_S12` |
+| S13 — Archived rechaza entrada | `apps/movements/tests/test_services.py::test_entry_fails_when_destination_is_archived` + `tests/ers/test_gherkin_dynamic.py::test_RF004_S13` |
+| S14 — Restricted bloquea despacho, permite entrada | `apps/movements/tests/test_services.py::test_dispatch_fails_when_origin_is_restricted` + `test_entry_allows_destination_in_restricted` + `tests/ers/test_gherkin_dynamic.py::test_RF004_S14` |
+| Blocked bloquea traslado destino | `apps/movements/tests/test_services.py::test_internal_transfer_fails_when_destination_is_blocked` |
+| Return a blocked/archived rechazado (BR-14) | `apps/movements/tests/test_services.py::test_return_fails_when_destination_is_blocked` + `test_return_fails_when_destination_is_archived` |
+| Archived bloquea despacho origen | `apps/movements/tests/test_services.py::test_dispatch_fails_when_origin_is_archived` |
+
+---
+
+## RF-004 / BR-15 — StorageType activo requerido para asignación
+
+| Criterio ERS (Scenarios 8–9) | Cobertura |
+|------------------------------|-----------|
+| S08 — Crear tipo y asignar a ubicación | `apps/inventory/tests/test_storage_types.py::test_storage_type_crud_and_location_binding` + `tests/ers/test_gherkin_dynamic.py::test_RF004_S08` |
+| S09 — Tipo inactivo rechazado en create | `apps/inventory/tests/test_storage_types.py::test_inactive_storage_type_rejected_on_create_location` + `tests/ers/test_gherkin_dynamic.py::test_RF004_S09` |
+| Tipo inactivo rechazado en PATCH | `apps/inventory/tests/test_storage_types.py::test_inactive_storage_type_rejected_on_patch_location` |
 
 ---
 
