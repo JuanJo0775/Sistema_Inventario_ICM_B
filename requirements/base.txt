@@ -21,6 +21,9 @@ django-filter==23.5
 # PDF Generation
 WeasyPrint==68.0
 
+# Excel Export
+openpyxl==3.1.5
+
 # Barcode generation
 python-barcode==0.15.1
 

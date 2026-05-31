@@ -17,9 +17,16 @@ from apps.alerts.selectors import (
 )
 from apps.alerts.serializers import AlertSerializer
 from apps.alerts.services import resolve_alert
+from shared.exporters import export_to_csv, export_to_xlsx
 from shared.openapi import TAG_ALERTS, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenista, IsAlmacenistaOrAdministrador
+
+_ALERT_EXPORT_HEADERS = [
+    "id", "product_sku", "lot_code", "lot_expiration_date", "location",
+    "alert_type", "severity", "category", "message",
+    "is_resolved", "resolved_at", "created_at",
+]
 
 _ALERT_QUERY_PARAMS = [
     OpenApiParameter(
@@ -104,6 +111,13 @@ class AlertListView(generics.ListAPIView):
         tags=[TAG_ALERTS],
     )
     def get(self, request, *args, **kwargs):
+        export = request.query_params.get("export", "").lower()
+        if export in ("csv", "xlsx"):
+            qs = self.get_queryset()
+            rows = [dict(item) for item in AlertSerializer(qs, many=True).data]
+            if export == "csv":
+                return export_to_csv(_ALERT_EXPORT_HEADERS, rows, "alerts.csv")
+            return export_to_xlsx(_ALERT_EXPORT_HEADERS, rows, "alerts.xlsx")
         return super().get(request, *args, **kwargs)
 
 
@@ -175,3 +189,70 @@ class AlertResolveView(APIView):
     def post(self, request, pk):
         alert = resolve_alert(request.user, UUID(str(pk)))
         return Response(AlertSerializer(alert).data, status=status.HTTP_200_OK)
+
+
+class AlertPollView(APIView):
+    """GET — Polling de alertas nuevas desde un timestamp (NEW-04).
+
+    Uso: GET /api/v1/alerts/poll/?since=<ISO-timestamp>&severity=CRITICA,ALTA
+
+    El cliente debe usar `server_timestamp` de cada respuesta como siguiente `since`.
+    """
+
+    permission_classes = (IsAuthenticated,)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="since",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="ISO-8601 timestamp. Retorna alertas creadas después de este momento. Default: últimas 24 horas.",
+            ),
+            OpenApiParameter(
+                name="severity",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Filtrar por severidades separadas por coma. Ej: CRITICA,ALTA",
+            ),
+        ],
+        responses={200: AlertSerializer(many=True), **standard_error_responses()},
+        tags=[TAG_ALERTS],
+    )
+    def get(self, request):
+        from django.utils.dateparse import parse_datetime
+
+        since_str = request.query_params.get("since")
+        if since_str:
+            since = parse_datetime(since_str)
+            if since is None:
+                return Response(
+                    {"detail": "Formato de 'since' inválido. Use ISO-8601."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        else:
+            from django.utils import timezone as tz
+            from datetime import timedelta
+            since = tz.now() - timedelta(hours=24)
+
+        qs = Alert.objects.select_related("product", "location").filter(
+            created_at__gt=since
+        )
+
+        severity_param = request.query_params.get("severity")
+        if severity_param:
+            severities = [s.strip() for s in severity_param.split(",") if s.strip()]
+            qs = qs.filter(severity__in=severities)
+
+        qs = qs.order_by("-created_at")[:50]
+
+        from django.utils import timezone as tz
+        return Response(
+            {
+                "server_timestamp": tz.now().isoformat(),
+                "count": qs.count(),
+                "results": AlertSerializer(qs, many=True).data,
+            }
+        )

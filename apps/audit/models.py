@@ -82,3 +82,32 @@ class AuditLog(models.Model):
 
     def __str__(self) -> str:
         return f"{self.event_type} @ {self.created_at}"
+
+
+class AuditLogArchive(models.Model):
+    """Tabla de archivo histórico de AuditLog (M-02).
+
+    Misma estructura que AuditLog + campo archived_at.
+    Registros movidos por archive_old_audit_logs management command.
+    """
+
+    id = models.UUIDField(primary_key=True, editable=False)
+    event_type = models.CharField(max_length=64)
+    user_id = models.IntegerField(null=True, blank=True)
+    movement_id = models.UUIDField(null=True, blank=True)
+    description = models.TextField()
+    metadata = models.JSONField(default=dict, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    created_at = models.DateTimeField()
+    archived_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Log de Auditoría (Archivo)"
+        verbose_name_plural = "Logs de auditoría (Archivo)"
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=("created_at",)),
+        ]
+
+    def __str__(self) -> str:
+        return f"[ARCHIVO] {self.event_type} @ {self.created_at}"

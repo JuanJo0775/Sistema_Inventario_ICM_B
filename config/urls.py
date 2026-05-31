@@ -26,6 +26,7 @@ urlpatterns = [
     path("api/v1/reports/", include("apps.reports.urls")),
     path("api/v1/alerts/", include("apps.alerts.urls")),
     path("api/v1/audit/", include("apps.audit.urls")),
+    path("api/v1/webhooks/", include("apps.webhooks.urls")),
     path(
         "api/schema/",
         SpectacularAPIView.as_view(permission_classes=_schema_permissions()),

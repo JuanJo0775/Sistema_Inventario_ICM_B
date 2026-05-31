@@ -54,10 +54,22 @@ from apps.reports.serializers import (
     TopDispatchedProductSerializer,
     WarehouseUtilizationResponseSerializer,
 )
+from shared.exporters import export_to_csv, export_to_xlsx
 from shared.openapi import TAG_REPORTS, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenistaOrAdministrador
 from shared.utils.params import clamp_limit, clamp_period_days
+
+_MOVEMENT_EXPORT_HEADERS = [
+    "id", "movement_type", "product", "product_sku", "lot", "lot_code",
+    "lot_expiration_date", "origin_location", "destination_location",
+    "quantity", "serial_number", "invoice_number", "executed_by", "created_at",
+]
+
+_EXPIRING_EXPORT_HEADERS = [
+    "sku", "name", "lot_code", "expiration_date", "days_left",
+    "location_code", "location_name", "available_quantity",
+]
 
 
 def _parse_range(request):
@@ -226,6 +238,14 @@ class MovementHistoryReportView(APIView):
             start=start,
             end=end,
         )[:200]
+
+        export = request.query_params.get("export", "").lower()
+        if export == "csv":
+            rows = [dict(item) for item in MovementSerializer(qs, many=True).data]
+            return export_to_csv(_MOVEMENT_EXPORT_HEADERS, rows, "movements.csv")
+        if export == "xlsx":
+            rows = [dict(item) for item in MovementSerializer(qs, many=True).data]
+            return export_to_xlsx(_MOVEMENT_EXPORT_HEADERS, rows, "movements.xlsx")
         return Response(MovementSerializer(qs, many=True).data)
 
 
@@ -486,6 +506,12 @@ class ExpiringProductsReportView(APIView):
     def get(self, request):
         days = clamp_period_days(request.query_params.get("days", 30))
         data = get_expiring_products(days=days)
+
+        export = request.query_params.get("export", "").lower()
+        if export == "csv":
+            return export_to_csv(_EXPIRING_EXPORT_HEADERS, data, "expiring_products.csv")
+        if export == "xlsx":
+            return export_to_xlsx(_EXPIRING_EXPORT_HEADERS, data, "expiring_products.xlsx")
         return Response(ExpiringLotReportItemSerializer(data, many=True).data)
 
 

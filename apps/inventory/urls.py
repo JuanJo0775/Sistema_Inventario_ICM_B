@@ -9,6 +9,7 @@ from apps.inventory.views import (
     ReconstructStockView,
     StockByLocationView,
     StockByProductView,
+    StockThresholdView,
     StorageTemplateDetailView,
     StorageTemplateListCreateView,
     StorageTypeDetailView,
@@ -65,4 +66,9 @@ urlpatterns = [
         name="inventory-stock-location",
     ),
     path("search/", ProductSearchView.as_view(), name="inventory-search"),
+    path(
+        "stock/<uuid:pk>/threshold/",
+        StockThresholdView.as_view(),
+        name="inventory-stock-threshold",
+    ),
 ]

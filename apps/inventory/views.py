@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.inventory.models import Location
+from apps.inventory.models import Location, StockByLocation
 from apps.inventory.selectors import (
     get_full_inventory,
     get_stock_by_location,
@@ -29,6 +29,7 @@ from apps.inventory.serializers import (
     StockByProductResponseSerializer,
     StockReconstructRequestSerializer,
     StockReconstructResponseSerializer,
+    StockThresholdSerializer,
     StorageTemplateCreateSerializer,
     StorageTemplateSerializer,
     StorageTypeCreateSerializer,
@@ -47,9 +48,15 @@ from apps.inventory.services import (
     update_storage_template,
     update_storage_type,
 )
+from shared.exporters import export_to_csv, export_to_xlsx
 from shared.openapi import TAG_INVENTORY, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenista
+
+_INVENTORY_EXPORT_HEADERS = [
+    "sku", "name", "reorder_point", "total",
+    "location_code", "location_name", "quantity",
+]
 
 
 class InventoryFullListView(APIView):
@@ -127,6 +134,27 @@ class InventoryFullListView(APIView):
         ):
             filters["stock_below_reorder"] = True
         data = get_full_inventory(filters)
+
+        export = request.query_params.get("export", "").lower()
+        if export in ("csv", "xlsx"):
+            # Aplanar estructura anidada producto→ubicación a una fila por registro
+            rows = [
+                {
+                    "sku": item["sku"],
+                    "name": item["name"],
+                    "reorder_point": item["reorder_point"],
+                    "total": item["total"],
+                    "location_code": loc["location_code"],
+                    "location_name": loc["location_name"],
+                    "quantity": loc["quantity"],
+                }
+                for item in data
+                for loc in item.get("by_location", [{"location_code": "", "location_name": "", "quantity": item["total"]}])
+            ]
+            if export == "csv":
+                return export_to_csv(_INVENTORY_EXPORT_HEADERS, rows, "inventory.csv")
+            return export_to_xlsx(_INVENTORY_EXPORT_HEADERS, rows, "inventory.xlsx")
+
         paginator = ICMPageNumberPagination()
         page = paginator.paginate_queryset(data, request, view=self)
         return paginator.get_paginated_response(page)
@@ -562,3 +590,26 @@ class ProductSearchView(APIView):
         page = paginator.paginate_queryset(list(qs), request, view=self)
         ser = ProductSerializer(page, many=True)
         return paginator.get_paginated_response(ser.data)
+
+
+class StockThresholdView(APIView):
+    """PATCH — Actualiza el umbral de reorden por ubicación (NEW-02)."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        request=StockThresholdSerializer,
+        responses={
+            200: StockByLocationSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+        tags=[TAG_INVENTORY],
+    )
+    def patch(self, request, pk):
+        from django.shortcuts import get_object_or_404
+        row = get_object_or_404(StockByLocation, pk=pk)
+        ser = StockThresholdSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        row.location_reorder_point = ser.validated_data["location_reorder_point"]
+        row.save(update_fields=["location_reorder_point", "updated_at"])
+        return Response(StockByLocationSerializer(row).data)

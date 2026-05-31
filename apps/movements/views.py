@@ -523,15 +523,23 @@ class ComboDispatchView(APIView):
         },
     )
     def post(self, request):
+        from apps.catalog.models import ProductCombo
+
         ser = ComboDispatchSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         d = ser.validated_data
-        movements = dispatch_combo(
-            request.user,
-            d["combo_id"],
-            d["location_id"],
-            request=request,
-        )
+        try:
+            movements = dispatch_combo(
+                request.user,
+                d["combo_id"],
+                d["location_id"],
+                request=request,
+            )
+        except ProductCombo.DoesNotExist:
+            return Response(
+                {"detail": "Combo no encontrado o inactivo."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
         return Response(
             MovementSerializer(movements, many=True).data,
             status=status.HTTP_201_CREATED,

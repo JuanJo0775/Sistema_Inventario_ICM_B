@@ -69,6 +69,14 @@ def sync_stock_alerts_for_product(product_id: UUID, *, user=None) -> None:
                 location=None,
                 message=f"Stock total {total_qty} en o por debajo del umbral {threshold}.",
             )
+            try:
+                from apps.webhooks.services import queue_webhook_event
+                queue_webhook_event(
+                    AlertType.LOW_STOCK,
+                    {"product_id": str(product_id), "total_qty": total_qty, "threshold": threshold},
+                )
+            except Exception:
+                pass
     else:
         rb = (
             user
@@ -198,13 +206,14 @@ def check_and_create_minimum_stock_alert(
     """
     RF-011, BR-11 — Alerta de stock bajo por producto y ubicación (sin duplicados activos).
 
-    Usa `reorder_point` del producto como umbral mínimo.
+    Usa `location_reorder_point` si está definido; si no, `reorder_point` del producto.
     """
-    threshold = int(getattr(product, "reorder_point", 0) or 0)
     row = StockByLocation.objects.filter(
         product_id=product.id, location_id=location.id
-    ).first()
+    ).select_related("product").first()
     qty = int(row.current_stock) if row else 0
+    # NEW-02: umbral local si está definido, global del producto como fallback
+    threshold = row.effective_reorder_point if row else int(getattr(product, "reorder_point", 0) or 0)
     if qty > threshold:
         return None
     if Alert.objects.filter(

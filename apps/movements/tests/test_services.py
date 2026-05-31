@@ -21,6 +21,7 @@ from shared.exceptions import (
     AdjustmentJustificationRequiredError,
     CrossValidationFailedError,
     DiscrepancyNoteRequiredError,
+    ImmutableRecordError,
     LocationStateNotAllowedError,
     LotCodeRequiredError,
     LotExpirationDateRequiredError,
@@ -656,3 +657,118 @@ def test_register_entry_raises_lot_expiration_date_required(
             cold_chain_acknowledged=True,
             electrical_safety_acknowledged=True,
         )
+
+
+# ── BR-06: corrección dentro de ventana (ENTRADA y SALIDA) ───────────────────
+
+
+@pytest.mark.django_db
+def test_correct_entrada_within_window(almacenista_user, sample_product, sample_locations):
+    """BR-06 — Corrección de ENTRADA: reversal + nueva entrada con cantidad corregida."""
+    loc_a, loc_b = sample_locations[0], sample_locations[1]
+
+    original = register_entry(
+        almacenista_user,
+        sample_product.id,
+        loc_a.id,
+        10,
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+    assert original.movement_type == MovementType.ENTRADA
+
+    stock_before = StockByLocation.objects.get(product=sample_product, location=loc_a).current_stock
+    assert stock_before == 10
+
+    fixed_time = original.created_at + timedelta(seconds=45)
+    with patch("django.utils.timezone.now", return_value=fixed_time):
+        result = correct_movement_within_window(
+            almacenista_user,
+            original.id,
+            {"location_id": loc_a.id, "quantity": 7},
+        )
+
+    assert len(result) == 2
+    reversal, corrected = result
+    # El reversal debe ser SALIDA_DANO (undo de la entrada original)
+    assert reversal.movement_type == MovementType.SALIDA_DANO
+    assert reversal.related_movement == original
+    # El corregido debe ser una nueva ENTRADA
+    assert corrected.movement_type == MovementType.ENTRADA
+    assert corrected.quantity == 7
+
+    # El ledger original no se modificó (inmutabilidad)
+    original.refresh_from_db()
+    assert original.quantity == 10
+
+    # Stock neto debe reflejar la corrección: 10 - 10 + 7 = 7
+    stock_after = StockByLocation.objects.get(product=sample_product, location=loc_a).current_stock
+    assert stock_after == 7
+
+
+@pytest.mark.django_db
+def test_correct_salida_within_window(almacenista_user, sample_product, sample_locations):
+    """BR-06 — Corrección de SALIDA_VENTA_MENOR: reversal + nueva salida con cantidad corregida."""
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=20)
+
+    dispatches = register_dispatch(
+        almacenista_user,
+        sample_product.id,
+        loc.id,
+        8,
+        MovementType.SALIDA_VENTA_MENOR,
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+        privacy_notice_acknowledged=True,
+    )
+    original = dispatches[0] if isinstance(dispatches, list) else dispatches
+    assert original.movement_type == MovementType.SALIDA_VENTA_MENOR
+
+    # Stock tras dispatch: 20 - 8 = 12
+    stock_mid = StockByLocation.objects.get(product=sample_product, location=loc).current_stock
+    assert stock_mid == 12
+
+    fixed_time = original.created_at + timedelta(seconds=60)
+    with patch("django.utils.timezone.now", return_value=fixed_time):
+        result = correct_movement_within_window(
+            almacenista_user,
+            original.id,
+            {"location_id": loc.id, "quantity": 5, "movement_type": MovementType.SALIDA_VENTA_MENOR},
+        )
+
+    assert len(result) == 2
+    reversal, corrected = result
+    # El reversal restituye el stock (ENTRADA interna)
+    assert reversal.movement_type == MovementType.ENTRADA
+    assert reversal.related_movement == original
+    # La corrección es una nueva SALIDA con cantidad 5
+    assert corrected.movement_type == MovementType.SALIDA_VENTA_MENOR
+    assert corrected.quantity == 5
+
+    # Stock neto: 12 + 8 (reversal) - 5 (nueva salida) = 15
+    stock_final = StockByLocation.objects.get(product=sample_product, location=loc).current_stock
+    assert stock_final == 15
+
+
+@pytest.mark.django_db
+def test_correct_movement_outside_window_raises(almacenista_user, sample_product, sample_locations):
+    """BR-06 — Corrección fuera de la ventana de 5 minutos debe lanzar ImmutableRecordError."""
+    loc = sample_locations[0]
+    original = register_entry(
+        almacenista_user,
+        sample_product.id,
+        loc.id,
+        5,
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+
+    expired_time = original.created_at + timedelta(minutes=6)
+    with patch("django.utils.timezone.now", return_value=expired_time):
+        with pytest.raises(ImmutableRecordError):
+            correct_movement_within_window(
+                almacenista_user,
+                original.id,
+                {"location_id": loc.id, "quantity": 3},
+            )

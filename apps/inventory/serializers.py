@@ -176,6 +176,7 @@ class LocationStateTransitionSerializer(serializers.Serializer):
 
 class StockByLocationSerializer(serializers.ModelSerializer):
     product_sku = serializers.CharField(source="product.sku", read_only=True)
+    effective_reorder_point = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = StockByLocation
@@ -185,11 +186,27 @@ class StockByLocationSerializer(serializers.ModelSerializer):
             "product_sku",
             "location",
             "current_stock",
+            "location_reorder_point",
+            "effective_reorder_point",
             "last_movement_at",
             "created_at",
             "updated_at",
         )
-        read_only_fields = fields
+        read_only_fields = (
+            "id", "product", "product_sku", "location",
+            "current_stock", "effective_reorder_point",
+            "last_movement_at", "created_at", "updated_at",
+        )
+
+
+class StockThresholdSerializer(serializers.Serializer):
+    """Actualización de umbral de stock por ubicación (NEW-02)."""
+
+    location_reorder_point = serializers.IntegerField(
+        min_value=0,
+        allow_null=True,
+        help_text="Umbral local. null para eliminar el override y usar el umbral global del producto.",
+    )
 
 
 class PerLocationStockRowSerializer(serializers.Serializer):

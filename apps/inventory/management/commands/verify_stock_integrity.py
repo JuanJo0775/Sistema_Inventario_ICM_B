@@ -60,6 +60,15 @@ class Command(BaseCommand):
             self.style.WARNING(f"\nTotal divergencias: {len(divergences)}")
         )
 
+        try:
+            from apps.webhooks.services import queue_webhook_event
+            queue_webhook_event(
+                "STOCK_INTEGRITY_DIVERGENCE",
+                {"divergences": len(divergences)},
+            )
+        except Exception:
+            pass
+
         if options["fix"]:
             for row, expected in divergences:
                 row.current_stock = expected

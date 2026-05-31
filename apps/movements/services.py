@@ -35,55 +35,13 @@ from shared.exceptions import (
     StockMismatchError,
     UnauthorizedDomainActionError,
 )
+from shared.location_validators import (
+    validate_location_for_destination as _ensure_location_allows_destination,
+    validate_location_for_origin as _ensure_location_allows_origin,
+)
 
 logger = logging.getLogger(__name__)
 
-
-def _ensure_location_allows_origin(location: Location, operation: str) -> None:
-    """BR-14 — Valida elegibilidad de ubicación como origen según estado operativo."""
-    if location.operational_status in {
-        Location.OperationalStatus.BLOCKED,
-        Location.OperationalStatus.ARCHIVED,
-    }:
-        raise LocationStateNotAllowedError(
-            f"La ubicación '{location.name}' no puede operar como origen en {operation}.",
-            detail={
-                "location_id": str(location.id),
-                "operational_status": location.operational_status,
-                "operation": operation,
-                "role": "origin",
-            },
-        )
-    if location.operational_status in {
-        Location.OperationalStatus.MAINTENANCE,
-        Location.OperationalStatus.RESTRICTED,
-    }:
-        raise LocationStateNotAllowedError(
-            f"La ubicación '{location.name}' está en estado {location.operational_status} y no puede despachar stock.",
-            detail={
-                "location_id": str(location.id),
-                "operational_status": location.operational_status,
-                "operation": operation,
-                "role": "origin",
-            },
-        )
-
-
-def _ensure_location_allows_destination(location: Location, operation: str) -> None:
-    """BR-14 — Valida elegibilidad de ubicación como destino según estado operativo."""
-    if location.operational_status in {
-        Location.OperationalStatus.BLOCKED,
-        Location.OperationalStatus.ARCHIVED,
-    }:
-        raise LocationStateNotAllowedError(
-            f"La ubicación '{location.name}' no puede recibir stock en {operation}.",
-            detail={
-                "location_id": str(location.id),
-                "operational_status": location.operational_status,
-                "operation": operation,
-                "role": "destination",
-            },
-        )
 
 
 def _lock_stock(product_id: UUID, location_id: UUID) -> StockByLocation:
@@ -842,12 +800,12 @@ def register_adjustment(
     return movement
 
 
-_CORRECTABLE_TYPES = {
+_CORRECTABLE_TYPES = (
     MovementType.TRASLADO,
     MovementType.ENTRADA,
     MovementType.SALIDA_VENTA_MAYOR,
     MovementType.SALIDA_VENTA_MENOR,
-}
+)
 
 
 def _reverse_entrada_stock(user, original: Movement) -> Movement:

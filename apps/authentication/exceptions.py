@@ -1,5 +1,1 @@
-from shared.exceptions import ICMBaseException
-
-
-class OutsideOperatingHoursError(ICMBaseException):
-    pass
+from shared.exceptions import OutsideOperatingHoursError  # noqa: F401

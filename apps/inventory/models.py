@@ -209,11 +209,23 @@ class StockByLocation(BaseModel):
         default=0,
         help_text="BR-11: stock derivado; debe reconstruirse desde el ledger.",
     )
+    location_reorder_point = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Override local de umbral de reorden. Si null, usa reorder_point del producto.",
+    )
     last_movement_at = models.DateTimeField(
         null=True,
         blank=True,
         help_text="Último movimiento que alteró este registro (auditoría rápida).",
     )
+
+    @property
+    def effective_reorder_point(self) -> int:
+        """Umbral efectivo: local si está definido, global del producto como fallback."""
+        if self.location_reorder_point is not None:
+            return self.location_reorder_point
+        return int(self.product.reorder_point or 0)
 
     class Meta:
         verbose_name = "Stock por Ubicación"
