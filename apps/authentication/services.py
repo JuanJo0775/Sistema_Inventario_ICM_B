@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-from datetime import datetime, time
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
-from zoneinfo import ZoneInfo
 
 from django.contrib.auth import authenticate
 from django.db import transaction
@@ -23,30 +21,14 @@ from shared.exceptions import (
     OutsideOperatingHoursError,
     UnauthorizedCredentialManagementError,
 )
+from shared.operating_hours import (  # noqa: F401 — re-exportado para compatibilidad
+    is_within_operating_hours,
+)
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
 
     from apps.authentication.models import User
-
-
-BOGOTA = ZoneInfo("America/Bogota")
-
-
-def is_within_operating_hours(*, now: datetime | None = None) -> bool:
-    """
-    BR-03 — Determina si la hora actual está en franja permitida para auxiliares.
-
-    Franjas (hora local America/Bogota): 07:00–12:00 y 14:00–17:00 (inclusive).
-    """
-    now = now or timezone.now()
-    if timezone.is_naive(now):
-        now = timezone.make_aware(now, BOGOTA)
-    local = now.astimezone(BOGOTA)
-    t = local.time()
-    morning = time(7, 0) <= t <= time(12, 0)
-    afternoon = time(14, 0) <= t <= time(17, 0)
-    return morning or afternoon
 
 
 def _require_almacenista(user: User) -> None:

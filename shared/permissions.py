@@ -74,7 +74,7 @@ class IsWithinOperatingHours(BasePermission):
             return False
         if getattr(request.user, "role", None) != "auxiliar_despacho":
             return True
-        from apps.authentication.services import is_within_operating_hours
+        from shared.operating_hours import is_within_operating_hours
 
         return is_within_operating_hours()
 

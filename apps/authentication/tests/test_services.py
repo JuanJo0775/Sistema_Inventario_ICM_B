@@ -84,11 +84,7 @@ def test_operating_hours_enforced_per_request(auxiliar_user):
     factory = APIRequestFactory()
     request = factory.get("/dummy")
     request.user = auxiliar_user
-    with patch(
-        "apps.authentication.services.is_within_operating_hours", return_value=False
-    ):
+    with patch("shared.operating_hours.is_within_operating_hours", return_value=False):
         assert IsWithinOperatingHours().has_permission(request, view=None) is False
-    with patch(
-        "apps.authentication.services.is_within_operating_hours", return_value=True
-    ):
+    with patch("shared.operating_hours.is_within_operating_hours", return_value=True):
         assert IsWithinOperatingHours().has_permission(request, view=None) is True
