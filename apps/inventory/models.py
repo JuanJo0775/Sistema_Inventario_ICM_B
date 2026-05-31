@@ -1,4 +1,4 @@
-"""Stock derivado por ubicación (RF-004, BR-11).
+"""Stock derivado por ubicación (RF-004, BR-11, BR-14, BR-15).
 
 El ledger en `movements` es la única fuente de verdad; este modelo es caché
 consistente actualizada solo desde `apps.movements.services`.
@@ -41,14 +41,86 @@ def _is_retail_by_name(name: str) -> bool:
     return any(kw in normalized for kw in _VITRINA_KEYWORDS)
 
 
+class StorageType(BaseModel):
+    """
+    Tipo configurable de almacenamiento para clasificar ubicaciones (BR-15).
+
+    Se modela aparte para permitir extensibilidad (bodega, vitrina, nevera, etc.)
+    sin romper la entidad única de `Location`.
+    BR-15: solo tipos activos pueden asignarse a nuevas ubicaciones o reasignarse a las existentes.
+    """
+
+    code = models.SlugField(max_length=80, unique=True)
+    name = models.CharField(max_length=100, unique=True)
+    category = models.CharField(max_length=50, default="general")
+    description = models.TextField(blank=True)
+    capabilities = models.JSONField(default=dict, blank=True)
+    default_is_retail = models.BooleanField(default=False)
+    is_system = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        verbose_name = "Tipo de almacenamiento"
+        verbose_name_plural = "Tipos de almacenamiento"
+        ordering = ("sort_order", "name")
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class StorageTemplate(BaseModel):
+    """
+    Plantilla reutilizable de configuración para crear ubicaciones rápidamente.
+
+    Desacoplada de stock y ledger: solo define metadatos/defaults operativos.
+    """
+
+    code = models.SlugField(max_length=80, unique=True)
+    name = models.CharField(max_length=120, unique=True)
+    storage_type = models.ForeignKey(
+        StorageType,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="templates",
+    )
+    description = models.TextField(blank=True)
+    defaults = models.JSONField(default=dict, blank=True)
+    is_system = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        verbose_name = "Plantilla de almacenamiento"
+        verbose_name_plural = "Plantillas de almacenamiento"
+        ordering = ("sort_order", "name")
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class Location(BaseModel):
     """
-    Ubicación física de almacenamiento (RF-004, BR-11).
+    Ubicación física de almacenamiento (RF-004, BR-11, BR-14).
 
     `code`: identificador corto auto-generado con slugify del nombre (único).
     `is_retail`: se detecta automáticamente si el nombre contiene palabras clave de vitrina.
     `max_capacity`: capacidad máxima de productos (útil para vitrinas o espacios limitados).
+    BR-14: `operational_status` determina qué operaciones de stock son elegibles para esta ubicación.
     """
+
+    class OperationalStatus(models.TextChoices):
+        ACTIVE = "active", "Activa"
+        MAINTENANCE = "maintenance", "Mantenimiento"
+        RESTRICTED = "restricted", "Restringida"
+        BLOCKED = "blocked", "Bloqueada"
+        ARCHIVED = "archived", "Archivada"
+
+    class CapacityMode(models.TextChoices):
+        NONE = "none", "Sin capacidad"
+        RELATIVE_SCALE = "relative_scale", "Escala relativa"
+        ABSOLUTE_LEGACY = "absolute_legacy", "Capacidad absoluta (legacy)"
 
     code = models.SlugField(max_length=100, unique=True)
     name = models.CharField(max_length=100)
@@ -61,6 +133,49 @@ class Location(BaseModel):
         null=True,
         blank=True,
         help_text="Capacidad máxima de productos. Aplica principalmente a vitrinas.",
+    )
+    storage_type = models.ForeignKey(
+        StorageType,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="locations",
+    )
+    storage_template = models.ForeignKey(
+        StorageTemplate,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="locations",
+    )
+    operational_status = models.CharField(
+        max_length=20,
+        choices=OperationalStatus.choices,
+        default=OperationalStatus.ACTIVE,
+        db_index=True,
+        help_text="Estado operativo de la ubicación para reglas de movimientos.",
+    )
+    capacity_mode = models.CharField(
+        max_length=20,
+        choices=CapacityMode.choices,
+        default=CapacityMode.NONE,
+        db_index=True,
+        help_text="Modo de capacidad para cálculo de ocupación informativa.",
+    )
+    capacity_level = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        help_text="Escala relativa (1-5) cuando capacity_mode=relative_scale.",
+    )
+    capacity_score = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Puntaje de capacidad relativo (unidad abstracta, no bloqueante).",
+    )
+    occupancy_estimate_pct = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Estimación informativa de ocupación calculada o ajustada.",
     )
     is_active = models.BooleanField(default=True)
 

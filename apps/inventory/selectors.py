@@ -23,7 +23,11 @@ def get_stock_by_product(product_id: UUID) -> dict[str, Any]:
     product = Product.objects.filter(pk=product_id).only("id", "name", "sku").first()
     rows = (
         StockByLocation.objects.filter(product_id=product_id)
-        .select_related("location")
+        .select_related(
+            "location",
+            "location__storage_type",
+            "location__storage_template",
+        )
         .order_by("location__code")
     )
     by_location = [
@@ -31,6 +35,21 @@ def get_stock_by_product(product_id: UUID) -> dict[str, Any]:
             "location_id": str(r.location_id),
             "location_code": r.location.code,
             "location_name": r.location.name,
+            "storage_type_id": str(r.location.storage_type_id)
+            if r.location.storage_type_id
+            else None,
+            "storage_type_code": getattr(r.location.storage_type, "code", None),
+            "storage_template_id": str(r.location.storage_template_id)
+            if r.location.storage_template_id
+            else None,
+            "storage_template_code": getattr(
+                r.location.storage_template, "code", None
+            ),
+            "operational_status": r.location.operational_status,
+            "capacity_mode": r.location.capacity_mode,
+            "capacity_level": r.location.capacity_level,
+            "capacity_score": r.location.capacity_score,
+            "occupancy_estimate_pct": r.location.occupancy_estimate_pct,
             "quantity": r.current_stock,
         }
         for r in rows
@@ -121,7 +140,8 @@ def get_full_inventory(filters: dict[str, Any] | None = None) -> list[dict[str, 
     RF-004 — Inventario consolidado por producto y ubicación.
 
     Args:
-        filters: `category_id`, `location_id`, `only_in_stock`, `stock_below_reorder` (bool).
+        filters: `category_id`, `location_id`, `storage_type_id`, `operational_status`,
+                 `only_in_stock`, `stock_below_reorder` (bool).
 
     Returns:
         Lista de dicts con producto, totales y desglose por ubicación.
@@ -134,6 +154,14 @@ def get_full_inventory(filters: dict[str, Any] | None = None) -> list[dict[str, 
         qs = qs.filter(category_id=filters["category_id"])
     if filters.get("location_id"):
         qs = qs.filter(stock_by_location__location_id=filters["location_id"]).distinct()
+    if filters.get("storage_type_id"):
+        qs = qs.filter(
+            stock_by_location__location__storage_type_id=filters["storage_type_id"]
+        ).distinct()
+    if filters.get("operational_status"):
+        qs = qs.filter(
+            stock_by_location__location__operational_status=filters["operational_status"]
+        ).distinct()
     qs = qs.prefetch_related(
         Prefetch(
             "stock_by_location",
