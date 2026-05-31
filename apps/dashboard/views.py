@@ -21,6 +21,7 @@ from apps.dashboard.services import (
 )
 from shared.openapi import TAG_DASHBOARD, standard_error_responses
 from shared.permissions import IsAlmacenista
+from shared.utils.params import clamp_limit, clamp_period_days
 
 
 class DashboardOverviewView(APIView):
@@ -50,8 +51,8 @@ class DashboardOverviewView(APIView):
         tags=[TAG_DASHBOARD],
     )
     def get(self, request):
-        period_days = int(request.query_params.get("period_days", 30))
-        movements_limit = int(request.query_params.get("movements_limit", 10))
+        period_days = clamp_period_days(request.query_params.get("period_days", 30))
+        movements_limit = clamp_limit(request.query_params.get("movements_limit", 10))
         return Response(
             build_dashboard_overview(
                 period_days=period_days, movements_limit=movements_limit
@@ -78,7 +79,7 @@ class DashboardMetricsView(APIView):
         tags=[TAG_DASHBOARD],
     )
     def get(self, request):
-        period_days = int(request.query_params.get("period_days", 30))
+        period_days = clamp_period_days(request.query_params.get("period_days", 30))
         return Response(build_dashboard_metrics(period_days=period_days))
 
 
@@ -107,8 +108,8 @@ class DashboardAlertsView(APIView):
         tags=[TAG_DASHBOARD],
     )
     def get(self, request):
-        period_days = int(request.query_params.get("period_days", 30))
-        expiring_days = int(request.query_params.get("expiring_days", 30))
+        period_days = clamp_period_days(request.query_params.get("period_days", 30))
+        expiring_days = clamp_period_days(request.query_params.get("expiring_days", 30))
         return Response(
             build_dashboard_alerts(period_days=period_days, expiring_days=expiring_days)
         )
@@ -133,7 +134,7 @@ class DashboardKPIsView(APIView):
         tags=[TAG_DASHBOARD],
     )
     def get(self, request):
-        period_days = int(request.query_params.get("period_days", 30))
+        period_days = clamp_period_days(request.query_params.get("period_days", 30))
         return Response(build_dashboard_kpis(period_days=period_days))
 
 
@@ -162,6 +163,6 @@ class DashboardMovementsView(APIView):
         tags=[TAG_DASHBOARD],
     )
     def get(self, request):
-        period_days = int(request.query_params.get("period_days", 30))
-        limit = int(request.query_params.get("limit", 10))
+        period_days = clamp_period_days(request.query_params.get("period_days", 30))
+        limit = clamp_limit(request.query_params.get("limit", 10))
         return Response(build_dashboard_movements(period_days=period_days, limit=limit))

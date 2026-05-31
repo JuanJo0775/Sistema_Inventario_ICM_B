@@ -57,6 +57,7 @@ from apps.reports.serializers import (
 from shared.openapi import TAG_REPORTS, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenistaOrAdministrador
+from shared.utils.params import clamp_limit, clamp_period_days
 
 
 def _parse_range(request):
@@ -293,8 +294,8 @@ class TopDispatchedProductsReportView(APIView):
         tags=[TAG_REPORTS],
     )
     def get(self, request):
-        limit = int(request.query_params.get("limit", 10))
-        period_days = int(request.query_params.get("period_days", 30))
+        limit = clamp_limit(request.query_params.get("limit", 10))
+        period_days = clamp_period_days(request.query_params.get("period_days", 30))
         return Response(
             get_top_dispatched_products(limit=limit, period_days=period_days)
         )
@@ -408,7 +409,7 @@ class QualityOperationalReportView(APIView):
         tags=[TAG_REPORTS],
     )
     def get(self, request):
-        period_days = int(request.query_params.get("period_days", 30))
+        period_days = clamp_period_days(request.query_params.get("period_days", 30))
         return Response(get_quality_operational_summary(period_days=period_days))
 
 
@@ -432,7 +433,7 @@ class DiscardOperationalReportView(APIView):
         tags=[TAG_REPORTS],
     )
     def get(self, request):
-        period_days = int(request.query_params.get("period_days", 30))
+        period_days = clamp_period_days(request.query_params.get("period_days", 30))
         return Response(get_discard_operational_summary(period_days=period_days))
 
 
@@ -463,7 +464,7 @@ class DispatchOperationalReportView(APIView):
         tags=[TAG_REPORTS],
     )
     def get(self, request):
-        period_days = int(request.query_params.get("period_days", 30))
+        period_days = clamp_period_days(request.query_params.get("period_days", 30))
         return Response(get_dispatch_operational_summary(period_days=period_days))
 
 
@@ -483,7 +484,7 @@ class ExpiringProductsReportView(APIView):
         tags=[TAG_REPORTS],
     )
     def get(self, request):
-        days = int(request.query_params.get("days", 30))
+        days = clamp_period_days(request.query_params.get("days", 30))
         data = get_expiring_products(days=days)
         return Response(ExpiringLotReportItemSerializer(data, many=True).data)
 
@@ -528,7 +529,7 @@ class DispatchOrdersReportView(APIView):
         if e := request.query_params.get("end"):
             end = parse_datetime(e)
         inv = request.query_params.get("invoice_number")
-        limit = int(request.query_params.get("limit", 100))
+        limit = clamp_limit(request.query_params.get("limit", 100), default=100)
         data = get_dispatch_order_samples(
             start=start, end=end, invoice_number=inv, limit=limit
         )
@@ -637,10 +638,10 @@ class ReportDatasetView(APIView):
         elif kind == "warehouse-occupancy-distribution":
             data = get_warehouse_occupancy_distribution()
         elif kind == "quality-operational":
-            period_days = int(request.query_params.get("period_days", 30))
+            period_days = clamp_period_days(request.query_params.get("period_days", 30))
             data = get_quality_operational_summary(period_days=period_days)
         elif kind == "discard-operational":
-            period_days = int(request.query_params.get("period_days", 30))
+            period_days = clamp_period_days(request.query_params.get("period_days", 30))
             data = get_discard_operational_summary(period_days=period_days)
         elif kind == "movements-summary":
             start, end = _parse_range(request)
@@ -682,8 +683,8 @@ class ReportDatasetView(APIView):
             start, end = _parse_range(request)
             data = {"sales": sales_dispatch_totals(start=start, end=end)}
         elif kind == "top-products":
-            limit = int(request.query_params.get("limit", 10))
-            period_days = int(request.query_params.get("period_days", 30))
+            limit = clamp_limit(request.query_params.get("limit", 10))
+            period_days = clamp_period_days(request.query_params.get("period_days", 30))
             data = get_top_dispatched_products(limit=limit, period_days=period_days)
         elif kind == "invoices":
             filters_map: dict = {}
@@ -704,12 +705,12 @@ class ReportDatasetView(APIView):
             # servicio correspondiente en `apps/dashboard/services.py`.
             data = get_kpi_dashboard()
         elif kind == "expiring":
-            days = int(request.query_params.get("days", 30))
+            days = clamp_period_days(request.query_params.get("days", 30))
             data = ExpiringLotReportItemSerializer(
                 get_expiring_products(days=days), many=True
             ).data
         elif kind == "dispatch-operational":
-            period_days = int(request.query_params.get("period_days", 30))
+            period_days = clamp_period_days(request.query_params.get("period_days", 30))
             data = get_dispatch_operational_summary(period_days=period_days)
         else:
             raise ValidationError(
