@@ -2441,7 +2441,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_user_enable.py::TestEnableUserService::test_enable_already_active_user_is_idempotent -v
 ```
 
-Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 42)
+Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 41)
 
 
 ---
@@ -2477,7 +2477,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_user_enable.py::TestEnableUserService::test_enable_logs_audit_event -v
 ```
 
-Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 28)
+Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 27)
 
 
 ---
@@ -2513,7 +2513,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_user_enable.py::TestEnableUserService::test_enable_raises_if_not_almacenista -v
 ```
 
-Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 36)
+Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 35)
 
 
 ---
@@ -2549,7 +2549,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_user_enable.py::TestEnableUserService::test_enable_reactivates_disabled_user -v
 ```
 
-Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 20)
+Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 19)
 
 
 ---
@@ -2621,7 +2621,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_user_enable.py::TestUserEnableEndpoint::test_enable_404_on_nonexistent_user -v
 ```
 
-Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 83)
+Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 82)
 
 
 ---
@@ -2657,7 +2657,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_user_enable.py::TestUserEnableEndpoint::test_enable_requires_almacenista -v
 ```
 
-Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 69)
+Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 68)
 
 
 ---
@@ -2693,7 +2693,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_user_enable.py::TestUserEnableEndpoint::test_enable_requires_authentication -v
 ```
 
-Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 77)
+Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 76)
 
 
 ---
@@ -2729,7 +2729,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_user_enable.py::TestUserEnableEndpoint::test_enable_returns_200_with_user_data -v
 ```
 
-Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 57)
+Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 56)
 
 
 ---
@@ -2765,7 +2765,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_user_enable.py::TestUserListIncludeInactive::test_list_accessible_by_administrador -v
 ```
 
-Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 136)
+Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 138)
 
 
 ---
@@ -2801,7 +2801,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_user_enable.py::TestUserListIncludeInactive::test_list_excludes_inactive_by_default -v
 ```
 
-Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 116)
+Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 118)
 
 
 ---
@@ -2837,7 +2837,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_user_enable.py::TestUserListIncludeInactive::test_list_includes_inactive_with_param -v
 ```
 
-Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 126)
+Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 128)
 
 
 ---
@@ -2873,7 +2873,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_user_enable.py::TestUserListIncludeInactive::test_list_not_accessible_unauthenticated -v
 ```
 
-Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 142)
+Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 144)
 
 
 ---
@@ -3089,7 +3089,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_delete_category_with_active_products_returns_409 -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 103)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 105)
 
 
 ---
@@ -3125,7 +3125,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_delete_category_with_only_inactive_products_succeeds -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 115)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 117)
 
 
 ---
@@ -3161,7 +3161,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_delete_requires_almacenista -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 167)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 169)
 
 
 ---
@@ -3197,7 +3197,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_delete_soft_deletes_category -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 93)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 95)
 
 
 ---
@@ -3233,7 +3233,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_get_detail_404_on_missing -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 47)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 48)
 
 
 ---
@@ -3269,7 +3269,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_get_detail_returns_200 -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 38)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 37)
 
 
 ---
@@ -3305,7 +3305,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_list_excludes_inactive_by_default -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 137)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 139)
 
 
 ---
@@ -3341,7 +3341,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_list_includes_inactive_with_param -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 147)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 149)
 
 
 ---
@@ -3377,7 +3377,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_patch_requires_almacenista -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 157)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 159)
 
 
 ---
@@ -3413,7 +3413,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_patch_updates_flags -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 68)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 70)
 
 
 ---
@@ -3449,7 +3449,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_patch_updates_name -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 55)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 57)
 
 
 ---
@@ -3485,7 +3485,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_put_replaces_category -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 81)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 83)
 
 
 ---
@@ -3521,7 +3521,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_restore_category_reactivates -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 126)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 128)
 
 
 ---
@@ -3557,7 +3557,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_delete_soft_deletes -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 349)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 351)
 
 
 ---
@@ -3593,7 +3593,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_get_detail_returns_200 -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 290)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 292)
 
 
 ---
@@ -3629,7 +3629,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_list_excludes_inactive_by_default -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 372)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 378)
 
 
 ---
@@ -3665,7 +3665,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_list_includes_inactive_with_param -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 386)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 392)
 
 
 ---
@@ -3701,7 +3701,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_patch_updates_name -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 301)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 305)
 
 
 ---
@@ -3737,7 +3737,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_patch_with_items_replaces_all_items -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 314)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 318)
 
 
 ---
@@ -3773,7 +3773,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_put_replaces_combo -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 332)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 336)
 
 
 ---
@@ -3809,7 +3809,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_restore_reactivates -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 359)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 363)
 
 
 ---
@@ -3845,7 +3845,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_delete_deactivates_product -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 407)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 413)
 
 
 ---
@@ -3881,7 +3881,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_delete_requires_almacenista -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 452)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 458)
 
 
 ---
@@ -3917,7 +3917,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_list_excludes_inactive_by_default -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 432)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 438)
 
 
 ---
@@ -3953,7 +3953,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_list_includes_inactive_with_param -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 442)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 448)
 
 
 ---
@@ -3989,7 +3989,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_restore_reactivates_product -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 418)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 424)
 
 
 ---
@@ -4025,7 +4025,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_restore_requires_almacenista -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 461)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 467)
 
 
 ---
@@ -4061,7 +4061,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_delete_soft_deletes -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 220)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 222)
 
 
 ---
@@ -4097,7 +4097,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_delete_with_active_products_returns_409 -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 231)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 233)
 
 
 ---
@@ -4133,7 +4133,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_get_detail_returns_200 -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 182)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 184)
 
 
 ---
@@ -4169,7 +4169,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_list_excludes_inactive_by_default -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 257)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 259)
 
 
 ---
@@ -4205,7 +4205,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_list_includes_inactive_with_param -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 270)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 272)
 
 
 ---
@@ -4241,7 +4241,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_patch_updates_name -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 194)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 196)
 
 
 ---
@@ -4277,7 +4277,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_put_updates_subcategory -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 208)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 210)
 
 
 ---
@@ -4313,7 +4313,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_restore_reactivates -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 243)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 245)
 
 
 ---
@@ -5141,7 +5141,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_new_endpoints.py::TestLocationListIncludeInactive::test_active_locations_always_visible -v
 ```
 
-Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 136)
+Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 135)
 
 
 ---
@@ -5177,7 +5177,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_new_endpoints.py::TestLocationListIncludeInactive::test_list_excludes_inactive_by_default -v
 ```
 
-Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 103)
+Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 102)
 
 
 ---
@@ -5213,7 +5213,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_new_endpoints.py::TestLocationListIncludeInactive::test_list_includes_inactive_with_param -v
 ```
 
-Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 120)
+Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 119)
 
 
 ---
@@ -5249,7 +5249,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_new_endpoints.py::TestStorageTemplatePut::test_patch_still_works_after_put_added -v
 ```
 
-Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 84)
+Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 83)
 
 
 ---
@@ -5285,7 +5285,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_new_endpoints.py::TestStorageTemplatePut::test_put_404_on_nonexistent -v
 ```
 
-Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 70)
+Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 68)
 
 
 ---
@@ -5321,7 +5321,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_new_endpoints.py::TestStorageTemplatePut::test_put_replaces_template -v
 ```
 
-Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 37)
+Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 36)
 
 
 ---
@@ -5357,7 +5357,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_new_endpoints.py::TestStorageTemplatePut::test_put_requires_almacenista -v
 ```
 
-Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 56)
+Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 53)
 
 
 ---
@@ -8489,7 +8489,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/webhooks/tests/test_endpoint_put.py::TestWebhookEndpointPut::test_patch_still_works_independently -v
 ```
 
-Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/tests/test_endpoint_put.py) (aprox. línea 86)
+Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/tests/test_endpoint_put.py) (aprox. línea 87)
 
 
 ---
@@ -8561,7 +8561,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/webhooks/tests/test_endpoint_put.py::TestWebhookEndpointPut::test_put_replaces_endpoint -v
 ```
 
-Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/tests/test_endpoint_put.py) (aprox. línea 27)
+Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/tests/test_endpoint_put.py) (aprox. línea 26)
 
 
 ---
@@ -8597,7 +8597,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/webhooks/tests/test_endpoint_put.py::TestWebhookEndpointPut::test_put_requires_all_fields -v
 ```
 
-Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/tests/test_endpoint_put.py) (aprox. línea 48)
+Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/tests/test_endpoint_put.py) (aprox. línea 47)
 
 
 ---
@@ -8633,7 +8633,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/webhooks/tests/test_endpoint_put.py::TestWebhookEndpointPut::test_put_requires_almacenista -v
 ```
 
-Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/tests/test_endpoint_put.py) (aprox. línea 62)
+Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/tests/test_endpoint_put.py) (aprox. línea 61)
 
 
 ---
