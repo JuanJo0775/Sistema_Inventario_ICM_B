@@ -2953,6 +2953,222 @@ Código fuente: [apps/authentication/tests/test_views.py](../../apps/authenticat
 <!-- file: UNIT-0083.md -->
 **Código:** UNIT-0083
 
+# test_combo_derived_price_uses_individual_product_prices
+
+## Nombre del test
+
+`apps/catalog/tests/test_combo_pricing.py::test_combo_derived_price_uses_individual_product_prices`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_combo_pricing.py::test_combo_derived_price_uses_individual_product_prices -v
+```
+
+Código fuente: [apps/catalog/tests/test_combo_pricing.py](../../apps/catalog/tests/test_combo_pricing.py) (aprox. línea 64)
+
+
+---
+
+<!-- file: UNIT-0084.md -->
+**Código:** UNIT-0084
+
+# test_combo_derived_without_prices_stores_null
+
+## Nombre del test
+
+`apps/catalog/tests/test_combo_pricing.py::test_combo_derived_without_prices_stores_null`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_combo_pricing.py::test_combo_derived_without_prices_stores_null -v
+```
+
+Código fuente: [apps/catalog/tests/test_combo_pricing.py](../../apps/catalog/tests/test_combo_pricing.py) (aprox. línea 80)
+
+
+---
+
+<!-- file: UNIT-0085.md -->
+**Código:** UNIT-0085
+
+# test_combo_fixed_price_distributes_proportionally
+
+## Nombre del test
+
+`apps/catalog/tests/test_combo_pricing.py::test_combo_fixed_price_distributes_proportionally`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_combo_pricing.py::test_combo_fixed_price_distributes_proportionally -v
+```
+
+Código fuente: [apps/catalog/tests/test_combo_pricing.py](../../apps/catalog/tests/test_combo_pricing.py) (aprox. línea 108)
+
+
+---
+
+<!-- file: UNIT-0086.md -->
+**Código:** UNIT-0086
+
+# test_combo_fixed_price_invoice_created
+
+## Nombre del test
+
+`apps/catalog/tests/test_combo_pricing.py::test_combo_fixed_price_invoice_created`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_combo_pricing.py::test_combo_fixed_price_invoice_created -v
+```
+
+Código fuente: [apps/catalog/tests/test_combo_pricing.py](../../apps/catalog/tests/test_combo_pricing.py) (aprox. línea 126)
+
+
+---
+
+<!-- file: UNIT-0087.md -->
+**Código:** UNIT-0087
+
+# test_create_combo_with_fixed_price
+
+## Nombre del test
+
+`apps/catalog/tests/test_combo_pricing.py::test_create_combo_with_fixed_price`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_combo_pricing.py::test_create_combo_with_fixed_price -v
+```
+
+Código fuente: [apps/catalog/tests/test_combo_pricing.py](../../apps/catalog/tests/test_combo_pricing.py) (aprox. línea 148)
+
+
+---
+
+<!-- file: UNIT-0088.md -->
+**Código:** UNIT-0088
+
+# test_update_combo_price_strategy
+
+## Nombre del test
+
+`apps/catalog/tests/test_combo_pricing.py::test_update_combo_price_strategy`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_combo_pricing.py::test_update_combo_price_strategy -v
+```
+
+Código fuente: [apps/catalog/tests/test_combo_pricing.py](../../apps/catalog/tests/test_combo_pricing.py) (aprox. línea 168)
+
+
+---
+
+<!-- file: UNIT-0089.md -->
+**Código:** UNIT-0089
+
 # test_category_slug_unique
 
 ## Nombre del test
@@ -2986,8 +3202,8 @@ Código fuente: [apps/catalog/tests/test_models.py](../../apps/catalog/tests/tes
 
 ---
 
-<!-- file: UNIT-0084.md -->
-**Código:** UNIT-0084
+<!-- file: UNIT-0090.md -->
+**Código:** UNIT-0090
 
 # test_product_full_clean_rejects_invalid_sku_format
 
@@ -3022,8 +3238,8 @@ Código fuente: [apps/catalog/tests/test_models.py](../../apps/catalog/tests/tes
 
 ---
 
-<!-- file: UNIT-0085.md -->
-**Código:** UNIT-0085
+<!-- file: UNIT-0091.md -->
+**Código:** UNIT-0091
 
 # test_product_sku_field
 
@@ -3058,8 +3274,8 @@ Código fuente: [apps/catalog/tests/test_models.py](../../apps/catalog/tests/tes
 
 ---
 
-<!-- file: UNIT-0086.md -->
-**Código:** UNIT-0086
+<!-- file: UNIT-0092.md -->
+**Código:** UNIT-0092
 
 # test_delete_category_with_active_products_returns_409
 
@@ -3094,8 +3310,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0087.md -->
-**Código:** UNIT-0087
+<!-- file: UNIT-0093.md -->
+**Código:** UNIT-0093
 
 # test_delete_category_with_only_inactive_products_succeeds
 
@@ -3130,8 +3346,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0088.md -->
-**Código:** UNIT-0088
+<!-- file: UNIT-0094.md -->
+**Código:** UNIT-0094
 
 # test_delete_requires_almacenista
 
@@ -3166,8 +3382,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0089.md -->
-**Código:** UNIT-0089
+<!-- file: UNIT-0095.md -->
+**Código:** UNIT-0095
 
 # test_delete_soft_deletes_category
 
@@ -3202,8 +3418,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0090.md -->
-**Código:** UNIT-0090
+<!-- file: UNIT-0096.md -->
+**Código:** UNIT-0096
 
 # test_get_detail_404_on_missing
 
@@ -3238,8 +3454,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0091.md -->
-**Código:** UNIT-0091
+<!-- file: UNIT-0097.md -->
+**Código:** UNIT-0097
 
 # test_get_detail_returns_200
 
@@ -3274,8 +3490,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0092.md -->
-**Código:** UNIT-0092
+<!-- file: UNIT-0098.md -->
+**Código:** UNIT-0098
 
 # test_list_excludes_inactive_by_default
 
@@ -3310,8 +3526,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0093.md -->
-**Código:** UNIT-0093
+<!-- file: UNIT-0099.md -->
+**Código:** UNIT-0099
 
 # test_list_includes_inactive_with_param
 
@@ -3346,8 +3562,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0094.md -->
-**Código:** UNIT-0094
+<!-- file: UNIT-0100.md -->
+**Código:** UNIT-0100
 
 # test_patch_requires_almacenista
 
@@ -3382,8 +3598,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0095.md -->
-**Código:** UNIT-0095
+<!-- file: UNIT-0101.md -->
+**Código:** UNIT-0101
 
 # test_patch_updates_flags
 
@@ -3418,8 +3634,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0096.md -->
-**Código:** UNIT-0096
+<!-- file: UNIT-0102.md -->
+**Código:** UNIT-0102
 
 # test_patch_updates_name
 
@@ -3454,8 +3670,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0097.md -->
-**Código:** UNIT-0097
+<!-- file: UNIT-0103.md -->
+**Código:** UNIT-0103
 
 # test_put_replaces_category
 
@@ -3490,8 +3706,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0098.md -->
-**Código:** UNIT-0098
+<!-- file: UNIT-0104.md -->
+**Código:** UNIT-0104
 
 # test_restore_category_reactivates
 
@@ -3526,8 +3742,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0099.md -->
-**Código:** UNIT-0099
+<!-- file: UNIT-0105.md -->
+**Código:** UNIT-0105
 
 # test_delete_soft_deletes
 
@@ -3562,8 +3778,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0100.md -->
-**Código:** UNIT-0100
+<!-- file: UNIT-0106.md -->
+**Código:** UNIT-0106
 
 # test_get_detail_returns_200
 
@@ -3598,8 +3814,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0101.md -->
-**Código:** UNIT-0101
+<!-- file: UNIT-0107.md -->
+**Código:** UNIT-0107
 
 # test_list_excludes_inactive_by_default
 
@@ -3634,8 +3850,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0102.md -->
-**Código:** UNIT-0102
+<!-- file: UNIT-0108.md -->
+**Código:** UNIT-0108
 
 # test_list_includes_inactive_with_param
 
@@ -3670,8 +3886,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0103.md -->
-**Código:** UNIT-0103
+<!-- file: UNIT-0109.md -->
+**Código:** UNIT-0109
 
 # test_patch_updates_name
 
@@ -3706,8 +3922,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0104.md -->
-**Código:** UNIT-0104
+<!-- file: UNIT-0110.md -->
+**Código:** UNIT-0110
 
 # test_patch_with_items_replaces_all_items
 
@@ -3742,8 +3958,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0105.md -->
-**Código:** UNIT-0105
+<!-- file: UNIT-0111.md -->
+**Código:** UNIT-0111
 
 # test_put_replaces_combo
 
@@ -3778,8 +3994,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0106.md -->
-**Código:** UNIT-0106
+<!-- file: UNIT-0112.md -->
+**Código:** UNIT-0112
 
 # test_restore_reactivates
 
@@ -3814,8 +4030,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0107.md -->
-**Código:** UNIT-0107
+<!-- file: UNIT-0113.md -->
+**Código:** UNIT-0113
 
 # test_deactivate_via_delete_logs_combo_deactivated
 
@@ -3850,8 +4066,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0108.md -->
-**Código:** UNIT-0108
+<!-- file: UNIT-0114.md -->
+**Código:** UNIT-0114
 
 # test_patch_name_still_works_when_is_active_sent
 
@@ -3886,8 +4102,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0109.md -->
-**Código:** UNIT-0109
+<!-- file: UNIT-0115.md -->
+**Código:** UNIT-0115
 
 # test_patch_with_is_active_does_not_deactivate_combo
 
@@ -3922,8 +4138,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0110.md -->
-**Código:** UNIT-0110
+<!-- file: UNIT-0116.md -->
+**Código:** UNIT-0116
 
 # test_patch_with_is_active_does_not_log_combo_deactivated
 
@@ -3958,8 +4174,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0111.md -->
-**Código:** UNIT-0111
+<!-- file: UNIT-0117.md -->
+**Código:** UNIT-0117
 
 # test_delete_logs_product_deactivated_event
 
@@ -3994,8 +4210,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0112.md -->
-**Código:** UNIT-0112
+<!-- file: UNIT-0118.md -->
+**Código:** UNIT-0118
 
 # test_delete_returns_409_when_in_active_combo
 
@@ -4030,8 +4246,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0113.md -->
-**Código:** UNIT-0113
+<!-- file: UNIT-0119.md -->
+**Código:** UNIT-0119
 
 # test_delete_succeeds_when_not_in_any_combo
 
@@ -4066,8 +4282,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0114.md -->
-**Código:** UNIT-0114
+<!-- file: UNIT-0120.md -->
+**Código:** UNIT-0120
 
 # test_delete_succeeds_when_only_in_inactive_combo
 
@@ -4102,8 +4318,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0115.md -->
-**Código:** UNIT-0115
+<!-- file: UNIT-0121.md -->
+**Código:** UNIT-0121
 
 # test_delete_deactivates_product
 
@@ -4138,8 +4354,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0116.md -->
-**Código:** UNIT-0116
+<!-- file: UNIT-0122.md -->
+**Código:** UNIT-0122
 
 # test_delete_requires_almacenista
 
@@ -4174,8 +4390,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0117.md -->
-**Código:** UNIT-0117
+<!-- file: UNIT-0123.md -->
+**Código:** UNIT-0123
 
 # test_list_excludes_inactive_by_default
 
@@ -4210,8 +4426,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0118.md -->
-**Código:** UNIT-0118
+<!-- file: UNIT-0124.md -->
+**Código:** UNIT-0124
 
 # test_list_includes_inactive_with_param
 
@@ -4246,8 +4462,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0119.md -->
-**Código:** UNIT-0119
+<!-- file: UNIT-0125.md -->
+**Código:** UNIT-0125
 
 # test_restore_reactivates_product
 
@@ -4282,8 +4498,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0120.md -->
-**Código:** UNIT-0120
+<!-- file: UNIT-0126.md -->
+**Código:** UNIT-0126
 
 # test_restore_requires_almacenista
 
@@ -4318,8 +4534,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0121.md -->
-**Código:** UNIT-0121
+<!-- file: UNIT-0127.md -->
+**Código:** UNIT-0127
 
 # test_delete_soft_deletes
 
@@ -4354,8 +4570,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0122.md -->
-**Código:** UNIT-0122
+<!-- file: UNIT-0128.md -->
+**Código:** UNIT-0128
 
 # test_delete_with_active_products_returns_409
 
@@ -4390,8 +4606,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0123.md -->
-**Código:** UNIT-0123
+<!-- file: UNIT-0129.md -->
+**Código:** UNIT-0129
 
 # test_get_detail_returns_200
 
@@ -4426,8 +4642,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0124.md -->
-**Código:** UNIT-0124
+<!-- file: UNIT-0130.md -->
+**Código:** UNIT-0130
 
 # test_list_excludes_inactive_by_default
 
@@ -4462,8 +4678,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0125.md -->
-**Código:** UNIT-0125
+<!-- file: UNIT-0131.md -->
+**Código:** UNIT-0131
 
 # test_list_includes_inactive_with_param
 
@@ -4498,8 +4714,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0126.md -->
-**Código:** UNIT-0126
+<!-- file: UNIT-0132.md -->
+**Código:** UNIT-0132
 
 # test_patch_updates_name
 
@@ -4534,8 +4750,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0127.md -->
-**Código:** UNIT-0127
+<!-- file: UNIT-0133.md -->
+**Código:** UNIT-0133
 
 # test_put_updates_subcategory
 
@@ -4570,8 +4786,8 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0128.md -->
-**Código:** UNIT-0128
+<!-- file: UNIT-0134.md -->
+**Código:** UNIT-0134
 
 # test_restore_reactivates
 
@@ -4606,8 +4822,548 @@ Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/te
 
 ---
 
-<!-- file: UNIT-0129.md -->
-**Código:** UNIT-0129
+<!-- file: UNIT-0135.md -->
+**Código:** UNIT-0135
+
+# test_api_get_price_history_returns_list
+
+## Nombre del test
+
+`apps/catalog/tests/test_product_pricing.py::test_api_get_price_history_returns_list`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_product_pricing.py::test_api_get_price_history_returns_list -v
+```
+
+Código fuente: [apps/catalog/tests/test_product_pricing.py](../../apps/catalog/tests/test_product_pricing.py) (aprox. línea 213)
+
+
+---
+
+<!-- file: UNIT-0136.md -->
+**Código:** UNIT-0136
+
+# test_api_patch_prices_rejects_auxiliar
+
+## Nombre del test
+
+`apps/catalog/tests/test_product_pricing.py::test_api_patch_prices_rejects_auxiliar`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_product_pricing.py::test_api_patch_prices_rejects_auxiliar -v
+```
+
+Código fuente: [apps/catalog/tests/test_product_pricing.py](../../apps/catalog/tests/test_product_pricing.py) (aprox. línea 187)
+
+
+---
+
+<!-- file: UNIT-0137.md -->
+**Código:** UNIT-0137
+
+# test_api_patch_prices_rejects_negative_price
+
+## Nombre del test
+
+`apps/catalog/tests/test_product_pricing.py::test_api_patch_prices_rejects_negative_price`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_product_pricing.py::test_api_patch_prices_rejects_negative_price -v
+```
+
+Código fuente: [apps/catalog/tests/test_product_pricing.py](../../apps/catalog/tests/test_product_pricing.py) (aprox. línea 197)
+
+
+---
+
+<!-- file: UNIT-0138.md -->
+**Código:** UNIT-0138
+
+# test_api_patch_prices_rejects_tax_over_100
+
+## Nombre del test
+
+`apps/catalog/tests/test_product_pricing.py::test_api_patch_prices_rejects_tax_over_100`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_product_pricing.py::test_api_patch_prices_rejects_tax_over_100 -v
+```
+
+Código fuente: [apps/catalog/tests/test_product_pricing.py](../../apps/catalog/tests/test_product_pricing.py) (aprox. línea 205)
+
+
+---
+
+<!-- file: UNIT-0139.md -->
+**Código:** UNIT-0139
+
+# test_api_patch_prices_updates_product
+
+## Nombre del test
+
+`apps/catalog/tests/test_product_pricing.py::test_api_patch_prices_updates_product`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_product_pricing.py::test_api_patch_prices_updates_product -v
+```
+
+Código fuente: [apps/catalog/tests/test_product_pricing.py](../../apps/catalog/tests/test_product_pricing.py) (aprox. línea 172)
+
+
+---
+
+<!-- file: UNIT-0140.md -->
+**Código:** UNIT-0140
+
+# test_price_history_tracks_old_and_new_value
+
+## Nombre del test
+
+`apps/catalog/tests/test_product_pricing.py::test_price_history_tracks_old_and_new_value`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_product_pricing.py::test_price_history_tracks_old_and_new_value -v
+```
+
+Código fuente: [apps/catalog/tests/test_product_pricing.py](../../apps/catalog/tests/test_product_pricing.py) (aprox. línea 94)
+
+
+---
+
+<!-- file: UNIT-0141.md -->
+**Código:** UNIT-0141
+
+# test_product_can_store_all_price_fields
+
+## Nombre del test
+
+`apps/catalog/tests/test_product_pricing.py::test_product_can_store_all_price_fields`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_product_pricing.py::test_product_can_store_all_price_fields -v
+```
+
+Código fuente: [apps/catalog/tests/test_product_pricing.py](../../apps/catalog/tests/test_product_pricing.py) (aprox. línea 52)
+
+
+---
+
+<!-- file: UNIT-0142.md -->
+**Código:** UNIT-0142
+
+# test_product_price_fields_are_nullable_by_default
+
+## Nombre del test
+
+`apps/catalog/tests/test_product_pricing.py::test_product_price_fields_are_nullable_by_default`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_product_pricing.py::test_product_price_fields_are_nullable_by_default -v
+```
+
+Código fuente: [apps/catalog/tests/test_product_pricing.py](../../apps/catalog/tests/test_product_pricing.py) (aprox. línea 42)
+
+
+---
+
+<!-- file: UNIT-0143.md -->
+**Código:** UNIT-0143
+
+# test_product_serializer_exposes_price_fields
+
+## Nombre del test
+
+`apps/catalog/tests/test_product_pricing.py::test_product_serializer_exposes_price_fields`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_product_pricing.py::test_product_serializer_exposes_price_fields -v
+```
+
+Código fuente: [apps/catalog/tests/test_product_pricing.py](../../apps/catalog/tests/test_product_pricing.py) (aprox. línea 227)
+
+
+---
+
+<!-- file: UNIT-0144.md -->
+**Código:** UNIT-0144
+
+# test_update_multiple_price_fields_creates_multiple_history_records
+
+## Nombre del test
+
+`apps/catalog/tests/test_product_pricing.py::test_update_multiple_price_fields_creates_multiple_history_records`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_product_pricing.py::test_update_multiple_price_fields_creates_multiple_history_records -v
+```
+
+Código fuente: [apps/catalog/tests/test_product_pricing.py](../../apps/catalog/tests/test_product_pricing.py) (aprox. línea 109)
+
+
+---
+
+<!-- file: UNIT-0145.md -->
+**Código:** UNIT-0145
+
+# test_update_no_fields_returns_product_unchanged
+
+## Nombre del test
+
+`apps/catalog/tests/test_product_pricing.py::test_update_no_fields_returns_product_unchanged`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_product_pricing.py::test_update_no_fields_returns_product_unchanged -v
+```
+
+Código fuente: [apps/catalog/tests/test_product_pricing.py](../../apps/catalog/tests/test_product_pricing.py) (aprox. línea 135)
+
+
+---
+
+<!-- file: UNIT-0146.md -->
+**Código:** UNIT-0146
+
+# test_update_price_creates_history_record
+
+## Nombre del test
+
+`apps/catalog/tests/test_product_pricing.py::test_update_price_creates_history_record`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_product_pricing.py::test_update_price_creates_history_record -v
+```
+
+Código fuente: [apps/catalog/tests/test_product_pricing.py](../../apps/catalog/tests/test_product_pricing.py) (aprox. línea 74)
+
+
+---
+
+<!-- file: UNIT-0147.md -->
+**Código:** UNIT-0147
+
+# test_update_prices_requires_almacenista_role
+
+## Nombre del test
+
+`apps/catalog/tests/test_product_pricing.py::test_update_prices_requires_almacenista_role`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_product_pricing.py::test_update_prices_requires_almacenista_role -v
+```
+
+Código fuente: [apps/catalog/tests/test_product_pricing.py](../../apps/catalog/tests/test_product_pricing.py) (aprox. línea 156)
+
+
+---
+
+<!-- file: UNIT-0148.md -->
+**Código:** UNIT-0148
+
+# test_update_with_same_value_does_not_create_history
+
+## Nombre del test
+
+`apps/catalog/tests/test_product_pricing.py::test_update_with_same_value_does_not_create_history`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_product_pricing.py::test_update_with_same_value_does_not_create_history -v
+```
+
+Código fuente: [apps/catalog/tests/test_product_pricing.py](../../apps/catalog/tests/test_product_pricing.py) (aprox. línea 124)
+
+
+---
+
+<!-- file: UNIT-0149.md -->
+**Código:** UNIT-0149
+
+# test_wholesale_price_can_differ_from_retail
+
+## Nombre del test
+
+`apps/catalog/tests/test_product_pricing.py::test_wholesale_price_can_differ_from_retail`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_product_pricing.py::test_wholesale_price_can_differ_from_retail -v
+```
+
+Código fuente: [apps/catalog/tests/test_product_pricing.py](../../apps/catalog/tests/test_product_pricing.py) (aprox. línea 143)
+
+
+---
+
+<!-- file: UNIT-0150.md -->
+**Código:** UNIT-0150
 
 # test_catalog_service_exports_identifier_resolver
 
@@ -4642,8 +5398,8 @@ Código fuente: [apps/catalog/tests/test_services.py](../../apps/catalog/tests/t
 
 ---
 
-<!-- file: UNIT-0130.md -->
-**Código:** UNIT-0130
+<!-- file: UNIT-0151.md -->
+**Código:** UNIT-0151
 
 # test_create_product_auto_generates_stable_barcode
 
@@ -4678,8 +5434,8 @@ Código fuente: [apps/catalog/tests/test_services.py](../../apps/catalog/tests/t
 
 ---
 
-<!-- file: UNIT-0131.md -->
-**Código:** UNIT-0131
+<!-- file: UNIT-0152.md -->
+**Código:** UNIT-0152
 
 # test_update_product_backfills_missing_barcode
 
@@ -4714,8 +5470,8 @@ Código fuente: [apps/catalog/tests/test_services.py](../../apps/catalog/tests/t
 
 ---
 
-<!-- file: UNIT-0132.md -->
-**Código:** UNIT-0132
+<!-- file: UNIT-0153.md -->
+**Código:** UNIT-0153
 
 # test_update_product_keeps_existing_barcode
 
@@ -4750,8 +5506,8 @@ Código fuente: [apps/catalog/tests/test_services.py](../../apps/catalog/tests/t
 
 ---
 
-<!-- file: UNIT-0133.md -->
-**Código:** UNIT-0133
+<!-- file: UNIT-0154.md -->
+**Código:** UNIT-0154
 
 # test_catalog_views_are_available
 
@@ -4786,8 +5542,8 @@ Código fuente: [apps/catalog/tests/test_views.py](../../apps/catalog/tests/test
 
 ---
 
-<!-- file: UNIT-0134.md -->
-**Código:** UNIT-0134
+<!-- file: UNIT-0155.md -->
+**Código:** UNIT-0155
 
 # test_product_barcode_endpoint_returns_ready_to_consume_payload
 
@@ -4822,8 +5578,8 @@ Código fuente: [apps/catalog/tests/test_views.py](../../apps/catalog/tests/test
 
 ---
 
-<!-- file: UNIT-0135.md -->
-**Código:** UNIT-0135
+<!-- file: UNIT-0156.md -->
+**Código:** UNIT-0156
 
 # test_dashboard_kpis_expose_precision_metadata
 
@@ -4858,8 +5614,8 @@ Código fuente: [apps/dashboard/tests/test_views.py](../../apps/dashboard/tests/
 
 ---
 
-<!-- file: UNIT-0136.md -->
-**Código:** UNIT-0136
+<!-- file: UNIT-0157.md -->
+**Código:** UNIT-0157
 
 # test_dashboard_overview_returns_composable_payload
 
@@ -4894,8 +5650,8 @@ Código fuente: [apps/dashboard/tests/test_views.py](../../apps/dashboard/tests/
 
 ---
 
-<!-- file: UNIT-0137.md -->
-**Código:** UNIT-0137
+<!-- file: UNIT-0158.md -->
+**Código:** UNIT-0158
 
 # test_dashboard_service_overview_stays_structured
 
@@ -4930,8 +5686,8 @@ Código fuente: [apps/dashboard/tests/test_views.py](../../apps/dashboard/tests/
 
 ---
 
-<!-- file: UNIT-0138.md -->
-**Código:** UNIT-0138
+<!-- file: UNIT-0159.md -->
+**Código:** UNIT-0159
 
 # test_stock_by_location_admin_is_least_privilege_derived_stock
 
@@ -4966,8 +5722,8 @@ Código fuente: [apps/inventory/tests/test_admin.py](../../apps/inventory/tests/
 
 ---
 
-<!-- file: UNIT-0139.md -->
-**Código:** UNIT-0139
+<!-- file: UNIT-0160.md -->
+**Código:** UNIT-0160
 
 # test_verify_integrity_detects_divergence
 
@@ -5002,8 +5758,8 @@ Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0140.md -->
-**Código:** UNIT-0140
+<!-- file: UNIT-0161.md -->
+**Código:** UNIT-0161
 
 # test_verify_integrity_empty_stock
 
@@ -5038,8 +5794,8 @@ Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0141.md -->
-**Código:** UNIT-0141
+<!-- file: UNIT-0162.md -->
+**Código:** UNIT-0162
 
 # test_verify_integrity_fix_flag
 
@@ -5074,8 +5830,8 @@ Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0142.md -->
-**Código:** UNIT-0142
+<!-- file: UNIT-0163.md -->
+**Código:** UNIT-0163
 
 # test_verify_integrity_no_divergence
 
@@ -5110,8 +5866,8 @@ Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0143.md -->
-**Código:** UNIT-0143
+<!-- file: UNIT-0164.md -->
+**Código:** UNIT-0164
 
 # test_verify_integrity_no_fix_without_flag
 
@@ -5146,8 +5902,8 @@ Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0144.md -->
-**Código:** UNIT-0144
+<!-- file: UNIT-0165.md -->
+**Código:** UNIT-0165
 
 # test_effective_reorder_point_uses_global_when_no_override
 
@@ -5182,8 +5938,8 @@ Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inv
 
 ---
 
-<!-- file: UNIT-0145.md -->
-**Código:** UNIT-0145
+<!-- file: UNIT-0166.md -->
+**Código:** UNIT-0166
 
 # test_effective_reorder_point_uses_local_override
 
@@ -5218,8 +5974,8 @@ Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inv
 
 ---
 
-<!-- file: UNIT-0146.md -->
-**Código:** UNIT-0146
+<!-- file: UNIT-0167.md -->
+**Código:** UNIT-0167
 
 # test_global_threshold_generates_alert_without_local_override
 
@@ -5254,8 +6010,8 @@ Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inv
 
 ---
 
-<!-- file: UNIT-0147.md -->
-**Código:** UNIT-0147
+<!-- file: UNIT-0168.md -->
+**Código:** UNIT-0168
 
 # test_local_threshold_prevents_alert_when_stock_above_local
 
@@ -5290,8 +6046,8 @@ Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inv
 
 ---
 
-<!-- file: UNIT-0148.md -->
-**Código:** UNIT-0148
+<!-- file: UNIT-0169.md -->
+**Código:** UNIT-0169
 
 # test_patch_threshold_null_removes_override
 
@@ -5326,8 +6082,8 @@ Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inv
 
 ---
 
-<!-- file: UNIT-0149.md -->
-**Código:** UNIT-0149
+<!-- file: UNIT-0170.md -->
+**Código:** UNIT-0170
 
 # test_patch_threshold_via_api
 
@@ -5362,8 +6118,8 @@ Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inv
 
 ---
 
-<!-- file: UNIT-0150.md -->
-**Código:** UNIT-0150
+<!-- file: UNIT-0171.md -->
+**Código:** UNIT-0171
 
 # test_inventory_models_define_location_and_stock_cache
 
@@ -5398,8 +6154,8 @@ Código fuente: [apps/inventory/tests/test_models.py](../../apps/inventory/tests
 
 ---
 
-<!-- file: UNIT-0151.md -->
-**Código:** UNIT-0151
+<!-- file: UNIT-0172.md -->
+**Código:** UNIT-0172
 
 # test_active_locations_always_visible
 
@@ -5434,8 +6190,8 @@ Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0152.md -->
-**Código:** UNIT-0152
+<!-- file: UNIT-0173.md -->
+**Código:** UNIT-0173
 
 # test_list_excludes_inactive_by_default
 
@@ -5470,8 +6226,8 @@ Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0153.md -->
-**Código:** UNIT-0153
+<!-- file: UNIT-0174.md -->
+**Código:** UNIT-0174
 
 # test_list_includes_inactive_with_param
 
@@ -5506,8 +6262,8 @@ Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0154.md -->
-**Código:** UNIT-0154
+<!-- file: UNIT-0175.md -->
+**Código:** UNIT-0175
 
 # test_patch_still_works_after_put_added
 
@@ -5542,8 +6298,8 @@ Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0155.md -->
-**Código:** UNIT-0155
+<!-- file: UNIT-0176.md -->
+**Código:** UNIT-0176
 
 # test_put_404_on_nonexistent
 
@@ -5578,8 +6334,8 @@ Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0156.md -->
-**Código:** UNIT-0156
+<!-- file: UNIT-0177.md -->
+**Código:** UNIT-0177
 
 # test_put_replaces_template
 
@@ -5614,8 +6370,8 @@ Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0157.md -->
-**Código:** UNIT-0157
+<!-- file: UNIT-0178.md -->
+**Código:** UNIT-0178
 
 # test_put_requires_almacenista
 
@@ -5650,8 +6406,8 @@ Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0158.md -->
-**Código:** UNIT-0158
+<!-- file: UNIT-0179.md -->
+**Código:** UNIT-0179
 
 # test_negative_stock_constraint_enforced
 
@@ -5686,8 +6442,8 @@ Código fuente: [apps/inventory/tests/test_selectors.py](../../apps/inventory/te
 
 ---
 
-<!-- file: UNIT-0159.md -->
-**Código:** UNIT-0159
+<!-- file: UNIT-0180.md -->
+**Código:** UNIT-0180
 
 # test_search_products_performance_under_2s
 
@@ -5722,8 +6478,8 @@ Código fuente: [apps/inventory/tests/test_selectors.py](../../apps/inventory/te
 
 ---
 
-<!-- file: UNIT-0160.md -->
-**Código:** UNIT-0160
+<!-- file: UNIT-0181.md -->
+**Código:** UNIT-0181
 
 # test_stock_query_returns_per_location_and_total
 
@@ -5758,8 +6514,8 @@ Código fuente: [apps/inventory/tests/test_selectors.py](../../apps/inventory/te
 
 ---
 
-<!-- file: UNIT-0161.md -->
-**Código:** UNIT-0161
+<!-- file: UNIT-0182.md -->
+**Código:** UNIT-0182
 
 # test_get_current_stock_does_not_leak_other_locations
 
@@ -5794,8 +6550,8 @@ Código fuente: [apps/inventory/tests/test_services.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0162.md -->
-**Código:** UNIT-0162
+<!-- file: UNIT-0183.md -->
+**Código:** UNIT-0183
 
 # test_get_current_stock_does_not_leak_other_products
 
@@ -5830,8 +6586,8 @@ Código fuente: [apps/inventory/tests/test_services.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0163.md -->
-**Código:** UNIT-0163
+<!-- file: UNIT-0184.md -->
+**Código:** UNIT-0184
 
 # test_get_current_stock_returns_existing_stock
 
@@ -5866,8 +6622,8 @@ Código fuente: [apps/inventory/tests/test_services.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0164.md -->
-**Código:** UNIT-0164
+<!-- file: UNIT-0185.md -->
+**Código:** UNIT-0185
 
 # test_get_current_stock_returns_zero_when_no_row
 
@@ -5902,8 +6658,8 @@ Código fuente: [apps/inventory/tests/test_services.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0165.md -->
-**Código:** UNIT-0165
+<!-- file: UNIT-0186.md -->
+**Código:** UNIT-0186
 
 # test_trigger_stock_reconstruction_detects_discrepancy
 
@@ -5938,8 +6694,8 @@ Código fuente: [apps/inventory/tests/test_services.py](../../apps/inventory/tes
 
 ---
 
-<!-- file: UNIT-0166.md -->
-**Código:** UNIT-0166
+<!-- file: UNIT-0187.md -->
+**Código:** UNIT-0187
 
 # test_location_patch_can_assign_storage_template
 
@@ -5974,8 +6730,8 @@ Código fuente: [apps/inventory/tests/test_storage_templates.py](../../apps/inve
 
 ---
 
-<!-- file: UNIT-0167.md -->
-**Código:** UNIT-0167
+<!-- file: UNIT-0188.md -->
+**Código:** UNIT-0188
 
 # test_storage_template_crud_and_location_defaults
 
@@ -6010,8 +6766,8 @@ Código fuente: [apps/inventory/tests/test_storage_templates.py](../../apps/inve
 
 ---
 
-<!-- file: UNIT-0168.md -->
-**Código:** UNIT-0168
+<!-- file: UNIT-0189.md -->
+**Código:** UNIT-0189
 
 # test_inactive_storage_type_rejected_on_create_location
 
@@ -6046,8 +6802,8 @@ Código fuente: [apps/inventory/tests/test_storage_types.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0169.md -->
-**Código:** UNIT-0169
+<!-- file: UNIT-0190.md -->
+**Código:** UNIT-0190
 
 # test_inactive_storage_type_rejected_on_patch_location
 
@@ -6082,8 +6838,8 @@ Código fuente: [apps/inventory/tests/test_storage_types.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0170.md -->
-**Código:** UNIT-0170
+<!-- file: UNIT-0191.md -->
+**Código:** UNIT-0191
 
 # test_location_capacity_relative_fields_in_create_and_patch
 
@@ -6118,8 +6874,8 @@ Código fuente: [apps/inventory/tests/test_storage_types.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0171.md -->
-**Código:** UNIT-0171
+<!-- file: UNIT-0192.md -->
+**Código:** UNIT-0192
 
 # test_location_patch_can_assign_storage_type
 
@@ -6154,8 +6910,8 @@ Código fuente: [apps/inventory/tests/test_storage_types.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0172.md -->
-**Código:** UNIT-0172
+<!-- file: UNIT-0193.md -->
+**Código:** UNIT-0193
 
 # test_location_state_transition_endpoint
 
@@ -6190,8 +6946,8 @@ Código fuente: [apps/inventory/tests/test_storage_types.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0173.md -->
-**Código:** UNIT-0173
+<!-- file: UNIT-0194.md -->
+**Código:** UNIT-0194
 
 # test_storage_type_crud_and_location_binding
 
@@ -6226,8 +6982,8 @@ Código fuente: [apps/inventory/tests/test_storage_types.py](../../apps/inventor
 
 ---
 
-<!-- file: UNIT-0174.md -->
-**Código:** UNIT-0174
+<!-- file: UNIT-0195.md -->
+**Código:** UNIT-0195
 
 # test_inventory_views_are_available
 
@@ -6262,8 +7018,8 @@ Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/
 
 ---
 
-<!-- file: UNIT-0175.md -->
-**Código:** UNIT-0175
+<!-- file: UNIT-0196.md -->
+**Código:** UNIT-0196
 
 # test_dispatch_combo_creates_audit_log
 
@@ -6298,8 +7054,8 @@ Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movemen
 
 ---
 
-<!-- file: UNIT-0176.md -->
-**Código:** UNIT-0176
+<!-- file: UNIT-0197.md -->
+**Código:** UNIT-0197
 
 # test_dispatch_combo_inactive_combo_returns_404
 
@@ -6334,8 +7090,8 @@ Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movemen
 
 ---
 
-<!-- file: UNIT-0177.md -->
-**Código:** UNIT-0177
+<!-- file: UNIT-0198.md -->
+**Código:** UNIT-0198
 
 # test_dispatch_combo_insufficient_stock
 
@@ -6370,8 +7126,8 @@ Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movemen
 
 ---
 
-<!-- file: UNIT-0178.md -->
-**Código:** UNIT-0178
+<!-- file: UNIT-0199.md -->
+**Código:** UNIT-0199
 
 # test_dispatch_combo_requires_authentication
 
@@ -6406,8 +7162,8 @@ Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movemen
 
 ---
 
-<!-- file: UNIT-0179.md -->
-**Código:** UNIT-0179
+<!-- file: UNIT-0200.md -->
+**Código:** UNIT-0200
 
 # test_dispatch_combo_success
 
@@ -6442,8 +7198,620 @@ Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movemen
 
 ---
 
-<!-- file: UNIT-0180.md -->
-**Código:** UNIT-0180
+<!-- file: UNIT-0201.md -->
+**Código:** UNIT-0201
+
+# test_customer_snapshot_persisted_on_wholesale_dispatch
+
+## Nombre del test
+
+`apps/movements/tests/test_dispatch_pricing.py::test_customer_snapshot_persisted_on_wholesale_dispatch`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_dispatch_pricing.py::test_customer_snapshot_persisted_on_wholesale_dispatch -v
+```
+
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 160)
+
+
+---
+
+<!-- file: UNIT-0202.md -->
+**Código:** UNIT-0202
+
+# test_damage_dispatch_uses_unit_cost_as_price_type
+
+## Nombre del test
+
+`apps/movements/tests/test_dispatch_pricing.py::test_damage_dispatch_uses_unit_cost_as_price_type`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_dispatch_pricing.py::test_damage_dispatch_uses_unit_cost_as_price_type -v
+```
+
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 236)
+
+
+---
+
+<!-- file: UNIT-0203.md -->
+**Código:** UNIT-0203
+
+# test_dispatch_calculates_subtotal_tax_total_correctly
+
+## Nombre del test
+
+`apps/movements/tests/test_dispatch_pricing.py::test_dispatch_calculates_subtotal_tax_total_correctly`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_dispatch_pricing.py::test_dispatch_calculates_subtotal_tax_total_correctly -v
+```
+
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 84)
+
+
+---
+
+<!-- file: UNIT-0204.md -->
+**Código:** UNIT-0204
+
+# test_dispatch_retail_captures_sale_price_retail_as_unit_price
+
+## Nombre del test
+
+`apps/movements/tests/test_dispatch_pricing.py::test_dispatch_retail_captures_sale_price_retail_as_unit_price`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_dispatch_pricing.py::test_dispatch_retail_captures_sale_price_retail_as_unit_price -v
+```
+
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 28)
+
+
+---
+
+<!-- file: UNIT-0205.md -->
+**Código:** UNIT-0205
+
+# test_dispatch_wholesale_captures_sale_price_wholesale
+
+## Nombre del test
+
+`apps/movements/tests/test_dispatch_pricing.py::test_dispatch_wholesale_captures_sale_price_wholesale`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_dispatch_pricing.py::test_dispatch_wholesale_captures_sale_price_wholesale -v
+```
+
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 52)
+
+
+---
+
+<!-- file: UNIT-0206.md -->
+**Código:** UNIT-0206
+
+# test_dispatch_with_discount_calculates_correctly
+
+## Nombre del test
+
+`apps/movements/tests/test_dispatch_pricing.py::test_dispatch_with_discount_calculates_correctly`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_dispatch_pricing.py::test_dispatch_with_discount_calculates_correctly -v
+```
+
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 112)
+
+
+---
+
+<!-- file: UNIT-0207.md -->
+**Código:** UNIT-0207
+
+# test_dispatch_without_product_price_stores_null_gracefully
+
+## Nombre del test
+
+`apps/movements/tests/test_dispatch_pricing.py::test_dispatch_without_product_price_stores_null_gracefully`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_dispatch_pricing.py::test_dispatch_without_product_price_stores_null_gracefully -v
+```
+
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 139)
+
+
+---
+
+<!-- file: UNIT-0208.md -->
+**Código:** UNIT-0208
+
+# test_movement_serializer_exposes_price_fields
+
+## Nombre del test
+
+`apps/movements/tests/test_dispatch_pricing.py::test_movement_serializer_exposes_price_fields`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_dispatch_pricing.py::test_movement_serializer_exposes_price_fields -v
+```
+
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 258)
+
+
+---
+
+<!-- file: UNIT-0209.md -->
+**Código:** UNIT-0209
+
+# test_price_snapshot_immutable_after_product_price_change
+
+## Nombre del test
+
+`apps/movements/tests/test_dispatch_pricing.py::test_price_snapshot_immutable_after_product_price_change`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_dispatch_pricing.py::test_price_snapshot_immutable_after_product_price_change -v
+```
+
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 204)
+
+
+---
+
+<!-- file: UNIT-0210.md -->
+**Código:** UNIT-0210
+
+# test_retail_dispatch_has_no_customer_snapshot
+
+## Nombre del test
+
+`apps/movements/tests/test_dispatch_pricing.py::test_retail_dispatch_has_no_customer_snapshot`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_dispatch_pricing.py::test_retail_dispatch_has_no_customer_snapshot -v
+```
+
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 188)
+
+
+---
+
+<!-- file: UNIT-0211.md -->
+**Código:** UNIT-0211
+
+# test_api_invoice_detail_404_for_unknown_number
+
+## Nombre del test
+
+`apps/movements/tests/test_invoice.py::test_api_invoice_detail_404_for_unknown_number`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_invoice.py::test_api_invoice_detail_404_for_unknown_number -v
+```
+
+Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 181)
+
+
+---
+
+<!-- file: UNIT-0212.md -->
+**Código:** UNIT-0212
+
+# test_api_invoice_detail_returns_correct_data
+
+## Nombre del test
+
+`apps/movements/tests/test_invoice.py::test_api_invoice_detail_returns_correct_data`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_invoice.py::test_api_invoice_detail_returns_correct_data -v
+```
+
+Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 152)
+
+
+---
+
+<!-- file: UNIT-0213.md -->
+**Código:** UNIT-0213
+
+# test_create_invoice_from_movements_manually
+
+## Nombre del test
+
+`apps/movements/tests/test_invoice.py::test_create_invoice_from_movements_manually`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_invoice.py::test_create_invoice_from_movements_manually -v
+```
+
+Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 121)
+
+
+---
+
+<!-- file: UNIT-0214.md -->
+**Código:** UNIT-0214
+
+# test_invoice_created_on_dispatch
+
+## Nombre del test
+
+`apps/movements/tests/test_invoice.py::test_invoice_created_on_dispatch`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_invoice.py::test_invoice_created_on_dispatch -v
+```
+
+Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 29)
+
+
+---
+
+<!-- file: UNIT-0215.md -->
+**Código:** UNIT-0215
+
+# test_invoice_has_customer_data_on_wholesale
+
+## Nombre del test
+
+`apps/movements/tests/test_invoice.py::test_invoice_has_customer_data_on_wholesale`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_invoice.py::test_invoice_has_customer_data_on_wholesale -v
+```
+
+Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 74)
+
+
+---
+
+<!-- file: UNIT-0216.md -->
+**Código:** UNIT-0216
+
+# test_invoice_totals_match_sum_of_movements
+
+## Nombre del test
+
+`apps/movements/tests/test_invoice.py::test_invoice_totals_match_sum_of_movements`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_invoice.py::test_invoice_totals_match_sum_of_movements -v
+```
+
+Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 50)
+
+
+---
+
+<!-- file: UNIT-0217.md -->
+**Código:** UNIT-0217
+
+# test_invoice_without_price_has_zero_totals
+
+## Nombre del test
+
+`apps/movements/tests/test_invoice.py::test_invoice_without_price_has_zero_totals`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_invoice.py::test_invoice_without_price_has_zero_totals -v
+```
+
+Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 103)
+
+
+---
+
+<!-- file: UNIT-0218.md -->
+**Código:** UNIT-0218
 
 # test_movement_type_labels
 
@@ -6478,8 +7846,296 @@ Código fuente: [apps/movements/tests/test_models.py](../../apps/movements/tests
 
 ---
 
-<!-- file: UNIT-0181.md -->
-**Código:** UNIT-0181
+<!-- file: UNIT-0219.md -->
+**Código:** UNIT-0219
+
+# test_combo_create_without_price_strategy_uses_derived
+
+## Nombre del test
+
+`apps/movements/tests/test_pricing_optional.py::test_combo_create_without_price_strategy_uses_derived`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_pricing_optional.py::test_combo_create_without_price_strategy_uses_derived -v
+```
+
+Código fuente: [apps/movements/tests/test_pricing_optional.py](../../apps/movements/tests/test_pricing_optional.py) (aprox. línea 185)
+
+
+---
+
+<!-- file: UNIT-0220.md -->
+**Código:** UNIT-0220
+
+# test_combo_dispatch_without_prices_completes_normally
+
+## Nombre del test
+
+`apps/movements/tests/test_pricing_optional.py::test_combo_dispatch_without_prices_completes_normally`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_pricing_optional.py::test_combo_dispatch_without_prices_completes_normally -v
+```
+
+Código fuente: [apps/movements/tests/test_pricing_optional.py](../../apps/movements/tests/test_pricing_optional.py) (aprox. línea 208)
+
+
+---
+
+<!-- file: UNIT-0221.md -->
+**Código:** UNIT-0221
+
+# test_dispatch_api_works_without_any_price_fields
+
+## Nombre del test
+
+`apps/movements/tests/test_pricing_optional.py::test_dispatch_api_works_without_any_price_fields`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_pricing_optional.py::test_dispatch_api_works_without_any_price_fields -v
+```
+
+Código fuente: [apps/movements/tests/test_pricing_optional.py](../../apps/movements/tests/test_pricing_optional.py) (aprox. línea 27)
+
+
+---
+
+<!-- file: UNIT-0222.md -->
+**Código:** UNIT-0222
+
+# test_dispatch_wholesale_without_prices_still_works
+
+## Nombre del test
+
+`apps/movements/tests/test_pricing_optional.py::test_dispatch_wholesale_without_prices_still_works`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_pricing_optional.py::test_dispatch_wholesale_without_prices_still_works -v
+```
+
+Código fuente: [apps/movements/tests/test_pricing_optional.py](../../apps/movements/tests/test_pricing_optional.py) (aprox. línea 56)
+
+
+---
+
+<!-- file: UNIT-0223.md -->
+**Código:** UNIT-0223
+
+# test_movement_list_response_is_backward_compatible
+
+## Nombre del test
+
+`apps/movements/tests/test_pricing_optional.py::test_movement_list_response_is_backward_compatible`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_pricing_optional.py::test_movement_list_response_is_backward_compatible -v
+```
+
+Código fuente: [apps/movements/tests/test_pricing_optional.py](../../apps/movements/tests/test_pricing_optional.py) (aprox. línea 86)
+
+
+---
+
+<!-- file: UNIT-0224.md -->
+**Código:** UNIT-0224
+
+# test_product_create_without_prices
+
+## Nombre del test
+
+`apps/movements/tests/test_pricing_optional.py::test_product_create_without_prices`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_pricing_optional.py::test_product_create_without_prices -v
+```
+
+Código fuente: [apps/movements/tests/test_pricing_optional.py](../../apps/movements/tests/test_pricing_optional.py) (aprox. línea 116)
+
+
+---
+
+<!-- file: UNIT-0225.md -->
+**Código:** UNIT-0225
+
+# test_product_get_exposes_prices_as_nullable_info
+
+## Nombre del test
+
+`apps/movements/tests/test_pricing_optional.py::test_product_get_exposes_prices_as_nullable_info`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_pricing_optional.py::test_product_get_exposes_prices_as_nullable_info -v
+```
+
+Código fuente: [apps/movements/tests/test_pricing_optional.py](../../apps/movements/tests/test_pricing_optional.py) (aprox. línea 159)
+
+
+---
+
+<!-- file: UNIT-0226.md -->
+**Código:** UNIT-0226
+
+# test_product_patch_without_price_fields_unchanged
+
+## Nombre del test
+
+`apps/movements/tests/test_pricing_optional.py::test_product_patch_without_price_fields_unchanged`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/movements/tests/test_pricing_optional.py::test_product_patch_without_price_fields_unchanged -v
+```
+
+Código fuente: [apps/movements/tests/test_pricing_optional.py](../../apps/movements/tests/test_pricing_optional.py) (aprox. línea 137)
+
+
+---
+
+<!-- file: UNIT-0227.md -->
+**Código:** UNIT-0227
 
 # test_adjustment_requires_justification
 
@@ -6514,8 +8170,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0182.md -->
-**Código:** UNIT-0182
+<!-- file: UNIT-0228.md -->
+**Código:** UNIT-0228
 
 # test_correct_entrada_within_window
 
@@ -6550,8 +8206,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0183.md -->
-**Código:** UNIT-0183
+<!-- file: UNIT-0229.md -->
+**Código:** UNIT-0229
 
 # test_correct_movement_outside_window_raises
 
@@ -6586,8 +8242,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0184.md -->
-**Código:** UNIT-0184
+<!-- file: UNIT-0230.md -->
+**Código:** UNIT-0230
 
 # test_correct_salida_within_window
 
@@ -6622,8 +8278,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0185.md -->
-**Código:** UNIT-0185
+<!-- file: UNIT-0231.md -->
+**Código:** UNIT-0231
 
 # test_correction_within_window_creates_reversal_and_fixed
 
@@ -6658,8 +8314,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0186.md -->
-**Código:** UNIT-0186
+<!-- file: UNIT-0232.md -->
+**Código:** UNIT-0232
 
 # test_dispatch_chooses_earliest_lot_when_expiring_product
 
@@ -6694,8 +8350,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0187.md -->
-**Código:** UNIT-0187
+<!-- file: UNIT-0233.md -->
+**Código:** UNIT-0233
 
 # test_dispatch_consumes_across_multiple_lots
 
@@ -6730,8 +8386,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0188.md -->
-**Código:** UNIT-0188
+<!-- file: UNIT-0234.md -->
+**Código:** UNIT-0234
 
 # test_dispatch_cross_validation_fails_wrong_sku
 
@@ -6766,8 +8422,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0189.md -->
-**Código:** UNIT-0189
+<!-- file: UNIT-0235.md -->
+**Código:** UNIT-0235
 
 # test_dispatch_fails_when_origin_is_archived
 
@@ -6802,8 +8458,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0190.md -->
-**Código:** UNIT-0190
+<!-- file: UNIT-0236.md -->
+**Código:** UNIT-0236
 
 # test_dispatch_fails_when_origin_is_restricted
 
@@ -6838,8 +8494,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0191.md -->
-**Código:** UNIT-0191
+<!-- file: UNIT-0237.md -->
+**Código:** UNIT-0237
 
 # test_dispatch_fails_when_origin_location_is_in_maintenance
 
@@ -6874,8 +8530,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0192.md -->
-**Código:** UNIT-0192
+<!-- file: UNIT-0238.md -->
+**Código:** UNIT-0238
 
 # test_dispatch_single_movement_nonexpiring_product
 
@@ -6910,8 +8566,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0193.md -->
-**Código:** UNIT-0193
+<!-- file: UNIT-0239.md -->
+**Código:** UNIT-0239
 
 # test_entry_allows_destination_in_restricted
 
@@ -6946,8 +8602,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0194.md -->
-**Código:** UNIT-0194
+<!-- file: UNIT-0240.md -->
+**Código:** UNIT-0240
 
 # test_entry_allows_destination_location_in_maintenance
 
@@ -6982,8 +8638,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0195.md -->
-**Código:** UNIT-0195
+<!-- file: UNIT-0241.md -->
+**Código:** UNIT-0241
 
 # test_entry_discrepancy_note_required_when_qty_mismatch
 
@@ -7018,8 +8674,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0196.md -->
-**Código:** UNIT-0196
+<!-- file: UNIT-0242.md -->
+**Código:** UNIT-0242
 
 # test_entry_electroterapia_without_serial_fails
 
@@ -7054,8 +8710,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0197.md -->
-**Código:** UNIT-0197
+<!-- file: UNIT-0243.md -->
+**Código:** UNIT-0243
 
 # test_entry_fails_when_destination_is_archived
 
@@ -7090,8 +8746,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0198.md -->
-**Código:** UNIT-0198
+<!-- file: UNIT-0244.md -->
+**Código:** UNIT-0244
 
 # test_entry_increments_stock_and_creates_ledger_record
 
@@ -7126,8 +8782,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0199.md -->
-**Código:** UNIT-0199
+<!-- file: UNIT-0245.md -->
+**Código:** UNIT-0245
 
 # test_entry_with_lot_persists_lot_on_movement
 
@@ -7162,8 +8818,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0200.md -->
-**Código:** UNIT-0200
+<!-- file: UNIT-0246.md -->
+**Código:** UNIT-0246
 
 # test_internal_transfer_does_not_change_global_stock
 
@@ -7198,8 +8854,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0201.md -->
-**Código:** UNIT-0201
+<!-- file: UNIT-0247.md -->
+**Código:** UNIT-0247
 
 # test_internal_transfer_fails_when_destination_is_blocked
 
@@ -7234,8 +8890,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0202.md -->
-**Código:** UNIT-0202
+<!-- file: UNIT-0248.md -->
+**Código:** UNIT-0248
 
 # test_register_entry_raises_lot_code_required_for_expiring_product
 
@@ -7270,8 +8926,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0203.md -->
-**Código:** UNIT-0203
+<!-- file: UNIT-0249.md -->
+**Código:** UNIT-0249
 
 # test_register_entry_raises_lot_expiration_date_required
 
@@ -7306,8 +8962,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0204.md -->
-**Código:** UNIT-0204
+<!-- file: UNIT-0250.md -->
+**Código:** UNIT-0250
 
 # test_return_blocked_for_non_returnable_category
 
@@ -7342,8 +8998,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0205.md -->
-**Código:** UNIT-0205
+<!-- file: UNIT-0251.md -->
+**Código:** UNIT-0251
 
 # test_return_fails_when_destination_is_archived
 
@@ -7378,8 +9034,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0206.md -->
-**Código:** UNIT-0206
+<!-- file: UNIT-0252.md -->
+**Código:** UNIT-0252
 
 # test_return_fails_when_destination_is_blocked
 
@@ -7414,8 +9070,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0207.md -->
-**Código:** UNIT-0207
+<!-- file: UNIT-0253.md -->
+**Código:** UNIT-0253
 
 # test_stock_can_be_reconstructed_from_ledger
 
@@ -7450,8 +9106,8 @@ Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tes
 
 ---
 
-<!-- file: UNIT-0208.md -->
-**Código:** UNIT-0208
+<!-- file: UNIT-0254.md -->
+**Código:** UNIT-0254
 
 # test_movement_views_are_available
 
@@ -7486,8 +9142,8 @@ Código fuente: [apps/movements/tests/test_views.py](../../apps/movements/tests/
 
 ---
 
-<!-- file: UNIT-0209.md -->
-**Código:** UNIT-0209
+<!-- file: UNIT-0255.md -->
+**Código:** UNIT-0255
 
 # test_alerts_export_csv
 
@@ -7522,8 +9178,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0210.md -->
-**Código:** UNIT-0210
+<!-- file: UNIT-0256.md -->
+**Código:** UNIT-0256
 
 # test_expiring_products_export_csv
 
@@ -7558,8 +9214,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0211.md -->
-**Código:** UNIT-0211
+<!-- file: UNIT-0257.md -->
+**Código:** UNIT-0257
 
 # test_expiring_products_export_xlsx
 
@@ -7594,8 +9250,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0212.md -->
-**Código:** UNIT-0212
+<!-- file: UNIT-0258.md -->
+**Código:** UNIT-0258
 
 # test_export_empty_param_returns_json
 
@@ -7630,8 +9286,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0213.md -->
-**Código:** UNIT-0213
+<!-- file: UNIT-0259.md -->
+**Código:** UNIT-0259
 
 # test_export_unknown_param_returns_json
 
@@ -7666,8 +9322,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0214.md -->
-**Código:** UNIT-0214
+<!-- file: UNIT-0260.md -->
+**Código:** UNIT-0260
 
 # test_inventory_export_csv
 
@@ -7702,8 +9358,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0215.md -->
-**Código:** UNIT-0215
+<!-- file: UNIT-0261.md -->
+**Código:** UNIT-0261
 
 # test_inventory_export_xlsx
 
@@ -7738,8 +9394,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0216.md -->
-**Código:** UNIT-0216
+<!-- file: UNIT-0262.md -->
+**Código:** UNIT-0262
 
 # test_movement_history_export_csv
 
@@ -7774,8 +9430,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0217.md -->
-**Código:** UNIT-0217
+<!-- file: UNIT-0263.md -->
+**Código:** UNIT-0263
 
 # test_movement_history_export_xlsx
 
@@ -7810,8 +9466,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0218.md -->
-**Código:** UNIT-0218
+<!-- file: UNIT-0264.md -->
+**Código:** UNIT-0264
 
 # test_movement_history_json_unchanged
 
@@ -7846,8 +9502,404 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0219.md -->
-**Código:** UNIT-0219
+<!-- file: UNIT-0265.md -->
+**Código:** UNIT-0265
+
+# test_api_margin_by_product_returns_200
+
+## Nombre del test
+
+`apps/reports/tests/test_financial_reports.py::test_api_margin_by_product_returns_200`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/reports/tests/test_financial_reports.py::test_api_margin_by_product_returns_200 -v
+```
+
+Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/reports/tests/test_financial_reports.py) (aprox. línea 192)
+
+
+---
+
+<!-- file: UNIT-0266.md -->
+**Código:** UNIT-0266
+
+# test_api_revenue_summary_requires_auth
+
+## Nombre del test
+
+`apps/reports/tests/test_financial_reports.py::test_api_revenue_summary_requires_auth`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/reports/tests/test_financial_reports.py::test_api_revenue_summary_requires_auth -v
+```
+
+Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/reports/tests/test_financial_reports.py) (aprox. línea 210)
+
+
+---
+
+<!-- file: UNIT-0267.md -->
+**Código:** UNIT-0267
+
+# test_api_revenue_summary_returns_200
+
+## Nombre del test
+
+`apps/reports/tests/test_financial_reports.py::test_api_revenue_summary_returns_200`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/reports/tests/test_financial_reports.py::test_api_revenue_summary_returns_200 -v
+```
+
+Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/reports/tests/test_financial_reports.py) (aprox. línea 180)
+
+
+---
+
+<!-- file: UNIT-0268.md -->
+**Código:** UNIT-0268
+
+# test_api_sales_by_customer_returns_200
+
+## Nombre del test
+
+`apps/reports/tests/test_financial_reports.py::test_api_sales_by_customer_returns_200`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/reports/tests/test_financial_reports.py::test_api_sales_by_customer_returns_200 -v
+```
+
+Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/reports/tests/test_financial_reports.py) (aprox. línea 201)
+
+
+---
+
+<!-- file: UNIT-0269.md -->
+**Código:** UNIT-0269
+
+# test_gross_margin_correct_when_cost_and_price_set
+
+## Nombre del test
+
+`apps/reports/tests/test_financial_reports.py::test_gross_margin_correct_when_cost_and_price_set`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/reports/tests/test_financial_reports.py::test_gross_margin_correct_when_cost_and_price_set -v
+```
+
+Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/reports/tests/test_financial_reports.py) (aprox. línea 109)
+
+
+---
+
+<!-- file: UNIT-0270.md -->
+**Código:** UNIT-0270
+
+# test_gross_margin_excludes_movements_without_price
+
+## Nombre del test
+
+`apps/reports/tests/test_financial_reports.py::test_gross_margin_excludes_movements_without_price`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/reports/tests/test_financial_reports.py::test_gross_margin_excludes_movements_without_price -v
+```
+
+Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/reports/tests/test_financial_reports.py) (aprox. línea 132)
+
+
+---
+
+<!-- file: UNIT-0271.md -->
+**Código:** UNIT-0271
+
+# test_revenue_summary_products_without_price_contribute_zero
+
+## Nombre del test
+
+`apps/reports/tests/test_financial_reports.py::test_revenue_summary_products_without_price_contribute_zero`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/reports/tests/test_financial_reports.py::test_revenue_summary_products_without_price_contribute_zero -v
+```
+
+Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/reports/tests/test_financial_reports.py) (aprox. línea 91)
+
+
+---
+
+<!-- file: UNIT-0272.md -->
+**Código:** UNIT-0272
+
+# test_revenue_summary_returns_correct_totals
+
+## Nombre del test
+
+`apps/reports/tests/test_financial_reports.py::test_revenue_summary_returns_correct_totals`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/reports/tests/test_financial_reports.py::test_revenue_summary_returns_correct_totals -v
+```
+
+Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/reports/tests/test_financial_reports.py) (aprox. línea 47)
+
+
+---
+
+<!-- file: UNIT-0273.md -->
+**Código:** UNIT-0273
+
+# test_revenue_summary_separates_wholesale_and_retail
+
+## Nombre del test
+
+`apps/reports/tests/test_financial_reports.py::test_revenue_summary_separates_wholesale_and_retail`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/reports/tests/test_financial_reports.py::test_revenue_summary_separates_wholesale_and_retail -v
+```
+
+Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/reports/tests/test_financial_reports.py) (aprox. línea 64)
+
+
+---
+
+<!-- file: UNIT-0274.md -->
+**Código:** UNIT-0274
+
+# test_sales_by_customer_aggregates_correctly
+
+## Nombre del test
+
+`apps/reports/tests/test_financial_reports.py::test_sales_by_customer_aggregates_correctly`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/reports/tests/test_financial_reports.py::test_sales_by_customer_aggregates_correctly -v
+```
+
+Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/reports/tests/test_financial_reports.py) (aprox. línea 151)
+
+
+---
+
+<!-- file: UNIT-0275.md -->
+**Código:** UNIT-0275
+
+# test_webhook_emitted_on_dispatch_with_price
+
+## Nombre del test
+
+`apps/reports/tests/test_financial_reports.py::test_webhook_emitted_on_dispatch_with_price`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/reports/tests/test_financial_reports.py::test_webhook_emitted_on_dispatch_with_price -v
+```
+
+Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/reports/tests/test_financial_reports.py) (aprox. línea 222)
+
+
+---
+
+<!-- file: UNIT-0276.md -->
+**Código:** UNIT-0276
 
 # test_reports_app_has_no_domain_models
 
@@ -7882,8 +9934,8 @@ Código fuente: [apps/reports/tests/test_models.py](../../apps/reports/tests/tes
 
 ---
 
-<!-- file: UNIT-0220.md -->
-**Código:** UNIT-0220
+<!-- file: UNIT-0277.md -->
+**Código:** UNIT-0277
 
 # test_get_discard_operational_summary_excludes_returns
 
@@ -7918,8 +9970,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0221.md -->
-**Código:** UNIT-0221
+<!-- file: UNIT-0278.md -->
+**Código:** UNIT-0278
 
 # test_get_lots_expiring_soon_filters_by_window
 
@@ -7954,8 +10006,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0222.md -->
-**Código:** UNIT-0222
+<!-- file: UNIT-0279.md -->
+**Código:** UNIT-0279
 
 # test_get_quality_operational_summary_groups_damage_and_returns
 
@@ -7990,8 +10042,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0223.md -->
-**Código:** UNIT-0223
+<!-- file: UNIT-0280.md -->
+**Código:** UNIT-0280
 
 # test_get_warehouse_occupancy_distribution_returns_expected_sections
 
@@ -8026,8 +10078,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0224.md -->
-**Código:** UNIT-0224
+<!-- file: UNIT-0281.md -->
+**Código:** UNIT-0281
 
 # test_get_warehouse_utilization_supports_relative_capacity_and_distributions
 
@@ -8062,8 +10114,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0225.md -->
-**Código:** UNIT-0225
+<!-- file: UNIT-0282.md -->
+**Código:** UNIT-0282
 
 # test_get_warehouse_utilization_uses_capacity_and_stock
 
@@ -8098,8 +10150,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0226.md -->
-**Código:** UNIT-0226
+<!-- file: UNIT-0283.md -->
+**Código:** UNIT-0283
 
 # test_rotation_by_category_counts_units
 
@@ -8134,8 +10186,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0227.md -->
-**Código:** UNIT-0227
+<!-- file: UNIT-0284.md -->
+**Código:** UNIT-0284
 
 # test_generate_kpis_returns_dashboard_keys
 
@@ -8170,8 +10222,8 @@ Código fuente: [apps/reports/tests/test_services.py](../../apps/reports/tests/t
 
 ---
 
-<!-- file: UNIT-0228.md -->
-**Código:** UNIT-0228
+<!-- file: UNIT-0285.md -->
+**Código:** UNIT-0285
 
 # test_get_expiring_products_returns_lot_rows
 
@@ -8206,8 +10258,8 @@ Código fuente: [apps/reports/tests/test_services.py](../../apps/reports/tests/t
 
 ---
 
-<!-- file: UNIT-0229.md -->
-**Código:** UNIT-0229
+<!-- file: UNIT-0286.md -->
+**Código:** UNIT-0286
 
 # test_dispatch_orders_endpoint_returns_samples
 
@@ -8242,8 +10294,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0230.md -->
-**Código:** UNIT-0230
+<!-- file: UNIT-0287.md -->
+**Código:** UNIT-0287
 
 # test_movement_history_filters_by_location_id
 
@@ -8278,8 +10330,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0231.md -->
-**Código:** UNIT-0231
+<!-- file: UNIT-0288.md -->
+**Código:** UNIT-0288
 
 # test_reports_dataset_view_is_available
 
@@ -8314,8 +10366,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0232.md -->
-**Código:** UNIT-0232
+<!-- file: UNIT-0289.md -->
+**Código:** UNIT-0289
 
 # test_reports_dataset_view_supports_discard_operational
 
@@ -8350,8 +10402,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0233.md -->
-**Código:** UNIT-0233
+<!-- file: UNIT-0290.md -->
+**Código:** UNIT-0290
 
 # test_reports_dataset_view_supports_dispatch_operational
 
@@ -8386,8 +10438,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0234.md -->
-**Código:** UNIT-0234
+<!-- file: UNIT-0291.md -->
+**Código:** UNIT-0291
 
 # test_reports_dataset_view_supports_quality_operational
 
@@ -8422,8 +10474,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0235.md -->
-**Código:** UNIT-0235
+<!-- file: UNIT-0292.md -->
+**Código:** UNIT-0292
 
 # test_reports_dataset_view_supports_warehouse_occupancy_distribution
 
@@ -8458,8 +10510,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0236.md -->
-**Código:** UNIT-0236
+<!-- file: UNIT-0293.md -->
+**Código:** UNIT-0293
 
 # test_reports_dataset_view_supports_warehouse_utilization
 
@@ -8494,8 +10546,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0237.md -->
-**Código:** UNIT-0237
+<!-- file: UNIT-0294.md -->
+**Código:** UNIT-0294
 
 # test_reports_discard_operational_view_returns_summary
 
@@ -8530,8 +10582,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0238.md -->
-**Código:** UNIT-0238
+<!-- file: UNIT-0295.md -->
+**Código:** UNIT-0295
 
 # test_reports_dispatch_operational_view_returns_summary
 
@@ -8566,8 +10618,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0239.md -->
-**Código:** UNIT-0239
+<!-- file: UNIT-0296.md -->
+**Código:** UNIT-0296
 
 # test_reports_expiring_view_returns_lots
 
@@ -8602,8 +10654,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0240.md -->
-**Código:** UNIT-0240
+<!-- file: UNIT-0297.md -->
+**Código:** UNIT-0297
 
 # test_reports_quality_operational_view_returns_summary
 
@@ -8638,8 +10690,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0241.md -->
-**Código:** UNIT-0241
+<!-- file: UNIT-0298.md -->
+**Código:** UNIT-0298
 
 # test_reports_views_are_available
 
@@ -8674,8 +10726,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0242.md -->
-**Código:** UNIT-0242
+<!-- file: UNIT-0299.md -->
+**Código:** UNIT-0299
 
 # test_reports_warehouse_utilization_view_returns_summary
 
@@ -8710,8 +10762,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0243.md -->
-**Código:** UNIT-0243
+<!-- file: UNIT-0300.md -->
+**Código:** UNIT-0300
 
 # test_warehouse_utilization_by_storage_type_grouping
 
@@ -8746,8 +10798,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0244.md -->
-**Código:** UNIT-0244
+<!-- file: UNIT-0301.md -->
+**Código:** UNIT-0301
 
 # test_patch_still_works_independently
 
@@ -8782,8 +10834,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0245.md -->
-**Código:** UNIT-0245
+<!-- file: UNIT-0302.md -->
+**Código:** UNIT-0302
 
 # test_put_404_on_nonexistent
 
@@ -8818,8 +10870,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0246.md -->
-**Código:** UNIT-0246
+<!-- file: UNIT-0303.md -->
+**Código:** UNIT-0303
 
 # test_put_replaces_endpoint
 
@@ -8854,8 +10906,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0247.md -->
-**Código:** UNIT-0247
+<!-- file: UNIT-0304.md -->
+**Código:** UNIT-0304
 
 # test_put_requires_all_fields
 
@@ -8890,8 +10942,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0248.md -->
-**Código:** UNIT-0248
+<!-- file: UNIT-0305.md -->
+**Código:** UNIT-0305
 
 # test_put_requires_almacenista
 
@@ -8926,8 +10978,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0249.md -->
-**Código:** UNIT-0249
+<!-- file: UNIT-0306.md -->
+**Código:** UNIT-0306
 
 # test_deliver_connection_error_schedules_retry
 
@@ -8962,8 +11014,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0250.md -->
-**Código:** UNIT-0250
+<!-- file: UNIT-0307.md -->
+**Código:** UNIT-0307
 
 # test_deliver_max_retries_marks_as_failed
 
@@ -8998,8 +11050,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0251.md -->
-**Código:** UNIT-0251
+<!-- file: UNIT-0308.md -->
+**Código:** UNIT-0308
 
 # test_deliver_success
 
@@ -9034,8 +11086,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0252.md -->
-**Código:** UNIT-0252
+<!-- file: UNIT-0309.md -->
+**Código:** UNIT-0309
 
 # test_queue_creates_delivery_for_subscribed_endpoint
 
@@ -9070,8 +11122,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0253.md -->
-**Código:** UNIT-0253
+<!-- file: UNIT-0310.md -->
+**Código:** UNIT-0310
 
 # test_queue_creates_multiple_deliveries_for_multiple_endpoints
 
@@ -9106,8 +11158,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0254.md -->
-**Código:** UNIT-0254
+<!-- file: UNIT-0311.md -->
+**Código:** UNIT-0311
 
 # test_queue_skips_inactive_endpoints
 
@@ -9142,8 +11194,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0255.md -->
-**Código:** UNIT-0255
+<!-- file: UNIT-0312.md -->
+**Código:** UNIT-0312
 
 # test_queue_skips_unsubscribed_event
 
@@ -9178,8 +11230,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0256.md -->
-**Código:** UNIT-0256
+<!-- file: UNIT-0313.md -->
+**Código:** UNIT-0313
 
 # test_sign_payload_differs_with_different_key
 
@@ -9214,8 +11266,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0257.md -->
-**Código:** UNIT-0257
+<!-- file: UNIT-0314.md -->
+**Código:** UNIT-0314
 
 # test_sign_payload_format
 
@@ -9250,8 +11302,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0258.md -->
-**Código:** UNIT-0258
+<!-- file: UNIT-0315.md -->
+**Código:** UNIT-0315
 
 # test_sign_payload_is_deterministic
 
@@ -9286,8 +11338,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0259.md -->
-**Código:** UNIT-0259
+<!-- file: UNIT-0316.md -->
+**Código:** UNIT-0316
 
 # test_administrador_cannot_manage_webhooks
 
@@ -9322,8 +11374,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0260.md -->
-**Código:** UNIT-0260
+<!-- file: UNIT-0317.md -->
+**Código:** UNIT-0317
 
 # test_auxiliar_cannot_manage_webhooks
 
@@ -9358,8 +11410,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0261.md -->
-**Código:** UNIT-0261
+<!-- file: UNIT-0318.md -->
+**Código:** UNIT-0318
 
 # test_create_endpoint
 
@@ -9394,8 +11446,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0262.md -->
-**Código:** UNIT-0262
+<!-- file: UNIT-0319.md -->
+**Código:** UNIT-0319
 
 # test_delete_endpoint_deactivates_it
 
@@ -9430,8 +11482,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0263.md -->
-**Código:** UNIT-0263
+<!-- file: UNIT-0320.md -->
+**Código:** UNIT-0320
 
 # test_deliveries_list
 
@@ -9466,8 +11518,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0264.md -->
-**Código:** UNIT-0264
+<!-- file: UNIT-0321.md -->
+**Código:** UNIT-0321
 
 # test_list_endpoints
 
@@ -9502,8 +11554,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0265.md -->
-**Código:** UNIT-0265
+<!-- file: UNIT-0322.md -->
+**Código:** UNIT-0322
 
 # test_stats_view
 
@@ -9538,8 +11590,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0266.md -->
-**Código:** UNIT-0266
+<!-- file: UNIT-0323.md -->
+**Código:** UNIT-0323
 
 # test_change_report_detects_additions_and_removals
 
@@ -9574,8 +11626,8 @@ Código fuente: [tests/test_generate_project_structure.py](../../tests/test_gene
 
 ---
 
-<!-- file: UNIT-0267.md -->
-**Código:** UNIT-0267
+<!-- file: UNIT-0324.md -->
+**Código:** UNIT-0324
 
 # test_semantic_comment_for_services_is_specific
 
@@ -9610,8 +11662,8 @@ Código fuente: [tests/test_generate_project_structure.py](../../tests/test_gene
 
 ---
 
-<!-- file: UNIT-0268.md -->
-**Código:** UNIT-0268
+<!-- file: UNIT-0325.md -->
+**Código:** UNIT-0325
 
 # test_tree_ignores_noise_and_keeps_relevant_nodes
 
@@ -9646,8 +11698,1664 @@ Código fuente: [tests/test_generate_project_structure.py](../../tests/test_gene
 
 ---
 
-<!-- file: UNIT-0269.md -->
-**Código:** UNIT-0269
+<!-- file: UNIT-0326.md -->
+**Código:** UNIT-0326
+
+# test_categories_shared_across_products
+
+## Nombre del test
+
+`tests/test_import/test_importer.py::TestImportRows::test_categories_shared_across_products`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_importer.py::TestImportRows::test_categories_shared_across_products -v
+```
+
+Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 96)
+
+
+---
+
+<!-- file: UNIT-0327.md -->
+**Código:** UNIT-0327
+
+# test_creates_categories_and_products
+
+## Nombre del test
+
+`tests/test_import/test_importer.py::TestImportRows::test_creates_categories_and_products`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_importer.py::TestImportRows::test_creates_categories_and_products -v
+```
+
+Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 31)
+
+
+---
+
+<!-- file: UNIT-0328.md -->
+**Código:** UNIT-0328
+
+# test_dry_run_makes_no_db_changes
+
+## Nombre del test
+
+`tests/test_import/test_importer.py::TestImportRows::test_dry_run_makes_no_db_changes`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_importer.py::TestImportRows::test_dry_run_makes_no_db_changes -v
+```
+
+Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 67)
+
+
+---
+
+<!-- file: UNIT-0329.md -->
+**Código:** UNIT-0329
+
+# test_error_in_one_row_does_not_cancel_others
+
+## Nombre del test
+
+`tests/test_import/test_importer.py::TestImportRows::test_error_in_one_row_does_not_cancel_others`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_importer.py::TestImportRows::test_error_in_one_row_does_not_cancel_others -v
+```
+
+Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 80)
+
+
+---
+
+<!-- file: UNIT-0330.md -->
+**Código:** UNIT-0330
+
+# test_generated_sku_tracked_in_result
+
+## Nombre del test
+
+`tests/test_import/test_importer.py::TestImportRows::test_generated_sku_tracked_in_result`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_importer.py::TestImportRows::test_generated_sku_tracked_in_result -v
+```
+
+Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 106)
+
+
+---
+
+<!-- file: UNIT-0331.md -->
+**Código:** UNIT-0331
+
+# test_idempotent_second_run
+
+## Nombre del test
+
+`tests/test_import/test_importer.py::TestImportRows::test_idempotent_second_run`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_importer.py::TestImportRows::test_idempotent_second_run -v
+```
+
+Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 43)
+
+
+---
+
+<!-- file: UNIT-0332.md -->
+**Código:** UNIT-0332
+
+# test_no_stock_created
+
+## Nombre del test
+
+`tests/test_import/test_importer.py::TestImportRows::test_no_stock_created`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_importer.py::TestImportRows::test_no_stock_created -v
+```
+
+Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 51)
+
+
+---
+
+<!-- file: UNIT-0333.md -->
+**Código:** UNIT-0333
+
+# test_no_subcategory_assigned
+
+## Nombre del test
+
+`tests/test_import/test_importer.py::TestImportRows::test_no_subcategory_assigned`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_importer.py::TestImportRows::test_no_subcategory_assigned -v
+```
+
+Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 59)
+
+
+---
+
+<!-- file: UNIT-0334.md -->
+**Código:** UNIT-0334
+
+# test_products_have_is_active_true
+
+## Nombre del test
+
+`tests/test_import/test_importer.py::TestImportRows::test_products_have_is_active_true`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_importer.py::TestImportRows::test_products_have_is_active_true -v
+```
+
+Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 132)
+
+
+---
+
+<!-- file: UNIT-0335.md -->
+**Código:** UNIT-0335
+
+# test_transformed_sku_tracked_in_result
+
+## Nombre del test
+
+`tests/test_import/test_importer.py::TestImportRows::test_transformed_sku_tracked_in_result`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_importer.py::TestImportRows::test_transformed_sku_tracked_in_result -v
+```
+
+Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 119)
+
+
+---
+
+<!-- file: UNIT-0336.md -->
+**Código:** UNIT-0336
+
+# test_agujas_count
+
+## Nombre del test
+
+`tests/test_import/test_reader.py::TestReadExcel::test_agujas_count`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_reader.py::TestReadExcel::test_agujas_count -v
+```
+
+Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 74)
+
+
+---
+
+<!-- file: UNIT-0337.md -->
+**Código:** UNIT-0337
+
+# test_all_rows_are_raw_row_instances
+
+## Nombre del test
+
+`tests/test_import/test_reader.py::TestReadExcel::test_all_rows_are_raw_row_instances`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_reader.py::TestReadExcel::test_all_rows_are_raw_row_instances -v
+```
+
+Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 64)
+
+
+---
+
+<!-- file: UNIT-0338.md -->
+**Código:** UNIT-0338
+
+# test_all_rows_have_product_name
+
+## Nombre del test
+
+`tests/test_import/test_reader.py::TestReadExcel::test_all_rows_have_product_name`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_reader.py::TestReadExcel::test_all_rows_have_product_name -v
+```
+
+Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 59)
+
+
+---
+
+<!-- file: UNIT-0339.md -->
+**Código:** UNIT-0339
+
+# test_camillas_count
+
+## Nombre del test
+
+`tests/test_import/test_reader.py::TestReadExcel::test_camillas_count`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_reader.py::TestReadExcel::test_camillas_count -v
+```
+
+Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 69)
+
+
+---
+
+<!-- file: UNIT-0340.md -->
+**Código:** UNIT-0340
+
+# test_has_all_expected_categories
+
+## Nombre del test
+
+`tests/test_import/test_reader.py::TestReadExcel::test_has_all_expected_categories`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_reader.py::TestReadExcel::test_has_all_expected_categories -v
+```
+
+Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 33)
+
+
+---
+
+<!-- file: UNIT-0341.md -->
+**Código:** UNIT-0341
+
+# test_returns_rows_for_all_products
+
+## Nombre del test
+
+`tests/test_import/test_reader.py::TestReadExcel::test_returns_rows_for_all_products`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_reader.py::TestReadExcel::test_returns_rows_for_all_products -v
+```
+
+Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 24)
+
+
+---
+
+<!-- file: UNIT-0342.md -->
+**Código:** UNIT-0342
+
+# test_skips_resumen_sheet
+
+## Nombre del test
+
+`tests/test_import/test_reader.py::TestReadExcel::test_skips_resumen_sheet`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_reader.py::TestReadExcel::test_skips_resumen_sheet -v
+```
+
+Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 28)
+
+
+---
+
+<!-- file: UNIT-0343.md -->
+**Código:** UNIT-0343
+
+# test_skips_total_rows
+
+## Nombre del test
+
+`tests/test_import/test_reader.py::TestReadExcel::test_skips_total_rows`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_reader.py::TestReadExcel::test_skips_total_rows -v
+```
+
+Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 52)
+
+
+---
+
+<!-- file: UNIT-0344.md -->
+**Código:** UNIT-0344
+
+# test_flexbar_amarillo_genera_fl_0032
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestAutogenSku::test_flexbar_amarillo_genera_fl_0032`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestAutogenSku::test_flexbar_amarillo_genera_fl_0032 -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 27)
+
+
+---
+
+<!-- file: UNIT-0345.md -->
+**Código:** UNIT-0345
+
+# test_flexbar_azul_genera_fl_0033
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestAutogenSku::test_flexbar_azul_genera_fl_0033`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestAutogenSku::test_flexbar_azul_genera_fl_0033 -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 31)
+
+
+---
+
+<!-- file: UNIT-0346.md -->
+**Código:** UNIT-0346
+
+# test_numero_con_zero_padding_a_4_digitos
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestAutogenSku::test_numero_con_zero_padding_a_4_digitos`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestAutogenSku::test_numero_con_zero_padding_a_4_digitos -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 39)
+
+
+---
+
+<!-- file: UNIT-0347.md -->
+**Código:** UNIT-0347
+
+# test_numero_none_usa_1
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestAutogenSku::test_numero_none_usa_1`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestAutogenSku::test_numero_none_usa_1 -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 45)
+
+
+---
+
+<!-- file: UNIT-0348.md -->
+**Código:** UNIT-0348
+
+# test_usa_primeras_dos_letras_del_primer_word
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestAutogenSku::test_usa_primeras_dos_letras_del_primer_word`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestAutogenSku::test_usa_primeras_dos_letras_del_primer_word -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 35)
+
+
+---
+
+<!-- file: UNIT-0349.md -->
+**Código:** UNIT-0349
+
+# test_all_three_invalid_skus_from_excel
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestTransform::test_all_three_invalid_skus_from_excel`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestTransform::test_all_three_invalid_skus_from_excel -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 133)
+
+
+---
+
+<!-- file: UNIT-0350.md -->
+**Código:** UNIT-0350
+
+# test_category_name_is_titlecased
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestTransform::test_category_name_is_titlecased`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestTransform::test_category_name_is_titlecased -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 121)
+
+
+---
+
+<!-- file: UNIT-0351.md -->
+**Código:** UNIT-0351
+
+# test_invalid_sku_gets_transformed
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestTransform::test_invalid_sku_gets_transformed`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestTransform::test_invalid_sku_gets_transformed -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 111)
+
+
+---
+
+<!-- file: UNIT-0352.md -->
+**Código:** UNIT-0352
+
+# test_name_is_stripped
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestTransform::test_name_is_stripped`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestTransform::test_name_is_stripped -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 127)
+
+
+---
+
+<!-- file: UNIT-0353.md -->
+**Código:** UNIT-0353
+
+# test_sc_rows_get_autogenerated_sku
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestTransform::test_sc_rows_get_autogenerated_sku`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestTransform::test_sc_rows_get_autogenerated_sku -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 97)
+
+
+---
+
+<!-- file: UNIT-0354.md -->
+**Código:** UNIT-0354
+
+# test_valid_rows_pass_through_unchanged
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestTransform::test_valid_rows_pass_through_unchanged`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestTransform::test_valid_rows_pass_through_unchanged -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 87)
+
+
+---
+
+<!-- file: UNIT-0355.md -->
+**Código:** UNIT-0355
+
+# test_ec_01b_becomes_ecb_01
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestTransformInvalidSku::test_ec_01b_becomes_ecb_01`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestTransformInvalidSku::test_ec_01b_becomes_ecb_01 -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 58)
+
+
+---
+
+<!-- file: UNIT-0356.md -->
+**Código:** UNIT-0356
+
+# test_mpc_01a_becomes_mpca_01
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestTransformInvalidSku::test_mpc_01a_becomes_mpca_01`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestTransformInvalidSku::test_mpc_01a_becomes_mpca_01 -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 52)
+
+
+---
+
+<!-- file: UNIT-0357.md -->
+**Código:** UNIT-0357
+
+# test_mpc_02a_becomes_mpca_02
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestTransformInvalidSku::test_mpc_02a_becomes_mpca_02`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestTransformInvalidSku::test_mpc_02a_becomes_mpca_02 -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 55)
+
+
+---
+
+<!-- file: UNIT-0358.md -->
+**Código:** UNIT-0358
+
+# test_no_suffix_returns_normalized_sku
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestTransformInvalidSku::test_no_suffix_returns_normalized_sku`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestTransformInvalidSku::test_no_suffix_returns_normalized_sku -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 65)
+
+
+---
+
+<!-- file: UNIT-0359.md -->
+**Código:** UNIT-0359
+
+# test_result_passes_sku_validation
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestTransformInvalidSku::test_result_passes_sku_validation`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestTransformInvalidSku::test_result_passes_sku_validation -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 76)
+
+
+---
+
+<!-- file: UNIT-0360.md -->
+**Código:** UNIT-0360
+
+# test_returns_none_for_untransformable
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestTransformInvalidSku::test_returns_none_for_untransformable`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestTransformInvalidSku::test_returns_none_for_untransformable -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 72)
+
+
+---
+
+<!-- file: UNIT-0361.md -->
+**Código:** UNIT-0361
+
+# test_suffix_uppercased
+
+## Nombre del test
+
+`tests/test_import/test_transformer.py::TestTransformInvalidSku::test_suffix_uppercased`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_transformer.py::TestTransformInvalidSku::test_suffix_uppercased -v
+```
+
+Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 61)
+
+
+---
+
+<!-- file: UNIT-0362.md -->
+**Código:** UNIT-0362
+
+# test_duplicate_sku_second_occurrence_goes_to_errors
+
+## Nombre del test
+
+`tests/test_import/test_validator.py::TestValidate::test_duplicate_sku_second_occurrence_goes_to_errors`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_validator.py::TestValidate::test_duplicate_sku_second_occurrence_goes_to_errors -v
+```
+
+Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 57)
+
+
+---
+
+<!-- file: UNIT-0363.md -->
+**Código:** UNIT-0363
+
+# test_empty_product_name_goes_to_errors
+
+## Nombre del test
+
+`tests/test_import/test_validator.py::TestValidate::test_empty_product_name_goes_to_errors`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_validator.py::TestValidate::test_empty_product_name_goes_to_errors -v
+```
+
+Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 52)
+
+
+---
+
+<!-- file: UNIT-0364.md -->
+**Código:** UNIT-0364
+
+# test_empty_sku_goes_to_needs_autogen
+
+## Nombre del test
+
+`tests/test_import/test_validator.py::TestValidate::test_empty_sku_goes_to_needs_autogen`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_validator.py::TestValidate::test_empty_sku_goes_to_needs_autogen -v
+```
+
+Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 33)
+
+
+---
+
+<!-- file: UNIT-0365.md -->
+**Código:** UNIT-0365
+
+# test_invalid_sku_format_goes_to_invalid
+
+## Nombre del test
+
+`tests/test_import/test_validator.py::TestValidate::test_invalid_sku_format_goes_to_invalid`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_validator.py::TestValidate::test_invalid_sku_format_goes_to_invalid -v
+```
+
+Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 42)
+
+
+---
+
+<!-- file: UNIT-0366.md -->
+**Código:** UNIT-0366
+
+# test_mixed_rows
+
+## Nombre del test
+
+`tests/test_import/test_validator.py::TestValidate::test_mixed_rows`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_validator.py::TestValidate::test_mixed_rows -v
+```
+
+Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 74)
+
+
+---
+
+<!-- file: UNIT-0367.md -->
+**Código:** UNIT-0367
+
+# test_multiple_valid_rows
+
+## Nombre del test
+
+`tests/test_import/test_validator.py::TestValidate::test_multiple_valid_rows`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_validator.py::TestValidate::test_multiple_valid_rows -v
+```
+
+Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 68)
+
+
+---
+
+<!-- file: UNIT-0368.md -->
+**Código:** UNIT-0368
+
+# test_sc_sku_goes_to_needs_autogen
+
+## Nombre del test
+
+`tests/test_import/test_validator.py::TestValidate::test_sc_sku_goes_to_needs_autogen`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_validator.py::TestValidate::test_sc_sku_goes_to_needs_autogen -v
+```
+
+Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 28)
+
+
+---
+
+<!-- file: UNIT-0369.md -->
+**Código:** UNIT-0369
+
+# test_sc_uppercase_variants
+
+## Nombre del test
+
+`tests/test_import/test_validator.py::TestValidate::test_sc_uppercase_variants`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_validator.py::TestValidate::test_sc_uppercase_variants -v
+```
+
+Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 37)
+
+
+---
+
+<!-- file: UNIT-0370.md -->
+**Código:** UNIT-0370
+
+# test_valid_sku_boundary_cases
+
+## Nombre del test
+
+`tests/test_import/test_validator.py::TestValidate::test_valid_sku_boundary_cases`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_validator.py::TestValidate::test_valid_sku_boundary_cases -v
+```
+
+Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 47)
+
+
+---
+
+<!-- file: UNIT-0371.md -->
+**Código:** UNIT-0371
+
+# test_valid_sku_goes_to_ok
+
+## Nombre del test
+
+`tests/test_import/test_validator.py::TestValidate::test_valid_sku_goes_to_ok`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_import/test_validator.py::TestValidate::test_valid_sku_goes_to_ok -v
+```
+
+Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 21)
+
+
+---
+
+<!-- file: UNIT-0372.md -->
+**Código:** UNIT-0372
 
 # test_validate_destination_passes_for_non_blocked
 
@@ -9682,8 +13390,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0270.md -->
-**Código:** UNIT-0270
+<!-- file: UNIT-0373.md -->
+**Código:** UNIT-0373
 
 # test_validate_destination_raises_for_blocked_archived
 
@@ -9718,8 +13426,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0271.md -->
-**Código:** UNIT-0271
+<!-- file: UNIT-0374.md -->
+**Código:** UNIT-0374
 
 # test_validate_origin_passes_for_active
 
@@ -9754,8 +13462,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0272.md -->
-**Código:** UNIT-0272
+<!-- file: UNIT-0375.md -->
+**Código:** UNIT-0375
 
 # test_validate_origin_raises_for_blocked_archived
 
@@ -9790,8 +13498,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0273.md -->
-**Código:** UNIT-0273
+<!-- file: UNIT-0376.md -->
+**Código:** UNIT-0376
 
 # test_validate_origin_raises_for_maintenance_restricted
 
