@@ -258,12 +258,21 @@ def update_location(executor: Any, location_id: UUID, data: dict[str, Any]) -> L
         )
     loc = Location.objects.select_for_update().get(pk=location_id)
     # Validar regla de negocio: no permitir desactivar una ubicación con stock
-    deactivating_by_active = "is_active" in data and not bool(data["is_active"]) and loc.is_active
-    deactivating_by_status = "operational_status" in data and data["operational_status"] == Location.OperationalStatus.ARCHIVED and loc.operational_status != Location.OperationalStatus.ARCHIVED
+    deactivating_by_active = (
+        "is_active" in data and not bool(data["is_active"]) and loc.is_active
+    )
+    deactivating_by_status = (
+        "operational_status" in data
+        and data["operational_status"] == Location.OperationalStatus.ARCHIVED
+        and loc.operational_status != Location.OperationalStatus.ARCHIVED
+    )
     if deactivating_by_active or deactivating_by_status:
         from apps.inventory.models import StockByLocation
+
         if StockByLocation.objects.filter(location=loc, current_stock__gt=0).exists():
-            raise DomainValidationError("No es posible desactivar la ubicación porque aún contiene inventario.")
+            raise DomainValidationError(
+                "No es posible desactivar la ubicación porque aún contiene inventario."
+            )
     if "name" in data:
         loc.name = str(data["name"]).strip()
     if "description" in data:

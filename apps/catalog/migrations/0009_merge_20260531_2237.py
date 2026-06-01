@@ -6,9 +6,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('catalog', '0006_subcategory_description'),
-        ('catalog', '0008_rename_catalog_pph_prod_field_idx_catalog_pro_product_0b2827_idx_and_more'),
+        ("catalog", "0006_subcategory_description"),
+        (
+            "catalog",
+            "0008_rename_catalog_pph_prod_field_idx_catalog_pro_product_0b2827_idx_and_more",
+        ),
     ]
 
-    operations = [
-    ]
+    operations = []

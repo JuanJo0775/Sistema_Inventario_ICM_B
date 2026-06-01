@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('catalog', '0005_category_subcategory_is_active'),
+        ("catalog", "0005_category_subcategory_is_active"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='subcategory',
-            name='description',
+            model_name="subcategory",
+            name="description",
             field=models.TextField(blank=True),
         ),
     ]
