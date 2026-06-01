@@ -73,13 +73,24 @@ Contrato tecnico base de comunicacion:
 Dominios de API esperados:
 
 - `/api/v1/auth/` autenticacion y gestion de usuarios
-- `/api/v1/catalog/` productos, categorias, subcategorias y resolucion de identificadores
+- `/api/v1/catalog/` productos, categorias, subcategorias, combos y precios
 - `/api/v1/inventory/` stock por ubicacion y busqueda
-- `/api/v1/movements/` entradas, salidas, traslados, devoluciones y ajustes
+- `/api/v1/movements/` entradas, salidas, traslados, devoluciones, ajustes y facturas
 - `/api/v1/dashboard/` read model operacional orientado a UI ejecutiva
-- `/api/v1/reports/` indicadores y reportes de solo lectura
+- `/api/v1/reports/` indicadores, reportes operativos y reportes financieros
 - `/api/v1/alerts/` alertas operativas activas
 - `/api/v1/audit/` trazabilidad historica (solo lectura autorizada)
+- `/api/v1/webhooks/` suscripcion y entrega de eventos externos
+
+Endpoints de precios y facturacion agregados:
+
+- `PATCH /api/v1/catalog/products/<id>/prices/` actualizar precios (unit_cost, sale_price_retail, sale_price_wholesale, tax_rate_pct, currency)
+- `GET  /api/v1/catalog/products/<id>/prices/` historial inmutable de cambios de precio
+- `GET  /api/v1/movements/invoices/<number>/` detalle de factura con totales consolidados
+- `GET  /api/v1/movements/invoices/<number>/pdf/` descarga del PDF enriquecido
+- `GET  /api/v1/reports/revenue-summary/` revenue total por tipo de venta en el periodo
+- `GET  /api/v1/reports/margin-by-product/` margen bruto por SKU
+- `GET  /api/v1/reports/sales-by-customer/` ventas agrupadas por cliente (venta mayor)
 
 Objetivo de esta decision:
 
@@ -101,6 +112,9 @@ icm_backend/
 │   │   │   ├── test_services.py                                # Política de acceso y restricciones de rol
 │   │   │   ├── test_user_enable.py                             # Cobertura crítica del módulo
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── management/
+│   │   │   └── commands/                                       # Comandos administrativos del módulo
+│   │   │       └── create_almacenista.py                       # Comando Django para automatización operativa
 │   │   ├── models.py                                           # Entidades y constraints de persistencia
 │   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
 │   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
@@ -113,10 +127,15 @@ icm_backend/
 │   │   └── admin.py                                            # Registro administrativo y soporte operacional
 │   ├── catalog/                                                # Catálogo, SKUs definidos por usuario y validación de productos
 │   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_combo_pricing.py                           # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
 │   │   │   ├── test_new_endpoints.py                           # Cobertura crítica del módulo
+│   │   │   ├── test_product_pricing.py                         # Cobertura crítica del módulo
 │   │   │   ├── test_services.py                                # Cobertura crítica del módulo
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── management/
+│   │   │   └── commands/                                       # Comandos administrativos del módulo
+│   │   │       └── import_catalog.py                           # Comando Django para automatización operativa
 │   │   ├── models.py                                           # Entidades y constraints de persistencia
 │   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
 │   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
@@ -153,7 +172,10 @@ icm_backend/
 │   ├── movements/                                              # Ledger inmutable y consistencia de inventario
 │   │   ├── tests/                                              # Pruebas del subdominio
 │   │   │   ├── test_combo_dispatch.py                          # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_dispatch_pricing.py                        # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_invoice.py                                 # Cobertura crítica del módulo
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_pricing_optional.py                        # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
 │   │   ├── models.py                                           # Entidades y constraints de persistencia
@@ -168,6 +190,7 @@ icm_backend/
 │   ├── reports/                                                # Reportes e indicadores operativos
 │   │   ├── tests/                                              # Pruebas del subdominio
 │   │   │   ├── test_exports.py                                 # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_financial_reports.py                       # Cobertura crítica del módulo
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
 │   │   │   ├── test_selectors.py                               # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_services.py                                # Cobertura crítica del módulo
@@ -283,6 +306,11 @@ icm_backend/
 │   │   └── README_CICD.md                                      # Documento técnico relevante
 │   ├── evidence/                                               # Documento arquitectónico relevante
 │   │   └── README.md                                           # Documento técnico relevante
+│   ├── guias/                                                  # Documento arquitectónico relevante
+│   │   └── IMPORT_CATALOG.md                                   # Documento técnico relevante
+│   ├── pricing/                                                # Documento arquitectónico relevante
+│   │   ├── Plan Arquitectura de Precios y Facturación — Sistema Inventario ICM.md  # Documento técnico relevante
+│   │   └── README_PRECIOS_FACTURACION.md                       # Documento técnico relevante
 │   ├── storage/                                                # Documento arquitectónico relevante
 │   │   ├── README_LOCATION_STATES.md                           # Documento técnico relevante
 │   │   ├── README_STORAGE_DOMAIN.md                            # Documento técnico relevante
@@ -300,6 +328,13 @@ icm_backend/
 │   ├── generate_docs/                                          # Generadores compartidos de documentación
 │   │   ├── __main__.py                                         # Entry point oficial: python -m scripts.generate_docs
 │   │   └── utils.py                                            # Pipeline compartido: descubrimiento, renderizado y escritura
+│   ├── import_catalog/
+│   │   ├── config.py
+│   │   ├── importer.py
+│   │   ├── reader.py
+│   │   ├── reporter.py
+│   │   ├── transformer.py
+│   │   └── validator.py
 │   └── perf/
 │       └── locustfile.py
 ├── shared/                                                     # Código transversal reutilizable
@@ -324,8 +359,13 @@ icm_backend/
 │   │   ├── test_api_integration.py                             # Pruebas de integración HTTP/API
 │   │   ├── test_movements_integration.py                       # Pruebas de integración HTTP/API
 │   │   └── test_smoke_endpoints.py                             # Pruebas de integración HTTP/API
-│   └── concurrency/
-│       └── test_concurrent_movements.py                        # Cobertura crítica del módulo
+│   ├── concurrency/
+│   │   └── test_concurrent_movements.py                        # Cobertura crítica del módulo
+│   └── test_import/
+│       ├── test_importer.py                                    # Cobertura crítica del módulo
+│       ├── test_reader.py                                      # Cobertura crítica del módulo
+│       ├── test_transformer.py                                 # Cobertura crítica del módulo
+│       └── test_validator.py                                   # Cobertura crítica del módulo
 ├── docker-compose.prod.yml                                     # Orquestación de producción
 ├── docker-compose.yml                                          # Orquestación local del stack
 ├── manage.py                                                   # Punto de entrada de comandos Django
@@ -799,6 +839,86 @@ assert product.sku in pdf_content
 
 ---
 
+#### BR-16: Precio Congelado en Despacho
+
+**Descripción**: Al confirmar un despacho de venta, el sistema captura el precio unitario de venta, el costo unitario, la tasa de IVA, el descuento y el total calculado en el registro de movimiento de forma permanente. Ninguna modificación posterior al precio del producto en el catálogo puede alterar los campos financieros de un Movement ya creado.
+
+**Implementación**:
+- `movements.services._resolve_price_snapshot(product, quantity, movement_type)` — resuelve el precio correcto según el tipo de salida:
+  - `SALIDA_VENTA_MENOR` → `product.sale_price_retail`
+  - `SALIDA_VENTA_MAYOR` → `product.sale_price_wholesale`
+  - `SALIDA_DANO` / `SALIDA_VENCIMIENTO` → `product.unit_cost`
+- El resultado se pasa a `Movement.objects.create(**price_snapshot)` dentro de la misma transacción atómica.
+- Si el producto no tiene precio configurado, todos los campos quedan en `null` y el despacho continúa normalmente.
+- Los campos financieros en `Movement` son nullable para compatibilidad con movimientos históricos anteriores a esta regla.
+
+**Campos en Movement afectados**:
+
+```
+unit_price      — Precio unitario de venta congelado
+unit_cost       — Costo unitario congelado
+discount_pct    — Porcentaje de descuento aplicado
+discount_amount — Monto de descuento
+subtotal        — unit_price × quantity
+tax_rate_pct    — Tasa IVA congelada
+tax_amount      — IVA calculado
+total_amount    — Total final a cobrar
+currency        — Moneda ISO 4217
+price_type      — "retail" | "wholesale" | "cost" | "combo"
+customer_snapshot — JSON con datos del cliente (ventas mayores)
+```
+
+**Verificación en tests**:
+```python
+# Debe pasar: precio congelado permanece intacto
+m = register_dispatch(user, product.id, ..., MovementType.SALIDA_VENTA_MENOR)
+update_product_prices(user, product.id, sale_price_retail=Decimal("99999"))
+m.refresh_from_db()
+assert m.unit_price == Decimal("10000")  # precio original
+
+# Debe pasar: producto sin precio no bloquea el despacho
+m = register_dispatch(user, producto_sin_precio.id, ...)
+assert m.unit_price is None
+assert m.total_amount is None
+```
+
+**Referencia**: RF-NEW-05, RF-006, ADR-013
+
+---
+
+#### BR-17: Historial Auditado de Cambios de Precio
+
+**Descripción**: Toda actualización de precio de un producto (unit_cost, sale_price_retail, sale_price_wholesale o tax_rate_pct) debe registrarse de forma inmutable en `ProductPriceHistory`, identificando el campo modificado, el valor anterior, el valor nuevo, el usuario que realizó el cambio y la fecha/hora exacta. Si el valor enviado es idéntico al actual, no se registra nada.
+
+**Implementación**:
+- `catalog.services.update_product_prices(user, product_id, **price_fields)` — única función autorizada para cambiar precios.
+- Por cada campo que realmente cambie, crea una fila en `ProductPriceHistory` vía `bulk_create`.
+- Lanza `AuditEventType.PRODUCT_PRICE_UPDATED` en `AuditLog` con los campos modificados.
+- Solo usuarios con `role == "almacenista"` pueden ejecutar esta función; los demás reciben `UnauthorizedCredentialManagementError`.
+- El endpoint `PATCH /api/v1/catalog/products/<id>/prices/` es el único punto de acceso HTTP autorizado.
+
+**Verificación en tests**:
+```python
+# Debe crear historial con old/new value
+update_product_prices(almacenista, product.id, sale_price_retail=Decimal("12000"))
+h = ProductPriceHistory.objects.get(product=product, field_changed="sale_price_retail")
+assert h.old_value == Decimal("10000")
+assert h.new_value == Decimal("12000")
+assert h.changed_by == almacenista
+
+# Valor idéntico: NO debe crear historial
+update_product_prices(almacenista, product.id, sale_price_retail=Decimal("10000"))  # mismo valor
+assert ProductPriceHistory.objects.filter(product=product).count() == 0
+
+# Debe rechazar rol no autorizado
+with pytest.raises(UnauthorizedCredentialManagementError):
+    update_product_prices(auxiliar, product.id, sale_price_retail=Decimal("9000"))
+```
+
+**Referencia**: RF-NEW-05, RF-003, ADR-013
+
+---
+
 ### 3.1.4 Auditoría y Reportes
 
 #### Reglas de Auditoría Derivadas de BR-10
@@ -839,6 +959,8 @@ assert product.sku in pdf_content
 | BR-13 | Factura PDF + Numeración | Movements | `generate_invoice_pdf` + secuencia atómica | Tests: PDF existe, numeración correcta |
 | BR-14 | Estado Operativo de Ubicación | Inventory/Movements | `_ensure_location_allows_origin` + `_ensure_location_allows_destination` en `movements/services.py`; `Location.OperationalStatus` en `inventory/models.py` | Tests: archived/blocked bloquean todo, maintenance/restricted bloquean origen |
 | BR-15 | StorageType Activo como Requisito | Inventory | Validación en `create_location`/`update_location`; `StorageType.is_active` | Tests: tipo inactivo rechazado en asignación |
+| BR-16 | Precio Congelado en Despacho | Movements/Pricing | `_resolve_price_snapshot()` en `movements/services.py`; campos `unit_price`, `subtotal`, `total_amount` en `Movement` (nullable, inmutables post-creación) | Tests: `test_price_snapshot_immutable_after_product_price_change`; cambio de precio no altera Movement histórico |
+| BR-17 | Historial Auditado de Precios | Catalog/Pricing | `update_product_prices()` en `catalog/services.py` crea fila en `ProductPriceHistory` por cada campo modificado | Tests: `test_update_price_creates_history_record`; valor idéntico no genera registro |
 
 ---
 
@@ -1981,9 +2103,11 @@ Acceso: `GET /api/v1/docs/` → Swagger UI.
 - [ ] BR-10: **Movimientos e AuditLog son inmutables** (sin PUT/PATCH/DELETE).
 - [ ] BR-11: Stock derivado sincronizado + reconstruible desde ledger.
 - [ ] BR-12: SKU validado contra el patrón 1–4 letras, guion, 1–4 dígitos.
-- [ ] BR-13: Facturas numeradas secuencialmente + PDF generado.
+- [ ] BR-13: Facturas numeradas secuencialmente + PDF generado (ahora incluye precio, IVA y total).
 - [ ] BR-14: Estado operativo de ubicación validado antes de cada movimiento (archived/blocked rechazan todo, maintenance/restricted rechazan origen).
 - [ ] BR-15: StorageType inactivo rechazado al asignar a ubicaciones nuevas o existentes.
+- [ ] BR-16: Precio congelado en el Movement al momento del despacho; inmutable post-creación.
+- [ ] BR-17: Cada cambio de precio registra fila inmutable en ProductPriceHistory con old_value, new_value y changed_by.
 
 ### Transacciones y Consistencia
 
@@ -2054,10 +2178,10 @@ Documentacion complementaria de este analisis:
 | --- | --- | --- | --- |
 | RF-001 | Autenticacion | `apps/authentication/views.py`, `apps/authentication/services.py`, `shared/permissions.py` | BR-01, BR-03 |
 | RF-002 | Credenciales | `apps/authentication/services.py`, `apps/authentication/views.py`, `apps/audit/services.py` | BR-01, BR-02 |
-| RF-003 | Catalogo | `apps/catalog/models.py`, `apps/catalog/services.py`, `apps/catalog/views.py` | BR-04, BR-12, BR-13 |
+| RF-003 | Catalogo | `apps/catalog/models.py`, `apps/catalog/services.py`, `apps/catalog/views.py` | BR-04, BR-12, BR-13, BR-17 |
 | RF-004 | Consulta inventario | `apps/inventory/selectors.py`, `apps/inventory/views.py`, `apps/inventory/models.py` | BR-11, BR-13, BR-14, BR-15 |
 | RF-005 | Recepcion (entradas) | `apps/movements/services.py::register_entry`, `apps/movements/views.py`, `apps/inventory/models.py` | BR-04, BR-09, BR-10, BR-11, BR-13, BR-14 |
-| RF-006 | Despacho/salidas | `apps/movements/services.py::register_dispatch`, `apps/catalog/services.py`, `apps/movements/models.py` | BR-08, BR-10, BR-11, BR-13, BR-14 |
+| RF-006 | Despacho/salidas | `apps/movements/services.py::register_dispatch`, `apps/catalog/services.py`, `apps/movements/models.py` | BR-08, BR-10, BR-11, BR-13, BR-14, BR-16 |
 | RF-007 | Traslados internos | `apps/movements/services.py::register_internal_transfer`, `apps/inventory/models.py` | BR-06, BR-10, BR-11, BR-14 |
 | RF-008 | Devoluciones | `apps/movements/services.py::register_return`, `apps/movements/services.py::approve_return` | BR-02, BR-05, BR-10, BR-14 |
 | RF-009 | Ajustes | `apps/movements/services.py::register_adjustment`, `apps/movements/services.py::correct_movement_within_window` | BR-06, BR-07, BR-10, BR-11, BR-14 |
@@ -2068,6 +2192,7 @@ Documentacion complementaria de este analisis:
 | RF-NEW-02 | Umbrales de stock por ubicacion | `apps/inventory/models.py::StockByLocation.location_reorder_point`, `apps/alerts/services.py::check_and_create_minimum_stock_alert` | RF-011, BR-11 |
 | RF-NEW-03 | Webhooks (notificacion externa) | `apps/webhooks/models.py`, `apps/webhooks/services.py`, `apps/webhooks/management/commands/deliver_webhooks.py` | RF-011 |
 | RF-NEW-04 | Polling de alertas | `apps/alerts/views.py::AlertPollView`, `GET /api/v1/alerts/poll/` | RF-011 |
+| RF-NEW-05 | Precios y facturacion comercial | `apps/catalog/models.py::ProductPriceHistory`, `apps/movements/models.py::Invoice`, `apps/movements/services.py::_resolve_price_snapshot`, `apps/reports/selectors.py::sales_revenue_summary` | BR-13, BR-16, BR-17 |
 
 ## 16. Matriz de Trazabilidad Completa (BR -> Implementacion)
 
@@ -2088,6 +2213,8 @@ Documentacion complementaria de este analisis:
 | BR-13 Barcode alias + factura PDF | `resolve_identifier`, flujo fallback manual, numeracion secuencial y PDF en despacho | Tests de identificacion y facturacion |
 | BR-14 Estado operativo de ubicacion | `_ensure_location_allows_origin` + `_ensure_location_allows_destination` en `movements/services.py` | Tests de estados archived, blocked, maintenance, restricted |
 | BR-15 StorageType activo como requisito | Validacion en `create_location`/`update_location`; `StorageType.is_active` | Tests de tipo inactivo rechazado |
+| BR-16 Precio congelado en despacho | `_resolve_price_snapshot()` en `movements/services.py` captura precio al momento del despacho; el campo es inmutable | Tests de inmutabilidad: cambiar precio del producto no altera movimientos historicos |
+| BR-17 Trazabilidad de cambios de precio | `update_product_prices()` en `catalog/services.py` registra cada cambio en `ProductPriceHistory` antes de guardar | Tests de historial: un cambio genera exactamente una fila por campo modificado |
 
 ## 17. Matriz de Trazabilidad Completa (RNF -> Decisiones tecnicas)
 

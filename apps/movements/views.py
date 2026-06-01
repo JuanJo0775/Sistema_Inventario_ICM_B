@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.audit.services import log_immutable_modification_attempt
-from apps.movements.models import Movement, MovementType
+from apps.movements.models import Invoice, Movement, MovementType
 from apps.movements.serializers import (
     AdjustmentCorrectionSerializer,
     AdjustmentCreateSerializer,
@@ -18,6 +18,7 @@ from apps.movements.serializers import (
     CorrectionCreateSerializer,
     DispatchCreateSerializer,
     EntryCreateSerializer,
+    InvoiceSerializer,
     MovementSerializer,
     ReturnCreateSerializer,
     TransferCreateSerializer,
@@ -157,7 +158,7 @@ class EntryDetailView(generics.RetrieveAPIView):
     ),
     post=extend_schema(
         summary="Registrar despacho",
-        description="Registra un nuevo despacho de inventario.",
+        description="Registra un nuevo despacho de inventario (venta menor, venta mayor, daño o vencimiento).",
         request=DispatchCreateSerializer,
         responses={
             201: MovementSerializer,
@@ -208,6 +209,7 @@ class DispatchListCreateView(generics.ListCreateAPIView):
                 "electrical_safety_acknowledged", False
             ),
             privacy_notice_acknowledged=d.get("privacy_notice_acknowledged", False),
+            discount_pct=d.get("discount_pct"),
         )
         # register_dispatch may return one Movement or a list of Movements
         if isinstance(movement, (list, tuple)):
@@ -561,4 +563,55 @@ class ComboDispatchView(APIView):
         return Response(
             MovementSerializer(movements, many=True).data,
             status=status.HTTP_201_CREATED,
+        )
+
+
+class InvoiceDetailView(APIView):
+    """GET /movements/invoices/<number>/ — detalle de factura con totales y movements."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+
+    @extend_schema(
+        summary="Detalle de factura comercial",
+        description="Retorna el detalle de una factura por número, incluyendo totales y lista de movimientos asociados.",
+        responses={
+            200: InvoiceSerializer,
+            **standard_error_responses(include_404=True),
+        },
+        tags=[TAG_MOVEMENTS],
+    )
+    def get(self, request, number):
+        from django.shortcuts import get_object_or_404
+
+        invoice = get_object_or_404(
+            Invoice.objects.prefetch_related("movements"), number=number
+        )
+        return Response(InvoiceSerializer(invoice).data)
+
+
+class InvoicePDFDownloadView(APIView):
+    """GET /movements/invoices/<number>/pdf/ — descarga el PDF enriquecido de la factura."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+
+    @extend_schema(
+        summary="Descargar PDF de factura comercial",
+        description="Descarga el PDF de la factura con todos los datos del despacho, precios e información del cliente.",
+        responses={
+            200: None,
+            **standard_error_responses(include_404=True),
+        },
+        tags=[TAG_MOVEMENTS],
+    )
+    def get(self, request, number):
+        from django.http import Http404
+        from django.shortcuts import get_object_or_404
+
+        invoice = get_object_or_404(Invoice, number=number)
+        if not invoice.pdf:
+            raise Http404("PDF no disponible para esta factura.")
+        return FileResponse(
+            invoice.pdf.open("rb"),
+            as_attachment=True,
+            filename=f"{invoice.number}.pdf",
         )

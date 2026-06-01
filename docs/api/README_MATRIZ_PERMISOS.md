@@ -313,7 +313,7 @@ Leyenda:
 | Despachos | Leer | `GET /api/v1/movements/dispatches/` | Permitido | Permitido | Permitido | Denegado | Denegado | Solo autenticado |
 | Despachos | Crear | `POST /api/v1/movements/dispatches/` | Denegado | Permitido | Permitido | Denegado | Denegado | Incluye validacion cruzada y protecciones de datos |
 | Despacho detalle | Leer | `GET /api/v1/movements/dispatches/<uuid:pk>/` | Permitido | Permitido | Permitido | Denegado | Denegado | Solo autenticado |
-| Factura de despacho | Exportar | `GET /api/v1/movements/dispatches/<uuid:pk>/invoice/` | Denegado | Permitido | Permitido | Denegado | Denegado | Descarga de PDF |
+| Factura de despacho | Exportar | `GET /api/v1/movements/dispatches/<uuid:pk>/invoice/` | Denegado | Permitido | Permitido | Denegado | Denegado | Descarga de PDF — Aplica BR-13, BR-16, BR-17 |
 | Traslados | Leer | `GET /api/v1/movements/transfers/` | Permitido | Permitido | Permitido | Denegado | Denegado | Solo autenticado |
 | Traslados | Crear | `POST /api/v1/movements/transfers/` | Denegado | Permitido | Permitido | Denegado | Denegado | Combo de ubicaciones y stock |
 | Devoluciones | Leer | `GET /api/v1/movements/returns/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista |

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -109,6 +110,41 @@ class Product(BaseModel):
     # RF-011 / ERS: umbral global para alerta de stock bajo (no sustituye lógica en services).
     reorder_point = models.PositiveIntegerField(default=0)
 
+    # --- Precios (nullable para compatibilidad con productos existentes) ---
+    unit_cost = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Costo de adquisición por unidad (COGS).",
+    )
+    sale_price_retail = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Precio de venta al por menor (vitrina).",
+    )
+    sale_price_wholesale = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Precio de venta al por mayor.",
+    )
+    tax_rate_pct = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Tasa de IVA aplicable (ej: 19.00 para 19%).",
+    )
+    currency = models.CharField(
+        max_length=3,
+        default="COP",
+        help_text="Moneda ISO 4217 (COP por defecto).",
+    )
+
     class Meta:
         verbose_name = "Producto"
         verbose_name_plural = "Productos"
@@ -169,11 +205,37 @@ class Lot(BaseModel):
 class ProductCombo(BaseModel):
     """Kit o combo: varios SKUs bajo un identificador (RF-003)."""
 
+    class PriceStrategy(models.TextChoices):
+        DERIVED = "derived", "Derivado de componentes"
+        FIXED = "fixed", "Precio fijo del combo"
+
     name = models.CharField(max_length=255)
     sku = models.CharField(max_length=100, unique=True)
     is_active = models.BooleanField(default=True)
     products = models.ManyToManyField(
         Product, through="ComboItem", related_name="product_combos"
+    )
+
+    # --- Pricing del combo ---
+    price_strategy = models.CharField(
+        max_length=20,
+        choices=PriceStrategy.choices,
+        default=PriceStrategy.DERIVED,
+        help_text="derived: suma de precios de componentes. fixed: precio fijo del combo.",
+    )
+    fixed_price_retail = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Precio fijo al por menor del combo (si price_strategy=fixed).",
+    )
+    fixed_price_wholesale = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Precio fijo al por mayor del combo (si price_strategy=fixed).",
     )
 
     class Meta:
@@ -211,3 +273,53 @@ class ComboItem(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.combo.sku} × {self.product.sku} ({self.quantity})"
+
+
+class ProductPriceHistory(BaseModel):
+    """
+    Historial inmutable de cambios de precio por producto.
+
+    Cada vez que se actualiza unit_cost, sale_price_retail, sale_price_wholesale
+    o tax_rate_pct se registra una fila aquí para trazabilidad contable.
+    """
+
+    PRICE_FIELDS = (
+        "unit_cost",
+        "sale_price_retail",
+        "sale_price_wholesale",
+        "tax_rate_pct",
+        "currency",
+    )
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.PROTECT,
+        related_name="price_history",
+    )
+    changed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="price_changes",
+    )
+    field_changed = models.CharField(
+        max_length=64,
+        help_text="Nombre del campo de precio modificado.",
+    )
+    old_value = models.DecimalField(
+        max_digits=12, decimal_places=4, null=True, blank=True
+    )
+    new_value = models.DecimalField(
+        max_digits=12, decimal_places=4, null=True, blank=True
+    )
+    currency = models.CharField(max_length=3, default="COP")
+
+    class Meta:
+        verbose_name = "Historial de precio"
+        verbose_name_plural = "Historial de precios"
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=("product", "field_changed", "created_at")),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.product.sku} / {self.field_changed}: {self.old_value} → {self.new_value}"

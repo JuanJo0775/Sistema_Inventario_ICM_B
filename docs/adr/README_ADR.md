@@ -20,6 +20,7 @@ Este directorio contiene las decisiones arquitectonicas del Sistema Inventario I
 | [ADR-010](ADR-010.md) | Generar facturas digitales en PDF con numeracion secuencial atomica en cada despacho | Aceptado |
 | [ADR-011](ADR-011.md) | Estrategia de testing en tres niveles con pytest y factory-boy | Aceptado |
 | [ADR-012](ADR-012.md) | Alinear la imagen de produccion con dependencias runtime explicitas | Aceptado |
+| [ADR-013](ADR-013.md) | Arquitectura de precios y facturacion comercial sobre el ledger de movimientos | Aceptado |
 
 ## Resumen de Decisiones Clave
 
@@ -49,6 +50,7 @@ Este directorio contiene las decisiones arquitectonicas del Sistema Inventario I
 - **ADR-010**: Generacion de facturas PDF con numeracion secuencial atomica.
 - **ADR-011**: Testing en tres niveles (60% unitario, 25% integracion, 15% invariantes).
 - **ADR-012**: Imagen de produccion con dependencias runtime explicitas.
+- **ADR-013**: Arquitectura de precios y facturacion: snapshot inmutable en Movement, historial de precios en ProductPriceHistory, modelo Invoice consolidado, combos con precio fijo/derivado, reportes financieros y webhooks de despacho.
 
 ## Documentos de síntesis relacionados
 

@@ -88,6 +88,10 @@
 | RF012-S06 | Auxiliar de Despacho intenta acceder al log de auditoría | Implementado | [RF012-S06.md](./RF012-S06.md) |
 | RF012-S07 | El log registra tanto el movimiento original como la corrección del Auxiliar | Implementado | [RF012-S07.md](./RF012-S07.md) |
 | RF012-S08 | Intento de eliminación o modificación de un registro del log | Implementado | [RF012-S08.md](./RF012-S08.md) |
+| RF013-S01 | Despacho captura precio congelado del producto al momento de la salida | Implementado | [RF013-S01.md](./RF013-S01.md) |
+| RF013-S02 | Precio en historial permanece inmutable tras modificar el precio actual del producto | Implementado | [RF013-S02.md](./RF013-S02.md) |
+| RF013-S03 | Actualización de precio genera historial auditado con valor anterior y nuevo | Implementado | [RF013-S03.md](./RF013-S03.md) |
+| RF013-S04 | Factura comercial reconstruible completamente desde el Movement sin consultar el catálogo actual | Implementado | [RF013-S04.md](./RF013-S04.md) |
 | RNF001-S01 | Operario completa un flujo de despacho sin formación técnica previa | Fuera de alcance | [RNF001-S01.md](./RNF001-S01.md) |
 | RNF001-S02 | La interfaz responde correctamente en dispositivos móviles y tabletas | Fuera de alcance | [RNF001-S02.md](./RNF001-S02.md) |
 | RNF001-S03 | La búsqueda de productos es igualmente eficiente por cualquier vía | Fuera de alcance | [RNF001-S03.md](./RNF001-S03.md) |

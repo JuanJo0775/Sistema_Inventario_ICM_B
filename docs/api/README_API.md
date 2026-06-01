@@ -477,6 +477,123 @@ Regla operativa:
 - Existe prueba de servicio o vista que cubra el caso.
 - El cambio no rompe el contrato existente.
 
+
+## 14. Módulo de Precios y Facturación (RF-013)
+
+> Este módulo es **completamente opcional y no bloqueante**. El sistema funciona con normalidad sin precios configurados. La integración con el frontend puede hacerse de forma incremental.
+
+### 14.1 ¿Qué hace este módulo?
+
+Añade una capa financiera sobre el ledger de movimientos existente:
+
+- Los productos tienen campos de precio opcionales (`unit_cost`, `sale_price_retail`, `sale_price_wholesale`, `tax_rate_pct`, `currency`). Por defecto son `null`.
+- Al despachar, si el producto tiene precio, el sistema congela el snapshot financiero en el Movement (BR-16). Si no tiene precio, los campos quedan `null` y el despacho se completa igual.
+- Cada despacho genera un modelo `Invoice` con totales consolidados, incluso si los totales son `0`.
+- Cada cambio de precio queda en `ProductPriceHistory` (BR-17).
+
+### 14.2 Campos nuevos en respuestas existentes
+
+Estos campos aparecen en los responses actuales. Son informativos, siempre `null` hasta configurar precios y **no rompen ningún contrato existente**.
+
+**Movement (despachos):**
+```json
+{
+  "unit_price": null,       "unit_cost": null,
+  "discount_pct": null,     "discount_amount": null,
+  "subtotal": null,         "tax_rate_pct": null,
+  "tax_amount": null,       "total_amount": null,
+  "currency": "COP",        "price_type": null,
+  "customer_snapshot": null
+}
+```
+
+**Product:**
+```json
+{ "unit_cost": null, "sale_price_retail": null, "sale_price_wholesale": null, "tax_rate_pct": null, "currency": "COP" }
+```
+
+**ProductCombo:**
+```json
+{ "price_strategy": "derived", "fixed_price_retail": null, "fixed_price_wholesale": null }
+```
+
+### 14.3 Configurar precios (almacenista)
+
+El **único** endpoint que modifica precios es `PATCH /catalog/products/<id>/prices/`. El `PUT/PATCH /catalog/products/<id>/` general ignora cualquier campo de precio.
+
+```http
+PATCH /api/v1/catalog/products/<uuid>/prices/
+Authorization: Bearer <token>
+
+{ "unit_cost": "5000.0000", "sale_price_retail": "12000.0000", "tax_rate_pct": "19.00" }
+```
+
+Consultar historial:
+```http
+GET /api/v1/catalog/products/<uuid>/prices/
+```
+
+### 14.4 Despacho con descuento (opcional)
+
+```json
+POST /api/v1/movements/dispatches/
+{ "product_id": "...", "location_id": "...", "quantity": 3, "movement_type": "SALIDA_VENTA_MENOR", "discount_pct": "10.00" }
+```
+
+`discount_pct` puede omitirse. Si el producto no tiene precio, el campo se ignora sin error.
+
+### 14.5 Facturas comerciales
+
+```http
+GET  /api/v1/movements/invoices/ICM-0001/       → detalle con totales
+GET  /api/v1/movements/invoices/ICM-0001/pdf/   → PDF enriquecido con precios
+GET  /api/v1/movements/dispatches/<uuid>/invoice/ → PDF legacy (solo SKU y cantidad, sin precio)
+```
+
+Los totales son `0` cuando el producto no tenía precio. La factura se crea igualmente.
+
+### 14.6 Reportes financieros
+
+Requieren `?start=<ISO-8601>&end=<ISO-8601>`. Período default: últimos 30 días.
+
+| Endpoint | Descripción |
+|----------|-------------|
+| `GET /reports/revenue-summary/` | Revenue total por tipo de venta (mayor/menor/combinado) |
+| `GET /reports/margin-by-product/` | Revenue, COGS, margen bruto y margen % por SKU |
+| `GET /reports/sales-by-customer/` | Revenue y órdenes por cliente de venta mayor |
+
+Estos reportes solo incluyen movimientos con precio. Si no hay precios, retornan `0` o lista vacía — **nunca un error**.
+
+### 14.7 Combos con precio fijo
+
+Al crear o actualizar un combo se puede especificar `price_strategy: "fixed"` y los precios fijos. Por defecto es `"derived"` (suma de precios individuales de componentes). Campos opcionales:
+
+```json
+{ "price_strategy": "fixed", "fixed_price_retail": "50000.0000", "fixed_price_wholesale": "40000.0000" }
+```
+
+### 14.8 Reglas de negocio asociadas
+
+| Regla | Implementación |
+|-------|---------------|
+| BR-16 — Precio congelado en despacho | `movements/services._resolve_price_snapshot()` — el precio del producto al momento del despacho queda inmutable en el Movement |
+| BR-17 — Historial auditado de precios | `catalog/services.update_product_prices()` — registra cada cambio en `ProductPriceHistory` |
+
+### 14.9 Compatibilidad hacia atrás
+
+| Endpoint | ¿Cambió el contrato? | Detalle |
+|----------|----------------------|---------|
+| `POST /movements/dispatches/` | No | `discount_pct` opcional nuevo. Si se omite, comportamiento idéntico. |
+| `GET /movements/dispatches/` | No* | Nuevos campos `null` en respuesta. |
+| `POST /catalog/products/` | No | Sin campos requeridos nuevos. |
+| `PUT/PATCH /catalog/products/<id>/` | No | Los campos de precio son ignorados aquí. |
+| `POST /catalog/combos/` | No | `price_strategy` opcional, default `"derived"`. |
+| `POST /movements/combo-dispatch/` | No | Comportamiento idéntico. |
+
+*Los campos adicionales en respuestas JSON no rompen clientes REST que ignoran propiedades desconocidas.
+
+---
+
 ## 13. Referencias
 
 - [ERS_ICM_Requisitos.md](ERS_ICM_Requisitos.md)

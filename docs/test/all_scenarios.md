@@ -4679,6 +4679,227 @@ Validar el criterio de aceptación Gherkin del ERS ICM para RF012 — escenario 
 - Muestra un mensaje indicando que los registros de auditoría son inmutables
 - Registra en el propio log el intento fallido de modificación con UserID y timestamp
 
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF012_S08 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF013-S01.md -->
+# Despacho captura precio congelado del producto al momento de la salida
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF013_S01`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF013 — escenario 1.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF013` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- El usuario autenticado tiene rol "Almacenista" o "Auxiliar de Despacho"
+- Existe un producto con sale_price_retail=10000, tax_rate_pct=19.00 y currency="COP"
+- Hay stock suficiente del producto en la ubicación de origen
+
+**When (Cuando):**
+- Registra un despacho de venta al por menor de 3 unidades del producto y confirma la operación
+
+**Then (Entonces):**
+- El sistema crea un Movement con unit_price=10000, subtotal=30000, tax_amount=5700, total_amount=35700 y price_type="retail"
+- El sistema crea un registro Invoice con los mismos totales consolidados
+- El PDF del comprobante incluye precio unitario, IVA y total
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF013_S01 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF013-S02.md -->
+# Precio en historial permanece inmutable tras modificar el precio actual del producto
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF013_S02`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF013 — escenario 2.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF013` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe un producto con sale_price_retail=10000
+- Se realizó y confirmó un despacho de venta al por menor; el Movement quedó con unit_price=10000
+
+**When (Cuando):**
+- El Almacenista actualiza el precio del producto a sale_price_retail=20000 mediante PATCH /api/v1/catalog/products/<id>/prices/
+
+**Then (Entonces):**
+- El Movement histórico conserva unit_price=10000 sin alteración
+- La factura descargable sigue mostrando el precio original del despacho
+- El nuevo precio 20000 aplica únicamente a despachos futuros
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF013_S02 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF013-S03.md -->
+# Actualización de precio genera historial auditado con valor anterior y nuevo
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF013_S03`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF013 — escenario 3.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF013` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- El usuario autenticado tiene rol "Almacenista"
+- Existe un producto con sale_price_retail=10000
+
+**When (Cuando):**
+- El Almacenista ejecuta PATCH /api/v1/catalog/products/<id>/prices/ con {"sale_price_retail": "12000"}
+
+**Then (Entonces):**
+- Se crea un registro en ProductPriceHistory con field_changed="sale_price_retail", old_value=10000, new_value=12000 y changed_by igual al almacenista
+- Si el valor enviado es idéntico al actual, no se crea ningún registro de historial
+- GET /api/v1/catalog/products/<id>/prices/ retorna el historial completo del producto
+- Un usuario con rol distinto a almacenista recibe 403 Forbidden al intentar actualizar precios
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF013_S03 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF013-S04.md -->
+# Factura comercial reconstruible completamente desde el Movement sin consultar el catálogo actual
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF013_S04`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF013 — escenario 4.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF013` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Se confirmó un despacho de venta al por mayor con datos del cliente: nombre, correo, teléfono y dirección
+- El producto tenía sale_price_wholesale=9000 y tax_rate_pct=19.00
+
+**When (Cuando):**
+- El administrador o almacenista consulta GET /api/v1/movements/invoices/<number>/ o descarga el PDF
+
+**Then (Entonces):**
+- La respuesta incluye datos del cliente, subtotal, IVA, total y moneda con los valores exactos del momento del despacho
+- El PDF contiene la tabla de líneas con precio unitario, descuento, IVA y total
+- Los valores son correctos aunque el precio del producto haya sido modificado después del despacho
+- Los valores son correctos aunque el producto esté actualmente desactivado
+
+---
+
 # **6. Requisitos No Funcionales**
 
 Los requisitos no funcionales (RNF) definen los atributos de calidad que el sistema debe cumplir para ser operativamente viable en el contexto real de ICM. A diferencia de los requisitos funcionales, que describen qué hace el sistema, los requisitos no funcionales describen cómo debe hacerlo: con qué velocidad, con qué nivel de seguridad, con qué grado de disponibilidad. Estos requisitos son transversales a todos los módulos y deben ser considerados desde la fase de diseño arquitectónico, no como consideraciones tardías de optimización.
@@ -4692,7 +4913,7 @@ Ver la sección Then en el extracto anterior del ERS. En automatización backend
 Ejecutar:
 
 ```bash
-pytest tests/ers/test_gherkin_dynamic.py::test_RF012_S08 -v
+pytest tests/ers/test_gherkin_dynamic.py::test_RF013_S04 -v
 ```
 
 Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
@@ -5682,6 +5903,7 @@ La siguiente tabla presenta un resumen de todos los requisitos especificados en 
 | RF-010 | Reportes e Indicadores Operativos | Reportes e Indicadores | BR-10, BR-11, BR-13 |
 | RF-011 | Alertas Proactivas del Sistema | Alertas Proactivas | BR-04, BR-10, BR-11 |
 | RF-012 | Log de Auditoría y Trazabilidad | Auditoría y Trazabilidad | BR-01, BR-06, BR-07, BR-10 |
+| RF-013 | Precios y Facturación Comercial | Precios y Facturación | BR-13, BR-16, BR-17 |
 | RNF-001 | Usabilidad e Interfaz Intuitiva | Transversal | — |
 | RNF-002 | Disponibilidad del Sistema | Transversal | BR-03 |
 | RNF-003 | Seguridad e Integridad de Datos | Transversal | BR-01, BR-02, BR-10 |
@@ -5695,9 +5917,7 @@ El presente documento centraliza la especificación completa de dieciocho requis
 
 Los requisitos funcionales cubren la totalidad de los módulos identificados en la elicitación: autenticación y gestión de credenciales, gestión de inventario, recepción de mercancía, despacho y salidas, movimientos internos, devoluciones, ajustes de inventario, reportes e indicadores, alertas proactivas y auditoría. Los requisitos no funcionales complementan esta especificación con atributos de calidad medibles en usabilidad, disponibilidad, seguridad, rendimiento, mantenibilidad y cumplimiento legal.
 
-La redacción de los criterios de aceptación en formato Gherkin responde a una decisión deliberada orientada a facilitar el trabajo de la asignatura de Pruebas de Software: cada escenario puede ser convertido directamente en un caso de prueba sin necesidad de reinterpretación, lo que reduce el margen de error entre lo que el sistema debe hacer y lo que efectivamente se verifica en las fases de prueba.
-
-Este documento debe ser considerado un artefacto vivo dura…
+La redacción de los criterios de aceptación en formato Gherkin responde a una decisión deliberada orientada a facilitar el trabajo de la asignatura de Pruebas de Software: cada escenario puede ser convertido directamente en un caso de prueba sin necesidad de reinterpretación, lo que reduce el margen de error entre lo que el sistema debe hacer y lo que efectivamente se v…
 
 ## Resultado esperado (Then)
 

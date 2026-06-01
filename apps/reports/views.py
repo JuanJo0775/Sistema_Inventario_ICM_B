@@ -35,9 +35,12 @@ from apps.reports.selectors import (
     get_top_dispatched_products,
     get_warehouse_occupancy_distribution,
     get_warehouse_utilization,
+    gross_margin_by_product,
     movement_counts_by_period,
     movement_history,
+    sales_by_customer,
     sales_dispatch_totals,
+    sales_revenue_summary,
 )
 from apps.reports.serializers import (
     DiscardOperationalSummarySerializer,
@@ -807,3 +810,126 @@ class ReportDatasetView(APIView):
             "suggested_filename": f"{kind}-{generated_at:%Y%m%d-%H%M%S}",
         }
         return Response(payload)
+
+
+def _parse_period_params(request) -> tuple:
+    """Helper: parsea start/end de query params y retorna (start, end) como datetimes."""
+    from django.utils.dateparse import parse_datetime
+    from django.utils import timezone
+    from datetime import timedelta
+
+    end = timezone.now()
+    start = end - timedelta(days=30)
+    if s := request.query_params.get("start"):
+        parsed = parse_datetime(s)
+        if parsed:
+            start = parsed
+    if e := request.query_params.get("end"):
+        parsed = parse_datetime(e)
+        if parsed:
+            end = parsed
+    return start, end
+
+
+class RevenueReportView(APIView):
+    """GET /reports/revenue-summary/ — Revenue total por tipo de venta en el período."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
+
+    @extend_schema(
+        summary="Revenue por tipo de venta",
+        description="Retorna subtotales, IVA y totales de ventas al por menor y mayor, más un combinado. Período default: últimos 30 días.",
+        parameters=[
+            OpenApiParameter(
+                "start",
+                str,
+                OpenApiParameter.QUERY,
+                description="Inicio del período (ISO-8601).",
+            ),
+            OpenApiParameter(
+                "end",
+                str,
+                OpenApiParameter.QUERY,
+                description="Fin del período (ISO-8601).",
+            ),
+        ],
+        responses={200: None, **standard_error_responses(include_403=True)},
+        tags=[TAG_REPORTS],
+    )
+    def get(self, request):
+        start, end = _parse_period_params(request)
+        return Response(sales_revenue_summary(start=start, end=end))
+
+
+class GrossMarginReportView(APIView):
+    """GET /reports/margin-by-product/ — Margen bruto por SKU en el período."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
+
+    @extend_schema(
+        summary="Margen bruto por producto",
+        description="Retorna revenue, COGS, margen bruto y margen % por SKU para despachos de venta. Ordenado de mayor a menor revenue.",
+        parameters=[
+            OpenApiParameter(
+                "start",
+                str,
+                OpenApiParameter.QUERY,
+                description="Inicio del período (ISO-8601).",
+            ),
+            OpenApiParameter(
+                "end",
+                str,
+                OpenApiParameter.QUERY,
+                description="Fin del período (ISO-8601).",
+            ),
+            OpenApiParameter(
+                "limit",
+                int,
+                OpenApiParameter.QUERY,
+                description="Máximo de SKUs (default 50).",
+            ),
+        ],
+        responses={200: None, **standard_error_responses(include_403=True)},
+        tags=[TAG_REPORTS],
+    )
+    def get(self, request):
+        start, end = _parse_period_params(request)
+        limit = int(request.query_params.get("limit", 50))
+        return Response(gross_margin_by_product(start=start, end=end, limit=limit))
+
+
+class SalesByCustomerReportView(APIView):
+    """GET /reports/sales-by-customer/ — Ventas agrupadas por cliente (venta mayor)."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
+
+    @extend_schema(
+        summary="Ventas por cliente",
+        description="Retorna revenue, unidades y número de órdenes de venta al por mayor agrupados por cliente.",
+        parameters=[
+            OpenApiParameter(
+                "start",
+                str,
+                OpenApiParameter.QUERY,
+                description="Inicio del período (ISO-8601).",
+            ),
+            OpenApiParameter(
+                "end",
+                str,
+                OpenApiParameter.QUERY,
+                description="Fin del período (ISO-8601).",
+            ),
+            OpenApiParameter(
+                "limit",
+                int,
+                OpenApiParameter.QUERY,
+                description="Máximo de clientes (default 50).",
+            ),
+        ],
+        responses={200: None, **standard_error_responses(include_403=True)},
+        tags=[TAG_REPORTS],
+    )
+    def get(self, request):
+        start, end = _parse_period_params(request)
+        limit = int(request.query_params.get("limit", 50))
+        return Response(sales_by_customer(start=start, end=end, limit=limit))

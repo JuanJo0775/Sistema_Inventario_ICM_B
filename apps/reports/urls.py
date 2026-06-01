@@ -5,6 +5,7 @@ from apps.reports.views import (
     DispatchOperationalReportView,
     DispatchOrdersReportView,
     ExpiringProductsReportView,
+    GrossMarginReportView,
     InventorySummaryReportView,
     InvoiceHistoryReportView,
     KpiDashboardReportView,
@@ -13,6 +14,8 @@ from apps.reports.views import (
     MovementSummaryReportView,
     QualityOperationalReportView,
     ReportDatasetView,
+    RevenueReportView,
+    SalesByCustomerReportView,
     SalesSummaryReportView,
     TopDispatchedProductsReportView,
     WarehouseUtilizationReportView,
@@ -89,4 +92,18 @@ urlpatterns = [
     path("invoices/", InvoiceHistoryReportView.as_view(), name="reports-invoices"),
     # KPI (legacy panel) - delegated to dashboard service for ownership
     path("kpi/", KpiDashboardReportView.as_view(), name="reports-kpi"),
+    # Reportes financieros
+    path(
+        "revenue-summary/", RevenueReportView.as_view(), name="reports-revenue-summary"
+    ),
+    path(
+        "margin-by-product/",
+        GrossMarginReportView.as_view(),
+        name="reports-margin-by-product",
+    ),
+    path(
+        "sales-by-customer/",
+        SalesByCustomerReportView.as_view(),
+        name="reports-sales-by-customer",
+    ),
 ]

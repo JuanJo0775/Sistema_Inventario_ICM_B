@@ -123,9 +123,38 @@ Para probar los endpoints, haga clic en el botón **Authorize**, use el esquema 
 - **Restricción Horaria:** El rol `auxiliar_despacho` está sujeto a la regla **BR-03** (07:00-12:00 / 14:00-17:00).
 
 ---
+### **Módulo de Precios y Facturación — Opcional / No bloqueante**
+
+> ⚠️ Este módulo es **completamente opcional**. El sistema funciona con normalidad sin que los productos tengan precios configurados.
+
+El sistema incluye soporte de precios como capa aditiva sobre el ledger de inventario (**RF-013**). Su integración con el frontend puede realizarse de forma incremental:
+
+**Lo que cambia en respuestas existentes (campos adicionales, siempre `null` por defecto):**
+- `GET /catalog/products/<id>/` → incluye `unit_cost`, `sale_price_retail`, `sale_price_wholesale`, `tax_rate_pct`, `currency` (null si no se configuraron)
+- `GET /movements/dispatches/` → incluye `unit_price`, `subtotal`, `tax_amount`, `total_amount`, `currency`, `price_type`, `customer_snapshot` (null si el producto no tiene precio)
+- `GET /catalog/combos/<id>/` → incluye `price_strategy` (`"derived"`), `fixed_price_retail`, `fixed_price_wholesale` (null)
+
+**Lo que NO cambió (backward-compatible al 100%):**
+- `POST /movements/dispatches/` — sin campos requeridos nuevos. El campo opcional `discount_pct` puede omitirse.
+- `POST /catalog/products/` — sin campos requeridos nuevos.
+- `PUT/PATCH /catalog/products/<id>/` — los campos de precio son ignorados aquí; solo se modifican vía `/prices/`.
+- `POST /catalog/combos/` — `price_strategy` es opcional, default `"derived"`.
+
+**Endpoints nuevos (el frontend los ignora hasta que los necesite):**
+- `PATCH /catalog/products/<id>/prices/` — configurar precios del producto (solo almacenista)
+- `GET  /catalog/products/<id>/prices/` — historial inmutable de cambios de precio
+- `GET  /movements/invoices/<number>/` — detalle de factura con totales comerciales
+- `GET  /movements/invoices/<number>/pdf/` — PDF enriquecido con precios
+- `GET  /reports/revenue-summary/` — revenue por tipo de venta
+- `GET  /reports/margin-by-product/` — margen bruto por SKU
+- `GET  /reports/sales-by-customer/` — ventas por cliente (venta mayor)
+
+---
 ### **Documentación Adicional**
-- **Referencia:** `docs/ERS_ICM_Requisitos.md`
+- **API (referencia detallada):** `docs/api/README_API.md`
+- **Requisitos:** `docs/requisitos/ERS_ICM_Requisitos.md`
 - **Arquitectura:** `docs/README_ARQUITECTURA.md`
+- **Precios:** `docs/pricing/README_PRECIOS_FACTURACION.md`
 - **Nota:** el stock se maneja como un ledger inmutable con stock derivado.
     """.strip(),
     "VERSION": "1.0.0",
@@ -143,11 +172,14 @@ Para probar los endpoints, haga clic en el botón **Authorize**, use el esquema 
     "TAGS": [
         {"name": TAG_AUTH, "description": "JWT authentication and user management."},
         {"name": TAG_SYSTEM, "description": "System availability checks."},
-        {"name": TAG_CATALOG, "description": "Categories, products, and combos."},
+        {
+            "name": TAG_CATALOG,
+            "description": "Categories, products, combos and SKU management.",
+        },
         {"name": TAG_INVENTORY, "description": "Locations and stock tracking."},
         {
             "name": TAG_MOVEMENTS,
-            "description": "Ledger: entries, dispatches, transfers, returns, adjustments.",
+            "description": "Ledger: entries, dispatches, transfers, returns, adjustments and invoices.",
         },
         {
             "name": TAG_DASHBOARD,
@@ -208,6 +240,10 @@ Para probar los endpoints, haga clic en el botón **Authorize**, use el esquema 
         }
     },
     "SECURITY": [{"BearerAuth": []}],
+    "ENUM_NAME_OVERRIDES": {
+        # Unifica el enum price_strategy de ProductCombo bajo un nombre canónico
+        "PriceStrategyEnum": ["derived", "fixed"],
+    },
     "POSTPROCESSING_HOOKS": [
         "drf_spectacular.hooks.postprocess_schema_enums",
         "shared.openapi.standardize_errors_hook",

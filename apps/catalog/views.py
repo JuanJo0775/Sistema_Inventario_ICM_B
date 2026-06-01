@@ -29,6 +29,8 @@ from apps.catalog.serializers import (
     ProductBarcodeSerializer,
     ProductCreateSerializer,
     ProductDetailSerializer,
+    ProductPriceHistorySerializer,
+    ProductPriceUpdateSerializer,
     ProductSerializer,
     ProductUpdateSerializer,
     ResolveIdentifierQuerySerializer,
@@ -53,6 +55,7 @@ from apps.catalog.services import (
     update_category,
     update_combo,
     update_product,
+    update_product_prices,
     update_subcategory,
 )
 from shared.openapi import TAG_CATALOG, standard_error_responses
@@ -682,3 +685,57 @@ class ProductRestoreView(APIView):
         get_object_or_404(Product, pk=pk)
         product = activate_product(request.user, pk, request=request)
         return Response(ProductDetailSerializer(product).data)
+
+
+class ProductPricesView(APIView):
+    """PATCH /catalog/products/<id>/prices/ — gestión de precios (solo almacenista)."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Configurar precios de un producto",
+        description=(
+            "Actualiza unit_cost, sale_price_retail, sale_price_wholesale, tax_rate_pct y/o currency. "
+            "Solo los campos enviados se modifican. Registra historial inmutable de cada cambio (BR-17)."
+        ),
+        request=ProductPriceUpdateSerializer,
+        responses={
+            200: ProductSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+        tags=[TAG_CATALOG],
+    )
+    def patch(self, request, pk):
+        get_object_or_404(Product, pk=pk)
+        ser = ProductPriceUpdateSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        product = update_product_prices(
+            request.user,
+            pk,
+            unit_cost=d.get("unit_cost"),
+            sale_price_retail=d.get("sale_price_retail"),
+            sale_price_wholesale=d.get("sale_price_wholesale"),
+            tax_rate_pct=d.get("tax_rate_pct"),
+            currency=d.get("currency"),
+            request=request,
+        )
+        return Response(ProductSerializer(product).data)
+
+    @extend_schema(
+        summary="Historial de precios de un producto",
+        description="Retorna el historial inmutable de cambios de precio del producto.",
+        responses={
+            200: ProductPriceHistorySerializer(many=True),
+            **standard_error_responses(include_404=True),
+        },
+        tags=[TAG_CATALOG],
+    )
+    def get(self, request, pk):
+        from apps.catalog.models import ProductPriceHistory
+
+        product = get_object_or_404(Product, pk=pk)
+        history = ProductPriceHistory.objects.filter(product=product).select_related(
+            "changed_by"
+        )
+        return Response(ProductPriceHistorySerializer(history, many=True).data)

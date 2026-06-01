@@ -47,6 +47,20 @@ class MovementSerializer(serializers.ModelSerializer):
             "related_movement",
             "executed_by",
             "created_at",
+            # --- Precio snapshot (BR-16) ---
+            # Todos nullable: null si el producto no tenía precio al momento del despacho.
+            # Nunca bloquean el flujo — el despacho se completa aunque sean null.
+            "unit_price",
+            "unit_cost",
+            "discount_pct",
+            "discount_amount",
+            "subtotal",
+            "tax_rate_pct",
+            "tax_amount",
+            "total_amount",
+            "currency",
+            "price_type",
+            "customer_snapshot",
         )
         read_only_fields = fields
 
@@ -86,6 +100,18 @@ class DispatchCreateSerializer(serializers.Serializer):
     cold_chain_acknowledged = serializers.BooleanField(default=False)
     electrical_safety_acknowledged = serializers.BooleanField(default=False)
     privacy_notice_acknowledged = serializers.BooleanField(default=False)
+    discount_pct = serializers.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        required=False,
+        allow_null=True,
+        min_value=0,
+        max_value=100,
+        help_text=(
+            "Descuento en porcentaje (0-100). Opcional — omitir si no aplica descuento. "
+            "Solo tiene efecto si el producto tiene precio configurado."
+        ),
+    )
 
 
 class TransferCreateSerializer(serializers.Serializer):
@@ -138,3 +164,29 @@ class ComboDispatchSerializer(serializers.Serializer):
     location_id = serializers.UUIDField(
         help_text="UUID de la ubicación desde donde se descuentan los productos."
     )
+
+
+class InvoiceSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    number = serializers.CharField()
+    customer_name = serializers.CharField()
+    customer_email = serializers.EmailField()
+    customer_phone = serializers.CharField()
+    customer_address = serializers.CharField()
+    subtotal = serializers.DecimalField(max_digits=14, decimal_places=4)
+    discount_total = serializers.DecimalField(max_digits=12, decimal_places=4)
+    tax_total = serializers.DecimalField(max_digits=12, decimal_places=4)
+    total_amount = serializers.DecimalField(max_digits=14, decimal_places=4)
+    currency = serializers.CharField()
+    pdf = serializers.FileField(allow_null=True)
+    issued_by = serializers.CharField(
+        source="issued_by.username",
+        help_text="Username del operador que generó la factura.",
+    )
+    issued_at = serializers.DateTimeField()
+    movement_ids = serializers.SerializerMethodField(
+        help_text="Lista de UUIDs de los movimientos agrupados en esta factura.",
+    )
+
+    def get_movement_ids(self, obj) -> list[str]:
+        return [str(m.id) for m in obj.movements.all()]

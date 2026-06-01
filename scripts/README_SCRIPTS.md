@@ -64,6 +64,38 @@ python -m scripts.generate_docs --only unit
 python -m scripts.generate_docs --check
 ```
 
+4) import_catalog (management command)
+
+- Propósito: importa el catálogo inicial de productos desde el Excel de ICM (`Clasificacion_Productos.xlsx`) de forma idempotente. Los productos ya existentes se omiten. Las categorías se crean si no existen.
+- Soporte de precios: si el Excel contiene columnas de precio a partir de la columna D, el comando las lee y las carga en el producto. Si no existen, los precios quedan en null y el comando sigue funcionando sin error.
+  - Columnas reconocidas: `Precio Venta`, `Precio Menor`, `Precio Minorista` → `sale_price_retail`; `Precio Mayorista`, `Precio Mayor` → `sale_price_wholesale`; `Costo`, `Costo Unitario` → `unit_cost`; `IVA`, `IVA%` → `tax_rate_pct`; `Moneda` → `currency`.
+- Dependencia: requiere que el usuario almacenista exista primero (`python manage.py create_almacenista`).
+- Uso:
+
+```bash
+# Importación real
+python manage.py import_catalog
+
+# Dry-run (valida sin escribir en BD)
+python manage.py import_catalog --dry-run
+
+# Ruta personalizada al Excel
+python manage.py import_catalog --excel-path /ruta/al/archivo.xlsx
+
+# Usuario actor distinto al del .env
+python manage.py import_catalog --actor-username otro_almacenista
+```
+
+5) create_almacenista (management command)
+
+- Propósito: crea el usuario almacenista inicial del sistema con las credenciales definidas en las variables de entorno `ALMACENISTA_USERNAME`, `ALMACENISTA_EMAIL`, `ALMACENISTA_PASSWORD` del archivo `.env`. Es idempotente: si el usuario ya existe, no hace nada.
+- Dependencia: requiere que `ALMACENISTA_PASSWORD` esté configurada en `.env` (no puede estar vacía).
+- Uso:
+
+```bash
+python manage.py create_almacenista
+```
+
 ## Convenciones y buenas prácticas
 
 - Documenta cada script nuevo en este `README_SCRIPTS.md` con: propósito, entradas, salidas, opciones CLI y ejemplos de uso.

@@ -227,12 +227,14 @@ PATCH /api/v1/catalog/subcategories/<uuid>/  → parcial
 ### Productos
 
 ```
-GET  /api/v1/catalog/products/               → listar (solo almacenista)
-POST /api/v1/catalog/products/               → crear
-GET  /api/v1/catalog/products/<uuid>/        → detalle (todos autenticados)
-PUT  /api/v1/catalog/products/<uuid>/        → actualizar
-PATCH /api/v1/catalog/products/<uuid>/       → parcial
-GET  /api/v1/catalog/products/<uuid>/barcode/ → datos del código de barras
+GET  /api/v1/catalog/products/                   → listar (solo almacenista)
+POST /api/v1/catalog/products/                   → crear
+GET  /api/v1/catalog/products/<uuid>/            → detalle (todos autenticados)
+PUT  /api/v1/catalog/products/<uuid>/            → actualizar
+PATCH /api/v1/catalog/products/<uuid>/           → parcial
+GET  /api/v1/catalog/products/<uuid>/barcode/    → datos del código de barras
+PATCH /api/v1/catalog/products/<uuid>/prices/    → configurar precios (solo almacenista)
+GET  /api/v1/catalog/products/<uuid>/prices/     → historial de cambios de precio
 ```
 
 **Request POST:**
@@ -268,8 +270,50 @@ SKU: 1-4 letras, guion, 1-4 dígitos. Ej: `ELE-0001`, `MED-123`.
   "requires_expiration": false,
   "requires_cold_chain": false,
   "reorder_point": 5,
-  "is_active": true
+  "is_active": true,
+  "unit_cost": null,
+  "sale_price_retail": null,
+  "sale_price_wholesale": null,
+  "tax_rate_pct": null,
+  "currency": "COP"
 }
+```
+
+> Los campos de precio son `null` por defecto. Configurarlos via `PATCH /products/<uuid>/prices/`.
+
+---
+
+### Precios de producto (almacenista)
+
+```
+PATCH /api/v1/catalog/products/<uuid>/prices/   -> configurar precios
+GET  /api/v1/catalog/products/<uuid>/prices/    -> historial inmutable
+```
+
+**Request PATCH (todos los campos opcionales):**
+```json
+{
+  "unit_cost": "5000.0000",
+  "sale_price_retail": "12000.0000",
+  "sale_price_wholesale": "9500.0000",
+  "tax_rate_pct": "19.00",
+  "currency": "COP"
+}
+```
+
+**Response GET (historial):**
+```json
+[
+  {
+    "id": "uuid",
+    "field_changed": "sale_price_retail",
+    "old_value": "10000.0000",
+    "new_value": "12000.0000",
+    "currency": "COP",
+    "changed_by": "almacenista",
+    "created_at": "2026-05-31T20:00:00Z"
+  }
+]
 ```
 
 ---
@@ -303,9 +347,14 @@ GET  /api/v1/catalog/combos/<uuid>/          → detalle
   "items": [
     { "product_id": "uuid-prod1", "quantity": 2 },
     { "product_id": "uuid-prod2", "quantity": 1 }
-  ]
+  ],
+  "price_strategy": "derived",
+  "fixed_price_retail": null,
+  "fixed_price_wholesale": null
 }
 ```
+
+`price_strategy`: `"derived"` (default) o `"fixed"`. Con `"fixed"` el precio total se distribuye entre componentes por su costo unitario.
 
 ---
 
@@ -594,7 +643,9 @@ Disponible para `almacenista` y `auxiliar_despacho`.
 GET  /api/v1/movements/dispatches/                   → listar
 POST /api/v1/movements/dispatches/                   → registrar despacho
 GET  /api/v1/movements/dispatches/<uuid>/             → detalle
-GET  /api/v1/movements/dispatches/<uuid>/invoice/     → descargar PDF factura
+GET  /api/v1/movements/dispatches/<uuid>/invoice/     → PDF comprobante legacy (sin precio)
+GET  /api/v1/movements/invoices/<number>/             → detalle de factura comercial con totales
+GET  /api/v1/movements/invoices/<number>/pdf/         → PDF enriquecido con precios
 ```
 
 Disponible para `almacenista` y `auxiliar_despacho`.
@@ -608,9 +659,12 @@ Disponible para `almacenista` y `auxiliar_despacho`.
   "movement_type": "SALIDA_VENTA_MENOR",
   "cold_chain_acknowledged": true,
   "electrical_safety_acknowledged": false,
-  "privacy_notice_acknowledged": false
+  "privacy_notice_acknowledged": false,
+  "discount_pct": "10.00"
 }
 ```
+
+`discount_pct` es opcional. Si el producto no tiene precio, se ignora sin error.
 
 **Request POST (venta mayor — requiere datos del cliente):**
 ```json
@@ -633,6 +687,22 @@ Disponible para `almacenista` y `auxiliar_despacho`.
 ```
 
 > Los despachos multi-lote se resuelven automáticamente con política FEFO (First Expired, First Out).
+
+**Campos de precio en la respuesta** (`null` si el producto no tiene precio configurado):
+```json
+{
+  "unit_price": "12000.0000",   "subtotal": "24000.0000",
+  "tax_rate_pct": "19.00",      "tax_amount": "4560.0000",
+  "total_amount": "28560.0000", "currency": "COP",
+  "price_type": "retail",       "customer_snapshot": null
+}
+```
+
+**Factura comercial** (creada automáticamente en cada despacho):
+```
+GET /api/v1/movements/invoices/ICM-0001/      -> detalle con totales
+GET /api/v1/movements/invoices/ICM-0001/pdf/  -> PDF con precios
+```
 
 ---
 
@@ -838,6 +908,44 @@ GET /api/v1/inventory/?export=xlsx
 Las filas están aplanadas: una fila por combinación producto/ubicación.
 
 Columnas: `sku`, `name`, `reorder_point`, `total`, `location_code`, `location_name`, `quantity`.
+
+---
+
+### Reportes financieros
+
+Disponible para `almacenista` y `administrador`.
+
+```
+GET /api/v1/reports/revenue-summary/       -> revenue por tipo de venta
+GET /api/v1/reports/margin-by-product/     -> margen bruto por SKU
+GET /api/v1/reports/sales-by-customer/     -> ventas por cliente (venta mayor)
+```
+
+**Query params comunes:**
+
+| Param | Descripcion |
+|---|---|
+| `start` | Inicio del periodo ISO-8601 (default: hace 30 dias) |
+| `end` | Fin del periodo ISO-8601 (default: ahora) |
+| `limit` | Solo margin y customer. Maximo de resultados (default 50) |
+
+**Response `revenue-summary`:**
+```json
+{
+  "wholesale": { "units": 50, "subtotal": "475000.0000", "tax": "90250.0000", "total": "565250.0000" },
+  "retail":    { "units": 30, "subtotal": "360000.0000", "tax": "68400.0000",  "total": "428400.0000" },
+  "combined":  { "units": 80, "subtotal": "835000.0000", "tax": "158650.0000", "total": "993650.0000" }
+}
+```
+
+**Response `margin-by-product`:**
+```json
+[
+  { "sku": "CM-01", "units": 5, "revenue": "60000.0000", "cogs": "25000.0000", "gross_margin": "35000.0000", "gross_margin_pct": "58.33" }
+]
+```
+
+> Retornan `0` o lista vacia si los productos no tienen precio. Nunca un error.
 
 ---
 
@@ -1298,6 +1406,7 @@ Los listados están paginados. Respuesta estándar:
 | Boolean | JSON bool | `true`, `false` |
 | Integer | JSON number | `10`, `-3` |
 | SKU | Patrón | `"ELE-0001"` (1-4 letras, guion, 1-4 dígitos) |
+| Decimal | String numérico | `"12000.0000"` (4 cifras decimales, entre comillas) |
 
 ---
 
@@ -1330,9 +1439,12 @@ Los listados están paginados. Respuesta estándar:
 | Polling alertas | ✅ | ✅ | ✅ |
 | Ver auditoría | ✅ | ❌ | ✅ |
 | Gestionar webhooks | ✅ | ❌ | ❌ |
+| Configurar precios de producto | ✅ | ❌ | ❌ |
+| Ver facturas comerciales | ✅ | ✅ | ❌ |
+| Ver reportes financieros | ✅ | ❌ | ✅ |
 
 Para la matriz completa de cada endpoint, ver [README_MATRIZ_PERMISOS.md](README_MATRIZ_PERMISOS.md).
 
 ---
 
-*Actualizado: 2026-05-31. Sincronizado con el estado real del código (330 tests, production-readiness ~95%).*
+*Actualizado: 2026-05-31. Sincronizado con el estado real del código (508 tests, production-readiness ~95%).*

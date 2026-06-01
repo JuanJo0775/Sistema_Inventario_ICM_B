@@ -1,0 +1,28 @@
+{
+  "timestamp": "20260531_203419",
+  "dry_run": false,
+  "categories_created": 11,
+  "categories_skipped": 0,
+  "products_created": 215,
+  "products_skipped": 0,
+  "products_with_prices": 0,
+  "products_generated_sku": [
+    "FL-0032",
+    "FL-0033"
+  ],
+  "products_transformed_sku": [
+    [
+      "MPC-01A",
+      "MPCA-01"
+    ],
+    [
+      "MPC-02A",
+      "MPCA-02"
+    ],
+    [
+      "EC-01b",
+      "ECB-01"
+    ]
+  ],
+  "errors": []
+}

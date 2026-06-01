@@ -8,7 +8,14 @@ from django.db import transaction
 
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
-from apps.catalog.models import Category, ComboItem, Product, ProductCombo, Subcategory
+from apps.catalog.models import (
+    Category,
+    ComboItem,
+    Product,
+    ProductCombo,
+    ProductPriceHistory,
+    Subcategory,
+)
 from shared.exceptions import (
     InvalidSKUFormatError,
     UnauthorizedCredentialManagementError,
@@ -53,6 +60,12 @@ def create_product(
         is_active=bool(data.get("is_active", True)),
         notes=data.get("notes") or "",
         reorder_point=int(data.get("reorder_point", 0)),
+        # Campos de precio opcionales
+        unit_cost=data.get("unit_cost"),
+        sale_price_retail=data.get("sale_price_retail"),
+        sale_price_wholesale=data.get("sale_price_wholesale"),
+        tax_rate_pct=data.get("tax_rate_pct"),
+        currency=data.get("currency") or "COP",
     )
     if not product.barcode:
         product.barcode = build_product_barcode(product.id)
@@ -166,6 +179,9 @@ def create_combo(
         name=name,
         sku=sku,
         is_active=bool(data.get("is_active", True)),
+        price_strategy=data.get("price_strategy", "derived"),
+        fixed_price_retail=data.get("fixed_price_retail"),
+        fixed_price_wholesale=data.get("fixed_price_wholesale"),
     )
     for row in items:
         ComboItem.objects.create(
@@ -501,6 +517,9 @@ def update_combo(
         new_sku = data["sku"].strip()
         validate_sku_format(new_sku)
         combo.sku = new_sku
+    for field in ("price_strategy", "fixed_price_retail", "fixed_price_wholesale"):
+        if field in data:
+            setattr(combo, field, data[field])
     combo.save()
 
     if "items" in data:
@@ -574,6 +593,72 @@ def activate_combo(
         detail={"combo_id": str(combo.id), "sku": combo.sku},
     )
     return combo
+
+
+@transaction.atomic
+def update_product_prices(
+    user: "User",
+    product_id: Any,
+    *,
+    unit_cost: Any = None,
+    sale_price_retail: Any = None,
+    sale_price_wholesale: Any = None,
+    tax_rate_pct: Any = None,
+    currency: str | None = None,
+    request: "HttpRequest | None" = None,
+) -> Product:
+    """
+    Actualiza los campos de precio de un producto y registra cada cambio en ProductPriceHistory.
+
+    Solo almacenistas pueden ejecutar esta acción.
+    Los campos no enviados (None) se dejan intactos.
+    """
+    _require_almacenista(user)
+    product = Product.objects.select_for_update().get(pk=product_id)
+
+    updates: dict[str, Any] = {}
+    if unit_cost is not None:
+        updates["unit_cost"] = unit_cost
+    if sale_price_retail is not None:
+        updates["sale_price_retail"] = sale_price_retail
+    if sale_price_wholesale is not None:
+        updates["sale_price_wholesale"] = sale_price_wholesale
+    if tax_rate_pct is not None:
+        updates["tax_rate_pct"] = tax_rate_pct
+    if currency is not None:
+        updates["currency"] = currency
+
+    if not updates:
+        return product
+
+    history_entries = []
+    for field, new_val in updates.items():
+        old_val = getattr(product, field)
+        if old_val != new_val:
+            history_entries.append(
+                ProductPriceHistory(
+                    product=product,
+                    changed_by=user,
+                    field_changed=field,
+                    old_value=old_val if field != "currency" else None,
+                    new_value=new_val if field != "currency" else None,
+                    currency=updates.get("currency") or product.currency,
+                )
+            )
+        setattr(product, field, new_val)
+
+    product.save(update_fields=list(updates.keys()))
+    if history_entries:
+        ProductPriceHistory.objects.bulk_create(history_entries)
+
+    log_event(
+        AuditEventType.PRODUCT_PRICE_UPDATED,
+        description=f"Precios actualizados: {product.sku}",
+        user=user,
+        request=request,
+        detail={"product_id": str(product.id), "fields": list(updates.keys())},
+    )
+    return product
 
 
 @transaction.atomic

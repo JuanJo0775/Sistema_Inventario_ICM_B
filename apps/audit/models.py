@@ -29,6 +29,7 @@ class AuditEventType(models.TextChoices):
     PRODUCT_UPDATED = "PRODUCT_UPDATED", "Producto actualizado"
     PRODUCT_DEACTIVATED = "PRODUCT_DEACTIVATED", "Producto desactivado"
     PRODUCT_ACTIVATED = "PRODUCT_ACTIVATED", "Producto reactivado"
+    PRODUCT_PRICE_UPDATED = "PRODUCT_PRICE_UPDATED", "Precios de producto actualizados"
     COMBO_CREATED = "COMBO_CREATED", "Combo de productos creado"
     COMBO_UPDATED = "COMBO_UPDATED", "Combo de productos actualizado"
     COMBO_DEACTIVATED = "COMBO_DEACTIVATED", "Combo de productos desactivado"
@@ -58,6 +59,11 @@ class AuditEventType(models.TextChoices):
     MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD = (
         "MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD",
         "Intento de modificación sobre registro inmutable",
+    )
+    INVOICE_GENERATED = "INVOICE_GENERATED", "Factura generada"
+    DISPATCH_WITH_PRICE_COMPLETED = (
+        "DISPATCH_WITH_PRICE_COMPLETED",
+        "Despacho con precio completado",
     )
 
 

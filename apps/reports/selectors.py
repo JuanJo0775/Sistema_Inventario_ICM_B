@@ -759,3 +759,158 @@ def get_kpi_dashboard() -> dict[str, Any]:
     servicio de dashboard para evitar drift entre reports y dashboard.
     """
     return build_legacy_kpi_panel()
+
+
+# ---------------------------------------------------------------------------
+# Reportes financieros (Fase 5)
+# ---------------------------------------------------------------------------
+
+
+def sales_revenue_summary(*, start: datetime, end: datetime) -> dict[str, Any]:
+    """
+    Resumen de revenue por tipo de venta en el período.
+
+    Retorna subtotales, impuestos y totales separados por venta mayor/menor.
+    Los movements sin precio (históricos o sin precio configurado) contribuyen con 0.
+    """
+    from django.db.models import DecimalField
+    from django.db.models.functions import Coalesce
+    from decimal import Decimal
+
+    zero = Decimal("0")
+    sale_types = [MovementType.SALIDA_VENTA_MAYOR, MovementType.SALIDA_VENTA_MENOR]
+    qs = Movement.objects.filter(
+        created_at__gte=start,
+        created_at__lte=end,
+        movement_type__in=sale_types,
+    )
+
+    def _agg(movement_type: str) -> dict[str, Any]:
+        row = qs.filter(movement_type=movement_type).aggregate(
+            qty=Sum("quantity"),
+            subtotal=Sum(Coalesce("subtotal", 0, output_field=DecimalField())),
+            discount=Sum(Coalesce("discount_amount", 0, output_field=DecimalField())),
+            tax=Sum(Coalesce("tax_amount", 0, output_field=DecimalField())),
+            total=Sum(Coalesce("total_amount", 0, output_field=DecimalField())),
+        )
+        return {
+            "units": row["qty"] or 0,
+            "subtotal": row["subtotal"] or zero,
+            "discount": row["discount"] or zero,
+            "tax": row["tax"] or zero,
+            "total": row["total"] or zero,
+        }
+
+    mayor = _agg(MovementType.SALIDA_VENTA_MAYOR)
+    menor = _agg(MovementType.SALIDA_VENTA_MENOR)
+    return {
+        "wholesale": mayor,
+        "retail": menor,
+        "combined": {
+            "units": mayor["units"] + menor["units"],
+            "subtotal": mayor["subtotal"] + menor["subtotal"],
+            "discount": mayor["discount"] + menor["discount"],
+            "tax": mayor["tax"] + menor["tax"],
+            "total": mayor["total"] + menor["total"],
+        },
+        "period": {"start": start.isoformat(), "end": end.isoformat()},
+    }
+
+
+def gross_margin_by_product(
+    *, start: datetime, end: datetime, limit: int = 50
+) -> list[dict[str, Any]]:
+    """
+    Margen bruto por SKU en el período.
+
+    margen = total_amount - (unit_cost * quantity)
+    Solo incluye despachos de venta (SALIDA_VENTA_MAYOR / MENOR) con precio configurado.
+    """
+    from django.db.models import DecimalField, ExpressionWrapper, F
+    from django.db.models.functions import Coalesce
+    from decimal import Decimal
+
+    sale_types = [MovementType.SALIDA_VENTA_MAYOR, MovementType.SALIDA_VENTA_MENOR]
+    qs = (
+        Movement.objects.filter(
+            created_at__gte=start,
+            created_at__lte=end,
+            movement_type__in=sale_types,
+            total_amount__isnull=False,
+        )
+        .values("product__sku", "product__name")
+        .annotate(
+            revenue=Sum(Coalesce("total_amount", 0, output_field=DecimalField())),
+            cogs=Sum(
+                ExpressionWrapper(
+                    Coalesce("unit_cost", 0, output_field=DecimalField())
+                    * F("quantity"),
+                    output_field=DecimalField(),
+                )
+            ),
+            units=Sum("quantity"),
+        )
+        .order_by("-revenue")[:limit]
+    )
+
+    result = []
+    for row in qs:
+        revenue = row["revenue"] or Decimal("0")
+        cogs = row["cogs"] or Decimal("0")
+        margin = revenue - cogs
+        margin_pct = (
+            (margin / revenue * 100).quantize(Decimal("0.01"))
+            if revenue
+            else Decimal("0")
+        )
+        result.append(
+            {
+                "sku": row["product__sku"],
+                "name": row["product__name"],
+                "units": row["units"],
+                "revenue": revenue,
+                "cogs": cogs,
+                "gross_margin": margin,
+                "gross_margin_pct": margin_pct,
+            }
+        )
+    return result
+
+
+def sales_by_customer(
+    *, start: datetime, end: datetime, limit: int = 50
+) -> list[dict[str, Any]]:
+    """
+    Ventas mayores agrupadas por cliente (customer_snapshot.customer_name).
+
+    Retorna los N clientes con mayor revenue en el período.
+    """
+    from django.db.models import DecimalField
+    from django.db.models.functions import Coalesce
+    from decimal import Decimal
+
+    qs = (
+        Movement.objects.filter(
+            created_at__gte=start,
+            created_at__lte=end,
+            movement_type=MovementType.SALIDA_VENTA_MAYOR,
+            customer_snapshot__isnull=False,
+        )
+        .values("customer_snapshot__customer_name")
+        .annotate(
+            revenue=Sum(Coalesce("total_amount", 0, output_field=DecimalField())),
+            units=Sum("quantity"),
+            orders=Count("invoice_number", distinct=True),
+        )
+        .order_by("-revenue")[:limit]
+    )
+
+    return [
+        {
+            "customer_name": row["customer_snapshot__customer_name"] or "—",
+            "units": row["units"],
+            "orders": row["orders"],
+            "revenue": row["revenue"] or Decimal("0"),
+        }
+        for row in qs
+    ]

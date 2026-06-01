@@ -110,6 +110,33 @@ Este documento enlaza pruebas automatizadas con **requisitos** y **criterios de 
 
 ---
 
+## RF-NEW-05 / BR-16 — Precio congelado en despacho
+
+| Criterio ERS (Escenarios RFNEW05-S01, S02, S04) | Cobertura |
+|--------------------------------------------------|-----------|
+| S01 — Despacho captura unit_price, subtotal, tax_amount, total_amount | `apps/movements/tests/test_dispatch_pricing.py::test_dispatch_retail_captures_sale_price_retail_as_unit_price` + `test_dispatch_calculates_subtotal_tax_total_correctly` |
+| S01 — Despacho mayorista captura sale_price_wholesale | `apps/movements/tests/test_dispatch_pricing.py::test_dispatch_wholesale_captures_sale_price_wholesale` |
+| S01 — Despacho con descuento calcula discount_amount correctamente | `apps/movements/tests/test_dispatch_pricing.py::test_dispatch_with_discount_calculates_correctly` |
+| S01 — Producto sin precio almacena null sin bloquear el flujo | `apps/movements/tests/test_dispatch_pricing.py::test_dispatch_without_product_price_stores_null_gracefully` |
+| S02 — Precio en Movement no cambia tras actualizar precio del producto | `apps/movements/tests/test_dispatch_pricing.py::test_price_snapshot_immutable_after_product_price_change` |
+| S04 — customer_snapshot persiste datos del cliente en el Movement | `apps/movements/tests/test_dispatch_pricing.py::test_customer_snapshot_persisted_on_wholesale_dispatch` |
+| S04 — Factura contiene totales consolidados correctos | `apps/movements/tests/test_invoice.py::test_invoice_totals_match_sum_of_movements` |
+| S04 — Factura de venta mayor contiene datos del cliente | `apps/movements/tests/test_invoice.py::test_invoice_has_customer_data_on_wholesale` |
+
+---
+
+## RF-NEW-05 / BR-17 — Historial auditado de cambios de precio
+
+| Criterio ERS (Escenario RFNEW05-S03) | Cobertura |
+|--------------------------------------|-----------|
+| S03 — Actualizar precio crea fila en ProductPriceHistory con old/new value y usuario | `apps/catalog/tests/test_product_pricing.py::test_update_price_creates_history_record` + `test_price_history_tracks_old_and_new_value` |
+| S03 — Valor idéntico al actual no genera registro de historial | `apps/catalog/tests/test_product_pricing.py::test_update_with_same_value_does_not_create_history` |
+| S03 — Actualizar múltiples campos crea una fila por cada campo | `apps/catalog/tests/test_product_pricing.py::test_update_multiple_price_fields_creates_multiple_history_records` |
+| S03 — GET /prices/ retorna historial completo del producto | `apps/catalog/tests/test_product_pricing.py::test_api_get_price_history_returns_list` |
+| S03 — Solo almacenista puede actualizar precios | `apps/catalog/tests/test_product_pricing.py::test_update_prices_requires_almacenista_role` + `test_api_patch_prices_rejects_auxiliar` |
+
+---
+
 ## Cómo ejecutar (por módulo / test)
 
 ```bash

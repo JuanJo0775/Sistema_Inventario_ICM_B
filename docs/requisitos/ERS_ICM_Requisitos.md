@@ -55,6 +55,8 @@ Las siguientes reglas de negocio fueron identificadas durante las sesiones de el
 * BR-13 (Código de barras como alias de escaneo y factura digital): Cada producto puede tener registrado un código de barras físico como alias de escaneo. La ausencia del lector físico no debe bloquear ningún flujo del sistema. Todo despacho confirmado genera automáticamente una factura digital con numeración secuencial, almacenada de forma persistente y descargable en PDF.
 * BR-14 (Estado operativo de ubicación restringe movimientos): El estado operativo de una ubicación determina qué operaciones de stock puede ejecutar. Las ubicaciones en estado `archived` o `blocked` no admiten ningún movimiento de entrada ni salida. Las ubicaciones en estado `maintenance` o `restricted` no pueden operar como origen de despachos, traslados o ajustes de reducción, pero sí pueden recibir stock como destino. Solo el Almacenista puede cambiar el estado operativo de una ubicación. Esta restricción es informativa respecto a la capacidad, pero operativa y no negociable respecto al estado.
 * BR-15 (Tipo de almacenamiento activo como requisito de asignación): Un tipo de almacenamiento (`StorageType`) con estado inactivo no puede asignarse a nuevas ubicaciones ni reasignarse a ubicaciones existentes. La desactivación de un tipo no afecta las ubicaciones que ya lo tenían asignado, las cuales conservan su tipo sin restricción adicional. Solo el Almacenista puede crear, modificar o desactivar tipos de almacenamiento y plantillas de configuración.
+* BR-16 (Precio congelado en despacho): Al confirmar un despacho, el sistema captura el precio unitario de venta, el costo unitario, el IVA aplicable y el total calculado en el registro de movimiento de forma permanente e inmutable. Ninguna modificación posterior al precio de un producto en el catálogo puede alterar el precio registrado en movimientos o facturas ya emitidas. Esta regla garantiza la integridad contable del historial de transacciones.
+* BR-17 (Historial auditado de cambios de precio): Toda actualización de precio de un producto (precio minorista, precio mayorista, costo o tasa de IVA) debe registrarse de forma inmutable en un historial de precios que identifique el campo modificado, el valor anterior, el nuevo valor, el usuario que realizó el cambio y la fecha y hora exacta. El historial de precios es de solo lectura y no puede ser eliminado ni modificado.
 
 # **5. Requisitos Funcionales**
 
@@ -1681,6 +1683,93 @@ Feature: Log de auditoría y trazabilidad de operaciones
 - Muestra un mensaje indicando que los registros de auditoría son inmutables
 - Registra en el propio log el intento fallido de modificación con UserID y timestamp
 
+---
+
+## **RF-013 — Precios y Facturación Comercial**
+
+**Módulo:** Precios y Facturación
+
+**Descripción**
+
+El sistema debe gestionar el ciclo completo de precios de productos y la generación de documentos comerciales con valor económico real. Cada producto puede tener hasta cuatro campos de precio opcionales: costo de adquisición, precio de venta al por menor, precio de venta al por mayor y tasa de IVA. Toda modificación de precio debe quedar registrada de forma inmutable en un historial que identifica el campo, el valor anterior, el valor nuevo y el usuario responsable. Al confirmar cualquier despacho de venta, el sistema captura el precio vigente en el registro de movimiento de manera permanente, garantizando que documentos históricos no se vean afectados por cambios futuros al catálogo. El sistema genera automáticamente un modelo de factura consolidado con subtotales, IVA y total, exportable en PDF con todos los datos del despacho y del cliente. Los reportes financieros permiten calcular revenue por tipo de venta, margen bruto por SKU y ventas agrupadas por cliente.
+
+**Reglas de Negocio Aplicables**
+
+* BR-13: Todo despacho confirmado genera factura digital con numeración secuencial. El PDF incluye precio unitario, descuento, IVA y total.
+* BR-16: Al confirmar un despacho, el precio unitario, subtotal, IVA y total quedan congelados de forma permanente en el movimiento. Modificaciones posteriores al precio del producto no alteran movimientos ni facturas históricas.
+* BR-17: Toda actualización de precio genera un registro inmutable en el historial con el campo modificado, valor anterior, valor nuevo, usuario y timestamp. Si el valor enviado es idéntico al actual, no se registra nada.
+
+**Criterios de Aceptación (Formato Gherkin)**
+
+Feature: Precios y facturación comercial
+
+### Scenario 1: Despacho captura precio congelado del producto al momento de la salida
+
+**Given (Dado que):**
+- El usuario autenticado tiene rol "Almacenista" o "Auxiliar de Despacho"
+- Existe un producto con sale_price_retail=10000, tax_rate_pct=19.00 y currency="COP"
+- Hay stock suficiente del producto en la ubicación de origen
+
+**When (Cuando):**
+- Registra un despacho de venta al por menor de 3 unidades del producto y confirma la operación
+
+**Then (Entonces):**
+- El sistema crea un Movement con unit_price=10000, subtotal=30000, tax_amount=5700, total_amount=35700 y price_type="retail"
+- El sistema crea un registro Invoice con los mismos totales consolidados
+- El PDF del comprobante incluye precio unitario, IVA y total
+
+---
+
+### Scenario 2: Precio en historial permanece inmutable tras modificar el precio actual del producto
+
+**Given (Dado que):**
+- Existe un producto con sale_price_retail=10000
+- Se realizó y confirmó un despacho de venta al por menor; el Movement quedó con unit_price=10000
+
+**When (Cuando):**
+- El Almacenista actualiza el precio del producto a sale_price_retail=20000 mediante PATCH /api/v1/catalog/products/<id>/prices/
+
+**Then (Entonces):**
+- El Movement histórico conserva unit_price=10000 sin alteración
+- La factura descargable sigue mostrando el precio original del despacho
+- El nuevo precio 20000 aplica únicamente a despachos futuros
+
+---
+
+### Scenario 3: Actualización de precio genera historial auditado con valor anterior y nuevo
+
+**Given (Dado que):**
+- El usuario autenticado tiene rol "Almacenista"
+- Existe un producto con sale_price_retail=10000
+
+**When (Cuando):**
+- El Almacenista ejecuta PATCH /api/v1/catalog/products/<id>/prices/ con {"sale_price_retail": "12000"}
+
+**Then (Entonces):**
+- Se crea un registro en ProductPriceHistory con field_changed="sale_price_retail", old_value=10000, new_value=12000 y changed_by igual al almacenista
+- Si el valor enviado es idéntico al actual, no se crea ningún registro de historial
+- GET /api/v1/catalog/products/<id>/prices/ retorna el historial completo del producto
+- Un usuario con rol distinto a almacenista recibe 403 Forbidden al intentar actualizar precios
+
+---
+
+### Scenario 4: Factura comercial reconstruible completamente desde el Movement sin consultar el catálogo actual
+
+**Given (Dado que):**
+- Se confirmó un despacho de venta al por mayor con datos del cliente: nombre, correo, teléfono y dirección
+- El producto tenía sale_price_wholesale=9000 y tax_rate_pct=19.00
+
+**When (Cuando):**
+- El administrador o almacenista consulta GET /api/v1/movements/invoices/<number>/ o descarga el PDF
+
+**Then (Entonces):**
+- La respuesta incluye datos del cliente, subtotal, IVA, total y moneda con los valores exactos del momento del despacho
+- El PDF contiene la tabla de líneas con precio unitario, descuento, IVA y total
+- Los valores son correctos aunque el precio del producto haya sido modificado después del despacho
+- Los valores son correctos aunque el producto esté actualmente desactivado
+
+---
+
 # **6. Requisitos No Funcionales**
 
 Los requisitos no funcionales (RNF) definen los atributos de calidad que el sistema debe cumplir para ser operativamente viable en el contexto real de ICM. A diferencia de los requisitos funcionales, que describen qué hace el sistema, los requisitos no funcionales describen cómo debe hacerlo: con qué velocidad, con qué nivel de seguridad, con qué grado de disponibilidad. Estos requisitos son transversales a todos los módulos y deben ser considerados desde la fase de diseño arquitectónico, no como consideraciones tardías de optimización.
@@ -2060,6 +2149,7 @@ La siguiente tabla presenta un resumen de todos los requisitos especificados en 
 | RF-010 | Reportes e Indicadores Operativos | Reportes e Indicadores | BR-10, BR-11, BR-13 |
 | RF-011 | Alertas Proactivas del Sistema | Alertas Proactivas | BR-04, BR-10, BR-11 |
 | RF-012 | Log de Auditoría y Trazabilidad | Auditoría y Trazabilidad | BR-01, BR-06, BR-07, BR-10 |
+| RF-013 | Precios y Facturación Comercial | Precios y Facturación | BR-13, BR-16, BR-17 |
 | RNF-001 | Usabilidad e Interfaz Intuitiva | Transversal | — |
 | RNF-002 | Disponibilidad del Sistema | Transversal | BR-03 |
 | RNF-003 | Seguridad e Integridad de Datos | Transversal | BR-01, BR-02, BR-10 |

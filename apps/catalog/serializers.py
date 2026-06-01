@@ -63,6 +63,11 @@ class ProductSerializer(serializers.ModelSerializer):
             "is_active",
             "notes",
             "reorder_point",
+            "unit_cost",
+            "sale_price_retail",
+            "sale_price_wholesale",
+            "tax_rate_pct",
+            "currency",
             "created_at",
             "updated_at",
         )
@@ -72,6 +77,12 @@ class ProductSerializer(serializers.ModelSerializer):
             "updated_at",
             "category_slug",
             "barcode_type",
+            # Precio: solo se modifica via PATCH /products/<id>/prices/ (BR-17)
+            "unit_cost",
+            "sale_price_retail",
+            "sale_price_wholesale",
+            "tax_rate_pct",
+            "currency",
         )
 
     def get_barcode_type(self, obj: Product) -> str | None:
@@ -199,8 +210,20 @@ class ComboSerializer(serializers.ModelSerializer):
             "sku",
             "is_active",
             "components",
+            "price_strategy",
+            "fixed_price_retail",
+            "fixed_price_wholesale",
             "created_at",
             "updated_at",
+        )
+        read_only_fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            # Precio de combo: se gestiona via ComboCreateSerializer / ComboUpdateSerializer
+            "price_strategy",
+            "fixed_price_retail",
+            "fixed_price_wholesale",
         )
 
 
@@ -232,6 +255,15 @@ class ComboCreateSerializer(serializers.Serializer):
     sku = serializers.CharField()
     is_active = serializers.BooleanField(required=False, default=True)
     items = ComboCreateItemSerializer(many=True, allow_empty=False)
+    price_strategy = serializers.ChoiceField(
+        choices=["derived", "fixed"], required=False, default="derived"
+    )
+    fixed_price_retail = serializers.DecimalField(
+        max_digits=12, decimal_places=4, required=False, allow_null=True, min_value=0
+    )
+    fixed_price_wholesale = serializers.DecimalField(
+        max_digits=12, decimal_places=4, required=False, allow_null=True, min_value=0
+    )
 
 
 class CategoryCreateSerializer(serializers.Serializer):
@@ -269,3 +301,61 @@ class ComboUpdateSerializer(serializers.Serializer):
     name = serializers.CharField(required=False)
     sku = serializers.CharField(required=False)
     items = ComboUpdateItemSerializer(many=True, required=False)
+    price_strategy = serializers.ChoiceField(
+        choices=["derived", "fixed"], required=False
+    )
+    fixed_price_retail = serializers.DecimalField(
+        max_digits=12, decimal_places=4, required=False, allow_null=True, min_value=0
+    )
+    fixed_price_wholesale = serializers.DecimalField(
+        max_digits=12, decimal_places=4, required=False, allow_null=True, min_value=0
+    )
+
+
+class ProductPriceUpdateSerializer(serializers.Serializer):
+    """Actualización parcial de precios de un producto (solo almacenista)."""
+
+    unit_cost = serializers.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        required=False,
+        allow_null=True,
+        min_value=0,
+    )
+    sale_price_retail = serializers.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        required=False,
+        allow_null=True,
+        min_value=0,
+    )
+    sale_price_wholesale = serializers.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        required=False,
+        allow_null=True,
+        min_value=0,
+    )
+    tax_rate_pct = serializers.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        required=False,
+        allow_null=True,
+        min_value=0,
+        max_value=100,
+    )
+    currency = serializers.CharField(max_length=3, required=False)
+
+
+class ProductPriceHistorySerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    field_changed = serializers.CharField()
+    old_value = serializers.DecimalField(
+        max_digits=12, decimal_places=4, allow_null=True
+    )
+    new_value = serializers.DecimalField(
+        max_digits=12, decimal_places=4, allow_null=True
+    )
+    currency = serializers.CharField()
+    changed_by = serializers.UUIDField(source="changed_by_id")
+    created_at = serializers.DateTimeField()

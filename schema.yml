@@ -20,9 +20,38 @@ info:
     - **Restricción Horaria:** El rol `auxiliar_despacho` está sujeto a la regla **BR-03** (07:00-12:00 / 14:00-17:00).
 
     ---
+    ### **Módulo de Precios y Facturación — Opcional / No bloqueante**
+
+    > ⚠️ Este módulo es **completamente opcional**. El sistema funciona con normalidad sin que los productos tengan precios configurados.
+
+    El sistema incluye soporte de precios como capa aditiva sobre el ledger de inventario (**RF-013**). Su integración con el frontend puede realizarse de forma incremental:
+
+    **Lo que cambia en respuestas existentes (campos adicionales, siempre `null` por defecto):**
+    - `GET /catalog/products/<id>/` → incluye `unit_cost`, `sale_price_retail`, `sale_price_wholesale`, `tax_rate_pct`, `currency` (null si no se configuraron)
+    - `GET /movements/dispatches/` → incluye `unit_price`, `subtotal`, `tax_amount`, `total_amount`, `currency`, `price_type`, `customer_snapshot` (null si el producto no tiene precio)
+    - `GET /catalog/combos/<id>/` → incluye `price_strategy` (`"derived"`), `fixed_price_retail`, `fixed_price_wholesale` (null)
+
+    **Lo que NO cambió (backward-compatible al 100%):**
+    - `POST /movements/dispatches/` — sin campos requeridos nuevos. El campo opcional `discount_pct` puede omitirse.
+    - `POST /catalog/products/` — sin campos requeridos nuevos.
+    - `PUT/PATCH /catalog/products/<id>/` — los campos de precio son ignorados aquí; solo se modifican vía `/prices/`.
+    - `POST /catalog/combos/` — `price_strategy` es opcional, default `"derived"`.
+
+    **Endpoints nuevos (el frontend los ignora hasta que los necesite):**
+    - `PATCH /catalog/products/<id>/prices/` — configurar precios del producto (solo almacenista)
+    - `GET  /catalog/products/<id>/prices/` — historial inmutable de cambios de precio
+    - `GET  /movements/invoices/<number>/` — detalle de factura con totales comerciales
+    - `GET  /movements/invoices/<number>/pdf/` — PDF enriquecido con precios
+    - `GET  /reports/revenue-summary/` — revenue por tipo de venta
+    - `GET  /reports/margin-by-product/` — margen bruto por SKU
+    - `GET  /reports/sales-by-customer/` — ventas por cliente (venta mayor)
+
+    ---
     ### **Documentación Adicional**
-    - **Referencia:** `docs/ERS_ICM_Requisitos.md`
+    - **API (referencia detallada):** `docs/api/README_API.md`
+    - **Requisitos:** `docs/requisitos/ERS_ICM_Requisitos.md`
     - **Arquitectura:** `docs/README_ARQUITECTURA.md`
+    - **Precios:** `docs/pricing/README_PRECIOS_FACTURACION.md`
     - **Nota:** el stock se maneja como un ledger inmutable con stock derivado.
   contact:
     name: ICM / Proyecto Nuclear 3 — Universidad Alexander von Humboldt
@@ -1086,6 +1115,60 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/users/{id}/enable/:
+    post:
+      operationId: auth_users_enable_create
+      description: RF-002 — Reactiva una cuenta de usuario previamente deshabilitada.
+      summary: Rehabilitar usuario
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/catalog/categories/:
     get:
       operationId: catalog_categories_list
@@ -1198,6 +1281,287 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/categories/{id}/:
+    get:
+      operationId: catalog_categories_retrieve
+      description: Obtiene el detalle de una categoría.
+      summary: Detalle de categoría
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: catalog_categories_update
+      description: Reemplaza los datos editables de una categoría.
+      summary: Actualizar categoría
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdateRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: catalog_categories_partial_update
+      description: Actualiza solo los campos enviados de una categoría.
+      summary: Actualizar categoría parcialmente
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryUpdateRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: catalog_categories_destroy
+      description: Marca la categoría como inactiva. El registro NO se elimina de
+        la base de datos. Devuelve HTTP 409 si la categoría tiene productos activos
+        asociados. Para reactivarla use POST /categories/{id}/restore/.
+      summary: Desactivar categoría
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/categories/{id}/restore/:
+    post:
+      operationId: catalog_categories_restore_create
+      description: Reactiva una categoría previamente desactivada.
+      summary: Restaurar categoría
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/catalog/combos/:
     get:
       operationId: catalog_combos_list
@@ -1300,6 +1664,288 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
           description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/combos/{id}/:
+    get:
+      operationId: catalog_combos_retrieve
+      description: Obtiene el detalle de un combo de productos.
+      summary: Detalle de combo
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Combo'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: catalog_combos_update
+      description: Reemplaza los datos de un combo. Si se envían `items`, reemplaza
+        toda la lista de componentes.
+      summary: Actualizar combo
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComboUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ComboUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ComboUpdateRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Combo'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: catalog_combos_partial_update
+      description: Actualiza solo los campos enviados. Si se envían `items`, reemplaza
+        toda la lista.
+      summary: Actualizar combo parcialmente
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedComboUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedComboUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedComboUpdateRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Combo'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: catalog_combos_destroy
+      description: Marca el combo como inactivo. El registro NO se elimina de la base
+        de datos ni afecta sus productos componentes. Para reactivarlo use POST /combos/{id}/restore/.
+      summary: Desactivar combo
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/combos/{id}/restore/:
+    post:
+      operationId: catalog_combos_restore_create
+      description: Reactiva un combo de productos previamente desactivado.
+      summary: Restaurar combo
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Combo'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
           content:
             application/json:
               schema:
@@ -1605,6 +2251,65 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: catalog_products_destroy
+      description: Marca el producto como inactivo. El registro NO se elimina de la
+        base de datos ni afecta el historial de movimientos. Devuelve HTTP 409 si
+        el producto pertenece a uno o más combos activos. Para reactivarlo use POST
+        /products/{id}/restore/.
+      summary: Desactivar producto
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/catalog/products/{id}/barcode/:
     get:
       operationId: catalog_products_barcode_retrieve
@@ -1638,6 +2343,176 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/products/{id}/prices/:
+    get:
+      operationId: catalog_products_prices_list
+      description: Retorna el historial inmutable de cambios de precio del producto.
+      summary: Historial de precios de un producto
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductPriceHistory'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: catalog_products_prices_partial_update
+      description: Actualiza unit_cost, sale_price_retail, sale_price_wholesale, tax_rate_pct
+        y/o currency. Solo los campos enviados se modifican. Registra historial inmutable
+        de cada cambio (BR-17).
+      summary: Configurar precios de un producto
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProductPriceUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProductPriceUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProductPriceUpdateRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/products/{id}/restore/:
+    post:
+      operationId: catalog_products_restore_create
+      description: Reactiva un producto previamente desactivado.
+      summary: Restaurar producto
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDetail'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
           content:
             application/json:
               schema:
@@ -1860,6 +2735,287 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
           description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/subcategories/{id}/:
+    get:
+      operationId: catalog_subcategories_retrieve
+      description: Obtiene el detalle de una subcategoría.
+      summary: Detalle de subcategoría
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subcategory'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: catalog_subcategories_update
+      description: Reemplaza los datos editables de una subcategoría.
+      summary: Actualizar subcategoría
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubcategoryUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubcategoryUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubcategoryUpdateRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subcategory'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: catalog_subcategories_partial_update
+      description: Actualiza solo los campos enviados de una subcategoría.
+      summary: Actualizar subcategoría parcialmente
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSubcategoryUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSubcategoryUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSubcategoryUpdateRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subcategory'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: catalog_subcategories_destroy
+      description: Marca la subcategoría como inactiva. El registro NO se elimina
+        de la base de datos. Devuelve HTTP 409 si la subcategoría tiene productos
+        activos asociados. Para reactivarla use POST /subcategories/{id}/restore/.
+      summary: Desactivar subcategoría
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/subcategories/{id}/restore/:
+    post:
+      operationId: catalog_subcategories_restore_create
+      description: Reactiva una subcategoría previamente desactivada.
+      summary: Restaurar subcategoría
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subcategory'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
           content:
             application/json:
               schema:
@@ -2442,7 +3598,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: inventory_locations_destroy
-      description: Desactiva una ubicación.
+      description: Marca la ubicación como inactiva. El registro NO se elimina de
+        la base de datos ni afecta el historial de movimientos.
       summary: Desactivar ubicación
       parameters:
       - in: path
@@ -3004,9 +4161,74 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: inventory_storage_templates_update
+      description: Reemplaza completamente los datos de una plantilla de almacenamiento.
+      summary: Reemplazar plantilla de almacenamiento
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - inventory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorageTemplateCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StorageTemplateCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StorageTemplateCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageTemplate'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     patch:
       operationId: inventory_storage_templates_partial_update
-      description: Actualiza una plantilla de almacenamiento.
+      description: Actualiza parcialmente una plantilla de almacenamiento.
       summary: Actualizar plantilla de almacenamiento
       parameters:
       - in: path
@@ -3070,7 +4292,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: inventory_storage_templates_destroy
-      description: Desactiva una plantilla de almacenamiento.
+      description: Marca la plantilla como inactiva. El registro NO se elimina de
+        la base de datos.
       summary: Desactivar plantilla de almacenamiento
       parameters:
       - in: path
@@ -3385,7 +4608,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: inventory_storage_types_destroy
-      description: Desactiva un tipo de almacenamiento.
+      description: Marca el tipo de almacenamiento como inactivo. El registro NO se
+        elimina de la base de datos.
       summary: Desactivar tipo de almacenamiento
       parameters:
       - in: path
@@ -3945,7 +5169,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: movements_dispatches_create
-      description: Registra un nuevo despacho de inventario.
+      description: Registra un nuevo despacho de inventario (venta menor, venta mayor,
+        daño o vencimiento).
       summary: Registrar despacho
       tags:
       - movements
@@ -4237,6 +5462,98 @@ paths:
               schema:
                 $ref: '#/components/schemas/Movement'
           description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/movements/invoices/{number}/:
+    get:
+      operationId: movements_invoices_retrieve
+      description: Retorna el detalle de una factura por número, incluyendo totales
+        y lista de movimientos asociados.
+      summary: Detalle de factura comercial
+      parameters:
+      - in: path
+        name: number
+        schema:
+          type: string
+        required: true
+      tags:
+      - movements
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/movements/invoices/{number}/pdf/:
+    get:
+      operationId: movements_invoices_pdf_retrieve
+      description: Descarga el PDF de la factura con todos los datos del despacho,
+        precios e información del cliente.
+      summary: Descargar PDF de factura comercial
+      parameters:
+      - in: path
+        name: number
+        schema:
+          type: string
+        required: true
+      tags:
+      - movements
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
         '400':
           description: Solicitud inválida o con errores de validación.
           content:
@@ -4943,6 +6260,60 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/reports/margin-by-product/:
+    get:
+      operationId: reports_margin_by_product_retrieve
+      description: Retorna revenue, COGS, margen bruto y margen % por SKU para despachos
+        de venta. Ordenado de mayor a menor revenue.
+      summary: Margen bruto por producto
+      parameters:
+      - in: query
+        name: end
+        schema:
+          type: string
+        description: Fin del período (ISO-8601).
+      - in: query
+        name: limit
+        schema:
+          type: integer
+        description: Máximo de SKUs (default 50).
+      - in: query
+        name: start
+        schema:
+          type: string
+        description: Inicio del período (ISO-8601).
+      tags:
+      - reports
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/reports/movements/history/:
     get:
       operationId: reports_movements_history_retrieve
@@ -5138,6 +6509,109 @@ paths:
               schema:
                 $ref: '#/components/schemas/QualityOperationalResponse'
           description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/reports/revenue-summary/:
+    get:
+      operationId: reports_revenue_summary_retrieve
+      description: 'Retorna subtotales, IVA y totales de ventas al por menor y mayor,
+        más un combinado. Período default: últimos 30 días.'
+      summary: Revenue por tipo de venta
+      parameters:
+      - in: query
+        name: end
+        schema:
+          type: string
+        description: Fin del período (ISO-8601).
+      - in: query
+        name: start
+        schema:
+          type: string
+        description: Inicio del período (ISO-8601).
+      tags:
+      - reports
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/reports/sales-by-customer/:
+    get:
+      operationId: reports_sales_by_customer_retrieve
+      description: Retorna revenue, unidades y número de órdenes de venta al por mayor
+        agrupados por cliente.
+      summary: Ventas por cliente
+      parameters:
+      - in: query
+        name: end
+        schema:
+          type: string
+        description: Fin del período (ISO-8601).
+      - in: query
+        name: limit
+        schema:
+          type: integer
+        description: Máximo de clientes (default 50).
+      - in: query
+        name: start
+        schema:
+          type: string
+        description: Inicio del período (ISO-8601).
+      tags:
+      - reports
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
         '400':
           description: Solicitud inválida o con errores de validación.
           content:
@@ -5501,9 +6975,74 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: webhooks_endpoints_update
+      description: Reemplaza completamente los datos de un endpoint de webhook.
+      summary: Reemplazar endpoint de webhook
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - webhooks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookEndpointCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/WebhookEndpointCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WebhookEndpointCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEndpoint'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     patch:
       operationId: webhooks_endpoints_partial_update
-      description: Actualiza un endpoint de webhook.
+      description: Actualiza parcialmente un endpoint de webhook.
       summary: Actualizar endpoint de webhook
       parameters:
       - in: path
@@ -5567,7 +7106,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: webhooks_endpoints_destroy
-      description: Desactiva un endpoint de webhook.
+      description: 'Marca el endpoint como inactivo: deja de recibir eventos. El registro
+        NO se elimina de la base de datos ni se pierden las entregas registradas.'
       summary: Desactivar endpoint de webhook
       parameters:
       - in: path
@@ -5907,6 +7447,8 @@ components:
           description: 'BR-05: categoría admite devoluciones (Electroterapia / electrónicos).'
         description:
           type: string
+        is_active:
+          type: boolean
         created_at:
           type: string
           format: date-time
@@ -5954,6 +7496,18 @@ components:
         * `LOCATION` - Ubicación
         * `INTEGRITY` - Integridad
         * `BUSINESS` - Negocio
+    CategoryUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        requires_serial_number:
+          type: boolean
+        is_returnable:
+          type: boolean
     Combo:
       type: object
       properties:
@@ -5974,6 +7528,29 @@ components:
           items:
             $ref: '#/components/schemas/ComboItem'
           readOnly: true
+        price_strategy:
+          allOf:
+          - $ref: '#/components/schemas/ComboPriceStrategyEnum'
+          readOnly: true
+          description: |-
+            derived: suma de precios de componentes. fixed: precio fijo del combo.
+
+            * `derived` - Derivado de componentes
+            * `fixed` - Precio fijo del combo
+        fixed_price_retail:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: Precio fijo al por menor del combo (si price_strategy=fixed).
+        fixed_price_wholesale:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: Precio fijo al por mayor del combo (si price_strategy=fixed).
         created_at:
           type: string
           format: date-time
@@ -5987,8 +7564,11 @@ components:
       required:
       - components
       - created_at
+      - fixed_price_retail
+      - fixed_price_wholesale
       - id
       - name
+      - price_strategy
       - sku
       - updated_at
     ComboCreateItemRequest:
@@ -6021,6 +7601,20 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ComboCreateItemRequest'
+        price_strategy:
+          allOf:
+          - $ref: '#/components/schemas/PriceStrategyEnum'
+          default: derived
+        fixed_price_retail:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          nullable: true
+        fixed_price_wholesale:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          nullable: true
       required:
       - items
       - name
@@ -6058,6 +7652,52 @@ components:
       required:
       - id
       - product
+    ComboPriceStrategyEnum:
+      enum:
+      - derived
+      - fixed
+      type: string
+      description: |-
+        * `derived` - Derivado de componentes
+        * `fixed` - Precio fijo del combo
+    ComboUpdateItemRequest:
+      type: object
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+          default: 1
+      required:
+      - product_id
+    ComboUpdateRequest:
+      type: object
+      description: Campos editables de un combo. is_active no se acepta; usar DELETE/restore.
+      properties:
+        name:
+          type: string
+          minLength: 1
+        sku:
+          type: string
+          minLength: 1
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComboUpdateItemRequest'
+        price_strategy:
+          $ref: '#/components/schemas/PriceStrategyEnum'
+        fixed_price_retail:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          nullable: true
+        fixed_price_wholesale:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          nullable: true
     CorrectionCreateRequest:
       type: object
       properties:
@@ -6276,6 +7916,13 @@ components:
         privacy_notice_acknowledged:
           type: boolean
           default: false
+        discount_pct:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+          description: Descuento en porcentaje (0-100). Opcional — omitir si no aplica
+            descuento. Solo tiene efecto si el producto tiene precio configurado.
       required:
       - location_id
       - movement_type
@@ -6396,6 +8043,7 @@ components:
       - USER_CREATED
       - USER_UPDATED
       - USER_DISABLED
+      - USER_ENABLED
       - MOVEMENT_CREATED
       - ADJUSTMENT_CREATED
       - RETURN_CREATED
@@ -6404,15 +8052,29 @@ components:
       - STOCK_RECONSTRUCTED
       - PRODUCT_CREATED
       - PRODUCT_UPDATED
+      - PRODUCT_DEACTIVATED
+      - PRODUCT_ACTIVATED
+      - PRODUCT_PRICE_UPDATED
       - COMBO_CREATED
+      - COMBO_UPDATED
+      - COMBO_DEACTIVATED
+      - COMBO_ACTIVATED
       - CATEGORY_CREATED
+      - CATEGORY_UPDATED
+      - CATEGORY_DEACTIVATED
+      - CATEGORY_ACTIVATED
       - SUBCATEGORY_CREATED
+      - SUBCATEGORY_UPDATED
+      - SUBCATEGORY_DEACTIVATED
+      - SUBCATEGORY_ACTIVATED
       - MOVEMENT_CORRECTED
       - RETURN_APPROVED
       - RETURN_REJECTED
       - ALERT_ACKNOWLEDGED
       - UNAUTHORIZED_ACCESS_ATTEMPT
       - MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD
+      - INVOICE_GENERATED
+      - DISPATCH_WITH_PRICE_COMPLETED
       type: string
       description: |-
         * `LOGIN_SUCCESS` - Login exitoso
@@ -6421,6 +8083,7 @@ components:
         * `USER_CREATED` - Usuario creado
         * `USER_UPDATED` - Usuario actualizado
         * `USER_DISABLED` - Usuario deshabilitado
+        * `USER_ENABLED` - Usuario rehabilitado
         * `MOVEMENT_CREATED` - Movimiento creado
         * `ADJUSTMENT_CREATED` - Ajuste creado
         * `RETURN_CREATED` - Devolución registrada
@@ -6429,15 +8092,29 @@ components:
         * `STOCK_RECONSTRUCTED` - Stock reconstruido desde ledger
         * `PRODUCT_CREATED` - Producto creado
         * `PRODUCT_UPDATED` - Producto actualizado
+        * `PRODUCT_DEACTIVATED` - Producto desactivado
+        * `PRODUCT_ACTIVATED` - Producto reactivado
+        * `PRODUCT_PRICE_UPDATED` - Precios de producto actualizados
         * `COMBO_CREATED` - Combo de productos creado
+        * `COMBO_UPDATED` - Combo de productos actualizado
+        * `COMBO_DEACTIVATED` - Combo de productos desactivado
+        * `COMBO_ACTIVATED` - Combo de productos reactivado
         * `CATEGORY_CREATED` - Categoría de catálogo creada
+        * `CATEGORY_UPDATED` - Categoría de catálogo actualizada
+        * `CATEGORY_DEACTIVATED` - Categoría de catálogo desactivada
+        * `CATEGORY_ACTIVATED` - Categoría de catálogo reactivada
         * `SUBCATEGORY_CREATED` - Subcategoría de catálogo creada
+        * `SUBCATEGORY_UPDATED` - Subcategoría de catálogo actualizada
+        * `SUBCATEGORY_DEACTIVATED` - Subcategoría de catálogo desactivada
+        * `SUBCATEGORY_ACTIVATED` - Subcategoría de catálogo reactivada
         * `MOVEMENT_CORRECTED` - Movimiento corregido (BR-06)
         * `RETURN_APPROVED` - Devolución aprobada
         * `RETURN_REJECTED` - Devolución rechazada
         * `ALERT_ACKNOWLEDGED` - Alerta reconocida
         * `UNAUTHORIZED_ACCESS_ATTEMPT` - Intento de acceso no autorizado
         * `MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD` - Intento de modificación sobre registro inmutable
+        * `INVOICE_GENERATED` - Factura generada
+        * `DISPATCH_WITH_PRICE_COMPLETED` - Despacho con precio completado
     ExpiringLotReportItem:
       type: object
       properties:
@@ -6564,6 +8241,72 @@ components:
       - approximate_value_note
       - by_category
       - products_with_zero_stock
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: integer
+        number:
+          type: string
+        customer_name:
+          type: string
+        customer_email:
+          type: string
+          format: email
+        customer_phone:
+          type: string
+        customer_address:
+          type: string
+        subtotal:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,4})?$
+        discount_total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+        tax_total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,4})?$
+        currency:
+          type: string
+        pdf:
+          type: string
+          format: uri
+          nullable: true
+        issued_by:
+          type: string
+          description: Username del operador que generó la factura.
+        issued_at:
+          type: string
+          format: date-time
+        movement_ids:
+          type: array
+          items:
+            type: string
+          readOnly: true
+          description: Lista de UUIDs de los movimientos agrupados en esta factura.
+      required:
+      - currency
+      - customer_address
+      - customer_email
+      - customer_name
+      - customer_phone
+      - discount_total
+      - id
+      - issued_at
+      - issued_by
+      - movement_ids
+      - number
+      - pdf
+      - subtotal
+      - tax_total
+      - total_amount
     KpiDashboard:
       type: object
       properties:
@@ -6947,9 +8690,83 @@ components:
           type: string
           format: date-time
           readOnly: true
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: Precio unitario de venta congelado al momento del despacho.
+        unit_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: Costo unitario congelado al momento del despacho.
+        discount_pct:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+          description: Porcentaje de descuento aplicado (0-100).
+        discount_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: Monto de descuento calculado.
+        subtotal:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: unit_price × quantity.
+        tax_rate_pct:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+          description: Tasa de IVA congelada al momento del despacho.
+        tax_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: Monto de IVA calculado sobre la base imponible.
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: 'Total a cobrar: subtotal - discount_amount + tax_amount.'
+        currency:
+          type: string
+          readOnly: true
+          nullable: true
+          description: Moneda ISO 4217 del despacho.
+        price_type:
+          type: string
+          readOnly: true
+          nullable: true
+          description: 'Tipo de precio: retail | wholesale | cost | combo.'
+        customer_snapshot:
+          readOnly: true
+          nullable: true
+          description: Datos del cliente al momento del despacho (R-02).
       required:
       - created_at
+      - currency
+      - customer_snapshot
       - destination_location
+      - discount_amount
+      - discount_pct
       - discrepancy_note
       - executed_by
       - id
@@ -6962,6 +8779,7 @@ components:
       - movement_type
       - order_sku
       - origin_location
+      - price_type
       - product
       - product_sku
       - quantity
@@ -6973,6 +8791,12 @@ components:
       - stock_previo_origen
       - stock_resultante_destino
       - stock_resultante_origen
+      - subtotal
+      - tax_amount
+      - tax_rate_pct
+      - total_amount
+      - unit_cost
+      - unit_price
     MovementReportPeriod:
       type: object
       properties:
@@ -7236,6 +9060,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Subcategory'
+    PatchedCategoryUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        requires_serial_number:
+          type: boolean
+        is_returnable:
+          type: boolean
+    PatchedComboUpdateRequest:
+      type: object
+      description: Campos editables de un combo. is_active no se acepta; usar DELETE/restore.
+      properties:
+        name:
+          type: string
+          minLength: 1
+        sku:
+          type: string
+          minLength: 1
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComboUpdateItemRequest'
+        price_strategy:
+          $ref: '#/components/schemas/PriceStrategyEnum'
+        fixed_price_retail:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          nullable: true
+        fixed_price_wholesale:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          nullable: true
     PatchedLocationRequest:
       type: object
       properties:
@@ -7307,6 +9169,34 @@ components:
           description: Estimación informativa de ocupación calculada o ajustada.
         is_active:
           type: boolean
+    PatchedProductPriceUpdateRequest:
+      type: object
+      description: Actualización parcial de precios de un producto (solo almacenista).
+      properties:
+        unit_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          nullable: true
+        sale_price_retail:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          nullable: true
+        sale_price_wholesale:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          nullable: true
+        tax_rate_pct:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+        currency:
+          type: string
+          minLength: 1
+          maxLength: 3
     PatchedProductRequest:
       type: object
       properties:
@@ -7417,6 +9307,15 @@ components:
           type: integer
           minimum: 0
           default: 0
+    PatchedSubcategoryUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        category_id:
+          type: string
+          format: uuid
     PatchedUserRequest:
       type: object
       description: Perfil de usuario (RF-002) — lectura y actualización parcial por
@@ -7555,6 +9454,14 @@ components:
         * `partial` - partial
         * `approximate` - approximate
         * `future` - future
+    PriceStrategyEnum:
+      enum:
+      - derived
+      - fixed
+      type: string
+      description: |-
+        * `derived` - derived
+        * `fixed` - fixed
     Product:
       type: object
       properties:
@@ -7611,6 +9518,38 @@ components:
           type: integer
           maximum: 2147483647
           minimum: 0
+        unit_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: Costo de adquisición por unidad (COGS).
+        sale_price_retail:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: Precio de venta al por menor (vitrina).
+        sale_price_wholesale:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: Precio de venta al por mayor.
+        tax_rate_pct:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+          description: 'Tasa de IVA aplicable (ej: 19.00 para 19%).'
+        currency:
+          type: string
+          readOnly: true
+          description: Moneda ISO 4217 (COP por defecto).
         created_at:
           type: string
           format: date-time
@@ -7626,9 +9565,14 @@ components:
       - category
       - category_slug
       - created_at
+      - currency
       - id
       - name
+      - sale_price_retail
+      - sale_price_wholesale
       - sku
+      - tax_rate_pct
+      - unit_cost
       - updated_at
     ProductBarcode:
       type: object
@@ -7770,6 +9714,38 @@ components:
           type: integer
           maximum: 2147483647
           minimum: 0
+        unit_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: Costo de adquisición por unidad (COGS).
+        sale_price_retail:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: Precio de venta al por menor (vitrina).
+        sale_price_wholesale:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: Precio de venta al por mayor.
+        tax_rate_pct:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+          description: 'Tasa de IVA aplicable (ej: 19.00 para 19%).'
+        currency:
+          type: string
+          readOnly: true
+          description: Moneda ISO 4217 (COP por defecto).
         created_at:
           type: string
           format: date-time
@@ -7802,10 +9778,49 @@ components:
       - category
       - category_slug
       - created_at
+      - currency
       - id
       - name
+      - sale_price_retail
+      - sale_price_wholesale
       - sku
+      - tax_rate_pct
+      - unit_cost
       - updated_at
+    ProductPriceHistory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        field_changed:
+          type: string
+        old_value:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          nullable: true
+        new_value:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          nullable: true
+        currency:
+          type: string
+        changed_by:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - changed_by
+      - created_at
+      - currency
+      - field_changed
+      - id
+      - new_value
+      - old_value
     ProductRequest:
       type: object
       properties:
@@ -8339,6 +10354,8 @@ components:
           type: string
           maxLength: 128
           pattern: ^[-a-zA-Z0-9_]+$
+        is_active:
+          type: boolean
         created_at:
           type: string
           format: date-time
@@ -8368,6 +10385,15 @@ components:
       required:
       - category_id
       - name
+    SubcategoryUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        category_id:
+          type: string
+          format: uuid
     TopDispatchedProduct:
       type: object
       properties:
@@ -8864,11 +10890,11 @@ tags:
 - name: system
   description: System availability checks.
 - name: catalog
-  description: Categories, products, and combos.
+  description: Categories, products, combos and SKU management.
 - name: inventory
   description: Locations and stock tracking.
 - name: movements
-  description: 'Ledger: entries, dispatches, transfers, returns, adjustments.'
+  description: 'Ledger: entries, dispatches, transfers, returns, adjustments and invoices.'
 - name: dashboard
   description: Operational read model for executive UI and KPIs.
 - name: reports

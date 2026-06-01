@@ -10,6 +10,7 @@ from apps.catalog.views import (
     ProductBarcodeView,
     ProductDetailView,
     ProductListCreateView,
+    ProductPricesView,
     ProductRestoreView,
     ResolveIdentifierView,
     SubcategoryDetailView,
@@ -54,6 +55,11 @@ urlpatterns = [
         "products/<uuid:pk>/barcode/",
         ProductBarcodeView.as_view(),
         name="catalog-product-barcode",
+    ),
+    path(
+        "products/<uuid:pk>/prices/",
+        ProductPricesView.as_view(),
+        name="catalog-product-prices",
     ),
     path(
         "products/<uuid:pk>/restore/",

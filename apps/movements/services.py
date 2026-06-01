@@ -18,7 +18,7 @@ from apps.audit.services import log_event
 from apps.catalog.models import Lot, Product
 from apps.catalog.services import resolve_identifier
 from apps.inventory.models import Location, StockByLocation
-from apps.movements.models import InvoiceCounter, Movement, MovementType
+from apps.movements.models import Invoice, InvoiceCounter, Movement, MovementType
 from shared.exceptions import (
     AdjustmentJustificationRequiredError,
     AlertAcknowledgementRequiredError,
@@ -110,7 +110,7 @@ def _try_build_invoice_pdf(
     quantity: int,
     movement_type: str,
 ) -> ContentFile | None:
-    """BR-13 — Genera PDF y lo retorna como ContentFile."""
+    """BR-13 — Genera PDF básico (sin precio) como ContentFile."""
     try:
         from weasyprint import HTML
     except Exception as exc:  # pragma: no cover - entorno sin WeasyPrint
@@ -129,6 +129,203 @@ def _try_build_invoice_pdf(
     """
     pdf_bytes = HTML(string=html).write_pdf()
     return ContentFile(pdf_bytes, name=f"{invoice_number}.pdf")
+
+
+def _build_invoice_pdf_rich(invoice: "Invoice") -> ContentFile | None:
+    """Genera PDF enriquecido con datos de precio para un Invoice. Falla silenciosamente."""
+    try:
+        from weasyprint import HTML
+    except Exception as exc:  # pragma: no cover
+        logger.warning("WeasyPrint no disponible: %s", exc)
+        return None
+
+    movements = list(invoice.movements.select_related("product").all())
+    now = timezone.now().strftime("%Y-%m-%d %H:%M UTC")
+
+    rows_html = ""
+    for m in movements:
+        unit_price = f"{m.unit_price:,.4f}" if m.unit_price is not None else "—"
+        subtotal = f"{m.subtotal:,.4f}" if m.subtotal is not None else "—"
+        discount = f"{m.discount_amount:,.4f}" if m.discount_amount else "—"
+        rows_html += (
+            f"<tr>"
+            f"<td>{m.product.sku}</td>"
+            f"<td>{m.product.name}</td>"
+            f"<td>{m.quantity}</td>"
+            f"<td>{unit_price}</td>"
+            f"<td>{discount}</td>"
+            f"<td>{subtotal}</td>"
+            f"</tr>"
+        )
+
+    customer_html = ""
+    if invoice.customer_name:
+        customer_html = (
+            f"<p><strong>Cliente:</strong> {invoice.customer_name}</p>"
+            f"<p><strong>Email:</strong> {invoice.customer_email}</p>"
+            f"<p><strong>Teléfono:</strong> {invoice.customer_phone}</p>"
+            f"<p><strong>Dirección:</strong> {invoice.customer_address}</p>"
+        )
+
+    html = f"""
+    <html><head><meta charset="utf-8"/><style>
+      body {{ font-family: Arial, sans-serif; font-size: 12px; }}
+      table {{ width: 100%; border-collapse: collapse; margin-top: 12px; }}
+      th, td {{ border: 1px solid #ccc; padding: 6px; text-align: left; }}
+      th {{ background: #f5f5f5; }}
+      .totals {{ text-align: right; margin-top: 12px; }}
+    </style></head><body>
+      <h1>ICM — Comprobante de Despacho</h1>
+      <p><strong>Número:</strong> {invoice.number}</p>
+      <p><strong>Fecha:</strong> {now}</p>
+      {customer_html}
+      <table>
+        <tr><th>SKU</th><th>Producto</th><th>Cantidad</th>
+            <th>Precio Unit.</th><th>Descuento</th><th>Subtotal</th></tr>
+        {rows_html}
+      </table>
+      <div class="totals">
+        <p>Subtotal: {invoice.currency} {invoice.subtotal:,.4f}</p>
+        <p>Descuento: {invoice.currency} {invoice.discount_total:,.4f}</p>
+        <p>IVA: {invoice.currency} {invoice.tax_total:,.4f}</p>
+        <p><strong>TOTAL: {invoice.currency} {invoice.total_amount:,.4f}</strong></p>
+      </div>
+    </body></html>
+    """
+    pdf_bytes = HTML(string=html).write_pdf()
+    return ContentFile(pdf_bytes, name=f"{invoice.number}.pdf")
+
+
+def create_invoice_from_movements(
+    movements: list["Movement"],
+    *,
+    user: Any,
+    invoice_number: str,
+    customer_data: dict[str, Any] | None = None,
+) -> "Invoice":
+    """
+    Crea o actualiza el modelo Invoice que agrupa los movements del despacho.
+
+    Calcula los totales consolidando los campos de precio de cada Movement.
+    Los movements sin precio (históricos) contribuyen con 0 al total.
+    """
+    from decimal import Decimal
+
+    subtotal = sum((m.subtotal or Decimal("0")) for m in movements)
+    discount_total = sum((m.discount_amount or Decimal("0")) for m in movements)
+    tax_total = sum((m.tax_amount or Decimal("0")) for m in movements)
+    total_amount = sum((m.total_amount or Decimal("0")) for m in movements)
+    currency = next((m.currency for m in movements if m.currency), "COP")
+
+    cd = customer_data or {}
+    invoice, _ = Invoice.objects.get_or_create(
+        number=invoice_number,
+        defaults={
+            "customer_name": cd.get("customer_name", ""),
+            "customer_email": cd.get("customer_email", ""),
+            "customer_phone": cd.get("customer_phone", ""),
+            "customer_address": cd.get("customer_address", ""),
+            "subtotal": subtotal,
+            "discount_total": discount_total,
+            "tax_total": tax_total,
+            "total_amount": total_amount,
+            "currency": currency,
+            "issued_by": user,
+        },
+    )
+    for m in movements:
+        invoice.movements.add(m)
+
+    # Generar PDF enriquecido si aún no existe
+    if not invoice.pdf:
+        pdf = _build_invoice_pdf_rich(invoice)
+        if pdf:
+            invoice.pdf.save(f"{invoice_number}.pdf", pdf, save=True)
+
+    return invoice
+
+
+def _resolve_price_snapshot(
+    product: Product,
+    quantity: int,
+    movement_type: str,
+    *,
+    discount_pct: "Any | None" = None,
+) -> dict:
+    """
+    Calcula el snapshot de precio para un Movement de salida.
+
+    Retorna un dict con todos los campos financieros listos para pasar a Movement.objects.create().
+    Si el producto no tiene precio configurado, retorna campos None (sin error).
+
+    price_type:
+        - "retail"    → SALIDA_VENTA_MENOR
+        - "wholesale" → SALIDA_VENTA_MAYOR
+        - "cost"      → SALIDA_DANO / SALIDA_VENCIMIENTO (se usa unit_cost como referencia)
+    """
+    from decimal import Decimal, ROUND_HALF_UP
+
+    type_map = {
+        MovementType.SALIDA_VENTA_MENOR: ("retail", product.sale_price_retail),
+        MovementType.SALIDA_VENTA_MAYOR: ("wholesale", product.sale_price_wholesale),
+        MovementType.SALIDA_DANO: ("cost", product.unit_cost),
+        MovementType.SALIDA_VENCIMIENTO: ("cost", product.unit_cost),
+    }
+    price_type, raw_price = type_map.get(movement_type, (None, None))
+
+    if raw_price is None:
+        logger.info(
+            "Producto %s sin precio configurado para movement_type=%s; snapshot será null.",
+            product.sku,
+            movement_type,
+        )
+        return {
+            "unit_price": None,
+            "unit_cost": product.unit_cost,
+            "discount_pct": None,
+            "discount_amount": None,
+            "subtotal": None,
+            "tax_rate_pct": None,
+            "tax_amount": None,
+            "total_amount": None,
+            "currency": product.currency or "COP",
+            "price_type": price_type,
+        }
+
+    qty = Decimal(str(quantity))
+    unit_price = Decimal(str(raw_price))
+    subtotal = (unit_price * qty).quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
+
+    disc_pct = Decimal(str(discount_pct)) if discount_pct is not None else Decimal("0")
+    disc_amount = (subtotal * disc_pct / Decimal("100")).quantize(
+        Decimal("0.0001"), rounding=ROUND_HALF_UP
+    )
+
+    tax_base = subtotal - disc_amount
+    tax_rate = (
+        Decimal(str(product.tax_rate_pct))
+        if product.tax_rate_pct is not None
+        else Decimal("0")
+    )
+    tax_amount = (tax_base * tax_rate / Decimal("100")).quantize(
+        Decimal("0.0001"), rounding=ROUND_HALF_UP
+    )
+    total_amount = (tax_base + tax_amount).quantize(
+        Decimal("0.0001"), rounding=ROUND_HALF_UP
+    )
+
+    return {
+        "unit_price": unit_price,
+        "unit_cost": product.unit_cost,
+        "discount_pct": disc_pct if disc_pct else None,
+        "discount_amount": disc_amount if disc_amount else None,
+        "subtotal": subtotal,
+        "tax_rate_pct": product.tax_rate_pct,
+        "tax_amount": tax_amount if tax_amount else None,
+        "total_amount": total_amount,
+        "currency": product.currency or "COP",
+        "price_type": price_type,
+    }
 
 
 def check_and_create_alerts(product: Product, location: Location | None = None) -> None:
@@ -303,6 +500,7 @@ def register_dispatch(
     cold_chain_acknowledged: bool = False,
     electrical_safety_acknowledged: bool = False,
     privacy_notice_acknowledged: bool = False,
+    discount_pct: Any | None = None,
 ) -> list[Movement]:
     """
     RF-006, BR-04, BR-08, BR-11, BR-13, BR-14 — Salida con validación cruzada opcional y factura.
@@ -368,6 +566,7 @@ def register_dispatch(
         )
 
     extra_audit: dict[str, Any] = {}
+    customer_snapshot: dict[str, Any] | None = None
     if movement_type == MovementType.SALIDA_VENTA_MAYOR:
         cd = customer_data or {}
         required = (
@@ -388,8 +587,14 @@ def register_dispatch(
         if not ack:
             raise PrivacyConsentRequiredError()
         extra_audit["customer_data"] = cd
+        customer_snapshot = cd
     if note:
         extra_audit["note"] = note
+
+    # Calcular snapshot de precio al momento del despacho (R-05)
+    price_snapshot = _resolve_price_snapshot(
+        product, quantity, movement_type, discount_pct=discount_pct
+    )
 
     selected_lot: Lot | None = None
     if getattr(product, "requires_expiration", False):
@@ -474,6 +679,9 @@ def register_dispatch(
                 update_fields=["current_stock", "last_movement_at", "updated_at"]
             )
 
+            lot_price = _resolve_price_snapshot(
+                product, take, movement_type, discount_pct=discount_pct
+            )
             movement = Movement.objects.create(
                 movement_type=movement_type,
                 product_id=product_id,
@@ -488,6 +696,8 @@ def register_dispatch(
                 invoice_number=invoice_number,
                 invoice_pdf=pdf_file,
                 executed_by=user,
+                customer_snapshot=customer_snapshot,
+                **lot_price,
             )
             movements_created.append(movement)
             _log_alert_acknowledgement(
@@ -525,12 +735,63 @@ def register_dispatch(
             invoice_number=invoice_number,
             invoice_pdf=pdf_file,
             executed_by=user,
+            customer_snapshot=customer_snapshot,
+            **price_snapshot,
         )
         movements_created.append(movement)
 
     check_and_create_alerts(product, location)
     for m in movements_created:
         m.refresh_from_db()
+
+    # Crear el modelo Invoice consolidado con precio
+    try:
+        create_invoice_from_movements(
+            movements_created,
+            user=user,
+            invoice_number=invoice_number,
+            customer_data=customer_snapshot,
+        )
+    except Exception:
+        logger.exception(
+            "create_invoice_from_movements falló para invoice=%s; el despacho ya fue registrado.",
+            invoice_number,
+        )
+
+    # Emitir webhook dispatch.completed (falla silenciosamente)
+    try:
+        from apps.webhooks.services import queue_webhook_event
+
+        first_m = movements_created[0] if movements_created else None
+        if first_m:
+            queue_webhook_event(
+                "dispatch.completed",
+                {
+                    "invoice_number": invoice_number,
+                    "movement_ids": [str(m.id) for m in movements_created],
+                    "product_sku": product.sku,
+                    "quantity": quantity,
+                    "movement_type": movement_type,
+                    "unit_price": (
+                        str(first_m.unit_price)
+                        if first_m.unit_price is not None
+                        else None
+                    ),
+                    "total_amount": (
+                        str(first_m.total_amount)
+                        if first_m.total_amount is not None
+                        else None
+                    ),
+                    "currency": first_m.currency,
+                    "customer": customer_snapshot,
+                },
+            )
+    except Exception:
+        logger.exception(
+            "queue_webhook_event dispatch.completed falló para invoice=%s; despacho ya registrado.",
+            invoice_number,
+        )
+
     return movements_created
 
 
@@ -1165,6 +1426,27 @@ def dispatch_combo(
     _ensure_location_allows_origin(location, "combo_dispatch")
     movements_created: list[Movement] = []
 
+    # Generar un número de factura para el combo completo
+    combo_invoice_number = generate_invoice_number()
+    # Solo el primer Movement del combo recibirá invoice_number (por restricción UNIQUE).
+    # Los demás quedan sin ese campo; el modelo Invoice los agrupa todos vía M2M.
+    first_movement = True
+    from decimal import Decimal
+
+    # Si precio fijo, distribuir proporcionalmente por costo de cada componente
+    use_fixed_price = (
+        combo.price_strategy == "fixed" and combo.fixed_price_retail is not None
+    )
+    fixed_total = (
+        Decimal(str(combo.fixed_price_retail or 0)) if use_fixed_price else None
+    )
+
+    # Calcular costo total de componentes para distribución proporcional
+    if use_fixed_price:
+        total_derived = sum(
+            (item.product.unit_cost or Decimal("0")) * item.quantity for item in items
+        )
+
     for item in items:
         product = item.product
         qty_needed = item.quantity
@@ -1191,6 +1473,49 @@ def dispatch_combo(
             update_fields=["current_stock", "last_movement_at", "updated_at"]
         )
 
+        # Calcular precio del componente
+        if use_fixed_price and fixed_total is not None:
+            # Distribuir precio fijo proporcionalmente por costo
+            from decimal import ROUND_HALF_UP
+
+            item_cost = (product.unit_cost or Decimal("0")) * qty_needed
+            if total_derived > 0:
+                ratio = item_cost / total_derived
+                item_unit_price = (fixed_total * ratio / qty_needed).quantize(
+                    Decimal("0.0001"), rounding=ROUND_HALF_UP
+                )
+            else:
+                item_unit_price = None
+            price_snap = {
+                "unit_price": item_unit_price,
+                "unit_cost": product.unit_cost,
+                "subtotal": (
+                    (item_unit_price * qty_needed).quantize(
+                        Decimal("0.0001"), rounding=ROUND_HALF_UP
+                    )
+                    if item_unit_price
+                    else None
+                ),
+                "discount_pct": None,
+                "discount_amount": None,
+                "tax_rate_pct": product.tax_rate_pct,
+                "tax_amount": None,
+                "total_amount": (
+                    (item_unit_price * qty_needed).quantize(
+                        Decimal("0.0001"), rounding=ROUND_HALF_UP
+                    )
+                    if item_unit_price
+                    else None
+                ),
+                "currency": product.currency or "COP",
+                "price_type": "combo",
+            }
+        else:
+            price_snap = _resolve_price_snapshot(
+                product, qty_needed, MovementType.SALIDA_COMBO
+            )
+            price_snap["price_type"] = "combo"
+
         movement = Movement.objects.create(
             movement_type=MovementType.SALIDA_COMBO,
             product=product,
@@ -1200,7 +1525,11 @@ def dispatch_combo(
             stock_resultante_origen=after,
             justification=f"Salida por combo: {combo.sku} ({combo.name})",
             executed_by=user,
+            # Solo el primer movement lleva invoice_number (restricción UNIQUE del ledger).
+            invoice_number=combo_invoice_number if first_movement else None,
+            **price_snap,
         )
+        first_movement = False
         movements_created.append(movement)
         check_and_create_alerts(product, location)
 
@@ -1215,4 +1544,17 @@ def dispatch_combo(
             "movements": [str(m.id) for m in movements_created],
         },
     )
+
+    try:
+        create_invoice_from_movements(
+            movements_created,
+            user=user,
+            invoice_number=combo_invoice_number,
+        )
+    except Exception:
+        logger.exception(
+            "create_invoice_from_movements falló para combo invoice=%s; el despacho ya fue registrado.",
+            combo_invoice_number,
+        )
+
     return movements_created
