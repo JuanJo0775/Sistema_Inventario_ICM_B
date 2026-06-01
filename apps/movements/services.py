@@ -263,7 +263,7 @@ def _resolve_price_snapshot(
         - "wholesale" → SALIDA_VENTA_MAYOR
         - "cost"      → SALIDA_DANO / SALIDA_VENCIMIENTO (se usa unit_cost como referencia)
     """
-    from decimal import Decimal, ROUND_HALF_UP
+    from decimal import ROUND_HALF_UP, Decimal
 
     type_map = {
         MovementType.SALIDA_VENTA_MENOR: ("retail", product.sale_price_retail),

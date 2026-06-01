@@ -773,9 +773,10 @@ def sales_revenue_summary(*, start: datetime, end: datetime) -> dict[str, Any]:
     Retorna subtotales, impuestos y totales separados por venta mayor/menor.
     Los movements sin precio (históricos o sin precio configurado) contribuyen con 0.
     """
+    from decimal import Decimal
+
     from django.db.models import DecimalField
     from django.db.models.functions import Coalesce
-    from decimal import Decimal
 
     zero = Decimal("0")
     sale_types = [MovementType.SALIDA_VENTA_MAYOR, MovementType.SALIDA_VENTA_MENOR]
@@ -826,9 +827,10 @@ def gross_margin_by_product(
     margen = total_amount - (unit_cost * quantity)
     Solo incluye despachos de venta (SALIDA_VENTA_MAYOR / MENOR) con precio configurado.
     """
+    from decimal import Decimal
+
     from django.db.models import DecimalField, ExpressionWrapper, F
     from django.db.models.functions import Coalesce
-    from decimal import Decimal
 
     sale_types = [MovementType.SALIDA_VENTA_MAYOR, MovementType.SALIDA_VENTA_MENOR]
     qs = (
@@ -885,9 +887,10 @@ def sales_by_customer(
 
     Retorna los N clientes con mayor revenue en el período.
     """
+    from decimal import Decimal
+
     from django.db.models import DecimalField
     from django.db.models.functions import Coalesce
-    from decimal import Decimal
 
     qs = (
         Movement.objects.filter(

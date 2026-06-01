@@ -9,7 +9,10 @@ import pytest
 from scripts.import_catalog.reader import RawRow, read_excel
 
 EXCEL_PATH = (
-    Path(__file__).resolve().parent.parent.parent / "Clasificacion_Productos.xlsx"
+    Path(__file__).resolve().parent.parent.parent
+    / "docs"
+    / "guias"
+    / "Clasificacion_Productos.xlsx"
 )
 
 

@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from django.core.management.base import BaseCommand, CommandError
-
 from pathlib import Path
+
+from django.core.management.base import BaseCommand, CommandError
 
 from apps.authentication.models import User
 from scripts.import_catalog import config as import_config

@@ -21,7 +21,7 @@ Agrega estas variables a tu archivo `.env` (ver `.env.example` como referencia):
 
 ```env
 # Ruta al Excel (relativa a la raíz del proyecto, o absoluta)
-IMPORT_EXCEL_PATH=Clasificacion_Productos.xlsx
+IMPORT_EXCEL_PATH=docs/guias/Clasificacion_Productos.xlsx
 
 # Ejecutar en modo lectura sin escribir en BD (True/False)
 IMPORT_DRY_RUN=False

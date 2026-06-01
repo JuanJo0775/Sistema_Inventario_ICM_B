@@ -13,7 +13,7 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
-from apps.catalog.models import ProductCombo, ComboItem
+from apps.catalog.models import ComboItem, ProductCombo
 from apps.movements.models import Movement, MovementType
 from apps.movements.services import register_entry
 from tests.factories import LocationFactory, ProductFactory
@@ -137,6 +137,7 @@ def test_product_create_without_prices(authenticated_almacenista_client):
 def test_product_patch_without_price_fields_unchanged(authenticated_almacenista_client):
     """PATCH /catalog/products/<id>/ sin campos de precio → precios se mantienen intactos."""
     from decimal import Decimal
+
     from apps.catalog.services import update_product_prices
     from tests.factories import AlmacenistaFactory
 

@@ -11,7 +11,7 @@ _BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 EXCEL_PATH: str = config(
     "IMPORT_EXCEL_PATH",
-    default=str(_BASE_DIR / "Clasificacion_Productos.xlsx"),
+    default=str(_BASE_DIR / "docs" / "guias" / "Clasificacion_Productos.xlsx"),
 )
 
 DRY_RUN: bool = config("IMPORT_DRY_RUN", default=False, cast=bool)

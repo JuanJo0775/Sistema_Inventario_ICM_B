@@ -814,9 +814,10 @@ class ReportDatasetView(APIView):
 
 def _parse_period_params(request) -> tuple:
     """Helper: parsea start/end de query params y retorna (start, end) como datetimes."""
-    from django.utils.dateparse import parse_datetime
-    from django.utils import timezone
     from datetime import timedelta
+
+    from django.utils import timezone
+    from django.utils.dateparse import parse_datetime
 
     end = timezone.now()
     start = end - timedelta(days=30)

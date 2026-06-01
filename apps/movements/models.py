@@ -6,8 +6,8 @@ import uuid
 
 from django.conf import settings
 from django.db import models
-from django.utils import timezone
 from django.db.models import Q
+from django.utils import timezone
 
 
 class MovementType(models.TextChoices):
