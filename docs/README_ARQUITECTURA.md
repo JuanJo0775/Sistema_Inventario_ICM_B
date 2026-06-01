@@ -308,13 +308,14 @@ icm_backend/
 │   │   └── README.md                                           # Documento técnico relevante
 │   ├── guias/                                                  # Documento arquitectónico relevante
 │   │   └── IMPORT_CATALOG.md                                   # Documento técnico relevante
-│   ├── pricing/                                                # Documento arquitectónico relevante
-│   │   ├── Plan Arquitectura de Precios y Facturación — Sistema Inventario ICM.md  # Documento técnico relevante
-│   │   └── README_PRECIOS_FACTURACION.md                       # Documento técnico relevante
-│   ├── storage/                                                # Documento arquitectónico relevante
-│   │   ├── README_LOCATION_STATES.md                           # Documento técnico relevante
-│   │   ├── README_STORAGE_DOMAIN.md                            # Documento técnico relevante
-│   │   └── README_STORAGE_TYPES.md                             # Documento técnico relevante
+│   ├── system_behavior/                                        # Documento arquitectónico relevante
+│   │   ├── pricing/                                            # Documento arquitectónico relevante
+│   │   │   ├── Plan Arquitectura de Precios y Facturación — Sistema Inventario ICM.md  # Documento técnico relevante
+│   │   │   └── README_PRECIOS_FACTURACION.md                   # Documento técnico relevante
+│   │   └── storage/                                            # Documento arquitectónico relevante
+│   │       ├── README_LOCATION_STATES.md                       # Documento técnico relevante
+│   │       ├── README_STORAGE_DOMAIN.md                        # Documento técnico relevante
+│   │       └── README_STORAGE_TYPES.md                         # Documento técnico relevante
 │   └── GUIA_ONBOARDING.md                                      # Documento técnico relevante
 ├── requirements/                                               # Dependencias por entorno
 │   ├── base.txt
