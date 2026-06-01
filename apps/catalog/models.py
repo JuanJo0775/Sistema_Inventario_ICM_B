@@ -50,6 +50,7 @@ class Subcategory(BaseModel):
         related_name="subcategories",
     )
     slug = models.SlugField(max_length=128)
+    description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:

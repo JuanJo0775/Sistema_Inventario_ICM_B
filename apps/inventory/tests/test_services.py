@@ -72,3 +72,38 @@ def test_trigger_stock_reconstruction_detects_discrepancy(db, almacenista_user):
     assert Alert.objects.filter(
         product=product, location=location, alert_type=AlertType.STOCK_MISMATCH
     ).exists()
+
+
+@pytest.mark.django_db
+def test_deactivate_location_blocks_if_has_stock(db, almacenista_user):
+    from apps.inventory.services import deactivate_location, update_location
+    from shared.exceptions import DomainValidationError
+
+    product = ProductFactory()
+    location = LocationFactory(name="Vitrina Norte", code="vitrina-norte")
+    
+    # 1. Deactivation should succeed when stock is 0
+    loc_deactivated = deactivate_location(almacenista_user, location.id)
+    assert not loc_deactivated.is_active
+    assert loc_deactivated.operational_status == "archived"
+    
+    # Reactivate for testing block
+    loc_reactivated = update_location(almacenista_user, location.id, {"is_active": True})
+    assert loc_reactivated.is_active
+    assert loc_reactivated.operational_status == "active"
+    
+    # 2. Add stock and verify deactivation is blocked
+    StockByLocation.objects.create(product=product, location=location, current_stock=35)
+    
+    with pytest.raises(DomainValidationError) as excinfo:
+        deactivate_location(almacenista_user, location.id)
+    assert "No es posible desactivar la ubicación porque aún contiene inventario." in str(excinfo.value)
+    
+    with pytest.raises(DomainValidationError) as excinfo:
+        update_location(almacenista_user, location.id, {"is_active": False})
+    assert "No es posible desactivar la ubicación porque aún contiene inventario." in str(excinfo.value)
+
+    with pytest.raises(DomainValidationError) as excinfo:
+        update_location(almacenista_user, location.id, {"operational_status": "archived"})
+    assert "No es posible desactivar la ubicación porque aún contiene inventario." in str(excinfo.value)
+

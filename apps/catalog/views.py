@@ -142,18 +142,25 @@ class SubcategoryListCreateView(generics.ListCreateAPIView):
         include_inactive = self.request.query_params.get("include_inactive", "").lower()
         if include_inactive not in ("1", "true", "yes"):
             qs = qs.filter(is_active=True)
+        category = self.request.query_params.get("category")
+        if category:
+            qs = qs.filter(category_id=category)
         return qs
 
     def create(self, request, *args, **kwargs):
         ser = SubcategoryCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         d = ser.validated_data
-        subcat = create_subcategory(
-            request.user,
-            category_id=d["category_id"],
-            name=d["name"],
-            request=request,
-        )
+        try:
+            subcat = create_subcategory(
+                request.user,
+                category_id=d.get("category_id"),
+                name=d["name"],
+                description=d.get("description", ""),
+                request=request,
+            )
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(
             SubcategorySerializer(subcat).data, status=status.HTTP_201_CREATED
         )

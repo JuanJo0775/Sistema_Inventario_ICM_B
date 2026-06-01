@@ -34,6 +34,7 @@ class SubcategorySerializer(serializers.ModelSerializer):
             "category",
             "name",
             "slug",
+            "description",
             "is_active",
             "created_at",
             "updated_at",
@@ -281,13 +282,16 @@ class CategoryUpdateSerializer(serializers.Serializer):
 
 
 class SubcategoryCreateSerializer(serializers.Serializer):
-    category_id = serializers.UUIDField()
+    category_id = serializers.UUIDField(required=False, allow_null=True)
     name = serializers.CharField()
+    description = serializers.CharField(required=False, allow_blank=True, default="")
 
 
 class SubcategoryUpdateSerializer(serializers.Serializer):
     name = serializers.CharField(required=False)
     category_id = serializers.UUIDField(required=False)
+    description = serializers.CharField(required=False, allow_blank=True)
+    is_active = serializers.BooleanField(required=False)
 
 
 class ComboUpdateItemSerializer(serializers.Serializer):

@@ -278,15 +278,28 @@ def resolve_identifier(value: str) -> Product:
 def create_subcategory(
     user: User,
     *,
-    category_id: Any,
+    category_id: Any = None,
     name: str,
+    description: str = "",
     request: HttpRequest | None = None,
 ) -> Subcategory:
-    """RF-003 — Crea subcategoría (solo almacenista)."""
+    """RF-003 — Crea subcategoría / marca (solo almacenista)."""
     from django.utils.text import slugify
 
     _require_almacenista(user)
-    category = Category.objects.get(pk=category_id)
+
+    # Si no se provee category_id, usa la primera categoría activa disponible
+    if category_id:
+        category = Category.objects.get(pk=category_id)
+    else:
+        category = Category.objects.filter(is_active=True).order_by("name").first()
+        if not category:
+            category = Category.objects.order_by("name").first()
+        if not category:
+            raise ValueError(
+                "No existe ninguna categoría en el sistema. Crea al menos una categoría antes de crear marcas."
+            )
+
     base = slugify(name) or "subcategoria"
     slug = base
     n = 0
@@ -298,10 +311,11 @@ def create_subcategory(
         category=category,
         name=name.strip(),
         slug=slug,
+        description=description or "",
     )
     log_event(
         AuditEventType.SUBCATEGORY_CREATED,
-        description=f"Subcategoría creada: {subcat.name} en {category.name}",
+        description=f"Subcategoría/Marca creada: {subcat.name} en {category.name}",
         user=user,
         request=request,
         detail={"subcategory_id": str(subcat.id), "category_id": str(category.id)},
@@ -404,7 +418,7 @@ def update_subcategory(
     *,
     request: HttpRequest | None = None,
 ) -> Subcategory:
-    """RF-003 — Actualiza subcategoría (solo almacenista)."""
+    """RF-003 — Actualiza subcategoría / marca (solo almacenista)."""
     from django.utils.text import slugify
 
     _require_almacenista(user)
@@ -430,10 +444,14 @@ def update_subcategory(
                 slug = f"{base}-{n}"
             subcat.name = new_name
             subcat.slug = slug
+    if "description" in data:
+        subcat.description = data["description"] or ""
+    if "is_active" in data:
+        subcat.is_active = bool(data["is_active"])
     subcat.save()
     log_event(
         AuditEventType.SUBCATEGORY_UPDATED,
-        description=f"Subcategoría actualizada: {subcat.name}",
+        description=f"Subcategoría/Marca actualizada: {subcat.name}",
         user=user,
         request=request,
         detail={"subcategory_id": str(subcat.id)},
@@ -702,10 +720,14 @@ def activate_product(
     *,
     request: HttpRequest | None = None,
 ) -> Product:
-    """Reactiva un producto previamente desactivado."""
+    """
+    Reactiva un producto previamente desactivado.
+    """
     _require_almacenista(user)
+    # Fetch the product with a lock. Avoid select_related on nullable subcategory to prevent
+    # FOR UPDATE errors on outer joins (PostgreSQL limitation).
     product = (
-        Product.objects.select_related("category", "subcategory")
+        Product.objects.select_related("category")
         .select_for_update()
         .get(pk=product_id)
     )
