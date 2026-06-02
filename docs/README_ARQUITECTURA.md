@@ -109,6 +109,7 @@ icm_backend/
 │   ├── authentication/                                         # Autenticación JWT, RBAC y control de acceso
 │   │   ├── tests/                                              # Pruebas del subdominio
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_permissions_reorganization.py              # Cobertura crítica del módulo
 │   │   │   ├── test_services.py                                # Política de acceso y restricciones de rol
 │   │   │   ├── test_user_enable.py                             # Cobertura crítica del módulo
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo

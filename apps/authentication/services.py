@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
@@ -28,7 +29,7 @@ from shared.operating_hours import (  # noqa: F401 — re-exportado para compati
 if TYPE_CHECKING:
     from django.http import HttpRequest
 
-    from apps.authentication.models import User
+    from apps.authentication.models import TemporaryAccessPermit, User, UserSchedule
 
 
 def _require_almacenista(user: User) -> None:
@@ -70,7 +71,9 @@ def authenticate_user(
         raise AuthenticationFailed("La cuenta está deshabilitada.")
     if getattr(user, "role", None) == "auxiliar_despacho":
         rt = request_time or timezone.now()
-        if not is_within_operating_hours(now=rt):
+        from apps.authentication.selectors import check_user_access
+
+        if not check_user_access(user, rt):
             log_event(
                 AuditEventType.LOGIN_FAILED,
                 user=user,
@@ -253,3 +256,245 @@ def update_user_password(
         user_affected=target,
         detail={"target_username": target.username, "change": "password"},
     )
+
+
+@transaction.atomic
+def create_or_update_user_schedule(
+    almacenista_user: User,
+    target_user: User,
+    data: dict[str, Any],
+    *,
+    request: HttpRequest | None = None,
+) -> UserSchedule:
+    """
+    Creates or updates the stable operating hours schedule for an Auxiliar de Despacho.
+    Only Almacenista can perform this action, and they cannot modify other roles or themselves.
+    """
+    _require_almacenista(almacenista_user)
+
+    if target_user.pk == almacenista_user.pk:
+        raise DomainValidationError("No puede modificar su propio horario o permisos.")
+    if target_user.role != "auxiliar_despacho":
+        raise DomainValidationError(
+            "Solo se pueden asignar horarios personalizados a auxiliares de despacho."
+        )
+
+    from apps.audit.models import AuditEventType
+    from apps.audit.services import log_event
+    from apps.authentication.models import UserSchedule
+
+    schedule, created = UserSchedule.objects.select_for_update().get_or_create(
+        user=target_user
+    )
+
+    previous_values = (
+        {
+            "morning_start": (
+                schedule.morning_start.isoformat()
+                if schedule.morning_start
+                else None
+            ),
+            "morning_end": (
+                schedule.morning_end.isoformat() if schedule.morning_end else None
+            ),
+            "afternoon_start": (
+                schedule.afternoon_start.isoformat()
+                if schedule.afternoon_start
+                else None
+            ),
+            "afternoon_end": (
+                schedule.afternoon_end.isoformat()
+                if schedule.afternoon_end
+                else None
+            ),
+            "is_active": schedule.is_active,
+        }
+        if not created
+        else None
+    )
+
+    schedule.morning_start = data.get("morning_start")
+    schedule.morning_end = data.get("morning_end")
+    schedule.afternoon_start = data.get("afternoon_start")
+    schedule.afternoon_end = data.get("afternoon_end")
+    schedule.is_active = data.get("is_active", True)
+    schedule.save()
+
+    new_values = {
+        "morning_start": (
+            schedule.morning_start.isoformat() if schedule.morning_start else None
+        ),
+        "morning_end": (
+            schedule.morning_end.isoformat() if schedule.morning_end else None
+        ),
+        "afternoon_start": (
+            schedule.afternoon_start.isoformat()
+            if schedule.afternoon_start
+            else None
+        ),
+        "afternoon_end": (
+            schedule.afternoon_end.isoformat() if schedule.afternoon_end else None
+        ),
+        "is_active": schedule.is_active,
+    }
+
+    log_event(
+        AuditEventType.PERMISSION_CHANGED,
+        description=f"Horario personalizado {'creado' if created else 'actualizado'} para {target_user.username}",
+        user=almacenista_user,
+        request=request,
+        user_affected=target_user,
+        detail={
+            "change_type": "schedule_created" if created else "schedule_updated",
+            "target_user": {
+                "id": str(target_user.id),
+                "username": target_user.username,
+            },
+            "granted_by": {
+                "id": str(almacenista_user.id),
+                "username": almacenista_user.username,
+            },
+            "previous_values": previous_values,
+            "new_values": new_values,
+            "timestamp": timezone.now().isoformat(),
+        },
+    )
+    return schedule
+
+
+@transaction.atomic
+def grant_temporary_permit(
+    almacenista_user: User,
+    target_user: User,
+    data: dict[str, Any],
+    *,
+    request: HttpRequest | None = None,
+) -> TemporaryAccessPermit:
+    """
+    Grants a temporary access exception permit to an Auxiliar de Despacho.
+    Only Almacenista can perform this action.
+    """
+    _require_almacenista(almacenista_user)
+
+    if target_user.pk == almacenista_user.pk:
+        raise DomainValidationError("No puede otorgarse permisos temporales a sí mismo.")
+    if target_user.role != "auxiliar_despacho":
+        raise DomainValidationError(
+            "Solo se pueden otorgar permisos temporales a auxiliares de despacho."
+        )
+
+    from apps.audit.models import AuditEventType
+    from apps.audit.services import log_event
+    from apps.authentication.models import TemporaryAccessPermit
+
+    permit = TemporaryAccessPermit(
+        user=target_user,
+        start_datetime=data["start_datetime"],
+        end_datetime=data["end_datetime"],
+        allow_24_7=data.get("allow_24_7", False),
+        custom_morning_start=data.get("custom_morning_start"),
+        custom_morning_end=data.get("custom_morning_end"),
+        custom_afternoon_start=data.get("custom_afternoon_start"),
+        custom_afternoon_end=data.get("custom_afternoon_end"),
+        reason=data["reason"],
+        granted_by=almacenista_user,
+        is_active=True,
+    )
+    permit.save()
+
+    new_values = {
+        "permit_id": str(permit.id),
+        "start_datetime": permit.start_datetime.isoformat(),
+        "end_datetime": permit.end_datetime.isoformat(),
+        "allow_24_7": permit.allow_24_7,
+        "custom_morning_start": (
+            permit.custom_morning_start.isoformat()
+            if permit.custom_morning_start
+            else None
+        ),
+        "custom_morning_end": (
+            permit.custom_morning_end.isoformat()
+            if permit.custom_morning_end
+            else None
+        ),
+        "custom_afternoon_start": (
+            permit.custom_afternoon_start.isoformat()
+            if permit.custom_afternoon_start
+            else None
+        ),
+        "custom_afternoon_end": (
+            permit.custom_afternoon_end.isoformat()
+            if permit.custom_afternoon_end
+            else None
+        ),
+        "reason": permit.reason,
+    }
+
+    log_event(
+        AuditEventType.PERMISSION_CHANGED,
+        description=f"Permiso temporal otorgado a {target_user.username}",
+        user=almacenista_user,
+        request=request,
+        user_affected=target_user,
+        detail={
+            "change_type": "permit_granted",
+            "target_user": {
+                "id": str(target_user.id),
+                "username": target_user.username,
+            },
+            "granted_by": {
+                "id": str(almacenista_user.id),
+                "username": almacenista_user.username,
+            },
+            "new_values": new_values,
+            "timestamp": timezone.now().isoformat(),
+        },
+    )
+    return permit
+
+
+@transaction.atomic
+def revoke_temporary_permit(
+    almacenista_user: User,
+    permit_id: UUID | str,
+    *,
+    request: HttpRequest | None = None,
+) -> TemporaryAccessPermit:
+    """
+    Revokes (deactivates) an active temporary access permit.
+    Only Almacenista can perform this action.
+    """
+    _require_almacenista(almacenista_user)
+
+    from apps.audit.models import AuditEventType
+    from apps.audit.services import log_event
+    from apps.authentication.models import TemporaryAccessPermit
+
+    permit = TemporaryAccessPermit.objects.select_for_update().get(pk=permit_id)
+    if not permit.is_active:
+        return permit
+
+    permit.is_active = False
+    permit.save(update_fields=["is_active", "updated_at"])
+
+    log_event(
+        AuditEventType.PERMISSION_CHANGED,
+        description=f"Permiso temporal revocado para {permit.user.username}",
+        user=almacenista_user,
+        request=request,
+        user_affected=permit.user,
+        detail={
+            "change_type": "permit_revoked",
+            "target_user": {
+                "id": str(permit.user.id),
+                "username": permit.user.username,
+            },
+            "revoked_by": {
+                "id": str(almacenista_user.id),
+                "username": almacenista_user.username,
+            },
+            "permit_id": str(permit.id),
+            "timestamp": timezone.now().isoformat(),
+        },
+    )
+    return permit

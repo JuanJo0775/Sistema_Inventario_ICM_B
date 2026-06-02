@@ -8,10 +8,13 @@ from apps.authentication.views import (
     ICMTokenRefreshView,
     LogoutView,
     MeView,
+    TemporaryPermitRevokeView,
     UserDetailView,
     UserDisableView,
     UserEnableView,
     UserListCreateView,
+    UserScheduleDetailView,
+    UserTemporaryPermitListCreateView,
 )
 
 urlpatterns = [
@@ -26,4 +29,19 @@ urlpatterns = [
         "users/<uuid:pk>/disable/", UserDisableView.as_view(), name="auth-user-disable"
     ),
     path("users/<uuid:pk>/enable/", UserEnableView.as_view(), name="auth-user-enable"),
+    path(
+        "users/<uuid:pk>/schedule/",
+        UserScheduleDetailView.as_view(),
+        name="auth-user-schedule",
+    ),
+    path(
+        "users/<uuid:pk>/temporary-permits/",
+        UserTemporaryPermitListCreateView.as_view(),
+        name="auth-user-temporary-permits",
+    ),
+    path(
+        "temporary-permits/<uuid:pk>/revoke/",
+        TemporaryPermitRevokeView.as_view(),
+        name="auth-temporary-permit-revoke",
+    ),
 ]

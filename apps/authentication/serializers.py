@@ -141,7 +141,9 @@ class ICMTokenRefreshSerializer(TokenRefreshSerializer):
                 and user.is_active
                 and getattr(user, "role", None) == UserRole.AUXILIAR_DESPACHO
             ):
-                if not is_within_operating_hours():
+                from apps.authentication.selectors import check_user_access
+
+                if not check_user_access(user):
                     raise PermissionDenied(
                         detail="Acceso no permitido fuera del horario operativo del auxiliar de despacho."
                     )
@@ -200,3 +202,178 @@ class UserCreateSerializer(serializers.Serializer):
         if User.objects.filter(email__iexact=value.strip()).exists():
             raise serializers.ValidationError("Ya existe un usuario con ese correo.")
         return value.strip().lower()
+
+
+class UserScheduleSerializer(serializers.ModelSerializer):
+    class Meta:
+        from apps.authentication.models import UserSchedule
+
+        model = UserSchedule
+        fields = (
+            "id",
+            "user",
+            "morning_start",
+            "morning_end",
+            "afternoon_start",
+            "afternoon_end",
+            "is_active",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = ("id", "user", "created_at", "updated_at")
+
+    def validate(self, attrs):
+        morning_start = attrs.get(
+            "morning_start", self.instance.morning_start if self.instance else None
+        )
+        morning_end = attrs.get(
+            "morning_end", self.instance.morning_end if self.instance else None
+        )
+        afternoon_start = attrs.get(
+            "afternoon_start",
+            self.instance.afternoon_start if self.instance else None,
+        )
+        afternoon_end = attrs.get(
+            "afternoon_end", self.instance.afternoon_end if self.instance else None
+        )
+
+        if (morning_start and not morning_end) or (
+            not morning_start and morning_end
+        ):
+            raise serializers.ValidationError(
+                "Debe especificar inicio y fin de la franja de la mañana."
+            )
+        if (afternoon_start and not afternoon_end) or (
+            not afternoon_start and afternoon_end
+        ):
+            raise serializers.ValidationError(
+                "Debe especificar inicio y fin de la franja de la tarde."
+            )
+
+        if (
+            morning_start
+            and morning_end
+            and morning_start >= morning_end
+        ):
+            raise serializers.ValidationError(
+                "La hora de inicio de la mañana debe ser anterior a la de fin."
+            )
+        if (
+            afternoon_start
+            and afternoon_end
+            and afternoon_start >= afternoon_end
+        ):
+            raise serializers.ValidationError(
+                "La hora de inicio de la tarde debe ser anterior a la de fin."
+            )
+
+        return attrs
+
+
+class TemporaryAccessPermitSerializer(serializers.ModelSerializer):
+    granted_by_username = serializers.CharField(
+        source="granted_by.username", read_only=True
+    )
+    user_username = serializers.CharField(source="user.username", read_only=True)
+
+    class Meta:
+        from apps.authentication.models import TemporaryAccessPermit
+
+        model = TemporaryAccessPermit
+        fields = (
+            "id",
+            "user",
+            "user_username",
+            "start_datetime",
+            "end_datetime",
+            "allow_24_7",
+            "custom_morning_start",
+            "custom_morning_end",
+            "custom_afternoon_start",
+            "custom_afternoon_end",
+            "reason",
+            "granted_by",
+            "granted_by_username",
+            "is_active",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = ("id", "user", "granted_by", "created_at", "updated_at")
+
+    def validate(self, attrs):
+        start_datetime = attrs.get(
+            "start_datetime", self.instance.start_datetime if self.instance else None
+        )
+        end_datetime = attrs.get(
+            "end_datetime", self.instance.end_datetime if self.instance else None
+        )
+        allow_24_7 = attrs.get(
+            "allow_24_7", self.instance.allow_24_7 if self.instance else False
+        )
+        custom_morning_start = attrs.get(
+            "custom_morning_start",
+            self.instance.custom_morning_start if self.instance else None,
+        )
+        custom_morning_end = attrs.get(
+            "custom_morning_end",
+            self.instance.custom_morning_end if self.instance else None,
+        )
+        custom_afternoon_start = attrs.get(
+            "custom_afternoon_start",
+            self.instance.custom_afternoon_start if self.instance else None,
+        )
+        custom_afternoon_end = attrs.get(
+            "custom_afternoon_end",
+            self.instance.custom_afternoon_end if self.instance else None,
+        )
+        reason = attrs.get("reason", self.instance.reason if self.instance else "")
+
+        if start_datetime and end_datetime and start_datetime >= end_datetime:
+            raise serializers.ValidationError(
+                "La fecha/hora de fin debe ser posterior a la de inicio."
+            )
+
+        if not reason or not reason.strip():
+            raise serializers.ValidationError(
+                "El motivo de la autorización es obligatorio."
+            )
+
+        if not allow_24_7:
+            has_morning = custom_morning_start and custom_morning_end
+            has_afternoon = custom_afternoon_start and custom_afternoon_end
+            if not has_morning and not has_afternoon:
+                raise serializers.ValidationError(
+                    "Si no se permite acceso 24/7, debe configurar al menos una franja horaria válida (mañana o tarde)."
+                )
+
+        if (custom_morning_start and not custom_morning_end) or (
+            not custom_morning_start and custom_morning_end
+        ):
+            raise serializers.ValidationError(
+                "Debe especificar inicio y fin de la franja custom de la mañana."
+            )
+        if (custom_afternoon_start and not custom_afternoon_end) or (
+            not custom_afternoon_start and custom_afternoon_end
+        ):
+            raise serializers.ValidationError(
+                "Debe especificar inicio y fin de la franja custom de la tarde."
+            )
+
+        if (
+            custom_morning_start
+            and custom_morning_end
+            and custom_morning_start >= custom_morning_end
+        ):
+            raise serializers.ValidationError(
+                "La hora de inicio de la mañana debe ser anterior a la de fin."
+            )
+        if (
+            custom_afternoon_start
+            and custom_afternoon_end
+            and custom_afternoon_start >= custom_afternoon_end
+        ):
+            raise serializers.ValidationError(
+                "La hora de inicio de la tarde debe ser anterior a la de fin."
+            )
+
+        return attrs

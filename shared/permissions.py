@@ -61,22 +61,19 @@ class IsAlmacenistaOrAdministrador(BasePermission):
 
 class IsWithinOperatingHours(BasePermission):
     """
-    BR-03 — Auxiliares de despacho solo operan en franjas permitidas (America/Bogota).
-
-    Horario local: 07:00–12:00 y 14:00–17:00 inclusive. Otros roles no tienen esta restricción
-    adicional tras autenticación JWT.
+    BR-03 — Auxiliares de despacho solo operan en franjas permitidas.
     """
 
-    message = "Acceso denegado: el auxiliar de despacho solo opera en horario 07:00–12:00 y 14:00–17:00 (Bogotá)."
+    message = "Acceso denegado: fuera del horario operativo del auxiliar de despacho."
 
     def has_permission(self, request, view) -> bool:
         if not request.user or not request.user.is_authenticated:
             return False
         if getattr(request.user, "role", None) != "auxiliar_despacho":
             return True
-        from shared.operating_hours import is_within_operating_hours
+        from apps.authentication.selectors import check_user_access
 
-        return is_within_operating_hours()
+        return check_user_access(request.user)
 
 
 class IsReadOnly(BasePermission):

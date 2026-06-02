@@ -24,7 +24,7 @@ from tests.factories import UserFactory
 @pytest.mark.django_db
 def test_auxiliar_blocked_outside_hours(auxiliar_user):
     with patch(
-        "apps.authentication.services.is_within_operating_hours", return_value=False
+        "apps.authentication.selectors.check_user_access", return_value=False
     ):
         with pytest.raises(OutsideOperatingHoursError):
             authenticate_user(auxiliar_user.username, "testpass123")
@@ -84,7 +84,7 @@ def test_operating_hours_enforced_per_request(auxiliar_user):
     factory = APIRequestFactory()
     request = factory.get("/dummy")
     request.user = auxiliar_user
-    with patch("shared.operating_hours.is_within_operating_hours", return_value=False):
+    with patch("apps.authentication.selectors.check_user_access", return_value=False):
         assert IsWithinOperatingHours().has_permission(request, view=None) is False
-    with patch("shared.operating_hours.is_within_operating_hours", return_value=True):
+    with patch("apps.authentication.selectors.check_user_access", return_value=True):
         assert IsWithinOperatingHours().has_permission(request, view=None) is True

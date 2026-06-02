@@ -262,6 +262,12 @@ Leyenda:
 | Usuarios | Actualizar total | `PUT /api/v1/auth/users/<uuid:pk>/` | Denegado | Permitido | Denegado | Denegado | Denegado | Admin pasa la vista, pero el servicio rechaza |
 | Usuarios | Actualizar parcial | `PATCH /api/v1/auth/users/<uuid:pk>/` | Denegado | Permitido | Denegado | Denegado | Denegado | Misma logica que PUT |
 | Usuarios | Deshabilitar usuario | `POST /api/v1/auth/users/<uuid:pk>/disable/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista |
+| Usuarios | Rehabilitar usuario | `POST /api/v1/auth/users/<uuid:pk>/enable/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista |
+| Horario personalizado | Ver horario | `GET /api/v1/auth/users/<uuid:pk>/schedule/` | Permitido | Permitido | Denegado | Denegado | Denegado | Almacenista o administrador; 404 si no existe |
+| Horario personalizado | Asignar/Actualizar | `POST /api/v1/auth/users/<uuid:pk>/schedule/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista; target debe ser auxiliar_despacho |
+| Permisos temporales | Listar permisos | `GET /api/v1/auth/users/<uuid:pk>/temporary-permits/` | Permitido | Permitido | Denegado | Denegado | Denegado | Almacenista o administrador |
+| Permisos temporales | Otorgar permiso | `POST /api/v1/auth/users/<uuid:pk>/temporary-permits/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista; lógica de franjas con Unión |
+| Permiso temporal | Revocar permiso | `POST /api/v1/auth/temporary-permits/<uuid:pk>/revoke/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista; operación idempotente |
 
 ### 11.2 Catalogo
 
@@ -449,13 +455,63 @@ Las restricciones dinamicas existen, pero estan distribuidas entre permisos y se
 
 ## 15. Recomendaciones futuras
 
-1. Unificar la aplicacion de `IsWithinOperatingHours` para que la ventana del auxiliar no dependa de la vista concreta.
-2. Publicar una semantica explicita para acciones tipo aprobar/rechazar si el negocio las necesita como endpoint.
-3. Revisar si el rol `administrador` debe seguir siendo lectura privilegiada o evolucionar a un rol con funciones de supervision mas amplias.
-4. Considerar pruebas de concurrencia y de throttling mas cercanas a produccion en un entorno no SQLite.
-5. Añadir ejemplos OpenAPI especificos para `login`, `refresh` y `logout` si el frontend consume flujos autenticos desde Swagger.
+1. Publicar una semantica explicita para acciones tipo aprobar/rechazar si el negocio las necesita como endpoint.
+2. Considerar pruebas de concurrencia y de throttling mas cercanas a produccion en un entorno no SQLite.
+3. Añadir ejemplos OpenAPI especificos para `login`, `refresh` y `logout` si el frontend consume flujos autenticos desde Swagger.
 
-## 16. Referencias tecnicas rapidas
+## 16. Reorganización del control de acceso horario y excepciones extraordinarias (NUEVO)
+
+Se ha centralizado y fortalecido el control horario para el rol `auxiliar_despacho` mediante un sistema flexible que permite sobrescribir o exceptuar las franjas por defecto.
+
+### 16.1 Flujo de Autorización y Precedencia de Reglas
+
+Cuando un usuario interactúa con la API (login, renovación de token o petición HTTP), el sistema ejecuta el selector centralizado `check_user_access(user, dt)` en el timezone definido en settings. La precedencia de evaluación es la siguiente:
+
+1. **Permiso Temporal Activo (`TemporaryAccessPermit`)**: Se verifica si existe alguna excepción temporal vigente para la fecha/hora actual (is_active=True, start_datetime <= dt <= end_datetime).
+   - Si `allow_24_7` es `True`: **Acceso concedido**.
+   - Si existen franjas customizadas y el instante actual cae dentro de la mañana o la tarde definidas: **Acceso concedido**.
+   - *Resolución de Solapamientos (Unión)*: Si hay múltiples permisos temporales activos solapados, el acceso se concede si **cualquiera** de ellos lo autoriza.
+2. **Horario Personalizado Estable (`UserSchedule`)**: Si no hay permisos temporales vigentes, se verifica si el auxiliar tiene un horario personalizado estable configurado.
+   - Si existe y está activo: se evalúa la hora del instante contra sus franjas. Si coincide: **Acceso concedido**. Si no: **Acceso denegado** (el horario personalizado anula y reemplaza por completo el horario por defecto).
+   - *Nota:* Si el horario personalizado está activo pero no define ninguna franja, se interpreta como **horario vacío (bloqueo total)**.
+3. **Horario Base por Defecto**: Si no hay permisos temporales ni horario personalizado estable, se aplica el horario del sistema por defecto:
+   - Mañana: 07:00 a 12:00
+   - Tarde: 14:00 a 17:00
+   Si la hora actual coincide: **Acceso concedido**. Si no: **Acceso denegado**.
+
+### 16.2 Límites de Delegación del Almacenista
+
+El rol `almacenista` es el administrador operativo habilitado para gestionar permisos y horarios. Sin embargo, tiene límites estrictos de integridad:
+- Solo puede modificar el horario o crear permisos temporales para usuarios con el rol `auxiliar_despacho`.
+- No puede modificar su propio horario o permisos.
+- No puede modificar a otros almacenistas o administradores.
+- Todo cambio requiere una justificación (`reason`) obligatoria no vacía.
+
+### 16.3 Integridad Horaria y Expiración
+
+- **Validación Estricta**: Tanto los serializadores como los métodos `.clean()` de los modelos validan que `start_datetime < end_datetime` y que el inicio de cada franja horaria sea estrictamente anterior al fin de la misma.
+- **Expiración Lógica**: La expiración es estrictamente lógica, validada en cada consulta a la base de datos de manera dinámica. No se requiere de procesos físicos o crons en segundo plano.
+
+### 16.4 Auditoría Enriquecida
+
+Todas las modificaciones a los permisos de acceso horario generan registros inmutables en el log de auditoría con tipo de evento `PERMISSION_CHANGED`, conteniendo la siguiente metadata en formato JSON:
+- `change_type`: `"schedule_created" | "schedule_updated" | "permit_granted" | "permit_revoked"`
+- `target_user`: `{ "id", "username" }`
+- `granted_by` o `revoked_by`: `{ "id", "username" }`
+- `previous_values` y `new_values` (detallando franjas horarias y periodos).
+- `reason` y `timestamp`.
+
+### 16.5 Nuevos Endpoints Relacionados
+
+| Recurso | Acción | Endpoint | Rol Mínimo |
+|---|---|---|---|
+| Horario Personalizado | Ver | `GET /api/v1/auth/users/<uuid:pk>/schedule/` | Administrador (lectura) / Almacenista |
+| Horario Personalizado | Asignar/Actualizar | `POST /api/v1/auth/users/<uuid:pk>/schedule/` | Almacenista |
+| Permisos Temporales | Listar | `GET /api/v1/auth/users/<uuid:pk>/temporary-permits/` | Administrador (lectura) / Almacenista |
+| Permiso Temporal | Crear/Otorgar | `POST /api/v1/auth/users/<uuid:pk>/temporary-permits/` | Almacenista |
+| Permiso Temporal | Revocar | `POST /api/v1/auth/temporary-permits/<uuid:pk>/revoke/` | Almacenista |
+
+## 17. Referencias tecnicas rapidas
 
 - [API contract](README_API.md)
 - [Security settings](../../config/settings/base.py)

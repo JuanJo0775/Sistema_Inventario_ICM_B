@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiResponse, extend_schema, extend_schema_view
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
@@ -20,7 +21,9 @@ from apps.authentication.serializers import (
     ICMTokenObtainPairSerializer,
     ICMTokenRefreshSerializer,
     LoginRequestSerializer,
+    TemporaryAccessPermitSerializer,
     UserCreateSerializer,
+    UserScheduleSerializer,
     UserSerializer,
 )
 from apps.authentication.services import (
@@ -305,3 +308,137 @@ class HealthCheckView(APIView):
 
     def get(self, request):
         return Response({"status": "ok"})
+
+
+class UserScheduleDetailView(APIView):
+    def get_permissions(self):
+        if self.request.method in {"POST", "PUT", "PATCH"}:
+            permission_classes = (IsAuthenticated, IsAlmacenista)
+        else:
+            permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
+        return [permission() for permission in permission_classes]
+
+    @extend_schema(
+        summary="Ver horario personalizado del usuario",
+        description="Obtiene el horario personalizado estable del auxiliar de despacho.",
+        tags=[TAG_AUTH],
+        responses={
+            200: UserScheduleSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def get(self, request, pk):
+        from apps.authentication.models import UserSchedule
+
+        target_user = get_object_or_404(User, pk=pk)
+        try:
+            schedule = UserSchedule.objects.get(user=target_user)
+            return Response(UserScheduleSerializer(schedule).data)
+        except UserSchedule.DoesNotExist:
+            return Response(
+                {
+                    "detail": "No se ha configurado un horario personalizado para este usuario."
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+    @extend_schema(
+        summary="Configurar horario personalizado del usuario",
+        description="Establece o actualiza el horario personalizado estable del auxiliar de despacho (solo almacenista).",
+        tags=[TAG_AUTH],
+        request=UserScheduleSerializer,
+        responses={
+            200: UserScheduleSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        from apps.authentication.serializers import UserScheduleSerializer
+        from apps.authentication.services import create_or_update_user_schedule
+
+        target_user = get_object_or_404(User, pk=pk)
+        serializer = UserScheduleSerializer(
+            data=request.data, context={"target_user": target_user}
+        )
+        serializer.is_valid(raise_exception=True)
+        schedule = create_or_update_user_schedule(
+            request.user, target_user, serializer.validated_data, request=request
+        )
+        return Response(UserScheduleSerializer(schedule).data)
+
+
+class UserTemporaryPermitListCreateView(APIView):
+    def get_permissions(self):
+        if self.request.method == "POST":
+            permission_classes = (IsAuthenticated, IsAlmacenista)
+        else:
+            permission_classes = (IsAuthenticated, IsAlmacenistaOrAdministrador)
+        return [permission() for permission in permission_classes]
+
+    @extend_schema(
+        summary="Listar permisos temporales de un usuario",
+        description="Obtiene la lista de autorizaciones extraordinarias temporales de un auxiliar.",
+        tags=[TAG_AUTH],
+        responses={
+            200: TemporaryAccessPermitSerializer(many=True),
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def get(self, request, pk):
+        from apps.authentication.models import TemporaryAccessPermit
+
+        target_user = get_object_or_404(User, pk=pk)
+        permits = TemporaryAccessPermit.objects.filter(user=target_user).order_by(
+            "-created_at"
+        )
+        return Response(TemporaryAccessPermitSerializer(permits, many=True).data)
+
+    @extend_schema(
+        summary="Otorgar permiso temporal",
+        description="Crea una autorización extraordinaria temporal para el auxiliar de despacho (solo almacenista).",
+        tags=[TAG_AUTH],
+        request=TemporaryAccessPermitSerializer,
+        responses={
+            201: TemporaryAccessPermitSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        from apps.authentication.serializers import TemporaryAccessPermitSerializer
+        from apps.authentication.services import grant_temporary_permit
+
+        target_user = get_object_or_404(User, pk=pk)
+        serializer = TemporaryAccessPermitSerializer(
+            data=request.data, context={"target_user": target_user}
+        )
+        serializer.is_valid(raise_exception=True)
+        permit = grant_temporary_permit(
+            request.user, target_user, serializer.validated_data, request=request
+        )
+        return Response(
+            TemporaryAccessPermitSerializer(permit).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class TemporaryPermitRevokeView(APIView):
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Revocar permiso temporal",
+        description="Revoca (marca como inactivo) una autorización extraordinaria temporal (solo almacenista).",
+        tags=[TAG_AUTH],
+        request=None,
+        responses={
+            200: TemporaryAccessPermitSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        from apps.authentication.models import TemporaryAccessPermit
+        from apps.authentication.serializers import TemporaryAccessPermitSerializer
+        from apps.authentication.services import revoke_temporary_permit
+
+        permit = get_object_or_404(TemporaryAccessPermit, pk=pk)
+        revoked = revoke_temporary_permit(request.user, permit.id, request=request)
+        return Response(TemporaryAccessPermitSerializer(revoked).data)
