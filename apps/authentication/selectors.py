@@ -97,7 +97,9 @@ def check_user_access(user: User, dt: datetime | None = None) -> bool:
         return True
 
     from datetime import datetime
+
     from django.utils import timezone
+
     from apps.authentication.models import TemporaryAccessPermit, UserSchedule
     from shared.operating_hours import (
         _AFTERNOON_END,

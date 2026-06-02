@@ -1,11 +1,13 @@
-import pytest
 from datetime import datetime, time, timedelta
+
+import pytest
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.exceptions import ValidationError as DRFValidationError
-from django.core.exceptions import ValidationError as DjangoValidationError
 
-from apps.authentication.models import UserRole, UserSchedule, TemporaryAccessPermit
+from apps.audit.models import AuditEventType, AuditLog
+from apps.authentication.models import TemporaryAccessPermit, UserRole, UserSchedule
 from apps.authentication.selectors import check_user_access
 from apps.authentication.services import (
     create_or_update_user_schedule,
@@ -13,7 +15,7 @@ from apps.authentication.services import (
     revoke_temporary_permit,
 )
 from tests.factories import UserFactory
-from apps.audit.models import AuditEventType, AuditLog
+
 
 @pytest.mark.django_db
 class TestPermissionsReorganization:
@@ -22,13 +24,17 @@ class TestPermissionsReorganization:
         # We test default operating hours (07:00-12:00, 14:00-17:00)
         # Using check_user_access directly
         tz = timezone.get_current_timezone()
-        
+
         # Within morning range (08:00)
-        dt_morning = timezone.make_aware(datetime.combine(datetime.today(), time(8, 0)), tz)
+        dt_morning = timezone.make_aware(
+            datetime.combine(datetime.today(), time(8, 0)), tz
+        )
         assert check_user_access(auxiliar_user, dt_morning) is True
 
         # Outside range (13:00)
-        dt_middle = timezone.make_aware(datetime.combine(datetime.today(), time(13, 0)), tz)
+        dt_middle = timezone.make_aware(
+            datetime.combine(datetime.today(), time(13, 0)), tz
+        )
         assert check_user_access(auxiliar_user, dt_middle) is False
 
         # Non-auxiliar users are unrestricted
@@ -42,7 +48,7 @@ class TestPermissionsReorganization:
             user=auxiliar_user,
             morning_start=time(9, 0),
             morning_end=time(11, 0),
-            is_active=True
+            is_active=True,
         )
 
         # 08:00 was allowed by default, now it should be blocked because custom schedule overrides it
@@ -50,17 +56,16 @@ class TestPermissionsReorganization:
         assert check_user_access(auxiliar_user, dt_08) is False
 
         # 09:30 is within custom morning range
-        dt_0930 = timezone.make_aware(datetime.combine(datetime.today(), time(9, 30)), tz)
+        dt_0930 = timezone.make_aware(
+            datetime.combine(datetime.today(), time(9, 30)), tz
+        )
         assert check_user_access(auxiliar_user, dt_0930) is True
 
     def test_empty_user_schedule_blocks_all(self, auxiliar_user):
         tz = timezone.get_current_timezone()
         # Custom schedule with no hours defined
-        UserSchedule.objects.create(
-            user=auxiliar_user,
-            is_active=True
-        )
-        
+        UserSchedule.objects.create(user=auxiliar_user, is_active=True)
+
         # 08:00 (which was allowed by default) is now blocked
         dt_08 = timezone.make_aware(datetime.combine(datetime.today(), time(8, 0)), tz)
         assert check_user_access(auxiliar_user, dt_08) is False
@@ -77,8 +82,8 @@ class TestPermissionsReorganization:
                 "start_datetime": start,
                 "end_datetime": end,
                 "allow_24_7": True,
-                "reason": "Midnight inventory"
-            }
+                "reason": "Midnight inventory",
+            },
         )
 
         assert permit.is_active is True
@@ -102,8 +107,8 @@ class TestPermissionsReorganization:
                 "end_datetime": end,
                 "custom_morning_start": time(1, 0),
                 "custom_morning_end": time(3, 0),
-                "reason": "First shift"
-            }
+                "reason": "First shift",
+            },
         )
 
         grant_temporary_permit(
@@ -114,8 +119,8 @@ class TestPermissionsReorganization:
                 "end_datetime": end,
                 "custom_morning_start": time(2, 30),
                 "custom_morning_end": time(5, 0),
-                "reason": "Second shift overlap"
-            }
+                "reason": "Second shift overlap",
+            },
         )
 
         # 02:00: Allowed by Permit 1
@@ -134,9 +139,7 @@ class TestPermissionsReorganization:
         # Time validations: morning_start >= morning_end raises validation error
         with pytest.raises(DjangoValidationError):
             UserSchedule.objects.create(
-                user=auxiliar_user,
-                morning_start=time(10, 0),
-                morning_end=time(9, 0)
+                user=auxiliar_user, morning_start=time(10, 0), morning_end=time(9, 0)
             )
 
         # TemporaryPermit validation: allow_24_7=False but no custom ranges raises validation error
@@ -146,26 +149,27 @@ class TestPermissionsReorganization:
                 start_datetime=timezone.now(),
                 end_datetime=timezone.now() + timedelta(hours=1),
                 allow_24_7=False,
-                reason="Invalid"
+                reason="Invalid",
             )
 
     def test_almacenista_delegation_limits(self, almacenista_user, auxiliar_user):
         other_almacenista = UserFactory(role=UserRole.ALMACENISTA)
-        
+
         # Almacenista cannot modify their own schedule or other almacenistas
         from shared.exceptions import DomainValidationError
+
         with pytest.raises(DomainValidationError):
             create_or_update_user_schedule(
                 almacenista_user,
                 almacenista_user,
-                {"morning_start": time(9, 0), "morning_end": time(10, 0)}
+                {"morning_start": time(9, 0), "morning_end": time(10, 0)},
             )
 
         with pytest.raises(DomainValidationError):
             create_or_update_user_schedule(
                 almacenista_user,
                 other_almacenista,
-                {"morning_start": time(9, 0), "morning_end": time(10, 0)}
+                {"morning_start": time(9, 0), "morning_end": time(10, 0)},
             )
 
     def test_enriched_audit_logs(self, almacenista_user, auxiliar_user):
@@ -179,13 +183,12 @@ class TestPermissionsReorganization:
                 "start_datetime": start,
                 "end_datetime": end,
                 "allow_24_7": True,
-                "reason": "Audited shift"
-            }
+                "reason": "Audited shift",
+            },
         )
 
         audit_log = AuditLog.objects.filter(
-            event_type=AuditEventType.PERMISSION_CHANGED,
-            user=almacenista_user
+            event_type=AuditEventType.PERMISSION_CHANGED, user=almacenista_user
         ).first()
 
         assert audit_log is not None
@@ -195,11 +198,14 @@ class TestPermissionsReorganization:
 
         # Revoke permit
         revoke_temporary_permit(almacenista_user, permit.id)
-        
-        revoked_log = AuditLog.objects.filter(
-            event_type=AuditEventType.PERMISSION_CHANGED,
-            user=almacenista_user
-        ).order_by("-created_at").first()
+
+        revoked_log = (
+            AuditLog.objects.filter(
+                event_type=AuditEventType.PERMISSION_CHANGED, user=almacenista_user
+            )
+            .order_by("-created_at")
+            .first()
+        )
 
         assert revoked_log is not None
         assert revoked_log.metadata["change_type"] == "permit_revoked"
@@ -211,7 +217,7 @@ class TestPermissionsReorganization:
         # We can verify by patching the db call or simply checking that it is set.
         tz = timezone.get_current_timezone()
         dt = timezone.make_aware(datetime.combine(datetime.today(), time(8, 0)), tz)
-        
+
         # Clean potential cache first
         cache_attr = f"_cached_access_allowed_{dt.astimezone(tz).isoformat()[:16]}"
         if hasattr(auxiliar_user, cache_attr):

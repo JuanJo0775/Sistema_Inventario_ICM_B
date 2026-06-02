@@ -237,9 +237,7 @@ class UserScheduleSerializer(serializers.ModelSerializer):
             "afternoon_end", self.instance.afternoon_end if self.instance else None
         )
 
-        if (morning_start and not morning_end) or (
-            not morning_start and morning_end
-        ):
+        if (morning_start and not morning_end) or (not morning_start and morning_end):
             raise serializers.ValidationError(
                 "Debe especificar inicio y fin de la franja de la mañana."
             )
@@ -250,19 +248,11 @@ class UserScheduleSerializer(serializers.ModelSerializer):
                 "Debe especificar inicio y fin de la franja de la tarde."
             )
 
-        if (
-            morning_start
-            and morning_end
-            and morning_start >= morning_end
-        ):
+        if morning_start and morning_end and morning_start >= morning_end:
             raise serializers.ValidationError(
                 "La hora de inicio de la mañana debe ser anterior a la de fin."
             )
-        if (
-            afternoon_start
-            and afternoon_end
-            and afternoon_start >= afternoon_end
-        ):
+        if afternoon_start and afternoon_end and afternoon_start >= afternoon_end:
             raise serializers.ValidationError(
                 "La hora de inicio de la tarde debe ser anterior a la de fin."
             )

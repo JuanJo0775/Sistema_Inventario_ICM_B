@@ -86,7 +86,11 @@ class UserSchedule(models.Model):
 
     def clean(self) -> None:
         super().clean()
-        if hasattr(self, "user") and self.user and self.user.role != "auxiliar_despacho":
+        if (
+            hasattr(self, "user")
+            and self.user
+            and self.user.role != "auxiliar_despacho"
+        ):
             raise ValidationError(
                 "Solo se puede asignar un horario personalizado a auxiliares de despacho."
             )
@@ -163,12 +167,18 @@ class TemporaryAccessPermit(models.Model):
         verbose_name = "Permiso Temporal de Acceso"
         verbose_name_plural = "Permisos Temporales de Acceso"
         indexes = [
-            models.Index(fields=("user", "is_active", "start_datetime", "end_datetime")),
+            models.Index(
+                fields=("user", "is_active", "start_datetime", "end_datetime")
+            ),
         ]
 
     def clean(self) -> None:
         super().clean()
-        if hasattr(self, "user") and self.user and self.user.role != "auxiliar_despacho":
+        if (
+            hasattr(self, "user")
+            and self.user
+            and self.user.role != "auxiliar_despacho"
+        ):
             raise ValidationError(
                 "Solo se pueden otorgar permisos temporales a auxiliares de despacho."
             )

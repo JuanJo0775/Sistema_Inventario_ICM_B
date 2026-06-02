@@ -23,9 +23,7 @@ from tests.factories import UserFactory
 
 @pytest.mark.django_db
 def test_auxiliar_blocked_outside_hours(auxiliar_user):
-    with patch(
-        "apps.authentication.selectors.check_user_access", return_value=False
-    ):
+    with patch("apps.authentication.selectors.check_user_access", return_value=False):
         with pytest.raises(OutsideOperatingHoursError):
             authenticate_user(auxiliar_user.username, "testpass123")
 

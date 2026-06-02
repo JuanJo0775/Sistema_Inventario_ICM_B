@@ -198,9 +198,7 @@ class TestTemporaryPermitListCreateEndpoint:
     ):
         import uuid
 
-        url = reverse(
-            "auth-user-temporary-permits", kwargs={"pk": uuid.uuid4()}
-        )
+        url = reverse("auth-user-temporary-permits", kwargs={"pk": uuid.uuid4()})
         payload = {
             "start_datetime": timezone.now().isoformat(),
             "end_datetime": (timezone.now() + timedelta(hours=1)).isoformat(),

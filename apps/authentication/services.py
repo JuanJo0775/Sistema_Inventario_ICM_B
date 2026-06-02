@@ -290,9 +290,7 @@ def create_or_update_user_schedule(
     previous_values = (
         {
             "morning_start": (
-                schedule.morning_start.isoformat()
-                if schedule.morning_start
-                else None
+                schedule.morning_start.isoformat() if schedule.morning_start else None
             ),
             "morning_end": (
                 schedule.morning_end.isoformat() if schedule.morning_end else None
@@ -303,9 +301,7 @@ def create_or_update_user_schedule(
                 else None
             ),
             "afternoon_end": (
-                schedule.afternoon_end.isoformat()
-                if schedule.afternoon_end
-                else None
+                schedule.afternoon_end.isoformat() if schedule.afternoon_end else None
             ),
             "is_active": schedule.is_active,
         }
@@ -328,9 +324,7 @@ def create_or_update_user_schedule(
             schedule.morning_end.isoformat() if schedule.morning_end else None
         ),
         "afternoon_start": (
-            schedule.afternoon_start.isoformat()
-            if schedule.afternoon_start
-            else None
+            schedule.afternoon_start.isoformat() if schedule.afternoon_start else None
         ),
         "afternoon_end": (
             schedule.afternoon_end.isoformat() if schedule.afternoon_end else None
@@ -377,7 +371,9 @@ def grant_temporary_permit(
     _require_almacenista(almacenista_user)
 
     if target_user.pk == almacenista_user.pk:
-        raise DomainValidationError("No puede otorgarse permisos temporales a sí mismo.")
+        raise DomainValidationError(
+            "No puede otorgarse permisos temporales a sí mismo."
+        )
     if target_user.role != "auxiliar_despacho":
         raise DomainValidationError(
             "Solo se pueden otorgar permisos temporales a auxiliares de despacho."
@@ -413,9 +409,7 @@ def grant_temporary_permit(
             else None
         ),
         "custom_morning_end": (
-            permit.custom_morning_end.isoformat()
-            if permit.custom_morning_end
-            else None
+            permit.custom_morning_end.isoformat() if permit.custom_morning_end else None
         ),
         "custom_afternoon_start": (
             permit.custom_afternoon_start.isoformat()
