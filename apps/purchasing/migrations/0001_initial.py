@@ -11,7 +11,10 @@ class Migration(migrations.Migration):
     dependencies = [
         ("catalog", "0009_merge_20260531_2237"),
         ("inventory", "0009_add_location_reorder_point"),
-        ("movements", "0007_rename_movements_invoice_number_idx_movements_i_number_dec47a_idx_and_more"),
+        (
+            "movements",
+            "0007_rename_movements_invoice_number_idx_movements_i_number_dec47a_idx_and_more",
+        ),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -429,9 +432,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="purchaseorder",
-            index=models.Index(
-                fields=["number"], name="purchasing_po_number_idx"
-            ),
+            index=models.Index(fields=["number"], name="purchasing_po_number_idx"),
         ),
         migrations.AddIndex(
             model_name="reception",

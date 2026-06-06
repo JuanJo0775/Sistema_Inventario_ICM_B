@@ -45,7 +45,9 @@ def get_purchase_order(po_id: uuid.UUID) -> PurchaseOrder:
         PurchaseOrder.objects.select_related(
             "supplier", "created_by", "confirmed_by", "cancelled_by"
         )
-        .prefetch_related("items__product", "receptions__items__purchase_order_item__product")
+        .prefetch_related(
+            "items__product", "receptions__items__purchase_order_item__product"
+        )
         .get(pk=po_id)
     )
 

@@ -43,7 +43,6 @@ from .factories import (
     SupplierFactory,
 )
 
-
 # ---------------------------------------------------------------------------
 # Supplier tests
 # ---------------------------------------------------------------------------
@@ -81,7 +80,9 @@ def test_deactivate_supplier(almacenista_user):
     deactivate_supplier(almacenista_user, supplier.id)
     supplier.refresh_from_db()
     assert not supplier.is_active
-    assert AuditLog.objects.filter(event_type=AuditEventType.SUPPLIER_DEACTIVATED).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.SUPPLIER_DEACTIVATED
+    ).exists()
 
 
 @pytest.mark.django_db
@@ -120,7 +121,9 @@ def test_create_purchase_order(almacenista_user):
     assert po.status == PurchaseOrderStatus.BORRADOR
     assert po.items.count() == 1
     assert po.number.startswith("OC-")
-    assert AuditLog.objects.filter(event_type=AuditEventType.PURCHASE_ORDER_CREATED).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.PURCHASE_ORDER_CREATED
+    ).exists()
 
 
 @pytest.mark.django_db
@@ -132,7 +135,13 @@ def test_create_po_with_inactive_supplier_raises(almacenista_user):
             almacenista_user,
             {
                 "supplier_id": supplier.id,
-                "items": [{"product_id": product.id, "quantity_ordered": 1, "unit_cost": "5000"}],
+                "items": [
+                    {
+                        "product_id": product.id,
+                        "quantity_ordered": 1,
+                        "unit_cost": "5000",
+                    }
+                ],
             },
         )
 
@@ -145,7 +154,9 @@ def test_confirm_po_changes_status(almacenista_user):
     po.refresh_from_db()
     assert po.status == PurchaseOrderStatus.PENDIENTE
     assert po.confirmed_by == almacenista_user
-    assert AuditLog.objects.filter(event_type=AuditEventType.PURCHASE_ORDER_CONFIRMED).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.PURCHASE_ORDER_CONFIRMED
+    ).exists()
 
 
 @pytest.mark.django_db
@@ -241,9 +252,7 @@ def test_create_reception_exceeds_quantity_raises(almacenista_user):
             po.id,
             {
                 "destination_location_id": location.id,
-                "items": [
-                    {"purchase_order_item_id": poi.id, "quantity_received": 10}
-                ],
+                "items": [{"purchase_order_item_id": poi.id, "quantity_received": 10}],
             },
         )
 
@@ -288,7 +297,9 @@ def test_confirm_reception_creates_movements_and_updates_stock(almacenista_user)
     po.refresh_from_db()
     assert po.status == PurchaseOrderStatus.COMPLETADA
 
-    assert AuditLog.objects.filter(event_type=AuditEventType.RECEPTION_CONFIRMED).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.RECEPTION_CONFIRMED
+    ).exists()
 
 
 @pytest.mark.django_db
@@ -326,7 +337,9 @@ def test_confirm_reception_partial_second_delivery_matches_pending_without_note(
     poi = PurchaseOrderItemFactory(
         purchase_order=po, product=product, quantity_ordered=20, quantity_received=5
     )
-    location = LocationFactory(name="Bodega Segunda Parcial", code="bodega-segunda-parcial")
+    location = LocationFactory(
+        name="Bodega Segunda Parcial", code="bodega-segunda-parcial"
+    )
     reception = create_reception(
         almacenista_user,
         po.id,
@@ -353,7 +366,9 @@ def test_confirm_reception_partial_second_delivery_matches_pending_without_note(
 def test_confirm_reception_discrepancy_requires_note(almacenista_user):
     po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
     product = ProductFactory()
-    poi = PurchaseOrderItemFactory(purchase_order=po, product=product, quantity_ordered=10)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=10
+    )
     location = LocationFactory(name="Bodega Disc", code="bodega-disc")
     reception = ReceptionFactory(
         purchase_order=po, destination_location=location, received_by=almacenista_user
@@ -376,7 +391,9 @@ def test_confirm_reception_is_atomic_on_error(almacenista_user, monkeypatch):
 
     po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
     product = ProductFactory()
-    poi = PurchaseOrderItemFactory(purchase_order=po, product=product, quantity_ordered=5)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=5
+    )
     location = LocationFactory(name="Bodega Atomic", code="bodega-atomic")
     reception = ReceptionFactory(
         purchase_order=po, destination_location=location, received_by=almacenista_user
@@ -395,7 +412,9 @@ def test_confirm_reception_is_atomic_on_error(almacenista_user, monkeypatch):
 
     reception.refresh_from_db()
     assert reception.status == ReceptionStatus.BORRADOR
-    assert not StockByLocation.objects.filter(product=product, location=location).exists()
+    assert not StockByLocation.objects.filter(
+        product=product, location=location
+    ).exists()
 
 
 @pytest.mark.django_db
@@ -412,7 +431,9 @@ def test_confirm_reception_unit_cost_flows_to_movement(almacenista_user):
     reception = ReceptionFactory(
         purchase_order=po, destination_location=location, received_by=almacenista_user
     )
-    ReceptionItemFactory(reception=reception, purchase_order_item=poi, quantity_received=5)
+    ReceptionItemFactory(
+        reception=reception, purchase_order_item=poi, quantity_received=5
+    )
 
     confirm_reception(almacenista_user, reception.id)
 
@@ -439,7 +460,9 @@ def test_cancel_reception_borrador(almacenista_user):
     cancel_reception(almacenista_user, reception.id)
     reception.refresh_from_db()
     assert reception.status == ReceptionStatus.CANCELADA
-    assert AuditLog.objects.filter(event_type=AuditEventType.RECEPTION_CANCELLED).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.RECEPTION_CANCELLED
+    ).exists()
 
 
 @pytest.mark.django_db

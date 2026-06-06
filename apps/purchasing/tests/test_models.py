@@ -25,7 +25,6 @@ from .factories import (
     SupplierFactory,
 )
 
-
 # ---------------------------------------------------------------------------
 # Supplier model tests
 # ---------------------------------------------------------------------------
@@ -59,6 +58,7 @@ def test_supplier_default_is_active():
 def test_supplier_uuid_pk():
     supplier = SupplierFactory()
     import uuid
+
     assert isinstance(supplier.id, uuid.UUID)
 
 
@@ -119,21 +119,27 @@ def test_purchase_order_number_unique():
 @pytest.mark.django_db
 def test_poi_quantity_pending_property():
     po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
-    poi = PurchaseOrderItemFactory(purchase_order=po, quantity_ordered=10, quantity_received=3)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, quantity_ordered=10, quantity_received=3
+    )
     assert poi.quantity_pending == 7
 
 
 @pytest.mark.django_db
 def test_poi_is_fully_received_true():
     po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
-    poi = PurchaseOrderItemFactory(purchase_order=po, quantity_ordered=5, quantity_received=5)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, quantity_ordered=5, quantity_received=5
+    )
     assert poi.is_fully_received is True
 
 
 @pytest.mark.django_db
 def test_poi_is_fully_received_false():
     po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
-    poi = PurchaseOrderItemFactory(purchase_order=po, quantity_ordered=5, quantity_received=3)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, quantity_ordered=5, quantity_received=3
+    )
     assert poi.is_fully_received is False
 
 
@@ -194,9 +200,13 @@ def test_reception_is_editable_only_borrador():
 @pytest.mark.django_db
 def test_reception_item_quantity_expected_property():
     po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
-    poi = PurchaseOrderItemFactory(purchase_order=po, quantity_ordered=8, quantity_received=2)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, quantity_ordered=8, quantity_received=2
+    )
     reception = ReceptionFactory(purchase_order=po)
-    item = ReceptionItemFactory(reception=reception, purchase_order_item=poi, quantity_received=3)
+    item = ReceptionItemFactory(
+        reception=reception, purchase_order_item=poi, quantity_received=3
+    )
     # quantity_expected = ordered - received_so_far = 8 - 2 = 6
     assert item.quantity_expected == 6
 
@@ -204,7 +214,9 @@ def test_reception_item_quantity_expected_property():
 @pytest.mark.django_db
 def test_reception_item_has_discrepancy_true():
     po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
-    poi = PurchaseOrderItemFactory(purchase_order=po, quantity_ordered=10, quantity_received=0)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, quantity_ordered=10, quantity_received=0
+    )
     reception = ReceptionFactory(purchase_order=po)
     item = ReceptionItemFactory(
         reception=reception,
@@ -218,7 +230,9 @@ def test_reception_item_has_discrepancy_true():
 @pytest.mark.django_db
 def test_reception_item_has_discrepancy_false_when_matches_ordered():
     po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
-    poi = PurchaseOrderItemFactory(purchase_order=po, quantity_ordered=10, quantity_received=0)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, quantity_ordered=10, quantity_received=0
+    )
     reception = ReceptionFactory(purchase_order=po)
     item = ReceptionItemFactory(
         reception=reception,

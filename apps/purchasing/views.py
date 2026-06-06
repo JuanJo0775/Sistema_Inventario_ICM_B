@@ -45,7 +45,9 @@ class SupplierListCreateView(APIView):
             return [p() for p in _PERMS_VIEWER]
         return [p() for p in _PERMS_OPERATOR]
 
-    @extend_schema(summary="Listar proveedores", responses={200: SupplierSerializer(many=True)})
+    @extend_schema(
+        summary="Listar proveedores", responses={200: SupplierSerializer(many=True)}
+    )
     def get(self, request):
         is_active_param = request.query_params.get("is_active")
         is_active = None
@@ -56,19 +58,28 @@ class SupplierListCreateView(APIView):
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(qs, request)
         if page is not None:
-            return paginator.get_paginated_response(SupplierSerializer(page, many=True).data)
+            return paginator.get_paginated_response(
+                SupplierSerializer(page, many=True).data
+            )
         return Response(SupplierSerializer(qs, many=True).data)
 
     @extend_schema(
         summary="Crear proveedor",
         request=SupplierWriteSerializer,
-        responses={201: SupplierSerializer, **standard_error_responses(include_422=True)},
+        responses={
+            201: SupplierSerializer,
+            **standard_error_responses(include_422=True),
+        },
     )
     def post(self, request):
         serializer = SupplierWriteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        supplier = services.create_supplier(request.user, serializer.validated_data, request=request)
-        return Response(SupplierSerializer(supplier).data, status=status.HTTP_201_CREATED)
+        supplier = services.create_supplier(
+            request.user, serializer.validated_data, request=request
+        )
+        return Response(
+            SupplierSerializer(supplier).data, status=status.HTTP_201_CREATED
+        )
 
 
 @extend_schema(tags=[TAG_PURCHASING])
@@ -86,23 +97,33 @@ class SupplierDetailView(APIView):
     @extend_schema(
         summary="Actualizar proveedor (completo)",
         request=SupplierWriteSerializer,
-        responses={200: SupplierSerializer, **standard_error_responses(include_422=True)},
+        responses={
+            200: SupplierSerializer,
+            **standard_error_responses(include_422=True),
+        },
     )
     def put(self, request, pk: UUID):
         serializer = SupplierWriteSerializer(data=request.data, partial=False)
         serializer.is_valid(raise_exception=True)
-        supplier = services.update_supplier(request.user, pk, serializer.validated_data, request=request)
+        supplier = services.update_supplier(
+            request.user, pk, serializer.validated_data, request=request
+        )
         return Response(SupplierSerializer(supplier).data)
 
     @extend_schema(
         summary="Actualizar proveedor (parcial)",
         request=SupplierWriteSerializer,
-        responses={200: SupplierSerializer, **standard_error_responses(include_422=True)},
+        responses={
+            200: SupplierSerializer,
+            **standard_error_responses(include_422=True),
+        },
     )
     def patch(self, request, pk: UUID):
         serializer = SupplierWriteSerializer(data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        supplier = services.update_supplier(request.user, pk, serializer.validated_data, request=request)
+        supplier = services.update_supplier(
+            request.user, pk, serializer.validated_data, request=request
+        )
         return Response(SupplierSerializer(supplier).data)
 
     @extend_schema(
@@ -173,12 +194,17 @@ class PurchaseOrderListCreateView(APIView):
     @extend_schema(
         summary="Crear orden de compra",
         request=PurchaseOrderCreateSerializer,
-        responses={201: PurchaseOrderSerializer, **standard_error_responses(include_422=True)},
+        responses={
+            201: PurchaseOrderSerializer,
+            **standard_error_responses(include_422=True),
+        },
     )
     def post(self, request):
         serializer = PurchaseOrderCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        po = services.create_purchase_order(request.user, serializer.validated_data, request=request)
+        po = services.create_purchase_order(
+            request.user, serializer.validated_data, request=request
+        )
         return Response(
             PurchaseOrderSerializer(selectors.get_purchase_order(po.id)).data,
             status=status.HTTP_201_CREATED,
@@ -200,24 +226,38 @@ class PurchaseOrderDetailView(APIView):
     @extend_schema(
         summary="Actualizar OC (completo, solo BORRADOR)",
         request=PurchaseOrderUpdateSerializer,
-        responses={200: PurchaseOrderSerializer, **standard_error_responses(include_405=True, include_422=True)},
+        responses={
+            200: PurchaseOrderSerializer,
+            **standard_error_responses(include_405=True, include_422=True),
+        },
     )
     def put(self, request, pk: UUID):
         serializer = PurchaseOrderUpdateSerializer(data=request.data, partial=False)
         serializer.is_valid(raise_exception=True)
-        po = services.update_purchase_order(request.user, pk, serializer.validated_data, request=request)
-        return Response(PurchaseOrderSerializer(selectors.get_purchase_order(po.id)).data)
+        po = services.update_purchase_order(
+            request.user, pk, serializer.validated_data, request=request
+        )
+        return Response(
+            PurchaseOrderSerializer(selectors.get_purchase_order(po.id)).data
+        )
 
     @extend_schema(
         summary="Actualizar OC (parcial, solo BORRADOR)",
         request=PurchaseOrderUpdateSerializer,
-        responses={200: PurchaseOrderSerializer, **standard_error_responses(include_405=True, include_422=True)},
+        responses={
+            200: PurchaseOrderSerializer,
+            **standard_error_responses(include_405=True, include_422=True),
+        },
     )
     def patch(self, request, pk: UUID):
         serializer = PurchaseOrderUpdateSerializer(data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        po = services.update_purchase_order(request.user, pk, serializer.validated_data, request=request)
-        return Response(PurchaseOrderSerializer(selectors.get_purchase_order(po.id)).data)
+        po = services.update_purchase_order(
+            request.user, pk, serializer.validated_data, request=request
+        )
+        return Response(
+            PurchaseOrderSerializer(selectors.get_purchase_order(po.id)).data
+        )
 
 
 @extend_schema(tags=[TAG_PURCHASING])
@@ -226,11 +266,16 @@ class PurchaseOrderConfirmView(APIView):
 
     @extend_schema(
         summary="Confirmar OC (BORRADOR → PENDIENTE)",
-        responses={200: PurchaseOrderSerializer, **standard_error_responses(include_422=True)},
+        responses={
+            200: PurchaseOrderSerializer,
+            **standard_error_responses(include_422=True),
+        },
     )
     def post(self, request, pk: UUID):
         po = services.confirm_purchase_order(request.user, pk, request=request)
-        return Response(PurchaseOrderSerializer(selectors.get_purchase_order(po.id)).data)
+        return Response(
+            PurchaseOrderSerializer(selectors.get_purchase_order(po.id)).data
+        )
 
 
 @extend_schema(tags=[TAG_PURCHASING])
@@ -240,7 +285,10 @@ class PurchaseOrderCancelView(APIView):
     @extend_schema(
         summary="Cancelar OC",
         request=POCancelSerializer,
-        responses={200: PurchaseOrderSerializer, **standard_error_responses(include_409=True, include_422=True)},
+        responses={
+            200: PurchaseOrderSerializer,
+            **standard_error_responses(include_409=True, include_422=True),
+        },
     )
     def post(self, request, pk: UUID):
         serializer = POCancelSerializer(data=request.data)
@@ -248,7 +296,9 @@ class PurchaseOrderCancelView(APIView):
         po = services.cancel_purchase_order(
             request.user, pk, serializer.validated_data["reason"], request=request
         )
-        return Response(PurchaseOrderSerializer(selectors.get_purchase_order(po.id)).data)
+        return Response(
+            PurchaseOrderSerializer(selectors.get_purchase_order(po.id)).data
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -285,7 +335,10 @@ class ReceptionListCreateView(APIView):
     @extend_schema(
         summary="Crear recepción en BORRADOR",
         request=ReceptionCreateSerializer,
-        responses={201: ReceptionSerializer, **standard_error_responses(include_409=True, include_422=True)},
+        responses={
+            201: ReceptionSerializer,
+            **standard_error_responses(include_409=True, include_422=True),
+        },
     )
     def post(self, request):
         serializer = ReceptionCreateSerializer(data=request.data)
@@ -332,7 +385,12 @@ class ReceptionConfirmView(APIView):
 
     @extend_schema(
         summary="Confirmar recepción (genera Movements de ENTRADA)",
-        responses={200: ReceptionSerializer, **standard_error_responses(include_405=True, include_409=True, include_422=True)},
+        responses={
+            200: ReceptionSerializer,
+            **standard_error_responses(
+                include_405=True, include_409=True, include_422=True
+            ),
+        },
     )
     def post(self, request, pk: UUID):
         reception = services.confirm_reception(request.user, pk, request=request)
@@ -345,7 +403,10 @@ class ReceptionCancelView(APIView):
 
     @extend_schema(
         summary="Cancelar recepción (solo BORRADOR)",
-        responses={200: ReceptionSerializer, **standard_error_responses(include_405=True)},
+        responses={
+            200: ReceptionSerializer,
+            **standard_error_responses(include_405=True),
+        },
     )
     def post(self, request, pk: UUID):
         reception = services.cancel_reception(request.user, pk, request=request)

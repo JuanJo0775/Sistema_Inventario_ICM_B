@@ -43,7 +43,6 @@ from .models import (
     Supplier,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers internos
 # ---------------------------------------------------------------------------
@@ -416,9 +415,7 @@ def create_reception(
 
 
 @transaction.atomic
-def confirm_reception(
-    executor, reception_id: uuid.UUID, *, request=None
-) -> Reception:
+def confirm_reception(executor, reception_id: uuid.UUID, *, request=None) -> Reception:
     """
     BORRADOR → CONFIRMADA.
 
@@ -430,9 +427,11 @@ def confirm_reception(
     5. Recalcula PurchaseOrder.status.
     6. Marca la recepción como CONFIRMADA.
     """
-    reception = Reception.objects.select_for_update().select_related(
-        "purchase_order", "destination_location", "received_by"
-    ).get(pk=reception_id)
+    reception = (
+        Reception.objects.select_for_update()
+        .select_related("purchase_order", "destination_location", "received_by")
+        .get(pk=reception_id)
+    )
 
     if reception.status != ReceptionStatus.BORRADOR:
         raise ReceptionNotInBorradorError()
@@ -440,11 +439,7 @@ def confirm_reception(
     # Lock PO para evitar condición de carrera con otras recepciones
     po = PurchaseOrder.objects.select_for_update().get(pk=reception.purchase_order_id)
 
-    items = list(
-        reception.items.select_related(
-            "purchase_order_item__product"
-        ).all()
-    )
+    items = list(reception.items.select_related("purchase_order_item__product").all())
 
     active_items = [item for item in items if item.quantity_received > 0]
     if not active_items:
@@ -462,6 +457,7 @@ def confirm_reception(
 
     # Validar ubicación operativa (BR-14)
     from shared.exceptions import LocationStateNotAllowedError
+
     location = reception.destination_location
     if location.operational_status not in ("active", "restricted"):
         raise LocationStateNotAllowedError(
@@ -523,9 +519,7 @@ def confirm_reception(
 
 
 @transaction.atomic
-def cancel_reception(
-    executor, reception_id: uuid.UUID, *, request=None
-) -> Reception:
+def cancel_reception(executor, reception_id: uuid.UUID, *, request=None) -> Reception:
     """Cancela una recepción en estado BORRADOR. No tiene efecto en inventario."""
     reception = Reception.objects.select_for_update().get(pk=reception_id)
 

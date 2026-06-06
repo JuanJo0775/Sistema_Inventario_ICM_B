@@ -4,14 +4,7 @@ from __future__ import annotations
 
 from rest_framework import serializers
 
-from .models import (
-    PurchaseOrder,
-    PurchaseOrderItem,
-    Reception,
-    ReceptionItem,
-    Supplier,
-)
-
+from .models import PurchaseOrder, PurchaseOrderItem, Reception, ReceptionItem, Supplier
 
 # ---------------------------------------------------------------------------
 # Supplier
@@ -163,7 +156,9 @@ class ReceptionItemSerializer(serializers.ModelSerializer):
         source="purchase_order_item.product.sku", read_only=True
     )
     quantity_expected = serializers.SerializerMethodField()
-    movement_id = serializers.UUIDField(source="movement.id", read_only=True, allow_null=True)
+    movement_id = serializers.UUIDField(
+        source="movement.id", read_only=True, allow_null=True
+    )
 
     class Meta:
         model = ReceptionItem
@@ -190,7 +185,9 @@ class ReceptionItemWriteSerializer(serializers.Serializer):
     quantity_received = serializers.IntegerField(min_value=0)
     lot_code = serializers.CharField(required=False, allow_blank=True, default="")
     lot_expiration_date = serializers.DateField(required=False, allow_null=True)
-    discrepancy_note = serializers.CharField(required=False, allow_blank=True, default="")
+    discrepancy_note = serializers.CharField(
+        required=False, allow_blank=True, default=""
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -199,9 +196,7 @@ class ReceptionItemWriteSerializer(serializers.Serializer):
 
 
 class ReceptionSerializer(serializers.ModelSerializer):
-    po_number = serializers.CharField(
-        source="purchase_order.number", read_only=True
-    )
+    po_number = serializers.CharField(source="purchase_order.number", read_only=True)
     supplier_nombre = serializers.CharField(
         source="purchase_order.supplier.nombre_comercial", read_only=True
     )

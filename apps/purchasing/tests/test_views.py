@@ -15,7 +15,6 @@ from .factories import (
     SupplierFactory,
 )
 
-
 # ---------------------------------------------------------------------------
 # Supplier endpoints
 # ---------------------------------------------------------------------------
@@ -137,7 +136,9 @@ def test_create_reception(authenticated_almacenista_client, almacenista_user):
         created_by=almacenista_user, status=PurchaseOrderStatus.PENDIENTE
     )
     product = ProductFactory()
-    poi = PurchaseOrderItemFactory(purchase_order=po, product=product, quantity_ordered=10)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=10
+    )
     location = LocationFactory(name="Bodega API", code="bodega-api")
 
     response = authenticated_almacenista_client.post(
@@ -162,7 +163,9 @@ def test_create_reception(authenticated_almacenista_client, almacenista_user):
 def test_confirm_reception_endpoint(authenticated_almacenista_client, almacenista_user):
     po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
     product = ProductFactory()
-    poi = PurchaseOrderItemFactory(purchase_order=po, product=product, quantity_ordered=5)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=5
+    )
     location = LocationFactory(name="Bodega Endpoint", code="bodega-endpoint")
     reception = ReceptionFactory(
         purchase_order=po, destination_location=location, received_by=almacenista_user

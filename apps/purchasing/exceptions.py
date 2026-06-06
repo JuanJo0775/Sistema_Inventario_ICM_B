@@ -2,8 +2,13 @@
 
 from __future__ import annotations
 
-from shared.exceptions import DomainValidationError, ICMBaseException, ImmutableRecordError
 from rest_framework import status
+
+from shared.exceptions import (
+    DomainValidationError,
+    ICMBaseException,
+    ImmutableRecordError,
+)
 
 
 class SupplierNITDuplicateError(DomainValidationError):
@@ -12,7 +17,9 @@ class SupplierNITDuplicateError(DomainValidationError):
 
 
 class SupplierInactiveError(DomainValidationError):
-    default_message = "El proveedor está inactivo y no puede asociarse a nuevas órdenes de compra."
+    default_message = (
+        "El proveedor está inactivo y no puede asociarse a nuevas órdenes de compra."
+    )
     default_code = "SUPPLIER_INACTIVE"
 
 
@@ -37,7 +44,9 @@ class POHasConfirmedReceptionsError(DomainValidationError):
 
 
 class POItemQuantityExceededError(DomainValidationError):
-    default_message = "La cantidad a recibir supera la cantidad pendiente del ítem de la OC."
+    default_message = (
+        "La cantidad a recibir supera la cantidad pendiente del ítem de la OC."
+    )
     default_code = "PO_ITEM_QUANTITY_EXCEEDED"
 
 
@@ -47,7 +56,9 @@ class ReceptionImmutableError(ImmutableRecordError):
 
 
 class ReceptionNotInBorradorError(DomainValidationError):
-    default_message = "Solo se pueden confirmar o cancelar recepciones en estado borrador."
+    default_message = (
+        "Solo se pueden confirmar o cancelar recepciones en estado borrador."
+    )
     default_code = "RECEPTION_NOT_IN_BORRADOR"
 
 
@@ -57,7 +68,9 @@ class ReceptionDiscrepancyNoteRequiredError(DomainValidationError):
 
 
 class ReceptionEmptyError(DomainValidationError):
-    default_message = "La recepción no tiene ítems con cantidad mayor a cero para confirmar."
+    default_message = (
+        "La recepción no tiene ítems con cantidad mayor a cero para confirmar."
+    )
     default_code = "RECEPTION_EMPTY"
 
 

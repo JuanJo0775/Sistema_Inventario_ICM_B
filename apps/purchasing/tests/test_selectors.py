@@ -22,7 +22,6 @@ from .factories import (
     SupplierFactory,
 )
 
-
 # ---------------------------------------------------------------------------
 # Supplier selectors
 # ---------------------------------------------------------------------------
@@ -65,7 +64,9 @@ def test_get_supplier_returns_correct_instance():
 @pytest.mark.django_db
 def test_get_supplier_raises_for_nonexistent():
     import uuid
+
     from django.core.exceptions import ObjectDoesNotExist
+
     with pytest.raises(ObjectDoesNotExist):
         get_supplier(uuid.uuid4())
 

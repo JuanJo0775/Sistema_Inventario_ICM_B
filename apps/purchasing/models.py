@@ -303,9 +303,7 @@ class ReceptionItem(BaseModel):
         ]
 
     def __str__(self) -> str:
-        return (
-            f"ReceptionItem {self.id} qty={self.quantity_received}"
-        )
+        return f"ReceptionItem {self.id} qty={self.quantity_received}"
 
     @property
     def quantity_expected(self) -> int:
