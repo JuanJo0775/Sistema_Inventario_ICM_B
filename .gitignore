@@ -42,3 +42,11 @@ htmlcov/
 # IDEs
 .vscode/
 .idea/
+
+# Claude Code
+CLAUDE.md
+.claude/
+
+# Graphify
+graphify-out/
+.graphifyignore

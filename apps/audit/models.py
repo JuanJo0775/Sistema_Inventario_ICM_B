@@ -65,6 +65,17 @@ class AuditEventType(models.TextChoices):
         "DISPATCH_WITH_PRICE_COMPLETED",
         "Despacho con precio completado",
     )
+    # Módulo de compras (Proveedores, OC, Recepción)
+    SUPPLIER_CREATED = "SUPPLIER_CREATED", "Proveedor creado"
+    SUPPLIER_UPDATED = "SUPPLIER_UPDATED", "Proveedor actualizado"
+    SUPPLIER_DEACTIVATED = "SUPPLIER_DEACTIVATED", "Proveedor desactivado"
+    SUPPLIER_ACTIVATED = "SUPPLIER_ACTIVATED", "Proveedor reactivado"
+    PURCHASE_ORDER_CREATED = "PURCHASE_ORDER_CREATED", "Orden de compra creada"
+    PURCHASE_ORDER_CONFIRMED = "PURCHASE_ORDER_CONFIRMED", "Orden de compra confirmada"
+    PURCHASE_ORDER_CANCELLED = "PURCHASE_ORDER_CANCELLED", "Orden de compra cancelada"
+    RECEPTION_CREATED = "RECEPTION_CREATED", "Recepción de mercancía creada"
+    RECEPTION_CONFIRMED = "RECEPTION_CONFIRMED", "Recepción de mercancía confirmada"
+    RECEPTION_CANCELLED = "RECEPTION_CANCELLED", "Recepción de mercancía cancelada"
 
 
 class AuditLog(models.Model):

@@ -396,6 +396,7 @@ def register_entry(
     discrepancy_note: str | None = None,
     cold_chain_acknowledged: bool = False,
     electrical_safety_acknowledged: bool = False,
+    unit_cost: "Any | None" = None,
 ) -> Movement:
     """
     RF-005 — Entrada de mercancía.
@@ -465,6 +466,7 @@ def register_entry(
         quantity_invoiced=qty_invoiced,
         discrepancy_note=discrepancy_note,
         executed_by=user,
+        unit_cost=unit_cost,
     )
     log_event(
         AuditEventType.MOVEMENT_CREATED,

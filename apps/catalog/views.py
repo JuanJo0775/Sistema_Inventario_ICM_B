@@ -589,7 +589,11 @@ class SubcategoryRestoreView(APIView):
     ),
     put=extend_schema(
         summary="Actualizar combo",
-        description="Reemplaza los datos de un combo. Si se envían `items`, reemplaza toda la lista de componentes.",
+        description=(
+            "Reemplaza los datos de un combo. "
+            "Si se envían `items`, los ComboItems anteriores son **eliminados permanentemente** "
+            "de la base de datos (hard delete) y reemplazados por los nuevos."
+        ),
         request=ComboUpdateSerializer,
         tags=[TAG_CATALOG],
         responses={
@@ -599,7 +603,11 @@ class SubcategoryRestoreView(APIView):
     ),
     patch=extend_schema(
         summary="Actualizar combo parcialmente",
-        description="Actualiza solo los campos enviados. Si se envían `items`, reemplaza toda la lista.",
+        description=(
+            "Actualiza solo los campos enviados. "
+            "Si se envían `items`, los ComboItems anteriores son **eliminados permanentemente** "
+            "de la base de datos (hard delete) y reemplazados por los nuevos."
+        ),
         request=ComboUpdateSerializer,
         tags=[TAG_CATALOG],
         responses={

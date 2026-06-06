@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "apps.catalog",
     "apps.inventory",
     "apps.movements",
+    "apps.purchasing",
     "apps.dashboard",
     "apps.reports",
     "apps.alerts",

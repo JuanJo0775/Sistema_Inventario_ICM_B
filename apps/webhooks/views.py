@@ -73,7 +73,7 @@ class WebhookEndpointListCreateView(APIView):
 
 
 class WebhookEndpointDetailView(APIView):
-    """GET/PATCH/DELETE — Detalle de un endpoint de webhook."""
+    """GET/PUT/PATCH/DELETE — Detalle de un endpoint de webhook."""
 
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
