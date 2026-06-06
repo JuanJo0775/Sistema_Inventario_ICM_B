@@ -5319,3 +5319,472 @@ Implementaciones concretas (cuando existan) pueden delegarse en módulos bajo `t
 ## Estado de automatización backend
 
 Pendiente en backend: al ejecutar el test dinámico se aplicará `pytest.skip` con el motivo hasta que exista implementación.
+
+---
+
+<!-- ============================================================ -->
+<!-- MÓDULO DE COMPRAS: RF-019 a RF-025 (Anexo A del ERS) -->
+<!-- ============================================================ -->
+
+<!-- file: RF019-S01.md -->
+
+# RF-019 Scenario 1: Creación de proveedor con NIT único
+
+## Nombre del test
+
+`apps/purchasing/tests/test_views.py::test_create_supplier_almacenista`
+
+## Propósito
+
+Validar RF-019 — el sistema crea un proveedor con NIT único y registra auditoría.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF-019` (ver `docs/requisitos/ERS_ICM_Requisitos.md` Anexo A).
+- **Reglas de negocio:** BR-01, BR-018.
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Almacenista autenticado
+- No existe proveedor con NIT "900123456-1"
+
+**When (Cuando):**
+- POST /api/v1/purchasing/suppliers/ con nombre_comercial, razon_social, nit="900123456-1"
+
+## Resultado esperado (Then)
+
+- HTTP 201 con datos del proveedor (UUID, is_active=True)
+- AuditLog con evento SUPPLIER_CREATED
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_create_supplier_valid -v
+pytest apps/purchasing/tests/test_views.py::test_create_supplier_almacenista -v
+```
+
+## Estado de automatización backend
+
+Implementada en `apps/purchasing/tests/test_services.py::test_create_supplier_valid` y `test_views.py::test_create_supplier_almacenista`.
+
+---
+
+<!-- file: RF019-S02.md -->
+
+# RF-019 Scenario 2: NIT duplicado es rechazado
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_create_supplier_duplicate_nit_raises`
+
+## Propósito
+
+Validar BR-018: el sistema rechaza la creación de un proveedor con NIT ya registrado.
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe proveedor con nit="900000001-1"
+
+**When (Cuando):**
+- Almacenista intenta crear otro proveedor con el mismo NIT
+
+## Resultado esperado (Then)
+
+- SupplierNITDuplicateError (HTTP 422 en el endpoint)
+- No se crea ningún proveedor adicional
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_create_supplier_duplicate_nit_raises -v
+```
+
+## Estado de automatización backend
+
+Implementada en `apps/purchasing/tests/test_services.py`.
+
+---
+
+<!-- file: RF019-S04.md -->
+
+# RF-019 Scenario 4: Solo Almacenista puede gestionar proveedores (RBAC)
+
+## Nombre del test
+
+`apps/purchasing/tests/test_views.py::test_create_supplier_forbidden_auxiliar`
+
+## Propósito
+
+Validar RBAC: Auxiliar y Administrador reciben HTTP 403 al intentar crear proveedores.
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Usuario con rol Auxiliar o Administrador autenticado
+
+**When (Cuando):**
+- POST /api/v1/purchasing/suppliers/
+
+## Resultado esperado (Then)
+
+- HTTP 403 Forbidden
+- No se crea ningún proveedor
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_views.py::test_create_supplier_forbidden_auxiliar -v
+pytest apps/purchasing/tests/test_views.py::test_create_supplier_forbidden_administrador -v
+```
+
+## Estado de automatización backend
+
+Implementada en `apps/purchasing/tests/test_views.py`.
+
+---
+
+<!-- file: RF020-S01.md -->
+
+# RF-020 Scenario 1: Creación de OC en estado BORRADOR
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_create_purchase_order`
+
+## Propósito
+
+Validar RF-020 — creación de Orden de Compra con número secuencial único y estado inicial BORRADOR.
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Almacenista autenticado, proveedor activo, producto en catálogo
+
+**When (Cuando):**
+- POST /api/v1/purchasing/purchase-orders/ con supplier_id, ítems con product_id, quantity_ordered, unit_cost
+
+## Resultado esperado (Then)
+
+- HTTP 201, status="borrador", number comienza con "OC-"
+- AuditLog con PURCHASE_ORDER_CREATED
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_create_purchase_order -v
+pytest apps/purchasing/tests/test_views.py::test_create_purchase_order -v
+```
+
+## Estado de automatización backend
+
+Implementada.
+
+---
+
+<!-- file: RF020-S02.md -->
+
+# RF-020 Scenario 2: Confirmación de OC (BORRADOR → PENDIENTE)
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_confirm_po_changes_status`
+
+## Propósito
+
+Validar que la confirmación de una OC transiciona el estado a PENDIENTE con registro de auditoría.
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- OC en estado BORRADOR con al menos un ítem
+
+**When (Cuando):**
+- POST /api/v1/purchasing/purchase-orders/{id}/confirm/
+
+## Resultado esperado (Then)
+
+- Status PENDIENTE, confirmed_by registrado, AuditLog con PURCHASE_ORDER_CONFIRMED
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_confirm_po_changes_status -v
+pytest apps/purchasing/tests/test_views.py::test_confirm_purchase_order -v
+```
+
+## Estado de automatización backend
+
+Implementada.
+
+---
+
+<!-- file: RF020-S04.md -->
+
+# RF-020 Scenario 4: Cancelación de OC bloqueada si tiene recepciones confirmadas
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_cancel_po_with_confirmed_reception_raises`
+
+## Propósito
+
+Validar BR-020: no se puede cancelar una OC con recepciones en estado CONFIRMADA.
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- OC en PENDIENTE con al menos una recepción en estado CONFIRMADA
+
+**When (Cuando):**
+- POST /api/v1/purchasing/purchase-orders/{id}/cancel/ con razón
+
+## Resultado esperado (Then)
+
+- POHasConfirmedReceptionsError (HTTP 409)
+- OC permanece en su estado sin cambios
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_cancel_po_with_confirmed_reception_raises -v
+```
+
+## Estado de automatización backend
+
+Implementada.
+
+---
+
+<!-- file: RF022-S01.md -->
+
+# RF-022 Scenario 1: Confirmación exitosa genera Movements y actualiza stock
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_confirm_reception_creates_movements_and_updates_stock`
+
+## Propósito
+
+Validar RF-022 — la confirmación de una recepción genera Movements de ENTRADA y actualiza StockByLocation de forma atómica. BR-021: unit_cost congelado en Movement.
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Recepción en BORRADOR con 10 unidades de un producto en una ubicación activa
+- PurchaseOrderItem.unit_cost = 15000
+
+**When (Cuando):**
+- POST /api/v1/purchasing/receptions/{id}/confirm/
+
+## Resultado esperado (Then)
+
+- Movement ENTRADA creado con quantity=10
+- StockByLocation incrementa en 10
+- Movement.unit_cost == 15000 (snapshot del costo de compra)
+- Recepción pasa a CONFIRMADA
+- AuditLog con RECEPTION_CONFIRMED
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_confirm_reception_creates_movements_and_updates_stock -v
+pytest apps/purchasing/tests/test_views.py::test_confirm_reception_endpoint -v
+```
+
+## Estado de automatización backend
+
+Implementada. Movement.unit_cost se verifica en test_services.py.
+
+---
+
+<!-- file: RF022-S03.md -->
+
+# RF-022 Scenario 3: Recepción parcial marca OC como PARCIALMENTE_RECIBIDA
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_confirm_reception_partial_marks_po_partial`
+
+## Propósito
+
+Validar que confirmar una recepción que no cubre el total de la OC la deja en PARCIALMENTE_RECIBIDA.
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- OC con 20 unidades en PENDIENTE; recepción en BORRADOR con 5 unidades
+
+**When (Cuando):**
+- Almacenista confirma la recepción
+
+## Resultado esperado (Then)
+
+- OC pasa a PARCIALMENTE_RECIBIDA (no COMPLETADA)
+- Es posible crear nuevas recepciones para las unidades restantes
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_confirm_reception_partial_marks_po_partial -v
+```
+
+## Estado de automatización backend
+
+Implementada.
+
+---
+
+<!-- file: RF022-S04.md -->
+
+# RF-022 Scenario 4: Error en Movement revierte toda la recepción (atomicidad)
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_confirm_reception_is_atomic_on_error`
+
+## Propósito
+
+Validar la atomicidad de confirm_reception: si register_entry() falla, el rollback es total (BR-010, BR-011).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Recepción en BORRADOR con ítems
+- register_entry() falla con RuntimeError (simulado con monkeypatch)
+
+**When (Cuando):**
+- Almacenista intenta confirmar la recepción
+
+## Resultado esperado (Then)
+
+- Ningún Movement creado
+- StockByLocation no modificado
+- Recepción permanece en BORRADOR
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_confirm_reception_is_atomic_on_error -v
+```
+
+## Estado de automatización backend
+
+Implementada con monkeypatch de `movements.services.register_entry`.
+
+---
+
+<!-- file: RF022-S05.md -->
+
+# RF-022 Scenario 5: Discrepancia sin nota es rechazada
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_confirm_reception_discrepancy_requires_note`
+
+## Propósito
+
+Validar BR-009 en el contexto de purchasing: si quantity_received ≠ quantity_ordered y falta discrepancy_note, se rechaza.
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Recepción en BORRADOR con ítem donde quantity_received=7, quantity_ordered=10, discrepancy_note=""
+
+**When (Cuando):**
+- Almacenista intenta confirmar
+
+## Resultado esperado (Then)
+
+- ReceptionDiscrepancyNoteRequiredError (HTTP 422)
+- No se generan Movements
+- Recepción permanece en BORRADOR
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_confirm_reception_discrepancy_requires_note -v
+```
+
+## Estado de automatización backend
+
+Implementada.
+
+---
+
+<!-- file: RF023-S02.md -->
+
+# RF-023 Scenario 2: No se puede cancelar recepción CONFIRMADA
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_cancel_confirmed_reception_raises`
+
+## Propósito
+
+Validar BR-010: una recepción CONFIRMADA es inmutable, no puede cancelarse.
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Recepción en estado CONFIRMADA
+
+**When (Cuando):**
+- Almacenista intenta cancelarla
+
+## Resultado esperado (Then)
+
+- ReceptionNotInBorradorError (HTTP 422)
+- Recepción permanece CONFIRMADA, stock no cambia
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_cancel_confirmed_reception_raises -v
+```
+
+## Estado de automatización backend
+
+Implementada.
+
+---
+
+<!-- file: RF025-S02.md -->
+
+# RF-025 Scenario 2: Administrador tiene solo lectura en módulo de compras
+
+## Nombre del test
+
+`apps/purchasing/tests/test_views.py::test_list_receptions_administrador_can_view`
+
+## Propósito
+
+Validar RBAC del módulo de compras: Administrador puede consultar pero no ejecutar operaciones de escritura.
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Usuario con rol Administrador autenticado
+
+**When (Cuando — lectura):**
+- GET /api/v1/purchasing/receptions/
+
+**When (Cuando — escritura):**
+- POST /api/v1/purchasing/receptions/{id}/confirm/
+
+## Resultado esperado (Then)
+
+- GET: HTTP 200
+- POST: HTTP 403
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_views.py::test_list_receptions_administrador_can_view -v
+pytest apps/purchasing/tests/test_views.py::test_confirm_reception_forbidden_administrador -v
+```
+
+## Estado de automatización backend
+
+Implementada en `apps/purchasing/tests/test_views.py`.

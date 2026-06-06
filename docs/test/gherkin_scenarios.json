@@ -1312,7 +1312,295 @@
     "rf": "RNF006",
     "scenario_number": 3,
     "title": "El equipo documenta la autorización de ICM antes de usar datos reales en pruebas",
-    "given_when_then": "**Given (Dado que):**\n- El equipo de desarrollo va a ejecutar pruebas de aceptación usando datos operativos reales de ICM en el Corte 3\n\n**When (Cuando):**\n- Se planifica la fase de pruebas de aceptación\n\n**Then (Entonces):**\n- El equipo debe contar con un documento de autorización expresa firmado por ICM que permita el uso de sus datos operativos en el contexto académico del proyecto\n- Las pruebas con datos reales no deben ejecutarse hasta que esa autorización esté formalmente obtenida\n\n# **7. Resumen de Trazabilidad Requisitos — Módulos**\n\nLa siguiente tabla presenta un resumen de todos los requisitos especificados en este documento, con su módulo de pertenencia y las reglas de negocio que les aplican directamente. Esta tabla constituye el punto de partida para la Matriz de Trazabilidad Requisitos-Pruebas que debe ser elaborada por la asignatura de Pruebas de Software como entregable del Corte 1.\n\n| **ID** | **Nombre** | **Módulo** | **Reglas de Negocio** |\n| --- | --- | --- | --- |\n| RF-001 | Inicio de Sesión con Credenciales Únicas | Autenticación | BR-01, BR-03 |\n| RF-002 | Gestión de Credenciales de Usuario | Autenticación | BR-01, BR-02 |\n| RF-003 | Registro de Producto en el Catálogo (SKU) | Gestión de Inventario | BR-04, BR-11, BR-12, BR-13 |\n| RF-004 | Consulta y Búsqueda de Inventario en Tiempo Real | Gestión de Inventario | BR-11, BR-13, BR-14, BR-15 |\n| RF-005 | Recepción de Mercancía | Recepción de Mercancía | BR-04, BR-09, BR-10, BR-11, BR-13, BR-14 |\n| RF-006 | Despacho y Salidas de Inventario | Despacho y Salidas | BR-08, BR-10, BR-11, BR-13, BR-14 |\n| RF-007 | Movimientos Internos entre Ubicaciones | Movimientos Internos | BR-06, BR-10, BR-11, BR-14 |\n| RF-008 | Registro de Devoluciones de Productos | Devoluciones | BR-02, BR-05, BR-10, BR-14 |\n| RF-009 | Ajustes de Inventario | Ajustes de Inventario | BR-06, BR-07, BR-10, BR-11, BR-14 |\n| RF-010 | Reportes e Indicadores Operativos | Reportes e Indicadores | BR-10, BR-11, BR-13 |\n| RF-011 | Alertas Proactivas del Sistema | Alertas Proactivas | BR-04, BR-10, BR-11 |\n| RF-012 | Log de Auditoría y Trazabilidad | Auditoría y Trazabilidad | BR-01, BR-06, BR-07, BR-10 |\n| RF-013 | Precios y Facturación Comercial | Precios y Facturación | BR-13, BR-16, BR-17 |\n| RNF-001 | Usabilidad e Interfaz Intuitiva | Transversal | — |\n| RNF-002 | Disponibilidad del Sistema | Transversal | BR-03 |\n| RNF-003 | Seguridad e Integridad de Datos | Transversal | BR-01, BR-02, BR-10 |\n| RNF-004 | Rendimiento en Consultas y Operaciones | Transversal | — |\n| RNF-005 | Mantenibilidad y Estándares Técnicos | Transversal | — |\n| RNF-006 | Cumplimiento Legal: Ley 1581 de 2012 | Transversal | — |\n\n# **8. Conclusiones**\n\nEl presente documento centraliza la especificación completa de dieciocho requisitos —doce funcionales y seis no funcionales— para el sistema de gestión de inventario y operaciones de Import Corporal Medical. Cada requisito ha sido elaborado a partir de la información recogida durante el proceso de elicitación con los responsables operativos de ICM y alineado con las condiciones académicas del Proyecto Nuclear 3.\n\nLos requisitos funcionales cubren la totalidad de los módulos identificados en la elicitación: autenticación y gestión de credenciales, gestión de inventario, recepción de mercancía, despacho y salidas, movimientos internos, devoluciones, ajustes de inventario, reportes e indicadores, alertas proactivas y auditoría. Los requisitos no funcionales complementan esta especificación con atributos de calidad medibles en usabilidad, disponibilidad, seguridad, rendimiento, mantenibilidad y cumplimiento legal.\n\nLa redacción de los criterios de aceptación en formato Gherkin responde a una decisión deliberada orientada a facilitar el trabajo de la asignatura de Pruebas de Software: cada escenario puede ser convertido directamente en un caso de prueba sin necesidad de reinterpretación, lo que reduce el margen de error entre lo que el sistema debe hacer y lo que efectivamente se verifica en las fases de prueba.\n\nEste documento debe ser considerado un artefacto vivo durante el desarrollo del proyecto: cualquier cambio en los requisitos acordado con el cliente funcional (estudiantes de Ingeniería Industrial) debe quedar registrado mediante una nueva versión del documento, garantizando la trazabilidad de los cambios a lo largo de los tres cortes académicos del período I-2026.\n\n# **9. Referencias Bibliográficas**\n\n* [1] Pressman, R. S. y Maxim, B. R. (2021). Ingeniería del software: Un enfoque práctico (9.ª ed.). McGraw-Hill.\n* [2] Bass, L., Clements, P. y Kazman, R. (2021). Software Architecture in Practice (4.ª ed.). Addison-Wesley.\n* [3] Myers, G. J., Sandler, C. y Badgett, T. (2011). The Art of Software Testing (3.ª ed.). Wiley.\n* [4] Ballou, R. H. (2004). Logística: Administración de la cadena de suministro (5.ª ed.). Pearson Educación.\n* [5] Schwaber, K. y Sutherland, J. (2020). La Guía Scrum. Recuperado de https://scrumguides.org\n* [6] Congreso de Colombia. (2012). Ley 1581 de 2012 — Protección de Datos Personales. Diario Oficial.\n* [7] IEEE. (1998). IEEE Std 830-1998: IEEE Recommended Practice for Software Requirements Specifications. Institute of Electrical and Electronics Engineers.",
+    "given_when_then": "**Given (Dado que):**\n- El equipo de desarrollo va a ejecutar pruebas de aceptación usando datos operativos reales de ICM en el Corte 3\n\n**When (Cuando):**\n- Se planifica la fase de pruebas de aceptación\n\n**Then (Entonces):**\n- El equipo debe contar con un documento de autorización expresa firmado por ICM que permita el uso de sus datos operativos en el contexto académico del proyecto\n- Las pruebas con datos reales no deben ejecutarse hasta que esa autorización esté formalmente obtenida\n\n# **7. Resumen de Trazabilidad Requisitos — Módulos**\n\nLa siguiente tabla presenta un resumen de todos los requisitos especificados en este documento, con su módulo de pertenencia y las reglas de negocio que les aplican directamente. Esta tabla constituye el punto de partida para la Matriz de Trazabilidad Requisitos-Pruebas que debe ser elaborada por la asignatura de Pruebas de Software como entregable del Corte 1.\n\n| **ID** | **Nombre** | **Módulo** | **Reglas de Negocio** |\n| --- | --- | --- | --- |\n| RF-001 | Inicio de Sesión con Credenciales Únicas | Autenticación | BR-01, BR-03 |\n| RF-002 | Gestión de Credenciales de Usuario | Autenticación | BR-01, BR-02 |\n| RF-003 | Registro de Producto en el Catálogo (SKU) | Gestión de Inventario | BR-04, BR-11, BR-12, BR-13 |\n| RF-004 | Consulta y Búsqueda de Inventario en Tiempo Real | Gestión de Inventario | BR-11, BR-13, BR-14, BR-15 |\n| RF-005 | Recepción de Mercancía | Recepción de Mercancía | BR-04, BR-09, BR-10, BR-11, BR-13, BR-14 |\n| RF-006 | Despacho y Salidas de Inventario | Despacho y Salidas | BR-08, BR-10, BR-11, BR-13, BR-14 |\n| RF-007 | Movimientos Internos entre Ubicaciones | Movimientos Internos | BR-06, BR-10, BR-11, BR-14 |\n| RF-008 | Registro de Devoluciones de Productos | Devoluciones | BR-02, BR-05, BR-10, BR-14 |\n| RF-009 | Ajustes de Inventario | Ajustes de Inventario | BR-06, BR-07, BR-10, BR-11, BR-14 |\n| RF-010 | Reportes e Indicadores Operativos | Reportes e Indicadores | BR-10, BR-11, BR-13 |\n| RF-011 | Alertas Proactivas del Sistema | Alertas Proactivas | BR-04, BR-10, BR-11 |\n| RF-012 | Log de Auditoría y Trazabilidad | Auditoría y Trazabilidad | BR-01, BR-06, BR-07, BR-10 |\n| RF-013 | Precios y Facturación Comercial | Precios y Facturación | BR-13, BR-16, BR-17 |\n| RNF-001 | Usabilidad e Interfaz Intuitiva | Transversal | — |\n| RNF-002 | Disponibilidad del Sistema | Transversal | BR-03 |\n| RNF-003 | Seguridad e Integridad de Datos | Transversal | BR-01, BR-02, BR-10 |\n| RNF-004 | Rendimiento en Consultas y Operaciones | Transversal | — |\n| RNF-005 | Mantenibilidad y Estándares Técnicos | Transversal | — |\n| RNF-006 | Cumplimiento Legal: Ley 1581 de 2012 | Transversal | — |\n\n# **8. Conclusiones**\n\nEl presente documento centraliza la especificación completa de dieciocho requisitos —doce funcionales y seis no funcionales— para el sistema de gestión de inventario y operaciones de Import Corporal Medical. Cada requisito ha sido elaborado a partir de la información recogida durante el proceso de elicitación con los responsables operativos de ICM y alineado con las condiciones académicas del Proyecto Nuclear 3.\n\nLos requisitos funcionales cubren la totalidad de los módulos identificados en la elicitación: autenticación y gestión de credenciales, gestión de inventario, recepción de mercancía, despacho y salidas, movimientos internos, devoluciones, ajustes de inventario, reportes e indicadores, alertas proactivas y auditoría. Los requisitos no funcionales complementan esta especificación con atributos de calidad medibles en usabilidad, disponibilidad, seguridad, rendimiento, mantenibilidad y cumplimiento legal.\n\nLa redacción de los criterios de aceptación en formato Gherkin responde a una decisión deliberada orientada a facilitar el trabajo de la asignatura de Pruebas de Software: cada escenario puede ser convertido directamente en un caso de prueba sin necesidad de reinterpretación, lo que reduce el margen de error entre lo que el sistema debe hacer y lo que efectivamente se verifica en las fases de prueba.\n\nEste documento debe ser considerado un artefacto vivo durante el desarrollo del proyecto: cualquier cambio en los requisitos acordado con el cliente funcional (estudiantes de Ingeniería Industrial) debe quedar registrado mediante una nueva versión del documento, garantizando la trazabilidad de los cambios a lo largo de los tres cortes académicos del período I-2026.\n\n# **9. Referencias Bibliográficas**\n\n* [1] Pressman, R. S. y Maxim, B. R. (2021). Ingeniería del software: Un enfoque práctico (9.ª ed.). McGraw-Hill.\n* [2] Bass, L., Clements, P. y Kazman, R. (2021). Software Architecture in Practice (4.ª ed.). Addison-Wesley.\n* [3] Myers, G. J., Sandler, C. y Badgett, T. (2011). The Art of Software Testing (3.ª ed.). Wiley.\n* [4] Ballou, R. H. (2004). Logística: Administración de la cadena de suministro (5.ª ed.). Pearson Educación.\n* [5] Schwaber, K. y Sutherland, J. (2020). La Guía Scrum. Recuperado de https://scrumguides.org\n* [6] Congreso de Colombia. (2012). Ley 1581 de 2012 — Protección de Datos Personales. Diario Oficial.\n* [7] IEEE. (1998). IEEE Std 830-1998: IEEE Recommended Practice for Software Requirements Specifications. Institute of Electrical and Electronics Engineers.\n\n---\n\n# **Anexo A: Módulo de Compras y Abastecimiento (RF-019 a RF-025)**\n\n*Versión 1.1 — Junio 2026. Estos requisitos amplían el alcance del ERS original para cubrir el ciclo completo de abastecimiento: Proveedor → Orden de Compra → Recepción → Movimiento de Entrada → Inventario. Su implementación no modifica ningún requisito existente (RF-001 a RF-013).*\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF019-S01",
+    "rf": "RF019",
+    "scenario_number": 1,
+    "title": "Creación de proveedor con NIT único",
+    "given_when_then": "**Given (Dado que):**\n- El Almacenista está autenticado en el sistema\n- No existe ningún proveedor con NIT \"900123456-1\"\n\n**When (Cuando):**\n- Envía POST /api/v1/purchasing/suppliers/ con nombre_comercial, razon_social y nit=\"900123456-1\"\n\n**Then (Entonces):**\n- El sistema crea el proveedor con estado is_active=True\n- Retorna HTTP 201 con los datos del proveedor incluyendo su UUID\n- Queda registrado un evento SUPPLIER_CREATED en el log de auditoría\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF019-S02",
+    "rf": "RF019",
+    "scenario_number": 2,
+    "title": "Intento de crear proveedor con NIT duplicado",
+    "given_when_then": "**Given (Dado que):**\n- Ya existe un proveedor con nit=\"900123456-1\"\n\n**When (Cuando):**\n- El Almacenista intenta crear otro proveedor con el mismo NIT\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- El log de auditoría no registra ningún evento SUPPLIER_CREATED\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF019-S03",
+    "rf": "RF019",
+    "scenario_number": 3,
+    "title": "Desactivación de proveedor",
+    "given_when_then": "**Given (Dado que):**\n- Existe un proveedor activo con OC en estado PENDIENTE\n\n**When (Cuando):**\n- El Almacenista desactiva el proveedor\n\n**Then (Entonces):**\n- El proveedor queda con is_active=False\n- Las OC existentes en estado PENDIENTE no se cancelan automáticamente\n- Nuevas OC con ese proveedor son rechazadas por el sistema\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF019-S04",
+    "rf": "RF019",
+    "scenario_number": 4,
+    "title": "Solo el Almacenista puede gestionar proveedores",
+    "given_when_then": "**Given (Dado que):**\n- Un usuario con rol Auxiliar de Despacho o Administrador está autenticado\n\n**When (Cuando):**\n- Intenta crear, actualizar o desactivar un proveedor\n\n**Then (Entonces):**\n- El sistema responde con HTTP 403 (Forbidden)\n- No se realiza ningún cambio en la base de datos\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF020-S01",
+    "rf": "RF020",
+    "scenario_number": 1,
+    "title": "Creación de OC en estado BORRADOR",
+    "given_when_then": "**Given (Dado que):**\n- El Almacenista está autenticado\n- Existe un proveedor activo y un producto en el catálogo\n\n**When (Cuando):**\n- Envía POST /api/v1/purchasing/purchase-orders/ con supplier_id y un ítem con product_id, quantity_ordered=10, unit_cost=15000\n\n**Then (Entonces):**\n- El sistema crea la OC con status=\"borrador\" y número OC-XXXX único\n- Retorna HTTP 201 con la OC y sus ítems\n- El log de auditoría registra PURCHASE_ORDER_CREATED\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF020-S02",
+    "rf": "RF020",
+    "scenario_number": 2,
+    "title": "Confirmación de OC (BORRADOR → PENDIENTE)",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC en estado BORRADOR con al menos un ítem\n\n**When (Cuando):**\n- El Almacenista confirma la OC mediante POST /api/v1/purchasing/purchase-orders/{id}/confirm/\n\n**Then (Entonces):**\n- La OC pasa a estado PENDIENTE\n- El campo confirmed_by queda registrado con el UserID del ejecutor\n- El log de auditoría registra PURCHASE_ORDER_CONFIRMED\n- La OC ya no puede ser editada (intentos de PATCH retornan HTTP 422)\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF020-S03",
+    "rf": "RF020",
+    "scenario_number": 3,
+    "title": "Cancelación de OC sin recepciones confirmadas",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC en estado BORRADOR o PENDIENTE sin recepciones confirmadas\n\n**When (Cuando):**\n- El Almacenista cancela la OC con una razón de cancelación\n\n**Then (Entonces):**\n- La OC pasa a estado CANCELADA con la razón registrada\n- El log de auditoría registra PURCHASE_ORDER_CANCELLED\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF020-S04",
+    "rf": "RF020",
+    "scenario_number": 4,
+    "title": "Intento de cancelar OC con recepciones confirmadas",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC en estado PENDIENTE con al menos una recepción en estado CONFIRMADA\n\n**When (Cuando):**\n- El Almacenista intenta cancelar la OC\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 409 (Conflict)\n- La OC permanece en su estado actual sin cambios\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF020-S05",
+    "rf": "RF020",
+    "scenario_number": 5,
+    "title": "Cancelación sin razón explícita es rechazada",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC cancelable\n\n**When (Cuando):**\n- El Almacenista intenta cancelar la OC sin proporcionar una razón (campo reason vacío)\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- La OC no cambia de estado\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF021-S01",
+    "rf": "RF021",
+    "scenario_number": 1,
+    "title": "Recepción parcial de una OC",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC en estado PENDIENTE con un ítem de 20 unidades y 0 recibidas\n\n**When (Cuando):**\n- El Almacenista crea una recepción con 10 unidades para ese ítem en una ubicación activa\n\n**Then (Entonces):**\n- El sistema crea la recepción en estado BORRADOR\n- El log de auditoría registra RECEPTION_CREATED\n- La OC sigue en estado PENDIENTE (no cambia hasta confirmar la recepción)\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF021-S02",
+    "rf": "RF021",
+    "scenario_number": 2,
+    "title": "Recepción que supera la cantidad pendiente es rechazada",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC con un ítem de 5 unidades ordenadas y 3 ya recibidas (2 pendientes)\n\n**When (Cuando):**\n- El Almacenista intenta crear una recepción con 5 unidades para ese ítem\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- No se crea ninguna recepción\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF021-S03",
+    "rf": "RF021",
+    "scenario_number": 3,
+    "title": "No se puede crear recepción para OC en BORRADOR",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC en estado BORRADOR (no confirmada aún)\n\n**When (Cuando):**\n- El Almacenista intenta crear una recepción asociada a ella\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- No se crea ninguna recepción\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF022-S01",
+    "rf": "RF022",
+    "scenario_number": 1,
+    "title": "Confirmación exitosa genera Movements y actualiza stock",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción en BORRADOR con 10 unidades de un producto en una ubicación activa\n\n**When (Cuando):**\n- El Almacenista confirma la recepción\n\n**Then (Entonces):**\n- El sistema crea un Movement de tipo ENTRADA con quantity=10 en la ubicación de destino\n- El StockByLocation para ese producto en esa ubicación incrementa en 10\n- El Movement.unit_cost queda registrado con el valor de PurchaseOrderItem.unit_cost\n- La recepción pasa a estado CONFIRMADA\n- El log de auditoría registra RECEPTION_CONFIRMED\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF022-S02",
+    "rf": "RF022",
+    "scenario_number": 2,
+    "title": "Recepción completa marca la OC como COMPLETADA",
+    "given_when_then": "**Given (Dado que):**\n- Una OC tiene un ítem de 10 unidades con 0 recibidas\n- Existe una recepción en BORRADOR con los 10 ítems\n\n**When (Cuando):**\n- El Almacenista confirma la recepción\n\n**Then (Entonces):**\n- La OC pasa a estado COMPLETADA\n- No es posible crear nuevas recepciones para esa OC\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF022-S03",
+    "rf": "RF022",
+    "scenario_number": 3,
+    "title": "Recepción parcial marca la OC como PARCIALMENTE_RECIBIDA",
+    "given_when_then": "**Given (Dado que):**\n- Una OC tiene un ítem de 20 unidades con 0 recibidas\n- Existe una recepción en BORRADOR con 12 de esas 20 unidades\n\n**When (Cuando):**\n- El Almacenista confirma la recepción\n\n**Then (Entonces):**\n- La OC pasa a estado PARCIALMENTE_RECIBIDA\n- Es posible crear nuevas recepciones para recibir las 8 unidades restantes\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF022-S04",
+    "rf": "RF022",
+    "scenario_number": 4,
+    "title": "Error en generación de Movement revierte toda la recepción",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción en BORRADOR con múltiples ítems\n\n**When (Cuando):**\n- Durante la confirmación, la generación del Movement falla para cualquiera de los ítems\n\n**Then (Entonces):**\n- Ningún Movement es creado (rollback total)\n- El StockByLocation no es modificado\n- La recepción permanece en estado BORRADOR\n- La OC no cambia de estado\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF022-S05",
+    "rf": "RF022",
+    "scenario_number": 5,
+    "title": "Discrepancia sin nota es rechazada",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción en BORRADOR donde un ítem tiene quantity_received diferente a quantity_ordered\n- El campo discrepancy_note está vacío para ese ítem\n\n**When (Cuando):**\n- El Almacenista intenta confirmar la recepción\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- La recepción permanece en BORRADOR sin cambios en el stock\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF023-S01",
+    "rf": "RF023",
+    "scenario_number": 1,
+    "title": "Cancelación exitosa de recepción en BORRADOR",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción en estado BORRADOR\n\n**When (Cuando):**\n- El Almacenista cancela la recepción\n\n**Then (Entonces):**\n- La recepción pasa a estado CANCELADA\n- No se generan Movements ni cambios en el stock\n- El log de auditoría registra RECEPTION_CANCELLED\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF023-S02",
+    "rf": "RF023",
+    "scenario_number": 2,
+    "title": "No se puede cancelar una recepción CONFIRMADA",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción en estado CONFIRMADA\n\n**When (Cuando):**\n- El Almacenista intenta cancelar la recepción\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- La recepción permanece CONFIRMADA, los Movements y el stock no se alteran\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF024-S01",
+    "rf": "RF024",
+    "scenario_number": 1,
+    "title": "Desde un Movement de ENTRADA se puede trazar la OC de origen",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción confirmada que generó Movements de ENTRADA\n\n**When (Cuando):**\n- El Almacenista consulta el detalle de la recepción\n\n**Then (Entonces):**\n- La respuesta incluye los IDs de los Movements generados por cada ítem\n- Es posible navegar de ReceptionItem → Movement → StockByLocation\n- Es posible navegar de ReceptionItem → PurchaseOrderItem → PurchaseOrder → Supplier\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF024-S02",
+    "rf": "RF024",
+    "scenario_number": 2,
+    "title": "El log de auditoría muestra todos los eventos del ciclo completo",
+    "given_when_then": "**Given (Dado que):**\n- Se completó un ciclo: crear proveedor → crear OC → confirmar OC → crear recepción → confirmar recepción\n\n**When (Cuando):**\n- El Almacenista consulta el log de auditoría\n\n**Then (Entonces):**\n- El log contiene eventos: SUPPLIER_CREATED, PURCHASE_ORDER_CREATED, PURCHASE_ORDER_CONFIRMED, RECEPTION_CREATED, RECEPTION_CONFIRMED, MOVEMENT_CREATED\n- Todos los eventos están asociados al UserID del ejecutor y tienen timestamp exacto\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF025-S01",
+    "rf": "RF025",
+    "scenario_number": 1,
+    "title": "Almacenista tiene acceso completo al módulo de compras",
+    "given_when_then": "**Given (Dado que):**\n- Un usuario con rol Almacenista está autenticado dentro de su horario operativo\n\n**When (Cuando):**\n- Realiza operaciones de lectura (GET) y escritura (POST, PATCH) en cualquier endpoint del módulo de compras\n\n**Then (Entonces):**\n- El sistema procesa todas las solicitudes con HTTP 200 o 201 según corresponda\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF025-S02",
+    "rf": "RF025",
+    "scenario_number": 2,
+    "title": "Administrador tiene acceso de solo lectura al módulo de compras",
+    "given_when_then": "**Given (Dado que):**\n- Un usuario con rol Administrador está autenticado\n\n**When (Cuando):**\n- Realiza una consulta GET sobre proveedores, OC o recepciones\n\n**Then (Entonces):**\n- El sistema retorna HTTP 200 con los datos solicitados\n\n**And (Y cuando):**\n- Intenta crear, modificar o confirmar cualquier entidad del módulo de compras\n\n**Then (Entonces):**\n- El sistema retorna HTTP 403 (Forbidden)\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF025-S03",
+    "rf": "RF025",
+    "scenario_number": 3,
+    "title": "Auxiliar de Despacho no tiene acceso al módulo de compras",
+    "given_when_then": "**Given (Dado que):**\n- Un usuario con rol Auxiliar de Despacho está autenticado\n\n**When (Cuando):**\n- Intenta acceder a cualquier endpoint del módulo de compras (GET o POST)\n\n**Then (Entonces):**\n- El sistema retorna HTTP 403 (Forbidden) para todas las operaciones\n\n---",
     "source": "docs/requisitos/ERS_ICM_Requisitos.md",
     "automation_scope": {
       "reason": "",

@@ -92,6 +92,30 @@
 | RF013-S02 | Precio en historial permanece inmutable tras modificar el precio actual del producto | Implementado | [RF013-S02.md](./RF013-S02.md) |
 | RF013-S03 | Actualización de precio genera historial auditado con valor anterior y nuevo | Implementado | [RF013-S03.md](./RF013-S03.md) |
 | RF013-S04 | Factura comercial reconstruible completamente desde el Movement sin consultar el catálogo actual | Implementado | [RF013-S04.md](./RF013-S04.md) |
+| RF019-S01 | Creación de proveedor con NIT único | Implementado | [RF019-S01.md](./RF019-S01.md) |
+| RF019-S02 | Intento de crear proveedor con NIT duplicado | Implementado | [RF019-S02.md](./RF019-S02.md) |
+| RF019-S03 | Desactivación de proveedor | Implementado | [RF019-S03.md](./RF019-S03.md) |
+| RF019-S04 | Solo el Almacenista puede gestionar proveedores | Implementado | [RF019-S04.md](./RF019-S04.md) |
+| RF020-S01 | Creación de OC en estado BORRADOR | Implementado | [RF020-S01.md](./RF020-S01.md) |
+| RF020-S02 | Confirmación de OC (BORRADOR → PENDIENTE) | Implementado | [RF020-S02.md](./RF020-S02.md) |
+| RF020-S03 | Cancelación de OC sin recepciones confirmadas | Implementado | [RF020-S03.md](./RF020-S03.md) |
+| RF020-S04 | Intento de cancelar OC con recepciones confirmadas | Implementado | [RF020-S04.md](./RF020-S04.md) |
+| RF020-S05 | Cancelación sin razón explícita es rechazada | Implementado | [RF020-S05.md](./RF020-S05.md) |
+| RF021-S01 | Recepción parcial de una OC | Implementado | [RF021-S01.md](./RF021-S01.md) |
+| RF021-S02 | Recepción que supera la cantidad pendiente es rechazada | Implementado | [RF021-S02.md](./RF021-S02.md) |
+| RF021-S03 | No se puede crear recepción para OC en BORRADOR | Implementado | [RF021-S03.md](./RF021-S03.md) |
+| RF022-S01 | Confirmación exitosa genera Movements y actualiza stock | Implementado | [RF022-S01.md](./RF022-S01.md) |
+| RF022-S02 | Recepción completa marca la OC como COMPLETADA | Implementado | [RF022-S02.md](./RF022-S02.md) |
+| RF022-S03 | Recepción parcial marca la OC como PARCIALMENTE_RECIBIDA | Implementado | [RF022-S03.md](./RF022-S03.md) |
+| RF022-S04 | Error en generación de Movement revierte toda la recepción | Implementado | [RF022-S04.md](./RF022-S04.md) |
+| RF022-S05 | Discrepancia sin nota es rechazada | Implementado | [RF022-S05.md](./RF022-S05.md) |
+| RF023-S01 | Cancelación exitosa de recepción en BORRADOR | Implementado | [RF023-S01.md](./RF023-S01.md) |
+| RF023-S02 | No se puede cancelar una recepción CONFIRMADA | Implementado | [RF023-S02.md](./RF023-S02.md) |
+| RF024-S01 | Desde un Movement de ENTRADA se puede trazar la OC de origen | Implementado | [RF024-S01.md](./RF024-S01.md) |
+| RF024-S02 | El log de auditoría muestra todos los eventos del ciclo completo | Implementado | [RF024-S02.md](./RF024-S02.md) |
+| RF025-S01 | Almacenista tiene acceso completo al módulo de compras | Implementado | [RF025-S01.md](./RF025-S01.md) |
+| RF025-S02 | Administrador tiene acceso de solo lectura al módulo de compras | Implementado | [RF025-S02.md](./RF025-S02.md) |
+| RF025-S03 | Auxiliar de Despacho no tiene acceso al módulo de compras | Implementado | [RF025-S03.md](./RF025-S03.md) |
 | RNF001-S01 | Operario completa un flujo de despacho sin formación técnica previa | Fuera de alcance | [RNF001-S01.md](./RNF001-S01.md) |
 | RNF001-S02 | La interfaz responde correctamente en dispositivos móviles y tabletas | Fuera de alcance | [RNF001-S02.md](./RNF001-S02.md) |
 | RNF001-S03 | La búsqueda de productos es igualmente eficiente por cualquier vía | Fuera de alcance | [RNF001-S03.md](./RNF001-S03.md) |

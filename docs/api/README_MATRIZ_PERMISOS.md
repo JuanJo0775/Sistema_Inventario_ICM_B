@@ -501,7 +501,7 @@ Todas las modificaciones a los permisos de acceso horario generan registros inmu
 - `previous_values` y `new_values` (detallando franjas horarias y periodos).
 - `reason` y `timestamp`.
 
-### 16.5 Nuevos Endpoints Relacionados
+### 16.5 Endpoints Relacionados
 
 | Recurso | Acción | Endpoint | Rol Mínimo |
 |---|---|---|---|
@@ -524,3 +524,67 @@ Todas las modificaciones a los permisos de acceso horario generan registros inmu
 - [Reports views](../../apps/reports/views.py)
 - [Alerts views](../../apps/alerts/views.py)
 - [Audit views](../../apps/audit/views.py)
+- [Purchasing views](../../apps/purchasing/views.py)
+- [Purchasing services](../../apps/purchasing/services.py)
+
+## 18. Módulo de Compras (Purchasing)
+
+El módulo de compras gestiona el ciclo completo Proveedor → Orden de Compra → Recepción → Movimiento de Entrada → Inventario.
+
+### 18.1 Principio de segregación de responsabilidades
+
+- **Proveedores**: Solo los almacenistas pueden crear, editar o desactivar proveedores.
+- **Órdenes de Compra**: Solo los almacenistas pueden crear, confirmar y cancelar OC. Los administradores pueden consultar en modo lectura.
+- **Recepciones**: Solo los almacenistas pueden crear y confirmar recepciones. Los administradores pueden consultar.
+- **Invariante crítica**: La confirmación de una recepción genera Movements de tipo ENTRADA a través de `movements.services.register_entry()`. Nunca actualiza `StockByLocation` directamente.
+
+### 18.2 Permisos por endpoint
+
+| Recurso | Acción | Endpoint | Supervisor (almacenista) | Admin (lectura) | Operador (auxiliar) |
+|---|---|---|---|---|---|
+| Proveedores | Listar | `GET /api/v1/purchasing/suppliers/` | ✅ | ✅ | ❌ |
+| Proveedores | Crear | `POST /api/v1/purchasing/suppliers/` | ✅ | ❌ | ❌ |
+| Proveedores | Editar | `PATCH /api/v1/purchasing/suppliers/<id>/` | ✅ | ❌ | ❌ |
+| Proveedores | Desactivar | `POST /api/v1/purchasing/suppliers/<id>/deactivate/` | ✅ | ❌ | ❌ |
+| Proveedores | Reactivar | `POST /api/v1/purchasing/suppliers/<id>/activate/` | ✅ | ❌ | ❌ |
+| Órdenes de Compra | Listar | `GET /api/v1/purchasing/purchase-orders/` | ✅ | ✅ | ❌ |
+| Órdenes de Compra | Crear | `POST /api/v1/purchasing/purchase-orders/` | ✅ | ❌ | ❌ |
+| Órdenes de Compra | Detalle | `GET /api/v1/purchasing/purchase-orders/<id>/` | ✅ | ✅ | ❌ |
+| Órdenes de Compra | Actualizar (BORRADOR) | `PATCH /api/v1/purchasing/purchase-orders/<id>/` | ✅ | ❌ | ❌ |
+| Órdenes de Compra | Confirmar | `POST /api/v1/purchasing/purchase-orders/<id>/confirm/` | ✅ | ❌ | ❌ |
+| Órdenes de Compra | Cancelar | `POST /api/v1/purchasing/purchase-orders/<id>/cancel/` | ✅ | ❌ | ❌ |
+| Recepciones | Listar | `GET /api/v1/purchasing/receptions/` | ✅ | ✅ | ❌ |
+| Recepciones | Crear (BORRADOR) | `POST /api/v1/purchasing/receptions/` | ✅ | ❌ | ❌ |
+| Recepciones | Detalle | `GET /api/v1/purchasing/receptions/<id>/` | ✅ | ✅ | ❌ |
+| Recepciones | Confirmar | `POST /api/v1/purchasing/receptions/<id>/confirm/` | ✅ | ❌ | ❌ |
+| Recepciones | Cancelar | `POST /api/v1/purchasing/receptions/<id>/cancel/` | ✅ | ❌ | ❌ |
+
+### 18.3 Estados y transiciones
+
+**PurchaseOrder:**
+```
+BORRADOR → PENDIENTE (confirm)
+BORRADOR → CANCELADA (cancel)
+PENDIENTE → PARCIALMENTE_RECIBIDA (primera recepción confirmada parcial)
+PENDIENTE → COMPLETADA (recepción completa)
+PARCIALMENTE_RECIBIDA → COMPLETADA (recepción final)
+PENDIENTE → CANCELADA (solo si no hay recepciones CONFIRMADAS)
+```
+
+**Reception:**
+```
+BORRADOR → CONFIRMADA (genera Movements ENTRADA, inmutable después)
+BORRADOR → CANCELADA (sin efecto en inventario)
+```
+
+### 18.4 Auditoría del módulo
+
+Todos los eventos generan registros en `AuditLog`:
+
+- `SUPPLIER_CREATED`, `SUPPLIER_UPDATED`, `SUPPLIER_DEACTIVATED`, `SUPPLIER_ACTIVATED`
+- `PURCHASE_ORDER_CREATED`, `PURCHASE_ORDER_CONFIRMED`, `PURCHASE_ORDER_CANCELLED`
+- `RECEPTION_CREATED`, `RECEPTION_CONFIRMED`, `RECEPTION_CANCELLED`
+
+### 18.5 Extensión futura: rol Comprador
+
+El módulo está diseñado para soportar un rol `comprador` en el futuro (ADR-014). La clase `IsPurchasingOperator` en `apps/purchasing/permissions.py` actualmente valida solo `almacenista`. Para agregar el rol: (1) agregar el valor a `RoleChoices` en `authentication/models.py`, (2) actualizar `IsPurchasingOperator.has_permission()`, (3) crear migración de authentication. No se requieren cambios en servicios ni modelos.

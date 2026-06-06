@@ -57,6 +57,10 @@ Las siguientes reglas de negocio fueron identificadas durante las sesiones de el
 * BR-15 (Tipo de almacenamiento activo como requisito de asignación): Un tipo de almacenamiento (`StorageType`) con estado inactivo no puede asignarse a nuevas ubicaciones ni reasignarse a ubicaciones existentes. La desactivación de un tipo no afecta las ubicaciones que ya lo tenían asignado, las cuales conservan su tipo sin restricción adicional. Solo el Almacenista puede crear, modificar o desactivar tipos de almacenamiento y plantillas de configuración.
 * BR-16 (Precio congelado en despacho): Al confirmar un despacho, el sistema captura el precio unitario de venta, el costo unitario, el IVA aplicable y el total calculado en el registro de movimiento de forma permanente e inmutable. Ninguna modificación posterior al precio de un producto en el catálogo puede alterar el precio registrado en movimientos o facturas ya emitidas. Esta regla garantiza la integridad contable del historial de transacciones.
 * BR-17 (Historial auditado de cambios de precio): Toda actualización de precio de un producto (precio minorista, precio mayorista, costo o tasa de IVA) debe registrarse de forma inmutable en un historial de precios que identifique el campo modificado, el valor anterior, el nuevo valor, el usuario que realizó el cambio y la fecha y hora exacta. El historial de precios es de solo lectura y no puede ser eliminado ni modificado.
+* BR-018 (NIT único por proveedor): El NIT de un proveedor es un identificador fiscal único en el sistema. No pueden existir dos proveedores con el mismo NIT, independientemente de su estado activo o inactivo. El sistema rechaza el registro de un proveedor si su NIT ya existe.
+* BR-019 (Estado de OC controla operaciones permitidas): Las Órdenes de Compra siguen un ciclo de vida estricto. Solo pueden editarse en estado BORRADOR. Solo pueden recibir mercancía en estado PENDIENTE o PARCIALMENTE_RECIBIDA. Una OC en estado COMPLETADA o CANCELADA es completamente inmutable.
+* BR-020 (Cancelación de OC requiere ausencia de recepciones confirmadas): Una Orden de Compra no puede cancelarse si tiene al menos una recepción en estado CONFIRMADA. El sistema bloquea la operación e informa al operario del conflicto.
+* BR-021 (Costo de compra congelado en el movimiento de entrada): Al confirmar una recepción, el costo unitario acordado con el proveedor en la Orden de Compra queda registrado de forma permanente en el campo de costo del movimiento de entrada generado. Ninguna modificación posterior al costo del producto en el catálogo puede alterar ese valor histórico.
 
 # **5. Requisitos Funcionales**
 
@@ -2176,3 +2180,506 @@ Este documento debe ser considerado un artefacto vivo durante el desarrollo del 
 * [5] Schwaber, K. y Sutherland, J. (2020). La Guía Scrum. Recuperado de https://scrumguides.org
 * [6] Congreso de Colombia. (2012). Ley 1581 de 2012 — Protección de Datos Personales. Diario Oficial.
 * [7] IEEE. (1998). IEEE Std 830-1998: IEEE Recommended Practice for Software Requirements Specifications. Institute of Electrical and Electronics Engineers.
+
+---
+
+# **Anexo A: Módulo de Compras y Abastecimiento (RF-019 a RF-025)**
+
+*Versión 1.1 — Junio 2026. Estos requisitos amplían el alcance del ERS original para cubrir el ciclo completo de abastecimiento: Proveedor → Orden de Compra → Recepción → Movimiento de Entrada → Inventario. Su implementación no modifica ningún requisito existente (RF-001 a RF-013).*
+
+---
+
+## **RF-019 — Gestión de Proveedores**
+
+**Módulo:** Compras y Abastecimiento
+
+**Descripción**
+
+El sistema debe permitir al Almacenista registrar, consultar, actualizar y activar/desactivar los proveedores de mercancía de ICM. Cada proveedor tiene un NIT único como identificador fiscal, y su estado activo/inactivo controla si puede asociarse a nuevas Órdenes de Compra.
+
+**Reglas de Negocio Aplicables**
+
+* BR-01: Toda operación de creación o modificación de proveedor queda vinculada al UserID del Almacenista ejecutor.
+* BR-018 (nueva): El NIT de un proveedor es único en el sistema. No pueden existir dos proveedores con el mismo NIT.
+* Un proveedor desactivado no puede asociarse a nuevas Órdenes de Compra, pero sus OC existentes no se afectan.
+
+**Criterios de Aceptación (Formato Gherkin)**
+
+Feature: Gestión de proveedores
+
+### Scenario 1: Creación de proveedor con NIT único
+
+**Given (Dado que):**
+- El Almacenista está autenticado en el sistema
+- No existe ningún proveedor con NIT "900123456-1"
+
+**When (Cuando):**
+- Envía POST /api/v1/purchasing/suppliers/ con nombre_comercial, razon_social y nit="900123456-1"
+
+**Then (Entonces):**
+- El sistema crea el proveedor con estado is_active=True
+- Retorna HTTP 201 con los datos del proveedor incluyendo su UUID
+- Queda registrado un evento SUPPLIER_CREATED en el log de auditoría
+
+---
+
+### Scenario 2: Intento de crear proveedor con NIT duplicado
+
+**Given (Dado que):**
+- Ya existe un proveedor con nit="900123456-1"
+
+**When (Cuando):**
+- El Almacenista intenta crear otro proveedor con el mismo NIT
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- El log de auditoría no registra ningún evento SUPPLIER_CREATED
+
+---
+
+### Scenario 3: Desactivación de proveedor
+
+**Given (Dado que):**
+- Existe un proveedor activo con OC en estado PENDIENTE
+
+**When (Cuando):**
+- El Almacenista desactiva el proveedor
+
+**Then (Entonces):**
+- El proveedor queda con is_active=False
+- Las OC existentes en estado PENDIENTE no se cancelan automáticamente
+- Nuevas OC con ese proveedor son rechazadas por el sistema
+
+---
+
+### Scenario 4: Solo el Almacenista puede gestionar proveedores
+
+**Given (Dado que):**
+- Un usuario con rol Auxiliar de Despacho o Administrador está autenticado
+
+**When (Cuando):**
+- Intenta crear, actualizar o desactivar un proveedor
+
+**Then (Entonces):**
+- El sistema responde con HTTP 403 (Forbidden)
+- No se realiza ningún cambio en la base de datos
+
+---
+
+## **RF-020 — Creación y Gestión de Órdenes de Compra**
+
+**Módulo:** Compras y Abastecimiento
+
+**Descripción**
+
+El sistema debe permitir al Almacenista crear Órdenes de Compra (OC) que especifiquen qué productos se solicitan al proveedor, en qué cantidades y a qué costo unitario. Cada OC recibe un número secuencial único (OC-0001, OC-0002...) y comienza en estado BORRADOR, siendo editable hasta su confirmación.
+
+**Reglas de Negocio Aplicables**
+
+* BR-01: Toda OC registra el UserID del Almacenista creador.
+* BR-019 (nueva): Una OC en estado BORRADOR puede editarse o cancelarse sin restricciones. A partir de PENDIENTE, es inmutable en su contenido.
+* BR-020 (nueva): Cada OC tiene al menos un ítem con `quantity_ordered > 0` para poder ser confirmada.
+
+**Criterios de Aceptación (Formato Gherkin)**
+
+Feature: Órdenes de compra
+
+### Scenario 1: Creación de OC en estado BORRADOR
+
+**Given (Dado que):**
+- El Almacenista está autenticado
+- Existe un proveedor activo y un producto en el catálogo
+
+**When (Cuando):**
+- Envía POST /api/v1/purchasing/purchase-orders/ con supplier_id y un ítem con product_id, quantity_ordered=10, unit_cost=15000
+
+**Then (Entonces):**
+- El sistema crea la OC con status="borrador" y número OC-XXXX único
+- Retorna HTTP 201 con la OC y sus ítems
+- El log de auditoría registra PURCHASE_ORDER_CREATED
+
+---
+
+### Scenario 2: Confirmación de OC (BORRADOR → PENDIENTE)
+
+**Given (Dado que):**
+- Existe una OC en estado BORRADOR con al menos un ítem
+
+**When (Cuando):**
+- El Almacenista confirma la OC mediante POST /api/v1/purchasing/purchase-orders/{id}/confirm/
+
+**Then (Entonces):**
+- La OC pasa a estado PENDIENTE
+- El campo confirmed_by queda registrado con el UserID del ejecutor
+- El log de auditoría registra PURCHASE_ORDER_CONFIRMED
+- La OC ya no puede ser editada (intentos de PATCH retornan HTTP 422)
+
+---
+
+### Scenario 3: Cancelación de OC sin recepciones confirmadas
+
+**Given (Dado que):**
+- Existe una OC en estado BORRADOR o PENDIENTE sin recepciones confirmadas
+
+**When (Cuando):**
+- El Almacenista cancela la OC con una razón de cancelación
+
+**Then (Entonces):**
+- La OC pasa a estado CANCELADA con la razón registrada
+- El log de auditoría registra PURCHASE_ORDER_CANCELLED
+
+---
+
+### Scenario 4: Intento de cancelar OC con recepciones confirmadas
+
+**Given (Dado que):**
+- Existe una OC en estado PENDIENTE con al menos una recepción en estado CONFIRMADA
+
+**When (Cuando):**
+- El Almacenista intenta cancelar la OC
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 409 (Conflict)
+- La OC permanece en su estado actual sin cambios
+
+---
+
+### Scenario 5: Cancelación sin razón explícita es rechazada
+
+**Given (Dado que):**
+- Existe una OC cancelable
+
+**When (Cuando):**
+- El Almacenista intenta cancelar la OC sin proporcionar una razón (campo reason vacío)
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- La OC no cambia de estado
+
+---
+
+## **RF-021 — Creación de Recepciones de Mercancía**
+
+**Módulo:** Compras y Abastecimiento
+
+**Descripción**
+
+El sistema debe permitir al Almacenista registrar la recepción física de mercancía asociada a una Orden de Compra. La recepción se crea en estado BORRADOR, especificando qué productos se recibieron, en qué cantidades, en qué ubicación de destino, y con opción a registrar código de lote, fecha de vencimiento y nota de discrepancia.
+
+**Reglas de Negocio Aplicables**
+
+* BR-014: La ubicación de destino de la recepción debe estar en estado operativo activo o restringido.
+* BR-019: Solo se pueden crear recepciones para OC en estado PENDIENTE o PARCIALMENTE_RECIBIDA.
+* La cantidad a recibir por ítem no puede superar la cantidad pendiente de recibir en la OC.
+
+**Criterios de Aceptación (Formato Gherkin)**
+
+Feature: Creación de recepciones
+
+### Scenario 1: Recepción parcial de una OC
+
+**Given (Dado que):**
+- Existe una OC en estado PENDIENTE con un ítem de 20 unidades y 0 recibidas
+
+**When (Cuando):**
+- El Almacenista crea una recepción con 10 unidades para ese ítem en una ubicación activa
+
+**Then (Entonces):**
+- El sistema crea la recepción en estado BORRADOR
+- El log de auditoría registra RECEPTION_CREATED
+- La OC sigue en estado PENDIENTE (no cambia hasta confirmar la recepción)
+
+---
+
+### Scenario 2: Recepción que supera la cantidad pendiente es rechazada
+
+**Given (Dado que):**
+- Existe una OC con un ítem de 5 unidades ordenadas y 3 ya recibidas (2 pendientes)
+
+**When (Cuando):**
+- El Almacenista intenta crear una recepción con 5 unidades para ese ítem
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- No se crea ninguna recepción
+
+---
+
+### Scenario 3: No se puede crear recepción para OC en BORRADOR
+
+**Given (Dado que):**
+- Existe una OC en estado BORRADOR (no confirmada aún)
+
+**When (Cuando):**
+- El Almacenista intenta crear una recepción asociada a ella
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- No se crea ninguna recepción
+
+---
+
+## **RF-022 — Confirmación de Recepción y Generación de Movimientos**
+
+**Módulo:** Compras y Abastecimiento
+
+**Descripción**
+
+Al confirmar una recepción, el sistema debe generar automáticamente un Movimiento de Entrada (ENTRADA) por cada ítem de la recepción con cantidad > 0, actualizar el stock en la ubicación de destino, y recalcular el estado de la Orden de Compra. Esta operación es atómica: si falla cualquier paso, se hace rollback completo.
+
+**Reglas de Negocio Aplicables**
+
+* BR-010: El ledger de movimientos es inmutable. Una recepción confirmada genera Movements permanentes que no pueden eliminarse.
+* BR-011: El stock se actualiza exclusivamente mediante `register_entry()`. La recepción no modifica StockByLocation directamente.
+* BR-014: La ubicación de destino debe estar en estado operativo válido al momento de la confirmación.
+* BR-021 (nueva): El costo de compra (`unit_cost` del ítem de OC) queda congelado en el campo `Movement.unit_cost` en el momento de la confirmación.
+
+**Criterios de Aceptación (Formato Gherkin)**
+
+Feature: Confirmación de recepciones
+
+### Scenario 1: Confirmación exitosa genera Movements y actualiza stock
+
+**Given (Dado que):**
+- Existe una recepción en BORRADOR con 10 unidades de un producto en una ubicación activa
+
+**When (Cuando):**
+- El Almacenista confirma la recepción
+
+**Then (Entonces):**
+- El sistema crea un Movement de tipo ENTRADA con quantity=10 en la ubicación de destino
+- El StockByLocation para ese producto en esa ubicación incrementa en 10
+- El Movement.unit_cost queda registrado con el valor de PurchaseOrderItem.unit_cost
+- La recepción pasa a estado CONFIRMADA
+- El log de auditoría registra RECEPTION_CONFIRMED
+
+---
+
+### Scenario 2: Recepción completa marca la OC como COMPLETADA
+
+**Given (Dado que):**
+- Una OC tiene un ítem de 10 unidades con 0 recibidas
+- Existe una recepción en BORRADOR con los 10 ítems
+
+**When (Cuando):**
+- El Almacenista confirma la recepción
+
+**Then (Entonces):**
+- La OC pasa a estado COMPLETADA
+- No es posible crear nuevas recepciones para esa OC
+
+---
+
+### Scenario 3: Recepción parcial marca la OC como PARCIALMENTE_RECIBIDA
+
+**Given (Dado que):**
+- Una OC tiene un ítem de 20 unidades con 0 recibidas
+- Existe una recepción en BORRADOR con 12 de esas 20 unidades
+
+**When (Cuando):**
+- El Almacenista confirma la recepción
+
+**Then (Entonces):**
+- La OC pasa a estado PARCIALMENTE_RECIBIDA
+- Es posible crear nuevas recepciones para recibir las 8 unidades restantes
+
+---
+
+### Scenario 4: Error en generación de Movement revierte toda la recepción
+
+**Given (Dado que):**
+- Existe una recepción en BORRADOR con múltiples ítems
+
+**When (Cuando):**
+- Durante la confirmación, la generación del Movement falla para cualquiera de los ítems
+
+**Then (Entonces):**
+- Ningún Movement es creado (rollback total)
+- El StockByLocation no es modificado
+- La recepción permanece en estado BORRADOR
+- La OC no cambia de estado
+
+---
+
+### Scenario 5: Discrepancia sin nota es rechazada
+
+**Given (Dado que):**
+- Existe una recepción en BORRADOR donde un ítem tiene quantity_received diferente a quantity_ordered
+- El campo discrepancy_note está vacío para ese ítem
+
+**When (Cuando):**
+- El Almacenista intenta confirmar la recepción
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- La recepción permanece en BORRADOR sin cambios en el stock
+
+---
+
+## **RF-023 — Cancelación de Recepciones**
+
+**Módulo:** Compras y Abastecimiento
+
+**Descripción**
+
+El sistema debe permitir cancelar una recepción que esté en estado BORRADOR. Una recepción confirmada no puede cancelarse (es inmutable por BR-010). La cancelación de una recepción en BORRADOR no genera ningún efecto en el inventario.
+
+**Reglas de Negocio Aplicables**
+
+* BR-010: Las recepciones CONFIRMADAS son inmutables, igual que los Movements.
+* BR-019 (nueva): Solo las recepciones en BORRADOR pueden cancelarse.
+
+**Criterios de Aceptación (Formato Gherkin)**
+
+Feature: Cancelación de recepciones
+
+### Scenario 1: Cancelación exitosa de recepción en BORRADOR
+
+**Given (Dado que):**
+- Existe una recepción en estado BORRADOR
+
+**When (Cuando):**
+- El Almacenista cancela la recepción
+
+**Then (Entonces):**
+- La recepción pasa a estado CANCELADA
+- No se generan Movements ni cambios en el stock
+- El log de auditoría registra RECEPTION_CANCELLED
+
+---
+
+### Scenario 2: No se puede cancelar una recepción CONFIRMADA
+
+**Given (Dado que):**
+- Existe una recepción en estado CONFIRMADA
+
+**When (Cuando):**
+- El Almacenista intenta cancelar la recepción
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- La recepción permanece CONFIRMADA, los Movements y el stock no se alteran
+
+---
+
+## **RF-024 — Trazabilidad del Ciclo de Compras**
+
+**Módulo:** Compras y Abastecimiento
+
+**Descripción**
+
+El sistema debe garantizar la trazabilidad completa del ciclo de compras. Dado un Movement de tipo ENTRADA generado por una recepción, debe ser posible navegar hacia el ítem de recepción, la recepción, el ítem de OC, la Orden de Compra y el Proveedor. Esta trazabilidad se implementa mediante la relación `ReceptionItem.movement` (OneToOneField).
+
+**Reglas de Negocio Aplicables**
+
+* BR-001: Toda operación es trazable al usuario que la ejecutó.
+* BR-010: El ledger es inmutable; la relación ReceptionItem → Movement persiste indefinidamente.
+
+**Criterios de Aceptación (Formato Gherkin)**
+
+Feature: Trazabilidad ciclo de compras
+
+### Scenario 1: Desde un Movement de ENTRADA se puede trazar la OC de origen
+
+**Given (Dado que):**
+- Existe una recepción confirmada que generó Movements de ENTRADA
+
+**When (Cuando):**
+- El Almacenista consulta el detalle de la recepción
+
+**Then (Entonces):**
+- La respuesta incluye los IDs de los Movements generados por cada ítem
+- Es posible navegar de ReceptionItem → Movement → StockByLocation
+- Es posible navegar de ReceptionItem → PurchaseOrderItem → PurchaseOrder → Supplier
+
+---
+
+### Scenario 2: El log de auditoría muestra todos los eventos del ciclo completo
+
+**Given (Dado que):**
+- Se completó un ciclo: crear proveedor → crear OC → confirmar OC → crear recepción → confirmar recepción
+
+**When (Cuando):**
+- El Almacenista consulta el log de auditoría
+
+**Then (Entonces):**
+- El log contiene eventos: SUPPLIER_CREATED, PURCHASE_ORDER_CREATED, PURCHASE_ORDER_CONFIRMED, RECEPTION_CREATED, RECEPTION_CONFIRMED, MOVEMENT_CREATED
+- Todos los eventos están asociados al UserID del ejecutor y tienen timestamp exacto
+
+---
+
+## **RF-025 — Control de Acceso al Módulo de Compras**
+
+**Módulo:** Compras y Abastecimiento
+
+**Descripción**
+
+El acceso al módulo de compras debe seguir el modelo RBAC del sistema. El Almacenista tiene acceso completo (lectura y escritura). El Administrador tiene acceso de solo lectura. El Auxiliar de Despacho no tiene acceso a ningún endpoint del módulo.
+
+**Reglas de Negocio Aplicables**
+
+* BR-001: Toda operación registra el UserID del ejecutor.
+* BR-003: Los Auxiliares de Despacho tienen restricción horaria; adicionalmente no tienen acceso al módulo de compras.
+
+**Criterios de Aceptación (Formato Gherkin)**
+
+Feature: Control de acceso al módulo de compras
+
+### Scenario 1: Almacenista tiene acceso completo al módulo de compras
+
+**Given (Dado que):**
+- Un usuario con rol Almacenista está autenticado dentro de su horario operativo
+
+**When (Cuando):**
+- Realiza operaciones de lectura (GET) y escritura (POST, PATCH) en cualquier endpoint del módulo de compras
+
+**Then (Entonces):**
+- El sistema procesa todas las solicitudes con HTTP 200 o 201 según corresponda
+
+---
+
+### Scenario 2: Administrador tiene acceso de solo lectura al módulo de compras
+
+**Given (Dado que):**
+- Un usuario con rol Administrador está autenticado
+
+**When (Cuando):**
+- Realiza una consulta GET sobre proveedores, OC o recepciones
+
+**Then (Entonces):**
+- El sistema retorna HTTP 200 con los datos solicitados
+
+**And (Y cuando):**
+- Intenta crear, modificar o confirmar cualquier entidad del módulo de compras
+
+**Then (Entonces):**
+- El sistema retorna HTTP 403 (Forbidden)
+
+---
+
+### Scenario 3: Auxiliar de Despacho no tiene acceso al módulo de compras
+
+**Given (Dado que):**
+- Un usuario con rol Auxiliar de Despacho está autenticado
+
+**When (Cuando):**
+- Intenta acceder a cualquier endpoint del módulo de compras (GET o POST)
+
+**Then (Entonces):**
+- El sistema retorna HTTP 403 (Forbidden) para todas las operaciones
+
+---
+
+## **Actualización de la Tabla de Trazabilidad (Sección 7)**
+
+Los siguientes requisitos se incorporan a la tabla de trazabilidad del documento:
+
+| **ID** | **Nombre** | **Módulo** | **Reglas de Negocio** |
+| --- | --- | --- | --- |
+| RF-019 | Gestión de Proveedores | Compras y Abastecimiento | BR-01, BR-018 |
+| RF-020 | Creación y Gestión de Órdenes de Compra | Compras y Abastecimiento | BR-01, BR-019, BR-020 |
+| RF-021 | Creación de Recepciones de Mercancía | Compras y Abastecimiento | BR-014, BR-019 |
+| RF-022 | Confirmación de Recepción y Generación de Movimientos | Compras y Abastecimiento | BR-010, BR-011, BR-014, BR-021 |
+| RF-023 | Cancelación de Recepciones | Compras y Abastecimiento | BR-010, BR-019 |
+| RF-024 | Trazabilidad del Ciclo de Compras | Compras y Abastecimiento | BR-001, BR-010 |
+| RF-025 | Control de Acceso al Módulo de Compras | Compras y Abastecimiento | BR-001, BR-003 |

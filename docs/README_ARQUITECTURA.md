@@ -109,6 +109,7 @@ icm_backend/
 │   ├── authentication/                                         # Autenticación JWT, RBAC y control de acceso
 │   │   ├── tests/                                              # Pruebas del subdominio
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_permissions_api.py                         # Cobertura crítica del módulo
 │   │   │   ├── test_permissions_reorganization.py              # Cobertura crítica del módulo
 │   │   │   ├── test_services.py                                # Política de acceso y restricciones de rol
 │   │   │   ├── test_user_enable.py                             # Cobertura crítica del módulo
@@ -247,6 +248,22 @@ icm_backend/
 │   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
 │   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
 │   │   └── services.py                                         # Reglas de negocio y transacciones del dominio
+│   ├── purchasing/                                             # Aplicación Django detectada automáticamente
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── factories.py                                    # Factories de datos de prueba
+│   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_selectors.py                               # Consultas de lectura sin efectos secundarios
+│   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
+│   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Reglas de negocio del ledger y actualización transaccional del stock
+│   │   ├── selectors.py                                        # Consultas de lectura y agregaciones del módulo
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   ├── exceptions.py                                       # Excepciones de dominio y validación
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
 │   └── webhooks/                                               # Aplicación Django detectada automáticamente
 │       ├── tests/                                              # Pruebas del subdominio
 │       │   ├── test_endpoint_put.py                            # Reglas de negocio y transacciones del dominio
@@ -921,6 +938,92 @@ with pytest.raises(UnauthorizedCredentialManagementError):
 
 ---
 
+#### BR-018: NIT Único por Proveedor
+
+**Descripción**: El NIT (Número de Identificación Tributaria) de un proveedor es único en todo el sistema. No pueden existir dos proveedores con el mismo NIT, independientemente de si están activos o inactivos.
+
+**Implementación**:
+- `Supplier.nit = CharField(unique=True)` — constraint a nivel de base de datos.
+- `purchasing.services.create_supplier()` lanza `SupplierNITDuplicateError` si el NIT ya existe (verificación previa al insert para mensaje de error claro).
+
+**Verificación en tests**:
+```python
+SupplierFactory(nit="900000001-1")
+with pytest.raises(SupplierNITDuplicateError):
+    create_supplier(user, {"nombre_comercial": "Otro", "nit": "900000001-1"})
+```
+
+**Referencia**: RF-019, ADR-014
+
+---
+
+#### BR-019: Estado de OC controla operaciones permitidas
+
+**Descripción**: Las Órdenes de Compra siguen un ciclo de vida estricto. El estado determina qué operaciones son posibles:
+- `BORRADOR`: editable, cancelable, no acepta recepciones.
+- `PENDIENTE` / `PARCIALMENTE_RECIBIDA`: inmutable en contenido, acepta recepciones, cancelable solo si no hay recepciones confirmadas.
+- `COMPLETADA` / `CANCELADA`: completamente inmutable, no acepta ninguna operación.
+
+Solo las recepciones pueden crearse para OC en estado `PENDIENTE` o `PARCIALMENTE_RECIBIDA`.
+
+**Implementación**:
+- `PurchaseOrder.is_editable` (property): True solo en BORRADOR.
+- `PurchaseOrder.is_receivable` (property): True en PENDIENTE y PARCIALMENTE_RECIBIDA.
+- `purchasing.services.update_purchase_order()` lanza `PurchaseOrderImmutableError` si no es BORRADOR.
+- `purchasing.services.create_reception()` lanza `PONotReceivableError` si la OC no está en estado receivable.
+
+**Verificación en tests**:
+```python
+po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
+with pytest.raises(PurchaseOrderImmutableError):
+    update_purchase_order(user, po.id, {"notes": "x"})
+```
+
+**Referencia**: RF-020, RF-021, ADR-014
+
+---
+
+#### BR-020: Cancelación de OC requiere ausencia de recepciones confirmadas
+
+**Descripción**: Una Orden de Compra no puede cancelarse si tiene al menos una recepción en estado `CONFIRMADA`. La cancelación solo es posible si todas las recepciones asociadas están en `BORRADOR` o `CANCELADA`.
+
+**Implementación**:
+- `purchasing.services.cancel_purchase_order()` verifica `reception.status == CONFIRMADA` antes de proceder.
+- Lanza `POHasConfirmedReceptionsError` (HTTP 409) si existe alguna.
+
+**Verificación en tests**:
+```python
+po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
+ReceptionFactory(purchase_order=po, status=ReceptionStatus.CONFIRMADA)
+with pytest.raises(POHasConfirmedReceptionsError):
+    cancel_purchase_order(user, po.id, reason="Motivo")
+```
+
+**Referencia**: RF-020, ADR-014
+
+---
+
+#### BR-021: Costo de Compra Congelado en Movement al Confirmar Recepción
+
+**Descripción**: Al confirmar una recepción, el `unit_cost` acordado con el proveedor en el ítem de la Orden de Compra (`PurchaseOrderItem.unit_cost`) queda registrado de forma inmutable en el campo `Movement.unit_cost` del movimiento de entrada generado. Este valor no cambia aunque el precio de catálogo del producto se actualice posteriormente.
+
+**Implementación**:
+- `purchasing.services.confirm_reception()` pasa `unit_cost=poi.unit_cost` a `movements.services.register_entry()`.
+- `movements.services.register_entry()` acepta parámetro opcional `unit_cost=None` (backward-compatible con entradas sin OC).
+- `Movement.unit_cost` es nullable — los movimientos de entrada sin OC asociada mantienen `None`.
+
+**Verificación en tests**:
+```python
+poi = PurchaseOrderItemFactory(unit_cost="12500.5000")
+confirm_reception(user, reception.id)
+movement = Movement.objects.get(product=poi.product, movement_type=MovementType.ENTRADA)
+assert movement.unit_cost == Decimal("12500.5000")
+```
+
+**Referencia**: RF-022, ADR-013, ADR-014
+
+---
+
 ### 3.1.4 Auditoría y Reportes
 
 #### Reglas de Auditoría Derivadas de BR-10
@@ -963,6 +1066,10 @@ with pytest.raises(UnauthorizedCredentialManagementError):
 | BR-15 | StorageType Activo como Requisito | Inventory | Validación en `create_location`/`update_location`; `StorageType.is_active` | Tests: tipo inactivo rechazado en asignación |
 | BR-16 | Precio Congelado en Despacho | Movements/Pricing | `_resolve_price_snapshot()` en `movements/services.py`; campos `unit_price`, `subtotal`, `total_amount` en `Movement` (nullable, inmutables post-creación) | Tests: `test_price_snapshot_immutable_after_product_price_change`; cambio de precio no altera Movement histórico |
 | BR-17 | Historial Auditado de Precios | Catalog/Pricing | `update_product_prices()` en `catalog/services.py` crea fila en `ProductPriceHistory` por cada campo modificado | Tests: `test_update_price_creates_history_record`; valor idéntico no genera registro |
+| BR-018 | NIT Único por Proveedor | Purchasing | `Supplier.nit = CharField(unique=True)` + `SupplierNITDuplicateError` en `purchasing/services.py` | Tests: `test_create_supplier_duplicate_nit_raises` |
+| BR-019 | Estado de OC Controla Operaciones | Purchasing | `PurchaseOrder.is_editable`, `is_receivable` (properties) + guardas en `purchasing/services.py` | Tests: `test_confirm_already_pendiente_raises`, `test_create_reception_po_not_receivable_raises` |
+| BR-020 | Cancelación de OC Requiere Sin Recepciones Confirmadas | Purchasing | `cancel_purchase_order()` verifica `ReceptionStatus.CONFIRMADA` → `POHasConfirmedReceptionsError` (HTTP 409) | Tests: `test_cancel_po_with_confirmed_reception_raises` |
+| BR-021 | Costo de Compra Congelado en Movement | Purchasing/Movements | `register_entry(unit_cost=poi.unit_cost)` en `purchasing/services.confirm_reception()` | Tests: `test_confirm_reception_unit_cost_flows_to_movement` |
 
 ---
 

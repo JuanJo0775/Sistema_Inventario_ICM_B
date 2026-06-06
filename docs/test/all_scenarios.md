@@ -4927,6 +4927,1275 @@ Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes 
 
 ---
 
+<!-- file: RF019-S01.md -->
+# Creación de proveedor con NIT único
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF019_S01`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF019 — escenario 1.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF019` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- El Almacenista está autenticado en el sistema
+- No existe ningún proveedor con NIT "900123456-1"
+
+**When (Cuando):**
+- Envía POST /api/v1/purchasing/suppliers/ con nombre_comercial, razon_social y nit="900123456-1"
+
+**Then (Entonces):**
+- El sistema crea el proveedor con estado is_active=True
+- Retorna HTTP 201 con los datos del proveedor incluyendo su UUID
+- Queda registrado un evento SUPPLIER_CREATED en el log de auditoría
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF019_S01 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF019-S02.md -->
+# Intento de crear proveedor con NIT duplicado
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF019_S02`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF019 — escenario 2.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF019` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Ya existe un proveedor con nit="900123456-1"
+
+**When (Cuando):**
+- El Almacenista intenta crear otro proveedor con el mismo NIT
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- El log de auditoría no registra ningún evento SUPPLIER_CREATED
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF019_S02 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF019-S03.md -->
+# Desactivación de proveedor
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF019_S03`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF019 — escenario 3.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF019` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe un proveedor activo con OC en estado PENDIENTE
+
+**When (Cuando):**
+- El Almacenista desactiva el proveedor
+
+**Then (Entonces):**
+- El proveedor queda con is_active=False
+- Las OC existentes en estado PENDIENTE no se cancelan automáticamente
+- Nuevas OC con ese proveedor son rechazadas por el sistema
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF019_S03 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF019-S04.md -->
+# Solo el Almacenista puede gestionar proveedores
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF019_S04`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF019 — escenario 4.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF019` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Un usuario con rol Auxiliar de Despacho o Administrador está autenticado
+
+**When (Cuando):**
+- Intenta crear, actualizar o desactivar un proveedor
+
+**Then (Entonces):**
+- El sistema responde con HTTP 403 (Forbidden)
+- No se realiza ningún cambio en la base de datos
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF019_S04 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF020-S01.md -->
+# Creación de OC en estado BORRADOR
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF020_S01`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF020 — escenario 1.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF020` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- El Almacenista está autenticado
+- Existe un proveedor activo y un producto en el catálogo
+
+**When (Cuando):**
+- Envía POST /api/v1/purchasing/purchase-orders/ con supplier_id y un ítem con product_id, quantity_ordered=10, unit_cost=15000
+
+**Then (Entonces):**
+- El sistema crea la OC con status="borrador" y número OC-XXXX único
+- Retorna HTTP 201 con la OC y sus ítems
+- El log de auditoría registra PURCHASE_ORDER_CREATED
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF020_S01 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF020-S02.md -->
+# Confirmación de OC (BORRADOR → PENDIENTE)
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF020_S02`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF020 — escenario 2.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF020` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una OC en estado BORRADOR con al menos un ítem
+
+**When (Cuando):**
+- El Almacenista confirma la OC mediante POST /api/v1/purchasing/purchase-orders/{id}/confirm/
+
+**Then (Entonces):**
+- La OC pasa a estado PENDIENTE
+- El campo confirmed_by queda registrado con el UserID del ejecutor
+- El log de auditoría registra PURCHASE_ORDER_CONFIRMED
+- La OC ya no puede ser editada (intentos de PATCH retornan HTTP 422)
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF020_S02 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF020-S03.md -->
+# Cancelación de OC sin recepciones confirmadas
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF020_S03`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF020 — escenario 3.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF020` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una OC en estado BORRADOR o PENDIENTE sin recepciones confirmadas
+
+**When (Cuando):**
+- El Almacenista cancela la OC con una razón de cancelación
+
+**Then (Entonces):**
+- La OC pasa a estado CANCELADA con la razón registrada
+- El log de auditoría registra PURCHASE_ORDER_CANCELLED
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF020_S03 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF020-S04.md -->
+# Intento de cancelar OC con recepciones confirmadas
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF020_S04`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF020 — escenario 4.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF020` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una OC en estado PENDIENTE con al menos una recepción en estado CONFIRMADA
+
+**When (Cuando):**
+- El Almacenista intenta cancelar la OC
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 409 (Conflict)
+- La OC permanece en su estado actual sin cambios
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF020_S04 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF020-S05.md -->
+# Cancelación sin razón explícita es rechazada
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF020_S05`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF020 — escenario 5.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF020` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una OC cancelable
+
+**When (Cuando):**
+- El Almacenista intenta cancelar la OC sin proporcionar una razón (campo reason vacío)
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- La OC no cambia de estado
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF020_S05 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF021-S01.md -->
+# Recepción parcial de una OC
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF021_S01`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF021 — escenario 1.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF021` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una OC en estado PENDIENTE con un ítem de 20 unidades y 0 recibidas
+
+**When (Cuando):**
+- El Almacenista crea una recepción con 10 unidades para ese ítem en una ubicación activa
+
+**Then (Entonces):**
+- El sistema crea la recepción en estado BORRADOR
+- El log de auditoría registra RECEPTION_CREATED
+- La OC sigue en estado PENDIENTE (no cambia hasta confirmar la recepción)
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF021_S01 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF021-S02.md -->
+# Recepción que supera la cantidad pendiente es rechazada
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF021_S02`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF021 — escenario 2.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF021` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una OC con un ítem de 5 unidades ordenadas y 3 ya recibidas (2 pendientes)
+
+**When (Cuando):**
+- El Almacenista intenta crear una recepción con 5 unidades para ese ítem
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- No se crea ninguna recepción
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF021_S02 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF021-S03.md -->
+# No se puede crear recepción para OC en BORRADOR
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF021_S03`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF021 — escenario 3.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF021` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una OC en estado BORRADOR (no confirmada aún)
+
+**When (Cuando):**
+- El Almacenista intenta crear una recepción asociada a ella
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- No se crea ninguna recepción
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF021_S03 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF022-S01.md -->
+# Confirmación exitosa genera Movements y actualiza stock
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF022_S01`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF022 — escenario 1.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF022` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una recepción en BORRADOR con 10 unidades de un producto en una ubicación activa
+
+**When (Cuando):**
+- El Almacenista confirma la recepción
+
+**Then (Entonces):**
+- El sistema crea un Movement de tipo ENTRADA con quantity=10 en la ubicación de destino
+- El StockByLocation para ese producto en esa ubicación incrementa en 10
+- El Movement.unit_cost queda registrado con el valor de PurchaseOrderItem.unit_cost
+- La recepción pasa a estado CONFIRMADA
+- El log de auditoría registra RECEPTION_CONFIRMED
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF022_S01 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF022-S02.md -->
+# Recepción completa marca la OC como COMPLETADA
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF022_S02`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF022 — escenario 2.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF022` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Una OC tiene un ítem de 10 unidades con 0 recibidas
+- Existe una recepción en BORRADOR con los 10 ítems
+
+**When (Cuando):**
+- El Almacenista confirma la recepción
+
+**Then (Entonces):**
+- La OC pasa a estado COMPLETADA
+- No es posible crear nuevas recepciones para esa OC
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF022_S02 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF022-S03.md -->
+# Recepción parcial marca la OC como PARCIALMENTE_RECIBIDA
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF022_S03`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF022 — escenario 3.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF022` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Una OC tiene un ítem de 20 unidades con 0 recibidas
+- Existe una recepción en BORRADOR con 12 de esas 20 unidades
+
+**When (Cuando):**
+- El Almacenista confirma la recepción
+
+**Then (Entonces):**
+- La OC pasa a estado PARCIALMENTE_RECIBIDA
+- Es posible crear nuevas recepciones para recibir las 8 unidades restantes
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF022_S03 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF022-S04.md -->
+# Error en generación de Movement revierte toda la recepción
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF022_S04`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF022 — escenario 4.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF022` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una recepción en BORRADOR con múltiples ítems
+
+**When (Cuando):**
+- Durante la confirmación, la generación del Movement falla para cualquiera de los ítems
+
+**Then (Entonces):**
+- Ningún Movement es creado (rollback total)
+- El StockByLocation no es modificado
+- La recepción permanece en estado BORRADOR
+- La OC no cambia de estado
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF022_S04 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF022-S05.md -->
+# Discrepancia sin nota es rechazada
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF022_S05`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF022 — escenario 5.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF022` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una recepción en BORRADOR donde un ítem tiene quantity_received diferente a quantity_ordered
+- El campo discrepancy_note está vacío para ese ítem
+
+**When (Cuando):**
+- El Almacenista intenta confirmar la recepción
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- La recepción permanece en BORRADOR sin cambios en el stock
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF022_S05 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF023-S01.md -->
+# Cancelación exitosa de recepción en BORRADOR
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF023_S01`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF023 — escenario 1.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF023` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una recepción en estado BORRADOR
+
+**When (Cuando):**
+- El Almacenista cancela la recepción
+
+**Then (Entonces):**
+- La recepción pasa a estado CANCELADA
+- No se generan Movements ni cambios en el stock
+- El log de auditoría registra RECEPTION_CANCELLED
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF023_S01 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF023-S02.md -->
+# No se puede cancelar una recepción CONFIRMADA
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF023_S02`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF023 — escenario 2.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF023` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una recepción en estado CONFIRMADA
+
+**When (Cuando):**
+- El Almacenista intenta cancelar la recepción
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- La recepción permanece CONFIRMADA, los Movements y el stock no se alteran
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF023_S02 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF024-S01.md -->
+# Desde un Movement de ENTRADA se puede trazar la OC de origen
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF024_S01`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF024 — escenario 1.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF024` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una recepción confirmada que generó Movements de ENTRADA
+
+**When (Cuando):**
+- El Almacenista consulta el detalle de la recepción
+
+**Then (Entonces):**
+- La respuesta incluye los IDs de los Movements generados por cada ítem
+- Es posible navegar de ReceptionItem → Movement → StockByLocation
+- Es posible navegar de ReceptionItem → PurchaseOrderItem → PurchaseOrder → Supplier
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF024_S01 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF024-S02.md -->
+# El log de auditoría muestra todos los eventos del ciclo completo
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF024_S02`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF024 — escenario 2.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF024` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Se completó un ciclo: crear proveedor → crear OC → confirmar OC → crear recepción → confirmar recepción
+
+**When (Cuando):**
+- El Almacenista consulta el log de auditoría
+
+**Then (Entonces):**
+- El log contiene eventos: SUPPLIER_CREATED, PURCHASE_ORDER_CREATED, PURCHASE_ORDER_CONFIRMED, RECEPTION_CREATED, RECEPTION_CONFIRMED, MOVEMENT_CREATED
+- Todos los eventos están asociados al UserID del ejecutor y tienen timestamp exacto
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF024_S02 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF025-S01.md -->
+# Almacenista tiene acceso completo al módulo de compras
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF025_S01`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF025 — escenario 1.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF025` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Un usuario con rol Almacenista está autenticado dentro de su horario operativo
+
+**When (Cuando):**
+- Realiza operaciones de lectura (GET) y escritura (POST, PATCH) en cualquier endpoint del módulo de compras
+
+**Then (Entonces):**
+- El sistema procesa todas las solicitudes con HTTP 200 o 201 según corresponda
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF025_S01 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF025-S02.md -->
+# Administrador tiene acceso de solo lectura al módulo de compras
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF025_S02`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF025 — escenario 2.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF025` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Un usuario con rol Administrador está autenticado
+
+**When (Cuando):**
+- Realiza una consulta GET sobre proveedores, OC o recepciones
+
+**Then (Entonces):**
+- El sistema retorna HTTP 200 con los datos solicitados
+
+**And (Y cuando):**
+- Intenta crear, modificar o confirmar cualquier entidad del módulo de compras
+
+**Then (Entonces):**
+- El sistema retorna HTTP 403 (Forbidden)
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF025_S02 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF025-S03.md -->
+# Auxiliar de Despacho no tiene acceso al módulo de compras
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF025_S03`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF025 — escenario 3.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF025` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Un usuario con rol Auxiliar de Despacho está autenticado
+
+**When (Cuando):**
+- Intenta acceder a cualquier endpoint del módulo de compras (GET o POST)
+
+**Then (Entonces):**
+- El sistema retorna HTTP 403 (Forbidden) para todas las operaciones
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF025_S03 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
 <!-- file: RNF001-S01.md -->
 # Operario completa un flujo de despacho sin formación técnica previa
 
