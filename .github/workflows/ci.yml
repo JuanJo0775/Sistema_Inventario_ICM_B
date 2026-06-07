@@ -266,7 +266,7 @@ jobs:
           --health-retries=5
 
     env:
-      DJANGO_SETTINGS_MODULE: config.settings.test
+      DJANGO_SETTINGS_MODULE: config.settings.loadtest
       DATABASE_URL: postgres://icm:icm_pass@localhost:5432/icm_test
 
     steps:
