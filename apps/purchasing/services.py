@@ -116,11 +116,12 @@ def update_supplier(
     """Actualiza datos de un proveedor existente. Solo almacenista."""
     supplier = Supplier.objects.select_for_update().get(pk=supplier_id)
 
-    new_nit = (data.get("nit") or "").strip() or None
-    if new_nit != supplier.nit:
-        if new_nit and Supplier.objects.filter(nit=new_nit).exclude(pk=supplier.pk).exists():
-            raise SupplierNITDuplicateError()
-        supplier.nit = new_nit
+    if "nit" in data:
+        new_nit = (data["nit"] or "").strip() or None
+        if new_nit != supplier.nit:
+            if new_nit and Supplier.objects.filter(nit=new_nit).exclude(pk=supplier.pk).exists():
+                raise SupplierNITDuplicateError()
+            supplier.nit = new_nit
 
     for field in (
         "nombre_comercial",

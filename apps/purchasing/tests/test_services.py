@@ -100,6 +100,32 @@ def test_update_supplier_changes_fields(almacenista_user):
     assert updated.ciudad == "Medellín"
 
 
+@pytest.mark.django_db
+def test_create_supplier_without_nit(almacenista_user):
+    supplier = create_supplier(
+        almacenista_user,
+        {"nombre_comercial": "Importadora Internacional", "pais": "México"},
+    )
+    assert supplier.pk is not None
+    assert supplier.nit is None
+
+
+@pytest.mark.django_db
+def test_patch_supplier_without_nit_preserves_existing(almacenista_user):
+    supplier = SupplierFactory(nit="900000001-1")
+    updated = update_supplier(almacenista_user, supplier.id, {"ciudad": "Medellín"})
+    updated.refresh_from_db()
+    assert updated.nit == "900000001-1"
+
+
+@pytest.mark.django_db
+def test_patch_supplier_with_empty_nit_clears_value(almacenista_user):
+    supplier = SupplierFactory(nit="900000001-1")
+    updated = update_supplier(almacenista_user, supplier.id, {"nit": ""})
+    updated.refresh_from_db()
+    assert updated.nit is None
+
+
 # ---------------------------------------------------------------------------
 # PurchaseOrder tests
 # ---------------------------------------------------------------------------

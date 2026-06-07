@@ -69,6 +69,41 @@ def test_create_supplier_forbidden_administrador(authenticated_administrador_cli
 
 
 @pytest.mark.django_db
+def test_create_supplier_without_nit(authenticated_almacenista_client):
+    response = authenticated_almacenista_client.post(
+        "/api/v1/purchasing/suppliers/",
+        {"nombre_comercial": "Importadora Internacional", "pais": "México"},
+        format="json",
+    )
+    assert response.status_code == 201
+    assert response.data["nit"] is None
+
+
+@pytest.mark.django_db
+def test_patch_supplier_without_nit_preserves_existing(authenticated_almacenista_client):
+    supplier = SupplierFactory(nit="900000002-2")
+    response = authenticated_almacenista_client.patch(
+        f"/api/v1/purchasing/suppliers/{supplier.id}/",
+        {"ciudad": "Medellín"},
+        format="json",
+    )
+    assert response.status_code == 200
+    assert response.data["nit"] == "900000002-2"
+
+
+@pytest.mark.django_db
+def test_patch_supplier_with_empty_nit_clears_value(authenticated_almacenista_client):
+    supplier = SupplierFactory(nit="900000003-3")
+    response = authenticated_almacenista_client.patch(
+        f"/api/v1/purchasing/suppliers/{supplier.id}/",
+        {"nit": ""},
+        format="json",
+    )
+    assert response.status_code == 200
+    assert response.data["nit"] is None
+
+
+@pytest.mark.django_db
 def test_deactivate_supplier(authenticated_almacenista_client):
     supplier = SupplierFactory(is_active=True)
     response = authenticated_almacenista_client.post(
