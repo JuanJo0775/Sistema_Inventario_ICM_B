@@ -8741,7 +8741,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_views.py::test_auxiliar_cannot_manage_locations -v
 ```
 
-Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 75)
+Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 71)
 
 
 ---
@@ -8849,7 +8849,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_views.py::test_location_create_returns_201 -v
 ```
 
-Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 39)
+Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 35)
 
 
 ---
@@ -8885,7 +8885,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_views.py::test_location_state_transition_returns_200 -v
 ```
 
-Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 50)
+Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 46)
 
 
 ---
@@ -8921,7 +8921,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_views.py::test_product_stock_returns_200 -v
 ```
 
-Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 28)
+Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 26)
 
 
 ---
@@ -8957,7 +8957,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_views.py::test_storage_type_create_returns_201 -v
 ```
 
-Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 64)
+Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 60)
 
 
 ---
@@ -11189,7 +11189,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_views.py::test_administrador_cannot_create_entry -v
 ```
 
-Código fuente: [apps/movements/tests/test_views.py](../../apps/movements/tests/test_views.py) (aprox. línea 170)
+Código fuente: [apps/movements/tests/test_views.py](../../apps/movements/tests/test_views.py) (aprox. línea 168)
 
 
 ---
@@ -11225,7 +11225,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_views.py::test_auxiliar_can_create_entry -v
 ```
 
-Código fuente: [apps/movements/tests/test_views.py](../../apps/movements/tests/test_views.py) (aprox. línea 153)
+Código fuente: [apps/movements/tests/test_views.py](../../apps/movements/tests/test_views.py) (aprox. línea 151)
 
 
 ---
@@ -11261,7 +11261,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_views.py::test_corrections_endpoint_returns_201 -v
 ```
 
-Código fuente: [apps/movements/tests/test_views.py](../../apps/movements/tests/test_views.py) (aprox. línea 119)
+Código fuente: [apps/movements/tests/test_views.py](../../apps/movements/tests/test_views.py) (aprox. línea 117)
 
 
 ---
@@ -11333,7 +11333,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_views.py::test_dispatch_returns_409_on_insufficient_stock -v
 ```
 
-Código fuente: [apps/movements/tests/test_views.py](../../apps/movements/tests/test_views.py) (aprox. línea 99)
+Código fuente: [apps/movements/tests/test_views.py](../../apps/movements/tests/test_views.py) (aprox. línea 97)
 
 
 ---
