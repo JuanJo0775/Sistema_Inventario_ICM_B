@@ -2,155 +2,238 @@
 
 ## Fuentes de verdad
 
-1. **`docs/requisitos/ERS_ICM_Requisitos.md`** — RF/RNF y criterios **Gherkin** (Given / When / Then).
-2. **`docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md`** — contexto de negocio ICM.
-3. **`docs/README_ARQUITECTURA.md`**, **`docs/api/README_API.md`**.
+| Prioridad | Archivo | Rol |
+|-----------|---------|-----|
+| 1 | `docs/requisitos/ERS_ICM_Requisitos.md` | Requisitos funcionales y criterios Gherkin (Given/When/Then) |
+| 2 | `docs/README_ARQUITECTURA.md` | Estructura de capas (services/selectors/views) |
+| 3 | `docs/api/README_API.md` | Contratos HTTP, códigos de respuesta |
 
-## Estructura de documentación por test
+---
 
-| Ubicación | Contenido |
-|-----------|------------|
-| `docs/test/scenarios/` | **Un archivo `.md` por cada escenario Gherkin del ERS** (95 archivos) + `index.md` al inicio de la carpeta. Los archivos se generan por código de escenario, por ejemplo `RF001-S01.md`. |
-| `docs/test/unit/` | **Un archivo `.md` por cada test** fuera de la suite Gherkin dinámica (p. ej. `apps/*/tests/*.py`, `tests/test_api_integration.py`) + `index.md` al inicio. Los archivos se generan por código, por ejemplo `UNIT-0001.md`. |
-| `docs/test/integration/` | **Un archivo `.md` por cada test de integración** + `index.md` al inicio. Los archivos se generan por código, por ejemplo `INT-0001.md`. |
-| `docs/test/gherkin_scenarios.json` | Metadatos parseados del ERS (título, cuerpo Gherkin por escenario). |
-| `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` | Matriz resumida RF ↔ tests (referencia viva). |
+## Estructura de documentación generada
 
-## Cómo se genera la documentación
+| Carpeta / archivo | Contenido |
+|-------------------|-----------|
+| `docs/test/scenarios/` | Un `.md` por escenario Gherkin del ERS (`RF001-S01.md`, etc.) |
+| `docs/test/unit/` | Un `.md` por test unitario (`UNIT-0001.md`, etc.) |
+| `docs/test/integration/` | Un `.md` por test de integración (`INT-0001.md`, etc.) |
+| `docs/test/gherkin_scenarios.json` | Metadatos parseados del ERS (generado, no editar a mano) |
+| `docs/test/gherkin_pending.json` | Escenarios backend aún sin automatizar — registrar aquí para que CI haga skip limpio |
+| `docs/test/gherkin_out_of_scope.json` | Escenarios solo verificables por E2E/UI — skip permanente en backend |
+| `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` | Matriz RF ↔ tests (referencia viva) |
 
-La documentación de pruebas se construye desde los tests reales del repositorio y se organiza en tres bloques:
+---
 
-1. **Gherkin/ERS**: escenarios derivados de `docs/requisitos/ERS_ICM_Requisitos.md`.
-2. **Unitarios**: tests bajo `apps/*/tests/` y otros tests no clasificados como integración.
-3. **Integración**: tests HTTP/API y otros casos marcados como integración por convención.
+## Cómo añadir un nuevo escenario — guía completa
 
-Cada bloque genera:
+### Paso 1 — Escribir el escenario en el ERS
 
-- Un archivo `index.md` dentro de su carpeta.
-- Un archivo `.md` por cada test o escenario.
-- Un archivo agregado `docs/test/all_*.md` cuando se ejecuta la concatenación.
+Abre `docs/requisitos/ERS_ICM_Requisitos.md` y localiza el requisito funcional (RF) correspondiente.
+Bajo la sección **Criterios de Aceptación (Formato Gherkin)** del RF, añade el escenario con la siguiente estructura:
 
-### Opción oficial: CLI única
+```
+### Scenario N: <Título descriptivo>
 
-El punto de entrada recomendado es el módulo canónico de Python:
+**Given (Dado que):**
+- <precondición 1>
+- <precondición 2>
+
+**When (Cuando):**
+- <acción del actor>
+
+**Then (Entonces):**
+- <resultado esperado 1>
+- <resultado esperado 2>
+```
+
+Reglas de numeración:
+- El identificador se forma como `RFxxx-SNN` donde `xxx` es el número del requisito y `NN` es el número de escenario dentro de ese RF.
+- Los escenarios deben ser consecutivos dentro de su RF, sin huecos.
+- Si añades un RNF nuevo, usa `RNFxxx-SNN` con la misma convención.
+
+El ERS es la única fuente autorizada para agregar o modificar escenarios. No crear escenarios directamente en los archivos de implementación sin que existan primero en el ERS.
+
+### Paso 2 — Regenerar los metadatos y la documentación
 
 ```bash
 python -m scripts.generate_docs
 ```
 
-Ese comando regenera los tres bloques y deja actualizados:
+Este comando:
+- Parsea el ERS y actualiza `docs/test/gherkin_scenarios.json`
+- Genera o actualiza el `.md` del escenario en `docs/test/scenarios/`
+- Regenera `docs/test/all_scenarios.md`
 
-- `docs/test/unit/`
-- `docs/test/integration/`
-- `docs/test/scenarios/`
-- `docs/test/all_unit.md`
-- `docs/test/all_integration.md`
-
-- `docs/test/all_scenarios.md`
-
-También puedes ejecutar un bloque específico:
-
-```bash
-python -m scripts.generate_docs --only unit
-python -m scripts.generate_docs --only integration
-python -m scripts.generate_docs --only gherkin
-```
-
-Si quieres validar sin escribir archivos, usa `--check`:
-
+Verifica que el nuevo escenario aparece en la salida:
 ```bash
 python -m scripts.generate_docs --check
 ```
 
-Si necesitas forzar reescritura aunque el contenido sea igual, usa `--force`:
+### Paso 3 — Decidir el tipo de automatización
 
-```bash
-python -m scripts.generate_docs --force
+| Situación | Acción |
+|-----------|--------|
+| El comportamiento es verificable por API/servicio Django | → Paso 4: implementar en `tests/ers/impl/` |
+| El comportamiento requiere UI, navegador o flujo E2E | → Paso 5: declarar en `gherkin_out_of_scope.json` |
+| El comportamiento es backend pero la implementación se aplaza | → Paso 6: declarar en `gherkin_pending.json` |
+
+Si no se hace uno de los tres, la suite fallará en tiempo de colección con `[MISSING]` — esto es intencional para evitar escenarios olvidados.
+
+### Paso 4 — Implementar el escenario (backend automatable hoy)
+
+**4a. Localiza el archivo de dominio correcto:**
+
+| RF | Archivo |
+|----|---------|
+| RF001, RF002 | `tests/ers/impl/auth.py` |
+| RF003 | `tests/ers/impl/catalog.py` |
+| RF004 | `tests/ers/impl/inventory.py` |
+| RF005–RF009 | `tests/ers/impl/movements.py` |
+| RF010 | `tests/ers/impl/reports.py` |
+| RF011 | `tests/ers/impl/alerts.py` |
+| RF012 | `tests/ers/impl/audit.py` |
+| RF013 | `tests/ers/impl/pricing.py` |
+| RF019–RF025 | `tests/ers/impl/purchasing.py` |
+| RNF003–RNF006 | `tests/ers/impl/nonfunctional.py` |
+
+Si el escenario pertenece a un RF completamente nuevo, crea un archivo de dominio nuevo (`tests/ers/impl/<dominio>.py`) e importa su `IMPLEMENTATIONS` en `tests/ers/impl/registry.py`.
+
+**4b. Escribe la función de implementación:**
+
+```python
+def impl_rf0XX_sNN(authenticated_almacenista_client: APIClient, sample_product, db):
+    # El nombre de cada parámetro debe ser exactamente el nombre de una fixture
+    # declarada en conftest.py o en el mismo módulo de pruebas.
+    from apps.mi_modulo.models import MiModelo
+
+    url = reverse("nombre-del-endpoint")
+    r = authenticated_almacenista_client.post(url, {...}, format="json")
+
+    assert r.status_code == status.HTTP_201_CREATED
+    assert MiModelo.objects.filter(...).exists()
 ```
 
-### Qué valida la generación
+Convenciones:
+- Nombre: `impl_rf{NNN}_s{NN}` en minúsculas con underscores.
+- Los parámetros se inyectan por nombre desde `conftest.py` — no usar `@pytest.fixture` aquí.
+- Fixtures globales disponibles: `api_client`, `almacenista_user`, `auxiliar_user`, `administrador_user`, `sample_product`, `sample_locations`, `authenticated_almacenista_client`, `authenticated_administrador_client`.
+- Los imports de Django/DRF pueden ir al nivel de módulo o dentro de la función; preferir dentro de la función para no alargar el encabezado del archivo.
 
-- El índice queda dentro de cada carpeta de destino.
-- Los archivos individuales se nombran por código: `UNIT-0001.md`, `INT-0001.md`, `RF001-S01.md`.
-- La carpeta queda limpia antes de regenerar para evitar mezclar archivos viejos con los nuevos.
+**4c. Registra la función en el dict `IMPLEMENTATIONS` del mismo archivo:**
 
-## Suite Gherkin (1 test = 1 escenario ERS)
-
-- **Código:** `tests/ers/test_gherkin_dynamic.py` genera **95** funciones `test_RFxxx_Sxx` / `test_RNFxxx_Sxx`.
-- **Implementación:** `tests/ers/gherkin_impl.py` — diccionario `IMPLEMENTATIONS` enlaza escenario → función Python. Si un escenario no está en el diccionario, el test hace **`pytest.skip`** con motivo (UI pura, exportación Excel, concurrencia multi-hilo, aprobación de devoluciones no modelada, etc.).
-- **Escenarios fuera de alcance backend:** la lista persistente vive en `docs/test/gherkin_out_of_scope.json`. El generador la incorpora en `docs/test/scenarios/*.md`, `docs/test/gherkin_scenarios.json` y `docs/test/scenarios/index.md`, de modo que el estado sobreviva a cualquier regeneración.
-- **Regenerar escenarios y MD** tras cambios en el ERS:
-
-```bash
-python scripts/parse_ers_gherkin.py
+```python
+IMPLEMENTATIONS: dict[str, object] = {
+    ...,
+    "RF0XX-SNN": impl_rf0XX_sNN,   # añadir esta línea
+}
 ```
 
-- **Sincronizar lista de escenarios implementados:** editar `_IMPL_IDS` en `scripts/parse_ers_gherkin.py` y el dict `IMPLEMENTATIONS` en `tests/ers/gherkin_impl.py` (deben coincidir).
+La clave debe coincidir exactamente con el ID del escenario en `gherkin_scenarios.json` (mayúsculas, guion, sin espacios).
 
-## Tests unitarios / integración (no Gherkin dinámico)
+**4d. Si el escenario estaba en `gherkin_pending.json`, elimina su entrada:**
 
-Para regenerar toda la documentación de tests, usa el comando oficial:
-
-```bash
-python -m scripts.generate_docs
+```json
+// Eliminar la entrada correspondiente de docs/test/gherkin_pending.json
 ```
 
-Si quieres hacerlo por partes:
+### Paso 5 — Escenario solo E2E/UI (fuera de alcance backend)
+
+Añade una entrada en `docs/test/gherkin_out_of_scope.json`:
+
+```json
+"RF0XX-SNN": {
+  "scope": "frontend-or-e2e",
+  "reason": "Requiere interacción con navegador — verificar con Playwright/Cypress."
+}
+```
+
+La suite hará `pytest.skip("[SCOPE] ...")` en lugar de fallar.
+
+### Paso 6 — Escenario backend aplazado
+
+Añade una entrada en `docs/test/gherkin_pending.json`:
+
+```json
+"RF0XX-SNN": {
+  "reason": "Módulo X pendiente de implementar — sprint Y",
+  "since": "YYYY-MM-DD"
+}
+```
+
+La suite hará `pytest.skip("[PENDING] ...")` en lugar de fallar. Cuando se automatice, eliminar la entrada y seguir el Paso 4.
+
+### Paso 7 — Verificar
 
 ```bash
-python -m scripts.generate_docs --only unit
-python -m scripts.generate_docs --only integration
-python -m scripts.generate_docs --only gherkin
+# Colección limpia (no debe haber errores ni [MISSING])
+pytest tests/ers --collect-only -q
+
+# Suite Gherkin completa
+pytest tests/ers -v --tb=short
+
+# No deben caerse los tests unitarios existentes
+pytest -q -k "not integration and not ers"
 ```
+
+---
+
+## Arquitectura del sistema Gherkin
+
+```
+docs/requisitos/ERS_ICM_Requisitos.md       ← fuente de verdad de escenarios
+        ↓ python -m scripts.generate_docs
+docs/test/gherkin_scenarios.json            ← metadatos parseados (no editar)
+docs/test/scenarios/RFxxx-Sxx.md           ← ficha por escenario (no editar)
+        ↓ import en test_gherkin_dynamic.py
+tests/ers/test_gherkin_dynamic.py           ← genera 1 test por escenario dinámicamente
+        ↓ llama a
+tests/ers/impl/_dispatcher.py              ← lógica 3-estados
+    ├── IMPLEMENTATIONS (registry.py)      → corre la función
+    ├── gherkin_out_of_scope.json          → pytest.skip("[SCOPE]")
+    ├── gherkin_pending.json               → pytest.skip("[PENDING]")
+    └── (ninguno de los anteriores)        → pytest.fail("[MISSING]")  ← CI roto
+```
+
+### Archivos de implementación (`tests/ers/impl/`)
+
+| Archivo | Propósito |
+|---------|-----------|
+| `registry.py` | Agrega todos los dicts de dominio en un único `IMPLEMENTATIONS` |
+| `_dispatcher.py` | `run_gherkin_scenario()` con la lógica 3-estados |
+| `__init__.py` | Re-exporta `IMPLEMENTATIONS` y `run_gherkin_scenario` |
+| `auth.py` … `nonfunctional.py` | Implementaciones por dominio (un archivo por grupo RF) |
+
+Para añadir un nuevo grupo de requisitos (e.g. RF026-RF030 de un módulo nuevo):
+1. Crear `tests/ers/impl/<dominio>.py` con sus funciones y su `IMPLEMENTATIONS` local.
+2. Importar y fusionar en `tests/ers/impl/registry.py`.
+
+---
 
 ## Cómo ejecutar la suite de tests
 
 ### Suite completa
-
-En Windows, usa una de estas dos formas. La primera es la recomendada porque deja claro que se está usando el entorno del proyecto.
-
-1. Activar el entorno virtual y ejecutar la suite:
 
 ```powershell
 . .venv\Scripts\Activate.ps1
 pytest -q
 ```
 
-2. Ejecutar directamente con el Python del entorno virtual, sin activarlo:
-
-```powershell
-& .\.venv\Scripts\python.exe -m pytest -q
-```
-
-Si quieres ver más detalle por test, cambia `-q` por `-v` en cualquiera de las dos opciones.
-
-`pytest -q` muestra salida concisa y es la opción recomendada para uso diario y CI.
-`pytest -v` muestra salida detallada y sirve mejor para depurar.
-
-Este comando ejecuta toda la suite del proyecto: unitarios, integración y Gherkin.
-
-Nota de fidelidad del entorno de pruebas:
-
-- `config.settings.test` usa SQLite in-memory.
-- `config.settings.test` desactiva `DEFAULT_THROTTLE_CLASSES`.
-- La suite valida contratos y reglas de dominio, pero no reproduce la semantica exacta de PostgreSQL ni el throttling de produccion.
-
-### Sólo escenarios ERS / Gherkin
+### Solo escenarios ERS / Gherkin
 
 ```bash
-pytest tests/ers/test_gherkin_dynamic.py -v
+pytest tests/ers -v
 ```
 
-### Un escenario ERS concreto
+### Un escenario concreto
 
 ```bash
-pytest tests/ers/test_gherkin_dynamic.py::test_RF006_S01 -v
+pytest tests/ers -k "RF006_S01" -v
 ```
 
-### Filtrar por requisito o prefijo
+### Por módulo
 
 ```bash
-pytest tests/ers/test_gherkin_dynamic.py -k "RF001" -v
+pytest tests/ers -k "RF005 or RF006 or RF007" -v
 ```
 
 ### Tests por app
@@ -165,53 +248,44 @@ pytest apps/movements/tests/ -v
 pytest tests/integration/ -v
 ```
 
-### Tests unitarios de una app concreta
+### Con cobertura
 
 ```bash
-pytest apps/catalog/tests/ -v
+pytest --cov=apps tests/ers
 ```
 
-### Si necesitas cobertura
+---
+
+## Cómo regenerar la documentación
 
 ```bash
-pytest --cov=apps
+# Todo
+python -m scripts.generate_docs
+
+# Solo bloque Gherkin
+python -m scripts.generate_docs --only gherkin
+
+# Validar sin escribir archivos
+python -m scripts.generate_docs --check
+
+# Forzar reescritura aunque el contenido sea igual
+python -m scripts.generate_docs --force
 ```
+
+---
 
 ## Definition of Done (testing)
 
-- `pytest` completo en verde; skips solo en escenarios Gherkin **explícitamente pendientes** de backend.
-- Nuevas automatizaciones Gherkin: añadir función en `gherkin_impl.py`, registrar en `IMPLEMENTATIONS`, actualizar `_IMPL_IDS` en `parse_ers_gherkin.py` y regenerar MD.
-- Contratos RF/BR nuevos reflejados en docstrings y, si aplica, en `TRAZABILIDAD_ERS_GHERKIN.md`.
+- `pytest` completo en verde; skips solo para escenarios con entrada en `gherkin_pending.json` o `gherkin_out_of_scope.json`.
+- Nuevo escenario ERS → entrada en el ERS → `generate_docs` → implementación en `impl/<dominio>.py` → registrada en `IMPLEMENTATIONS` → entrada eliminada de `gherkin_pending.json` si existía.
+- Nuevo RF sin implementación inmediata → entrada en `gherkin_pending.json` antes del merge.
+- Contratos RF/BR nuevos reflejados en la traza `TRAZABILIDAD_ERS_GHERKIN.md`.
 
-## Mantenimiento
+---
 
-- Añadir implementación: función en `tests/ers/gherkin_impl.py` + clave en `IMPLEMENTATIONS` + id en `_IMPL_IDS` en `scripts/parse_ers_gherkin.py`
-  → `python scripts/parse_ers_gherkin.py`
+## Notas sobre entorno de pruebas
 
-- Regenerar docs de tests:
-  `python -m scripts.generate_docs`
-
-## Nuevas suites añadidas (concurrency / e2e)
-
-Se han añadido nuevas áreas de prueba previstas en el plan de cierre de brechas:
-
-- `tests/concurrency/`: pruebas de concurrencia/consistencia pensadas para ejecutarse contra PostgreSQL real (no SQLite). Estas pruebas están deshabilitadas por defecto y requieren una DB Postgres accesible y la variable de entorno `RUN_CONCURRENCY_TESTS=1` para ejecutarse.
-
-- `tests/e2e/`: carpeta objetivo para tests E2E UI (Playwright/Cypress). El repositorio incluye un plan de handoff para frontend en `docs/test/FRONTEND_E2E_PLAN.md` con escenarios, payloads y criterios de aceptación que el equipo frontend puede implementar.
-
-Nota: el generador de documentación ahora clasifica `tests/concurrency/` como parte de la familia `integration`. Al regenerar la documentación de integración (`python -m scripts.generate_docs --only integration`) se crearán las páginas markdown correspondientes dentro de `docs/test/integration/` y se añadirán al agregador `docs/test/all_integration.md`.
-
-Comandos recomendados para ejecutar las nuevas suites (localmente con Postgres):
-
-```powershell
-# Run concurrency tests (requires Postgres and RUN_CONCURRENCY_TESTS=1)
-$env:RUN_CONCURRENCY_TESTS = "1"
-& .\.venv\Scripts\python.exe -m pytest tests/concurrency -q
-
-# Run E2E tests (example for Playwright runner)
-pwsh -c "npx playwright test tests/e2e --project=chromium"
-```
-
-Notas:
-- Las pruebas de concurrencia deben correr en un entorno que reproduzca la semántica de PostgreSQL; la configuración por defecto de `config.settings.test` usa SQLite en memoria.
-- Añadir estas pruebas al pipeline de CI requiere exponer un servicio `postgres` en el job y establecer la variable `RUN_CONCURRENCY_TESTS=1`.
+- `config.settings.test` usa **SQLite in-memory** — la semántica de PostgreSQL no se reproduce (transacciones advisory, `SELECT FOR UPDATE`, etc.).
+- `DEFAULT_THROTTLE_CLASSES` está desactivado en test.
+- Tests de concurrencia real: `tests/concurrency/` requiere Postgres y `RUN_CONCURRENCY_TESTS=1`.
+- Tests E2E UI: `tests/e2e/` — ver `docs/test/FRONTEND_E2E_PLAN.md` para plan de handoff a frontend.

@@ -2,9 +2,43 @@
 
 Este documento enlaza pruebas automatizadas con **requisitos** y **criterios de aceptación en estilo Gherkin** del `docs/requisitos/ERS_ICM_Requisitos.md`, complementados con el contexto de negocio del `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` (BR, roles, ubicaciones).
 
-**Cobertura 1:1 ERS:** la suite `tests/ers/test_gherkin_dynamic.py` (106 nodos) y `tests/ers/gherkin_impl.py` son la fuente principal; cada escenario tiene su ficha en `docs/test/scenarios/<ID>.md`.
+**Cobertura 1:1 ERS:** la suite `tests/ers/test_gherkin_dynamic.py` genera 1 función de test por escenario; la implementación vive en `tests/ers/impl/<dominio>.py`; cada escenario tiene su ficha en `docs/test/scenarios/<ID>.md`.
 
 **Fuentes de verdad (orden):** ERS + informe de elicitación → código → tests.
+
+---
+
+## Workflow para añadir un nuevo escenario
+
+> Ver guía completa en `docs/test/README_TEST.md`. Resumen ejecutivo:
+
+1. **ERS primero** — escribir el escenario en `docs/requisitos/ERS_ICM_Requisitos.md` bajo la sección *Criterios de Aceptación (Formato Gherkin)* del RF correspondiente. El identificador sigue el patrón `RFxxx-SNN`.
+
+2. **Regenerar metadatos** — `python -m scripts.generate_docs` actualiza `gherkin_scenarios.json` y crea `docs/test/scenarios/RFxxx-SNN.md`.
+
+3. **Decidir tipo:**
+   - Backend automatable → implementar en `tests/ers/impl/<dominio>.py` y registrar en `IMPLEMENTATIONS` del mismo archivo.
+   - Backend aplazado → añadir entrada en `docs/test/gherkin_pending.json`.
+   - Solo E2E/UI → añadir entrada en `docs/test/gherkin_out_of_scope.json`.
+
+4. **Verificar** — `pytest tests/ers --collect-only -q` no debe mostrar errores; `pytest tests/ers -q` no debe mostrar `[MISSING]`.
+
+5. **Actualizar esta matriz** — añadir fila en la sección del RF correspondiente con el escenario y su cobertura.
+
+### Archivos de implementación por dominio
+
+| Módulo | Archivo de implementación |
+|--------|--------------------------|
+| RF001–RF002 (Autenticación) | `tests/ers/impl/auth.py` |
+| RF003 (Catálogo) | `tests/ers/impl/catalog.py` |
+| RF004 (Inventario / Storage) | `tests/ers/impl/inventory.py` |
+| RF005–RF009 (Movimientos) | `tests/ers/impl/movements.py` |
+| RF010 (Reportes) | `tests/ers/impl/reports.py` |
+| RF011 (Alertas) | `tests/ers/impl/alerts.py` |
+| RF012 (Auditoría) | `tests/ers/impl/audit.py` |
+| RF013 (Precios / Facturación) | `tests/ers/impl/pricing.py` |
+| RF019–RF025 (Compras) | `tests/ers/impl/purchasing.py` |
+| RNF003–RNF006 (No funcionales) | `tests/ers/impl/nonfunctional.py` |
 
 ---
 
