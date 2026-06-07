@@ -283,9 +283,51 @@ python -m scripts.generate_docs --force
 
 ---
 
+## Estado actual de la suite
+
+**683 tests · 674 pasan · 9 skips legítimos · 0 fallos** _(2026-06-07)_
+
+| Capa | Archivos | Descripción |
+|------|----------|-------------|
+| Servicios (unit) | `apps/*/tests/test_services.py` | Lógica de negocio, edge cases, rollback |
+| HTTP (views) | `apps/*/tests/test_views.py` | Endpoints reales con `APIClient` |
+| Gherkin/ERS | `tests/ers/` | Escenarios RF001–RF025, RNF003–RNF006 |
+| Concurrencia | `tests/concurrency/` | Requiere `RUN_CONCURRENCY_TESTS=1` + Postgres |
+| Performance (load) | `tests/performance/locustfile.py` | Locust — NO parte de pytest, correr aparte |
+
+Para el historial completo de cambios ver [`CHANGELOG_TESTING.md`](CHANGELOG_TESTING.md).
+
+---
+
+## Cómo verificar cobertura
+
+```powershell
+# Cobertura con reporte HTML (abre htmlcov/index.html)
+pytest --cov=apps --cov-report=html --cov-report=term-missing -q
+```
+
+---
+
+## Load testing con Locust (opcional)
+
+Locust simula usuarios concurrentes contra un servidor vivo. **No reemplaza pytest** — úsalo antes de releases o para detectar regresiones N+1 bajo carga.
+
+```bash
+# Instalar (solo para performance, no va en requirements.txt principal)
+pip install -r requirements-perf.txt
+
+# Correr (requiere servidor en localhost:8000)
+locust -f tests/performance/locustfile.py \
+       --headless -H http://localhost:8000 \
+       -u 10 -r 2 --run-time 60s --only-summary
+```
+
+---
+
 ## Notas sobre entorno de pruebas
 
 - `config.settings.test` usa **SQLite in-memory** — la semántica de PostgreSQL no se reproduce (transacciones advisory, `SELECT FOR UPDATE`, etc.).
 - `DEFAULT_THROTTLE_CLASSES` está desactivado en test.
 - Tests de concurrencia real: `tests/concurrency/` requiere Postgres y `RUN_CONCURRENCY_TESTS=1`.
 - Tests E2E UI: `tests/e2e/` — ver `docs/test/FRONTEND_E2E_PLAN.md` para plan de handoff a frontend.
+- `tests/performance/` está excluido de la recolección de pytest (`norecursedirs` en `pytest.ini`) para evitar errores de importación de `locust`.

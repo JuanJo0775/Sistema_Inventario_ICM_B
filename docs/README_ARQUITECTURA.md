@@ -179,7 +179,7 @@ icm_backend/
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
 │   │   │   ├── test_pricing_optional.py                        # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
-│   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   │   └── test_views.py                                   # Reglas de negocio y transacciones del dominio
 │   │   ├── models.py                                           # Entidades y constraints de persistencia
 │   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
 │   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
