@@ -92,17 +92,55 @@ import pytest
     os.environ.get("RUN_CONCURRENCY_TESTS") != "1",
     reason="Requires Postgres and RUN_CONCURRENCY_TESTS=1",
 )
-def test_concurrent_movements_do_not_create_negative_stock(db):
-    """Esqueleto: implementar con multiprocessing o threading contra Postgres.
+@pytest.mark.django_db(transaction=True)
+def test_concurrent_movements_do_not_create_negative_stock(
+    almacenista_user, sample_product, sample_locations
+):
+    """Simula entries y dispatches concurrentes para verificar que el stock nunca sea negativo."""
+    from django.db import connection
 
-    Requisitos de implementación:
-    - Usar una DB PostgreSQL accesible en CI/local (no SQLite).
-    - Crear un `StockByLocation` inicial con cantidad conocida.
-    - Ejecutar N workers que intenten consumir stock simultáneamente.
-    - Verificar que al final: stock >= 0 y suma(movements) == cantidad original - consumida.
+    if connection.vendor == "sqlite":
+        pytest.skip("SQLite no garantiza semántica de bloqueo; ejecutar en Postgres")
 
-    Por ahora el test está marcado skip por defecto y actúa como plantilla.
-    """
-    pytest.skip(
-        "Implementar prueba de concurrencia: requiere Postgres y setup de contenedor"
-    )
+    loc = sample_locations[0]
+    product = sample_product
+
+    register_entry(almacenista_user, product.id, loc.id, 5)
+
+    results = []
+
+    def entry_worker():
+        connections.close_all()
+        try:
+            register_entry(almacenista_user, product.id, loc.id, 2)
+            results.append(("entry", True, 2))
+        except Exception as e:
+            results.append(("entry", False, e))
+
+    def dispatch_worker():
+        connections.close_all()
+        with patch(
+            "apps.movements.services.generate_invoice_number", return_value=None
+        ):
+            try:
+                register_dispatch(
+                    almacenista_user,
+                    product.id,
+                    loc.id,
+                    3,
+                    MovementType.SALIDA_VENTA_MENOR,
+                    scanned_code=product.barcode,
+                    order_sku=product.sku,
+                )
+                results.append(("dispatch", True, 3))
+            except Exception as e:
+                results.append(("dispatch", False, e))
+
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        futures = [ex.submit(entry_worker) for _ in range(3)]
+        futures += [ex.submit(dispatch_worker) for _ in range(5)]
+        for fut in futures:
+            fut.result()
+
+    row = StockByLocation.objects.get(product=product, location=loc)
+    assert row.current_stock >= 0

@@ -141,15 +141,30 @@ def impl_rf005_s05(authenticated_almacenista_client: APIClient, sample_locations
 def impl_rf005_s06(
     authenticated_almacenista_client: APIClient, sample_product, sample_locations
 ):
-    # Resolución de código de barras escaneado durante recepción — mismo flujo que S01
-    impl_rf005_s01(authenticated_almacenista_client, sample_product, sample_locations)
+    loc = sample_locations[0]
+    r = authenticated_almacenista_client.post(
+        reverse("movements-entries"),
+        _entry_payload(
+            sample_product.id,
+            loc.id,
+            scanned_code=sample_product.barcode,
+            serial_number="SN-RF005-06",
+        ),
+        format="json",
+    )
+    assert r.status_code == status.HTTP_201_CREATED
 
 
 def impl_rf005_s07(
     authenticated_almacenista_client: APIClient, sample_product, sample_locations
 ):
-    # Recepción sin lector disponible — mismo flujo backend que S06
-    impl_rf005_s06(authenticated_almacenista_client, sample_product, sample_locations)
+    loc = sample_locations[0]
+    r = authenticated_almacenista_client.post(
+        reverse("movements-entries"),
+        _entry_payload(sample_product.id, loc.id, serial_number="SN-RF005-07"),
+        format="json",
+    )
+    assert r.status_code == status.HTTP_201_CREATED
 
 
 # --- RF-006 -----------------------------------------------------------------

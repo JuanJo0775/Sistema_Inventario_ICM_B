@@ -6,8 +6,32 @@ from shared.utils.barcode import build_product_barcode
 from tests.factories import CategoryFactory
 
 
-def test_catalog_service_exports_identifier_resolver():
-    assert callable(resolve_identifier)
+@pytest.mark.django_db
+def test_resolve_identifier_by_sku_returns_product():
+    from tests.factories import CategoryFactory, ProductFactory
+
+    category = CategoryFactory()
+    product = ProductFactory(sku="RES-0001", category=category)
+    result = resolve_identifier("RES-0001")
+    assert result.id == product.id
+
+
+@pytest.mark.django_db
+def test_resolve_identifier_by_barcode_returns_product():
+    from tests.factories import CategoryFactory, ProductFactory
+
+    category = CategoryFactory()
+    product = ProductFactory(sku="RES-0002", category=category)
+    result = resolve_identifier(product.barcode)
+    assert result.id == product.id
+
+
+@pytest.mark.django_db
+def test_resolve_identifier_unknown_raises_not_found():
+    from apps.catalog.models import Product
+
+    with pytest.raises(Product.DoesNotExist):
+        resolve_identifier("SKU-INEXISTENTE-9999")
 
 
 @pytest.mark.django_db

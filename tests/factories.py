@@ -106,9 +106,8 @@ class LotFactory(DjangoModelFactory):
 class LocationFactory(DjangoModelFactory):
     class Meta:
         model = Location
-        django_get_or_create = ("name",)
 
-    name = factory.Iterator(["Vitrina", "Bodega 1", "Bodega 2"])
-    code = factory.LazyAttribute(lambda o: o.name.lower().replace(" ", "-"))
+    name = factory.Sequence(lambda n: f"Ubicación {n}")
+    code = factory.Sequence(lambda n: f"LOC-{n:04d}")
     description = ""
-    is_retail = factory.LazyAttribute(lambda o: "vitrina" in o.name.lower())
+    is_retail = False

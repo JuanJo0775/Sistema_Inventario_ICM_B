@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import time
 from datetime import datetime
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
@@ -114,17 +113,23 @@ def impl_rnf003_s04(
 # --- RNF-004 (Rendimiento de consultas y operaciones) -------------------------
 
 
-def impl_rnf004_s01(authenticated_almacenista_client: APIClient, sample_product):
+def impl_rnf004_s01(
+    authenticated_almacenista_client: APIClient,
+    sample_product,
+    django_assert_num_queries,
+):
     url = reverse("inventory-product-stock", kwargs={"product_id": sample_product.id})
-    t0 = time.perf_counter()
-    r = authenticated_almacenista_client.get(url)
-    elapsed = time.perf_counter() - t0
+    with django_assert_num_queries(3):
+        r = authenticated_almacenista_client.get(url)
     assert r.status_code == status.HTTP_200_OK
-    assert elapsed < 2.0
 
 
 def impl_rnf004_s02(
-    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+    authenticated_almacenista_client: APIClient,
+    sample_product,
+    sample_locations,
+    db,
+    django_assert_num_queries,
 ):
     from apps.inventory.models import StockByLocation
 
@@ -132,22 +137,20 @@ def impl_rnf004_s02(
     StockByLocation.objects.create(
         product=sample_product, location=loc, current_stock=5
     )
-    t0 = time.perf_counter()
-    r = authenticated_almacenista_client.post(
-        reverse("movements-entries"),
-        {
-            "product_id": str(sample_product.id),
-            "location_id": str(loc.id),
-            "quantity": 1,
-            "serial_number": "SN-RNF004-02",
-            "cold_chain_acknowledged": True,
-            "electrical_safety_acknowledged": True,
-        },
-        format="json",
-    )
-    elapsed = time.perf_counter() - t0
+    with django_assert_num_queries(20):
+        r = authenticated_almacenista_client.post(
+            reverse("movements-entries"),
+            {
+                "product_id": str(sample_product.id),
+                "location_id": str(loc.id),
+                "quantity": 1,
+                "serial_number": "SN-RNF004-02",
+                "cold_chain_acknowledged": True,
+                "electrical_safety_acknowledged": True,
+            },
+            format="json",
+        )
     assert r.status_code == status.HTTP_201_CREATED
-    assert elapsed < 3.0
 
 
 def impl_rnf004_s03(
@@ -157,6 +160,7 @@ def impl_rnf004_s03(
     sample_product,
     sample_locations,
     db,
+    django_assert_num_queries,
 ):
     from apps.inventory.models import StockByLocation
 
@@ -167,26 +171,20 @@ def impl_rnf004_s03(
     aux_client = APIClient()
     aux_client.force_authenticate(user=auxiliar_user)
 
-    start = time.perf_counter()
-    response_1 = authenticated_almacenista_client.get(reverse("inventory-full"))
-    elapsed_1 = time.perf_counter() - start
+    with django_assert_num_queries(2):
+        response_1 = authenticated_almacenista_client.get(reverse("inventory-full"))
 
-    start = time.perf_counter()
-    response_2 = authenticated_administrador_client.get(reverse("reports-kpi"))
-    elapsed_2 = time.perf_counter() - start
+    with django_assert_num_queries(4):
+        response_2 = authenticated_administrador_client.get(reverse("reports-kpi"))
 
-    start = time.perf_counter()
-    response_3 = aux_client.get(
-        reverse("inventory-search"), {"q": sample_product.sku[:3]}
-    )
-    elapsed_3 = time.perf_counter() - start
+    with django_assert_num_queries(1):
+        response_3 = aux_client.get(
+            reverse("inventory-search"), {"q": sample_product.sku[:3]}
+        )
 
     assert response_1.status_code == status.HTTP_200_OK
     assert response_2.status_code == status.HTTP_200_OK
     assert response_3.status_code == status.HTTP_200_OK
-    assert elapsed_1 < 3.0
-    assert elapsed_2 < 3.0
-    assert elapsed_3 < 3.0
 
 
 # --- RNF-005 (Mantenibilidad y estándares técnicos) ---------------------------
@@ -222,12 +220,13 @@ def impl_rnf005_s03(db):
     from pathlib import Path
 
     root = Path(__file__).resolve().parents[3]
-    architecture = (root / "docs" / "README_ARQUITECTURA.md").read_text(
-        encoding="utf-8"
-    )
-    assert "services.py" in architecture
-    assert "selectors.py" in architecture
-    assert "Negocio" in architecture or "Business logic" in architecture
+    for app in ("movements", "catalog", "inventory", "purchasing"):
+        assert (root / "apps" / app / "services.py").exists(), (
+            f"Falta services.py en {app}"
+        )
+        assert (root / "apps" / app / "selectors.py").exists(), (
+            f"Falta selectors.py en {app}"
+        )
 
 
 # --- RNF-006 (Cumplimiento legal — Ley 1581/2012) ----------------------------
@@ -284,19 +283,39 @@ def impl_rnf006_s02(
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-def impl_rnf006_s03(db):
-    from pathlib import Path
+def impl_rnf006_s03(
+    authenticated_almacenista_client: APIClient,
+    sample_product,
+    sample_locations,
+    db,
+):
+    from apps.inventory.models import StockByLocation
+    from apps.movements.models import MovementType
 
-    root = Path(__file__).resolve().parents[3]
-    scenario = (root / "docs" / "test" / "scenarios" / "RNF006-S03.md").read_text(
-        encoding="utf-8"
+    loc = sample_locations[0]
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=10
     )
-    ers = (root / "docs" / "requisitos" / "ERS_ICM_Requisitos.md").read_text(
-        encoding="utf-8"
+    _without_consent = {
+        "customer_name": "Mayorista SA",
+        "customer_email": "mayor@example.com",
+        "customer_phone": "3001112233",
+        "customer_address": "Carrera 1 # 2-3",
+    }
+    r = authenticated_almacenista_client.post(
+        reverse("movements-dispatches"),
+        {
+            "product_id": str(sample_product.id),
+            "location_id": str(loc.id),
+            "quantity": 1,
+            "movement_type": MovementType.SALIDA_VENTA_MAYOR,
+            "scanned_code": sample_product.barcode,
+            "order_sku": sample_product.sku,
+            "customer_data": _without_consent,
+        },
+        format="json",
     )
-    assert "autorización expresa" in scenario.lower()
-    assert "no deben ejecutarse" in scenario.lower()
-    assert "autorización expresa" in ers.lower()
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 IMPLEMENTATIONS: dict[str, object] = {

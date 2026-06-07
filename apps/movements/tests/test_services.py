@@ -792,3 +792,66 @@ def test_correct_movement_outside_window_raises(
                 original.id,
                 {"location_id": loc.id, "quantity": 3},
             )
+
+
+@pytest.mark.django_db
+def test_dispatch_raises_insufficient_stock_when_stock_is_zero(
+    almacenista_user, sample_product, sample_locations
+):
+    from shared.exceptions import InsufficientStockError
+
+    loc = sample_locations[0]
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=0
+    )
+    with pytest.raises(InsufficientStockError):
+        register_dispatch(
+            almacenista_user,
+            sample_product.id,
+            loc.id,
+            1,
+            MovementType.SALIDA_VENTA_MENOR,
+        )
+
+
+@pytest.mark.django_db
+def test_dispatch_raises_insufficient_stock_when_quantity_exceeds_stock(
+    almacenista_user, sample_product, sample_locations
+):
+    from shared.exceptions import InsufficientStockError
+
+    loc = sample_locations[0]
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=2
+    )
+    with pytest.raises(InsufficientStockError):
+        register_dispatch(
+            almacenista_user,
+            sample_product.id,
+            loc.id,
+            5,
+            MovementType.SALIDA_VENTA_MENOR,
+        )
+
+
+@pytest.mark.django_db
+def test_register_entry_rolls_back_on_movement_save_failure(
+    almacenista_user, sample_product, sample_locations
+):
+    from unittest.mock import patch
+
+    from apps.movements.models import Movement
+
+    loc = sample_locations[0]
+    with patch.object(
+        Movement.objects, "create", side_effect=RuntimeError("DB error simulated")
+    ):
+        with pytest.raises(RuntimeError):
+            register_entry(almacenista_user, sample_product.id, loc.id, 5)
+    assert not Movement.objects.filter(
+        product=sample_product, destination_location=loc
+    ).exists()
+    row = StockByLocation.objects.filter(
+        product=sample_product, location=loc
+    ).first()
+    assert row is None or row.current_stock == 0
