@@ -851,7 +851,5 @@ def test_register_entry_rolls_back_on_movement_save_failure(
     assert not Movement.objects.filter(
         product=sample_product, destination_location=loc
     ).exists()
-    row = StockByLocation.objects.filter(
-        product=sample_product, location=loc
-    ).first()
+    row = StockByLocation.objects.filter(product=sample_product, location=loc).first()
     assert row is None or row.current_stock == 0

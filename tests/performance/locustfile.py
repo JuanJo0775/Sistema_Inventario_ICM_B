@@ -9,6 +9,7 @@ Usage (requires a running server and `pip install locust`):
 This is intentionally NOT part of the pytest suite — run it separately against
 a live server before releases or to catch N+1 regressions under realistic load.
 """
+
 from __future__ import annotations
 
 from locust import HttpUser, between, task

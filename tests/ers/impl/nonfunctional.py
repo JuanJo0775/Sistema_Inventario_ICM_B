@@ -221,12 +221,12 @@ def impl_rnf005_s03(db):
 
     root = Path(__file__).resolve().parents[3]
     for app in ("movements", "catalog", "inventory", "purchasing"):
-        assert (root / "apps" / app / "services.py").exists(), (
-            f"Falta services.py en {app}"
-        )
-        assert (root / "apps" / app / "selectors.py").exists(), (
-            f"Falta selectors.py en {app}"
-        )
+        assert (
+            root / "apps" / app / "services.py"
+        ).exists(), f"Falta services.py en {app}"
+        assert (
+            root / "apps" / app / "selectors.py"
+        ).exists(), f"Falta selectors.py en {app}"
 
 
 # --- RNF-006 (Cumplimiento legal — Ley 1581/2012) ----------------------------

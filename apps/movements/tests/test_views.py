@@ -88,9 +88,7 @@ def test_movement_detail_returns_200(
 
     loc = sample_locations[0]
     movement = register_entry(almacenista_user, sample_product.id, loc.id, 2)
-    response = authenticated_almacenista_client.get(
-        f"/api/v1/movements/{movement.id}/"
-    )
+    response = authenticated_almacenista_client.get(f"/api/v1/movements/{movement.id}/")
     assert response.status_code == status.HTTP_200_OK
     assert str(response.data["id"]) == str(movement.id)
 

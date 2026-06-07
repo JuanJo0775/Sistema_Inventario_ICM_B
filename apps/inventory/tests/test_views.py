@@ -15,9 +15,7 @@ def test_inventory_full_list_returns_200(authenticated_almacenista_client):
 
 
 @pytest.mark.django_db
-def test_inventory_search_returns_200(
-    authenticated_almacenista_client, sample_product
-):
+def test_inventory_search_returns_200(authenticated_almacenista_client, sample_product):
     response = authenticated_almacenista_client.get(
         "/api/v1/inventory/search/", {"q": sample_product.sku}
     )
@@ -25,9 +23,7 @@ def test_inventory_search_returns_200(
 
 
 @pytest.mark.django_db
-def test_product_stock_returns_200(
-    authenticated_almacenista_client, sample_product
-):
+def test_product_stock_returns_200(authenticated_almacenista_client, sample_product):
     response = authenticated_almacenista_client.get(
         f"/api/v1/inventory/products/{sample_product.id}/stock/"
     )
