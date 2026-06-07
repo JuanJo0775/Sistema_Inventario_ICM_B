@@ -17,9 +17,11 @@ class Supplier(BaseModel):
     nit = models.CharField(
         max_length=20,
         unique=True,
+        null=True,
+        blank=True,
         help_text="NIT del proveedor incluyendo dígito de verificación.",
     )
-    contacto = models.CharField(max_length=100, blank=True)
+    pais = models.CharField(max_length=100)
     correo = models.EmailField(blank=True)
     telefono = models.CharField(max_length=20, blank=True)
     ciudad = models.CharField(max_length=100, blank=True)
@@ -44,7 +46,7 @@ class Supplier(BaseModel):
         ]
 
     def __str__(self) -> str:
-        return f"{self.nombre_comercial} ({self.nit})"
+        return f"{self.nombre_comercial} ({self.nit})" if self.nit else self.nombre_comercial
 
 
 class PurchaseOrderStatus(models.TextChoices):

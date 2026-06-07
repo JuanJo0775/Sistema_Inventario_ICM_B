@@ -19,7 +19,7 @@ class SupplierSerializer(serializers.ModelSerializer):
             "nombre_comercial",
             "razon_social",
             "nit",
-            "contacto",
+            "pais",
             "correo",
             "telefono",
             "ciudad",
@@ -34,12 +34,12 @@ class SupplierSerializer(serializers.ModelSerializer):
 
 class SupplierWriteSerializer(serializers.Serializer):
     nombre_comercial = serializers.CharField(max_length=200)
-    razon_social = serializers.CharField(max_length=200, required=False)
-    nit = serializers.CharField(max_length=20)
-    contacto = serializers.CharField(max_length=100, required=False, allow_blank=True)
-    correo = serializers.EmailField(required=False, allow_blank=True)
-    telefono = serializers.CharField(max_length=20, required=False, allow_blank=True)
-    ciudad = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    razon_social = serializers.CharField(max_length=200, required=False, allow_blank=True)
+    nit = serializers.CharField(max_length=20, required=False, allow_blank=True, allow_null=True)
+    pais = serializers.CharField(max_length=100, required=True)
+    correo = serializers.EmailField(required=True)
+    telefono = serializers.CharField(max_length=20, required=True)
+    ciudad = serializers.CharField(max_length=100, required=True)
     direccion = serializers.CharField(max_length=300, required=False, allow_blank=True)
     observaciones = serializers.CharField(required=False, allow_blank=True)
 

@@ -82,15 +82,15 @@ def _update_po_status_from_receptions(po: PurchaseOrder) -> None:
 @transaction.atomic
 def create_supplier(created_by, data: dict[str, Any], *, request=None) -> Supplier:
     """Registra un nuevo proveedor. Solo almacenista."""
-    nit = (data.get("nit") or "").strip()
-    if Supplier.objects.filter(nit=nit).exists():
+    nit = (data.get("nit") or "").strip() or None
+    if nit and Supplier.objects.filter(nit=nit).exists():
         raise SupplierNITDuplicateError()
 
     supplier = Supplier.objects.create(
         nombre_comercial=data["nombre_comercial"],
         razon_social=data.get("razon_social", data["nombre_comercial"]),
         nit=nit,
-        contacto=data.get("contacto", ""),
+        pais=data.get("pais", "Colombia"),
         correo=data.get("correo", ""),
         telefono=data.get("telefono", ""),
         ciudad=data.get("ciudad", ""),
@@ -116,16 +116,16 @@ def update_supplier(
     """Actualiza datos de un proveedor existente. Solo almacenista."""
     supplier = Supplier.objects.select_for_update().get(pk=supplier_id)
 
-    new_nit = (data.get("nit") or "").strip()
-    if new_nit and new_nit != supplier.nit:
-        if Supplier.objects.filter(nit=new_nit).exclude(pk=supplier.pk).exists():
+    new_nit = (data.get("nit") or "").strip() or None
+    if new_nit != supplier.nit:
+        if new_nit and Supplier.objects.filter(nit=new_nit).exclude(pk=supplier.pk).exists():
             raise SupplierNITDuplicateError()
         supplier.nit = new_nit
 
     for field in (
         "nombre_comercial",
         "razon_social",
-        "contacto",
+        "pais",
         "correo",
         "telefono",
         "ciudad",
