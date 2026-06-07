@@ -6,22 +6,31 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('purchasing', '0002_rename_purchasing_po_status_created_idx_purchasing__status_b65bdb_idx_and_more'),
+        (
+            "purchasing",
+            "0002_rename_purchasing_po_status_created_idx_purchasing__status_b65bdb_idx_and_more",
+        ),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='supplier',
-            name='contacto',
+            model_name="supplier",
+            name="contacto",
         ),
         migrations.AddField(
-            model_name='supplier',
-            name='pais',
-            field=models.CharField(default='Colombia', max_length=100),
+            model_name="supplier",
+            name="pais",
+            field=models.CharField(default="Colombia", max_length=100),
         ),
         migrations.AlterField(
-            model_name='supplier',
-            name='nit',
-            field=models.CharField(blank=True, help_text='NIT del proveedor incluyendo dígito de verificación.', max_length=20, null=True, unique=True),
+            model_name="supplier",
+            name="nit",
+            field=models.CharField(
+                blank=True,
+                help_text="NIT del proveedor incluyendo dígito de verificación.",
+                max_length=20,
+                null=True,
+                unique=True,
+            ),
         ),
     ]

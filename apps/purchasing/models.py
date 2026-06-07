@@ -46,7 +46,11 @@ class Supplier(BaseModel):
         ]
 
     def __str__(self) -> str:
-        return f"{self.nombre_comercial} ({self.nit})" if self.nit else self.nombre_comercial
+        return (
+            f"{self.nombre_comercial} ({self.nit})"
+            if self.nit
+            else self.nombre_comercial
+        )
 
 
 class PurchaseOrderStatus(models.TextChoices):

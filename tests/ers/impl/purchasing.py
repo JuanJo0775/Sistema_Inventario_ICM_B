@@ -9,11 +9,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from apps.audit.models import AuditEventType, AuditLog
-from apps.purchasing.models import (
-    PurchaseOrderStatus,
-    ReceptionStatus,
-)
-
+from apps.purchasing.models import PurchaseOrderStatus, ReceptionStatus
 
 # ---------------------------------------------------------------------------
 # Helpers internos
@@ -44,7 +40,9 @@ def _create_supplier_via_api(client: APIClient, **overrides) -> dict:
     return r.data
 
 
-def _create_po_via_api(client: APIClient, supplier_id: str, product_id: str, **overrides) -> dict:
+def _create_po_via_api(
+    client: APIClient, supplier_id: str, product_id: str, **overrides
+) -> dict:
     payload = {
         "supplier_id": supplier_id,
         "items": [
@@ -128,6 +126,7 @@ def impl_rf019_s02(authenticated_almacenista_client: APIClient, db):
     )
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     from apps.purchasing.models import Supplier
+
     assert Supplier.objects.filter(nit="800111222-9").count() == 1
 
 
@@ -142,8 +141,11 @@ def impl_rf019_s03(authenticated_almacenista_client: APIClient, db):
     assert r.status_code == status.HTTP_200_OK
     assert r.data["is_active"] is False
     from apps.purchasing.models import Supplier
+
     assert Supplier.objects.filter(pk=supplier["id"]).exists()
-    assert AuditLog.objects.filter(event_type=AuditEventType.SUPPLIER_DEACTIVATED).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.SUPPLIER_DEACTIVATED
+    ).exists()
 
 
 def impl_rf019_s04(almacenista_user, administrador_user, auxiliar_user, db):
@@ -180,9 +182,7 @@ def impl_rf019_s04(almacenista_user, administrador_user, auxiliar_user, db):
 # ---------------------------------------------------------------------------
 
 
-def impl_rf020_s01(
-    authenticated_almacenista_client: APIClient, sample_product, db
-):
+def impl_rf020_s01(authenticated_almacenista_client: APIClient, sample_product, db):
     """Creación de OC en estado BORRADOR con número secuencial OC-XXXX."""
     supplier = _create_supplier_via_api(
         authenticated_almacenista_client, nit="111222333-0"
@@ -198,12 +198,12 @@ def impl_rf020_s01(
     assert po["number"].startswith("OC-")
     assert len(po["items"]) == 1
     assert po["items"][0]["quantity_ordered"] == 5
-    assert AuditLog.objects.filter(event_type=AuditEventType.PURCHASE_ORDER_CREATED).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.PURCHASE_ORDER_CREATED
+    ).exists()
 
 
-def impl_rf020_s02(
-    authenticated_almacenista_client: APIClient, sample_product, db
-):
+def impl_rf020_s02(authenticated_almacenista_client: APIClient, sample_product, db):
     """Confirmación de OC: BORRADOR → PENDIENTE — queda inmutable para edición."""
     supplier = _create_supplier_via_api(
         authenticated_almacenista_client, nit="222333444-1"
@@ -225,12 +225,12 @@ def impl_rf020_s02(
         status.HTTP_405_METHOD_NOT_ALLOWED,
         status.HTTP_422_UNPROCESSABLE_ENTITY,
     )
-    assert AuditLog.objects.filter(event_type=AuditEventType.PURCHASE_ORDER_CONFIRMED).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.PURCHASE_ORDER_CONFIRMED
+    ).exists()
 
 
-def impl_rf020_s03(
-    authenticated_almacenista_client: APIClient, sample_product, db
-):
+def impl_rf020_s03(authenticated_almacenista_client: APIClient, sample_product, db):
     """Cancelación de OC sin recepciones confirmadas — BR-020."""
     supplier = _create_supplier_via_api(
         authenticated_almacenista_client, nit="333444555-2"
@@ -248,7 +248,9 @@ def impl_rf020_s03(
     assert r.status_code == status.HTTP_200_OK
     assert r.data["status"] == PurchaseOrderStatus.CANCELADA
     assert r.data["cancellation_reason"] != ""
-    assert AuditLog.objects.filter(event_type=AuditEventType.PURCHASE_ORDER_CANCELLED).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.PURCHASE_ORDER_CANCELLED
+    ).exists()
 
 
 def impl_rf020_s04(
@@ -285,13 +287,12 @@ def impl_rf020_s04(
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     from apps.purchasing.models import PurchaseOrder
+
     po_db = PurchaseOrder.objects.get(pk=po["id"])
     assert po_db.status != PurchaseOrderStatus.CANCELADA
 
 
-def impl_rf020_s05(
-    authenticated_almacenista_client: APIClient, sample_product, db
-):
+def impl_rf020_s05(authenticated_almacenista_client: APIClient, sample_product, db):
     """Cancelación sin razón explícita es rechazada."""
     supplier = _create_supplier_via_api(
         authenticated_almacenista_client, nit="555666777-4"
@@ -324,7 +325,10 @@ def impl_rf020_s05(
     )
 
     from apps.purchasing.models import PurchaseOrder
-    assert PurchaseOrder.objects.get(pk=po["id"]).status != PurchaseOrderStatus.CANCELADA
+
+    assert (
+        PurchaseOrder.objects.get(pk=po["id"]).status != PurchaseOrderStatus.CANCELADA
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -481,10 +485,13 @@ def impl_rf022_s01(
 
     # El ReceptionItem enlaza al Movement
     from apps.purchasing.models import ReceptionItem
+
     ri = ReceptionItem.objects.get(reception_id=reception["id"])
     assert ri.movement == movement
 
-    assert AuditLog.objects.filter(event_type=AuditEventType.RECEPTION_CONFIRMED).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.RECEPTION_CONFIRMED
+    ).exists()
 
 
 def impl_rf022_s02(
@@ -575,9 +582,7 @@ def impl_rf022_s04(
     payload = {
         "po_id": po["id"],
         "destination_location_id": str(loc.id),
-        "items": [
-            {"purchase_order_item_id": poi_id, "quantity_received": 0}
-        ],
+        "items": [{"purchase_order_item_id": poi_id, "quantity_received": 0}],
     }
     r_create = authenticated_almacenista_client.post(
         reverse("reception-list-create"), payload, format="json"
@@ -620,8 +625,8 @@ def impl_rf022_s05(
         "items": [
             {
                 "purchase_order_item_id": poi_id,
-                "quantity_received": 7,   # difiere de 10 → discrepancia
-                "discrepancy_note": "",   # sin nota → debe fallar al confirmar
+                "quantity_received": 7,  # difiere de 10 → discrepancia
+                "discrepancy_note": "",  # sin nota → debe fallar al confirmar
             }
         ],
     }
@@ -686,7 +691,9 @@ def impl_rf023_s01(
     qty_after = stock_after.current_stock if stock_after else 0
     assert qty_after == qty_before
 
-    assert AuditLog.objects.filter(event_type=AuditEventType.RECEPTION_CANCELLED).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.RECEPTION_CANCELLED
+    ).exists()
 
 
 def impl_rf023_s02(
@@ -721,7 +728,10 @@ def impl_rf023_s02(
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     from apps.purchasing.models import Reception
-    assert Reception.objects.get(pk=reception["id"]).status == ReceptionStatus.CONFIRMADA
+
+    assert (
+        Reception.objects.get(pk=reception["id"]).status == ReceptionStatus.CONFIRMADA
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -807,9 +817,9 @@ def impl_rf024_s02(
         AuditEventType.RECEPTION_CONFIRMED,
     ]
     for event in expected_events:
-        assert AuditLog.objects.filter(event_type=event).exists(), (
-            f"Evento esperado en audit log no encontrado: {event}"
-        )
+        assert AuditLog.objects.filter(
+            event_type=event
+        ).exists(), f"Evento esperado en audit log no encontrado: {event}"
 
 
 # ---------------------------------------------------------------------------

@@ -80,7 +80,9 @@ def test_create_supplier_without_nit(authenticated_almacenista_client):
 
 
 @pytest.mark.django_db
-def test_patch_supplier_without_nit_preserves_existing(authenticated_almacenista_client):
+def test_patch_supplier_without_nit_preserves_existing(
+    authenticated_almacenista_client,
+):
     supplier = SupplierFactory(nit="900000002-2")
     response = authenticated_almacenista_client.patch(
         f"/api/v1/purchasing/suppliers/{supplier.id}/",

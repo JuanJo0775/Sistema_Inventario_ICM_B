@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 # --- RF-013 (Precios y Facturación Comercial — BR-16, BR-17) -----------------
 
 
@@ -77,6 +76,7 @@ def impl_rf013_s03(almacenista_user, auxiliar_user, db):
     from decimal import Decimal
 
     import pytest
+
     from apps.catalog.models import ProductPriceHistory
     from apps.catalog.services import update_product_prices
     from shared.exceptions import UnauthorizedCredentialManagementError
