@@ -24,7 +24,6 @@ class SupplierFactory(DjangoModelFactory):
     nombre_comercial = factory.Sequence(lambda n: f"Proveedor {n} S.A.S.")
     razon_social = factory.LazyAttribute(lambda o: o.nombre_comercial)
     nit = factory.Sequence(lambda n: f"9{n:08d}-{n%9}")
-    contacto = factory.Faker("name")
     correo = factory.LazyAttribute(lambda o: f"contacto@proveedor{o.nit[:3]}.com")
     telefono = factory.Sequence(lambda n: f"30{n:08d}")
     ciudad = "Bogotá"

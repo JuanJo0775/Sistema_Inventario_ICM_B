@@ -36,6 +36,10 @@ def test_create_supplier_almacenista(authenticated_almacenista_client):
             "nombre_comercial": "Proveedor Test",
             "razon_social": "Proveedor Test S.A.S.",
             "nit": "800000001-1",
+            "pais": "Colombia",
+            "correo": "test@proveedor.com",
+            "telefono": "3001234567",
+            "ciudad": "Bogotá",
         },
         format="json",
     )
