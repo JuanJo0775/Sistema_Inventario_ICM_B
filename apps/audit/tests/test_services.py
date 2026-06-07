@@ -46,9 +46,21 @@ def test_movement_creation_logged(almacenista_user, sample_product, sample_locat
 
 @pytest.mark.django_db
 def test_audit_log_metadata_mutable_in_memory(almacenista_user):
-    """El modelo no impide mutar el objeto en memoria; la inmutabilidad es por contrato de API (BR-10)."""
+    """In-memory mutation is allowed; only .save() is blocked (BR-10)."""
     log = log_event(
         AuditEventType.LOGOUT, description="Cierre", user=almacenista_user, detail={}
     )
     log.metadata = {"x": 1}
     assert log.metadata["x"] == 1
+
+
+@pytest.mark.django_db
+def test_audit_log_is_immutable_at_orm_level(almacenista_user):
+    from shared.exceptions import ImmutableRecordError
+
+    log = log_event(
+        AuditEventType.LOGIN_SUCCESS, description="Login OK", user=almacenista_user
+    )
+    with pytest.raises(ImmutableRecordError):
+        log.description = "modificado"
+        log.save()

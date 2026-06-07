@@ -115,6 +115,13 @@ class AuditLog(models.Model):
             models.Index(fields=("event_type", "created_at")),
         ]
 
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            from shared.exceptions import ImmutableRecordError
+
+            raise ImmutableRecordError("AuditLog records cannot be modified.")
+        super().save(*args, **kwargs)
+
     def __str__(self) -> str:
         return f"{self.event_type} @ {self.created_at}"
 
