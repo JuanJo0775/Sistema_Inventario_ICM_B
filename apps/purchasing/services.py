@@ -259,6 +259,19 @@ def update_purchase_order(
         if field in data:
             setattr(po, field, data[field])
     po.save()
+
+    # Recreate items if provided in update payload
+    if "items" in data:
+        po.items.all().delete()
+        for item_data in data["items"]:
+            PurchaseOrderItem.objects.create(
+                purchase_order=po,
+                product_id=item_data["product_id"],
+                quantity_ordered=int(item_data["quantity_ordered"]),
+                unit_cost=item_data["unit_cost"],
+                notes=item_data.get("notes", ""),
+            )
+
     return po
 
 
