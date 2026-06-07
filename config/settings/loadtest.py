@@ -5,8 +5,8 @@ Para el load test se necesita que migrate, manage.py shell y runserver
 compartan la misma base de datos, lo que requiere un motor persistente.
 """
 
-import urllib.parse
 import os
+import urllib.parse
 
 from .test import *  # noqa: F401,F403
 
