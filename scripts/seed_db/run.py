@@ -28,7 +28,7 @@ import django  # noqa: E402
 
 django.setup()
 
-from scripts.seed_db.seeder import SeedResult, Seeder  # noqa: E402
+from scripts.seed_db.seeder import Seeder, SeedResult  # noqa: E402
 
 
 def _print_summary(result: SeedResult) -> None:
