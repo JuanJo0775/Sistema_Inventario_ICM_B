@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
 from apps.authentication.models import RoleChoices, User
-from scripts.import_catalog.config import (
+from scripts.seed_db.env import (
     ALMACENISTA_EMAIL,
     ALMACENISTA_PASSWORD,
     ALMACENISTA_USERNAME,
