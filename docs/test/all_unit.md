@@ -16813,1662 +16813,6 @@ Código fuente: [tests/test_generate_project_structure.py](../../tests/test_gene
 <!-- file: UNIT-0468.md -->
 **Código:** UNIT-0468
 
-# test_categories_shared_across_products
-
-## Nombre del test
-
-`tests/test_import/test_importer.py::TestImportRows::test_categories_shared_across_products`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_importer.py::TestImportRows::test_categories_shared_across_products -v
-```
-
-Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 96)
-
-
----
-
-<!-- file: UNIT-0469.md -->
-**Código:** UNIT-0469
-
-# test_creates_categories_and_products
-
-## Nombre del test
-
-`tests/test_import/test_importer.py::TestImportRows::test_creates_categories_and_products`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_importer.py::TestImportRows::test_creates_categories_and_products -v
-```
-
-Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 31)
-
-
----
-
-<!-- file: UNIT-0470.md -->
-**Código:** UNIT-0470
-
-# test_dry_run_makes_no_db_changes
-
-## Nombre del test
-
-`tests/test_import/test_importer.py::TestImportRows::test_dry_run_makes_no_db_changes`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_importer.py::TestImportRows::test_dry_run_makes_no_db_changes -v
-```
-
-Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 67)
-
-
----
-
-<!-- file: UNIT-0471.md -->
-**Código:** UNIT-0471
-
-# test_error_in_one_row_does_not_cancel_others
-
-## Nombre del test
-
-`tests/test_import/test_importer.py::TestImportRows::test_error_in_one_row_does_not_cancel_others`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_importer.py::TestImportRows::test_error_in_one_row_does_not_cancel_others -v
-```
-
-Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 80)
-
-
----
-
-<!-- file: UNIT-0472.md -->
-**Código:** UNIT-0472
-
-# test_generated_sku_tracked_in_result
-
-## Nombre del test
-
-`tests/test_import/test_importer.py::TestImportRows::test_generated_sku_tracked_in_result`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_importer.py::TestImportRows::test_generated_sku_tracked_in_result -v
-```
-
-Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 106)
-
-
----
-
-<!-- file: UNIT-0473.md -->
-**Código:** UNIT-0473
-
-# test_idempotent_second_run
-
-## Nombre del test
-
-`tests/test_import/test_importer.py::TestImportRows::test_idempotent_second_run`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_importer.py::TestImportRows::test_idempotent_second_run -v
-```
-
-Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 43)
-
-
----
-
-<!-- file: UNIT-0474.md -->
-**Código:** UNIT-0474
-
-# test_no_stock_created
-
-## Nombre del test
-
-`tests/test_import/test_importer.py::TestImportRows::test_no_stock_created`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_importer.py::TestImportRows::test_no_stock_created -v
-```
-
-Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 51)
-
-
----
-
-<!-- file: UNIT-0475.md -->
-**Código:** UNIT-0475
-
-# test_no_subcategory_assigned
-
-## Nombre del test
-
-`tests/test_import/test_importer.py::TestImportRows::test_no_subcategory_assigned`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_importer.py::TestImportRows::test_no_subcategory_assigned -v
-```
-
-Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 59)
-
-
----
-
-<!-- file: UNIT-0476.md -->
-**Código:** UNIT-0476
-
-# test_products_have_is_active_true
-
-## Nombre del test
-
-`tests/test_import/test_importer.py::TestImportRows::test_products_have_is_active_true`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_importer.py::TestImportRows::test_products_have_is_active_true -v
-```
-
-Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 132)
-
-
----
-
-<!-- file: UNIT-0477.md -->
-**Código:** UNIT-0477
-
-# test_transformed_sku_tracked_in_result
-
-## Nombre del test
-
-`tests/test_import/test_importer.py::TestImportRows::test_transformed_sku_tracked_in_result`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_importer.py::TestImportRows::test_transformed_sku_tracked_in_result -v
-```
-
-Código fuente: [tests/test_import/test_importer.py](../../tests/test_import/test_importer.py) (aprox. línea 119)
-
-
----
-
-<!-- file: UNIT-0478.md -->
-**Código:** UNIT-0478
-
-# test_agujas_count
-
-## Nombre del test
-
-`tests/test_import/test_reader.py::TestReadExcel::test_agujas_count`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_reader.py::TestReadExcel::test_agujas_count -v
-```
-
-Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 74)
-
-
----
-
-<!-- file: UNIT-0479.md -->
-**Código:** UNIT-0479
-
-# test_all_rows_are_raw_row_instances
-
-## Nombre del test
-
-`tests/test_import/test_reader.py::TestReadExcel::test_all_rows_are_raw_row_instances`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_reader.py::TestReadExcel::test_all_rows_are_raw_row_instances -v
-```
-
-Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 64)
-
-
----
-
-<!-- file: UNIT-0480.md -->
-**Código:** UNIT-0480
-
-# test_all_rows_have_product_name
-
-## Nombre del test
-
-`tests/test_import/test_reader.py::TestReadExcel::test_all_rows_have_product_name`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_reader.py::TestReadExcel::test_all_rows_have_product_name -v
-```
-
-Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 59)
-
-
----
-
-<!-- file: UNIT-0481.md -->
-**Código:** UNIT-0481
-
-# test_camillas_count
-
-## Nombre del test
-
-`tests/test_import/test_reader.py::TestReadExcel::test_camillas_count`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_reader.py::TestReadExcel::test_camillas_count -v
-```
-
-Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 69)
-
-
----
-
-<!-- file: UNIT-0482.md -->
-**Código:** UNIT-0482
-
-# test_has_all_expected_categories
-
-## Nombre del test
-
-`tests/test_import/test_reader.py::TestReadExcel::test_has_all_expected_categories`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_reader.py::TestReadExcel::test_has_all_expected_categories -v
-```
-
-Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 33)
-
-
----
-
-<!-- file: UNIT-0483.md -->
-**Código:** UNIT-0483
-
-# test_returns_rows_for_all_products
-
-## Nombre del test
-
-`tests/test_import/test_reader.py::TestReadExcel::test_returns_rows_for_all_products`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_reader.py::TestReadExcel::test_returns_rows_for_all_products -v
-```
-
-Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 24)
-
-
----
-
-<!-- file: UNIT-0484.md -->
-**Código:** UNIT-0484
-
-# test_skips_resumen_sheet
-
-## Nombre del test
-
-`tests/test_import/test_reader.py::TestReadExcel::test_skips_resumen_sheet`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_reader.py::TestReadExcel::test_skips_resumen_sheet -v
-```
-
-Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 28)
-
-
----
-
-<!-- file: UNIT-0485.md -->
-**Código:** UNIT-0485
-
-# test_skips_total_rows
-
-## Nombre del test
-
-`tests/test_import/test_reader.py::TestReadExcel::test_skips_total_rows`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_reader.py::TestReadExcel::test_skips_total_rows -v
-```
-
-Código fuente: [tests/test_import/test_reader.py](../../tests/test_import/test_reader.py) (aprox. línea 52)
-
-
----
-
-<!-- file: UNIT-0486.md -->
-**Código:** UNIT-0486
-
-# test_flexbar_amarillo_genera_fl_0032
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestAutogenSku::test_flexbar_amarillo_genera_fl_0032`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestAutogenSku::test_flexbar_amarillo_genera_fl_0032 -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 27)
-
-
----
-
-<!-- file: UNIT-0487.md -->
-**Código:** UNIT-0487
-
-# test_flexbar_azul_genera_fl_0033
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestAutogenSku::test_flexbar_azul_genera_fl_0033`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestAutogenSku::test_flexbar_azul_genera_fl_0033 -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 31)
-
-
----
-
-<!-- file: UNIT-0488.md -->
-**Código:** UNIT-0488
-
-# test_numero_con_zero_padding_a_4_digitos
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestAutogenSku::test_numero_con_zero_padding_a_4_digitos`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestAutogenSku::test_numero_con_zero_padding_a_4_digitos -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 39)
-
-
----
-
-<!-- file: UNIT-0489.md -->
-**Código:** UNIT-0489
-
-# test_numero_none_usa_1
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestAutogenSku::test_numero_none_usa_1`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestAutogenSku::test_numero_none_usa_1 -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 45)
-
-
----
-
-<!-- file: UNIT-0490.md -->
-**Código:** UNIT-0490
-
-# test_usa_primeras_dos_letras_del_primer_word
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestAutogenSku::test_usa_primeras_dos_letras_del_primer_word`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestAutogenSku::test_usa_primeras_dos_letras_del_primer_word -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 35)
-
-
----
-
-<!-- file: UNIT-0491.md -->
-**Código:** UNIT-0491
-
-# test_all_three_invalid_skus_from_excel
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestTransform::test_all_three_invalid_skus_from_excel`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestTransform::test_all_three_invalid_skus_from_excel -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 133)
-
-
----
-
-<!-- file: UNIT-0492.md -->
-**Código:** UNIT-0492
-
-# test_category_name_is_titlecased
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestTransform::test_category_name_is_titlecased`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestTransform::test_category_name_is_titlecased -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 121)
-
-
----
-
-<!-- file: UNIT-0493.md -->
-**Código:** UNIT-0493
-
-# test_invalid_sku_gets_transformed
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestTransform::test_invalid_sku_gets_transformed`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestTransform::test_invalid_sku_gets_transformed -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 111)
-
-
----
-
-<!-- file: UNIT-0494.md -->
-**Código:** UNIT-0494
-
-# test_name_is_stripped
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestTransform::test_name_is_stripped`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestTransform::test_name_is_stripped -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 127)
-
-
----
-
-<!-- file: UNIT-0495.md -->
-**Código:** UNIT-0495
-
-# test_sc_rows_get_autogenerated_sku
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestTransform::test_sc_rows_get_autogenerated_sku`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestTransform::test_sc_rows_get_autogenerated_sku -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 97)
-
-
----
-
-<!-- file: UNIT-0496.md -->
-**Código:** UNIT-0496
-
-# test_valid_rows_pass_through_unchanged
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestTransform::test_valid_rows_pass_through_unchanged`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestTransform::test_valid_rows_pass_through_unchanged -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 87)
-
-
----
-
-<!-- file: UNIT-0497.md -->
-**Código:** UNIT-0497
-
-# test_ec_01b_becomes_ecb_01
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestTransformInvalidSku::test_ec_01b_becomes_ecb_01`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestTransformInvalidSku::test_ec_01b_becomes_ecb_01 -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 58)
-
-
----
-
-<!-- file: UNIT-0498.md -->
-**Código:** UNIT-0498
-
-# test_mpc_01a_becomes_mpca_01
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestTransformInvalidSku::test_mpc_01a_becomes_mpca_01`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestTransformInvalidSku::test_mpc_01a_becomes_mpca_01 -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 52)
-
-
----
-
-<!-- file: UNIT-0499.md -->
-**Código:** UNIT-0499
-
-# test_mpc_02a_becomes_mpca_02
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestTransformInvalidSku::test_mpc_02a_becomes_mpca_02`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestTransformInvalidSku::test_mpc_02a_becomes_mpca_02 -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 55)
-
-
----
-
-<!-- file: UNIT-0500.md -->
-**Código:** UNIT-0500
-
-# test_no_suffix_returns_normalized_sku
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestTransformInvalidSku::test_no_suffix_returns_normalized_sku`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestTransformInvalidSku::test_no_suffix_returns_normalized_sku -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 65)
-
-
----
-
-<!-- file: UNIT-0501.md -->
-**Código:** UNIT-0501
-
-# test_result_passes_sku_validation
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestTransformInvalidSku::test_result_passes_sku_validation`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestTransformInvalidSku::test_result_passes_sku_validation -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 76)
-
-
----
-
-<!-- file: UNIT-0502.md -->
-**Código:** UNIT-0502
-
-# test_returns_none_for_untransformable
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestTransformInvalidSku::test_returns_none_for_untransformable`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestTransformInvalidSku::test_returns_none_for_untransformable -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 72)
-
-
----
-
-<!-- file: UNIT-0503.md -->
-**Código:** UNIT-0503
-
-# test_suffix_uppercased
-
-## Nombre del test
-
-`tests/test_import/test_transformer.py::TestTransformInvalidSku::test_suffix_uppercased`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_transformer.py::TestTransformInvalidSku::test_suffix_uppercased -v
-```
-
-Código fuente: [tests/test_import/test_transformer.py](../../tests/test_import/test_transformer.py) (aprox. línea 61)
-
-
----
-
-<!-- file: UNIT-0504.md -->
-**Código:** UNIT-0504
-
-# test_duplicate_sku_second_occurrence_goes_to_errors
-
-## Nombre del test
-
-`tests/test_import/test_validator.py::TestValidate::test_duplicate_sku_second_occurrence_goes_to_errors`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_validator.py::TestValidate::test_duplicate_sku_second_occurrence_goes_to_errors -v
-```
-
-Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 57)
-
-
----
-
-<!-- file: UNIT-0505.md -->
-**Código:** UNIT-0505
-
-# test_empty_product_name_goes_to_errors
-
-## Nombre del test
-
-`tests/test_import/test_validator.py::TestValidate::test_empty_product_name_goes_to_errors`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_validator.py::TestValidate::test_empty_product_name_goes_to_errors -v
-```
-
-Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 52)
-
-
----
-
-<!-- file: UNIT-0506.md -->
-**Código:** UNIT-0506
-
-# test_empty_sku_goes_to_needs_autogen
-
-## Nombre del test
-
-`tests/test_import/test_validator.py::TestValidate::test_empty_sku_goes_to_needs_autogen`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_validator.py::TestValidate::test_empty_sku_goes_to_needs_autogen -v
-```
-
-Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 33)
-
-
----
-
-<!-- file: UNIT-0507.md -->
-**Código:** UNIT-0507
-
-# test_invalid_sku_format_goes_to_invalid
-
-## Nombre del test
-
-`tests/test_import/test_validator.py::TestValidate::test_invalid_sku_format_goes_to_invalid`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_validator.py::TestValidate::test_invalid_sku_format_goes_to_invalid -v
-```
-
-Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 42)
-
-
----
-
-<!-- file: UNIT-0508.md -->
-**Código:** UNIT-0508
-
-# test_mixed_rows
-
-## Nombre del test
-
-`tests/test_import/test_validator.py::TestValidate::test_mixed_rows`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_validator.py::TestValidate::test_mixed_rows -v
-```
-
-Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 74)
-
-
----
-
-<!-- file: UNIT-0509.md -->
-**Código:** UNIT-0509
-
-# test_multiple_valid_rows
-
-## Nombre del test
-
-`tests/test_import/test_validator.py::TestValidate::test_multiple_valid_rows`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_validator.py::TestValidate::test_multiple_valid_rows -v
-```
-
-Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 68)
-
-
----
-
-<!-- file: UNIT-0510.md -->
-**Código:** UNIT-0510
-
-# test_sc_sku_goes_to_needs_autogen
-
-## Nombre del test
-
-`tests/test_import/test_validator.py::TestValidate::test_sc_sku_goes_to_needs_autogen`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_validator.py::TestValidate::test_sc_sku_goes_to_needs_autogen -v
-```
-
-Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 28)
-
-
----
-
-<!-- file: UNIT-0511.md -->
-**Código:** UNIT-0511
-
-# test_sc_uppercase_variants
-
-## Nombre del test
-
-`tests/test_import/test_validator.py::TestValidate::test_sc_uppercase_variants`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_validator.py::TestValidate::test_sc_uppercase_variants -v
-```
-
-Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 37)
-
-
----
-
-<!-- file: UNIT-0512.md -->
-**Código:** UNIT-0512
-
-# test_valid_sku_boundary_cases
-
-## Nombre del test
-
-`tests/test_import/test_validator.py::TestValidate::test_valid_sku_boundary_cases`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_validator.py::TestValidate::test_valid_sku_boundary_cases -v
-```
-
-Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 47)
-
-
----
-
-<!-- file: UNIT-0513.md -->
-**Código:** UNIT-0513
-
-# test_valid_sku_goes_to_ok
-
-## Nombre del test
-
-`tests/test_import/test_validator.py::TestValidate::test_valid_sku_goes_to_ok`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest tests/test_import/test_validator.py::TestValidate::test_valid_sku_goes_to_ok -v
-```
-
-Código fuente: [tests/test_import/test_validator.py](../../tests/test_import/test_validator.py) (aprox. línea 21)
-
-
----
-
-<!-- file: UNIT-0514.md -->
-**Código:** UNIT-0514
-
 # test_validate_destination_passes_for_non_blocked
 
 ## Nombre del test
@@ -18502,8 +16846,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0515.md -->
-**Código:** UNIT-0515
+<!-- file: UNIT-0469.md -->
+**Código:** UNIT-0469
 
 # test_validate_destination_raises_for_blocked_archived
 
@@ -18538,8 +16882,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0516.md -->
-**Código:** UNIT-0516
+<!-- file: UNIT-0470.md -->
+**Código:** UNIT-0470
 
 # test_validate_origin_passes_for_active
 
@@ -18574,8 +16918,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0517.md -->
-**Código:** UNIT-0517
+<!-- file: UNIT-0471.md -->
+**Código:** UNIT-0471
 
 # test_validate_origin_raises_for_blocked_archived
 
@@ -18610,8 +16954,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0518.md -->
-**Código:** UNIT-0518
+<!-- file: UNIT-0472.md -->
+**Código:** UNIT-0472
 
 # test_validate_origin_raises_for_maintenance_restricted
 
@@ -18642,6 +16986,330 @@ pytest tests/test_location_validators.py::test_validate_origin_raises_for_mainte
 ```
 
 Código fuente: [tests/test_location_validators.py](../../tests/test_location_validators.py) (aprox. línea 36)
+
+
+---
+
+<!-- file: UNIT-0473.md -->
+**Código:** UNIT-0473
+
+# test_all_category_slugs_declared
+
+## Nombre del test
+
+`tests/test_seed_db.py::TestSeedConfig::test_all_category_slugs_declared`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_seed_db.py::TestSeedConfig::test_all_category_slugs_declared -v
+```
+
+Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. línea 107)
+
+
+---
+
+<!-- file: UNIT-0474.md -->
+**Código:** UNIT-0474
+
+# test_all_product_skus_valid_format
+
+## Nombre del test
+
+`tests/test_seed_db.py::TestSeedConfig::test_all_product_skus_valid_format`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_seed_db.py::TestSeedConfig::test_all_product_skus_valid_format -v
+```
+
+Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. línea 103)
+
+
+---
+
+<!-- file: UNIT-0475.md -->
+**Código:** UNIT-0475
+
+# test_combo_items_reference_known_skus
+
+## Nombre del test
+
+`tests/test_seed_db.py::TestSeedConfig::test_combo_items_reference_known_skus`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_seed_db.py::TestSeedConfig::test_combo_items_reference_known_skus -v
+```
+
+Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. línea 116)
+
+
+---
+
+<!-- file: UNIT-0476.md -->
+**Código:** UNIT-0476
+
+# test_electroterapia_requires_serial
+
+## Nombre del test
+
+`tests/test_seed_db.py::TestSeedConfig::test_electroterapia_requires_serial`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_seed_db.py::TestSeedConfig::test_electroterapia_requires_serial -v
+```
+
+Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. línea 126)
+
+
+---
+
+<!-- file: UNIT-0477.md -->
+**Código:** UNIT-0477
+
+# test_expiration_products_have_valid_skus
+
+## Nombre del test
+
+`tests/test_seed_db.py::TestSeedConfig::test_expiration_products_have_valid_skus`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_seed_db.py::TestSeedConfig::test_expiration_products_have_valid_skus -v
+```
+
+Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. línea 130)
+
+
+---
+
+<!-- file: UNIT-0478.md -->
+**Código:** UNIT-0478
+
+# test_no_duplicate_product_skus
+
+## Nombre del test
+
+`tests/test_seed_db.py::TestSeedConfig::test_no_duplicate_product_skus`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_seed_db.py::TestSeedConfig::test_no_duplicate_product_skus -v
+```
+
+Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. línea 98)
+
+
+---
+
+<!-- file: UNIT-0479.md -->
+**Código:** UNIT-0479
+
+# test_clean_removes_seed_data_preserves_base
+
+## Nombre del test
+
+`tests/test_seed_db.py::TestSeedIntegration::test_clean_removes_seed_data_preserves_base`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_seed_db.py::TestSeedIntegration::test_clean_removes_seed_data_preserves_base -v
+```
+
+Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. línea 180)
+
+
+---
+
+<!-- file: UNIT-0480.md -->
+**Código:** UNIT-0480
+
+# test_seed_creates_catalog_and_movements
+
+## Nombre del test
+
+`tests/test_seed_db.py::TestSeedIntegration::test_seed_creates_catalog_and_movements`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_seed_db.py::TestSeedIntegration::test_seed_creates_catalog_and_movements -v
+```
+
+Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. línea 149)
+
+
+---
+
+<!-- file: UNIT-0481.md -->
+**Código:** UNIT-0481
+
+# test_seed_is_idempotent
+
+## Nombre del test
+
+`tests/test_seed_db.py::TestSeedIntegration::test_seed_is_idempotent`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/test_seed_db.py::TestSeedIntegration::test_seed_is_idempotent -v
+```
+
+Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. línea 165)
 
 
 ---

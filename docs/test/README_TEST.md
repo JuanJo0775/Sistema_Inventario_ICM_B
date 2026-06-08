@@ -285,7 +285,7 @@ python -m scripts.generate_docs --force
 
 ## Estado actual de la suite
 
-**683 tests · 674 pasan · 9 skips legítimos · 0 fallos** _(2026-06-07)_
+**646 tests · 637 pasan · 9 skips legítimos · 0 fallos** _(2026-06-07)_
 
 | Capa | Archivos | Descripción |
 |------|----------|-------------|

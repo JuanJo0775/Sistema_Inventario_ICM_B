@@ -1,7 +1,7 @@
 # Historial de mejoras de testing — Sistema Inventario ICM
 
 **Fecha de aplicación:** 2026-06-07  
-**Resultado final:** 683 tests recolectados · 674 pasan · 9 skips legítimos · 0 fallos
+**Resultado final:** 646 tests recolectados · 637 pasan · 9 skips legítimos · 0 fallos
 
 ---
 
