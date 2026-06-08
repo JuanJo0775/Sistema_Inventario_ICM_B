@@ -1,122 +1,158 @@
-README CI/CD - Sistema Inventario ICM
+# README CI/CD - Sistema Inventario ICM
 
 ## 1. Objetivo
 
-Este documento define el flujo operativo de CI/CD del proyecto para asegurar:
+Este documento resume el estado operativo de CI del proyecto para que los gates de calidad, pruebas y documentación queden alineados con el repositorio real.
 
-- integracion continua con gates bloqueantes,
-- despliegue reproducible sobre Docker Compose,
-- trazabilidad por artefacto inmutable (digest),
-- recuperacion ante fallos con backup y rollback verificables.
+Alcance actual:
 
-Registry principal: **GHCR** (`ghcr.io`).
+- lint y formato,
+- seguridad estática y supply chain,
+- validación de migraciones,
+- documentación de tests sincronizada,
+- suite de pruebas unitarias, integración, Gherkin y concurrencia,
+- carga opcional con Locust.
 
----
-
-## 2. Componentes implementados
-
-### 2.1 Workflows
-
-- `.github/workflows/ci.yml`
-	- Lint (`black`, `isort`)
-	- Security scan Python (`pip-audit --strict`)
-	- Tests unitarios
-	- Integration tests con PostgreSQL
-	- Tests de escenarios (Gherkin)
-	- `makemigrations --check --dry-run`
-
-Nota: Los workflows y scripts de despliegue han sido removidos de este repositorio por decisión del equipo; la canalización actual está limitada a comprobaciones y pruebas CI.
+No existe en este repositorio un flujo de despliegue automatizado completo. La canalización activa está enfocada en validación y pruebas.
 
 ---
 
-## 3. Flujo CI/CD (estado operativo)
+## 2. Workflows actuales
 
-### 3.1 CI (PR y push)
+### 2.1 `.github/workflows/ci.yml`
 
-Secuencia principal:
+Este workflow se ejecuta en `push`, `pull_request` y `workflow_dispatch`.
 
-1. Lint y quality checks.
-2. `pip-audit --strict` (bloqueante).
-3. Unit-like tests rapidos.
-4. Validacion de docs de tests.
-5. `makemigrations --check --dry-run`.
-6. Trivy image scan (`HIGH,CRITICAL` bloqueante).
-7. Integration tests con PostgreSQL.
-8. En `main`: build and push a GHCR, manifest y release.
+Jobs reales:
 
-Comandos equivalentes locales:
+1. `quality`
+2. `unit_tests`
+3. `integration_gherkin`
+4. `concurrency_tests`
+5. `load_test`
+
+### 2.2 Resumen de cada job
+
+#### `quality`
+
+Ejecuta:
+
+- `black --check .`
+- `isort --check-only .`
+- `bandit -r apps shared -ll`
+- `pip-audit --progress=off`
+- `python manage.py makemigrations --check --dry-run`
+- `python -m scripts.generate_docs --check`
+
+#### `unit_tests`
+
+Ejecuta la suite rápida de apps:
+
+- `pytest apps/ -q --ignore=tests`
+
+Genera:
+
+- `junit-unit.xml`
+- `coverage-unit.xml`
+
+#### `integration_gherkin`
+
+Levanta PostgreSQL y ejecuta:
+
+- `pytest tests/integration -q`
+- `pytest tests/ers -q`
+
+Genera:
+
+- `junit-integration.xml`
+- `junit-gherkin.xml`
+- `coverage-integration.xml`
+- `coverage-gherkin.xml`
+
+#### `concurrency_tests`
+
+Ejecuta:
+
+- `pytest tests/concurrency -v`
+
+Usa PostgreSQL y la variable:
+
+- `RUN_CONCURRENCY_TESTS=1`
+
+#### `load_test`
+
+Ejecuta Locust contra un servidor Django levantado en el mismo job.
+
+Genera:
+
+- `locust-results_*.csv`
+
+---
+
+## 3. Comandos locales equivalentes
+
+Para reproducir los gates principales:
 
 ```bash
 python -m pip install -U pip
 pip install -r requirements/base.txt
-pip install black==23.12.1 isort==5.13.2 pip-audit pytest pytest-django pytest-cov
+pip install black==23.12.1 isort==5.13.2 pip-audit pytest pytest-django pytest-cov bandit
 
 black --check .
 isort --check-only .
-pip-audit --progress=off --strict
-pytest -q -k "not integration and not ers" --maxfail=1
-python -m scripts.generate_docs --check
+bandit -r apps shared -ll
+pip-audit --progress=off
 python manage.py makemigrations --check --dry-run
-```
-
----
-
-## 4. Artefactos inmutables y trazabilidad
-
-## 4.1 Manifest de release
-
-En CI se genera `release-manifest.json` y se publica como artifact y asset en GitHub Release.
-
-Campos esperados para trazabilidad de despliegues:
-
-- commit SHA
-- image digest (`ghcr.io/...@sha256:...`)
-- timestamp
-- environment
-- version desplegada
-- migraciones ejecutadas
-
----
-
-## 5. Backups: politica, integridad y restauracion
-
-## 5.1 Politica de retencion
-
-- Variable: `BACKUP_RETENTION_DAYS`.
-- Valor recomendado inicial: `14` dias (ajustable por cumplimiento).
-- Backups locales en `/srv/backups`.
-- Recomendado: subida a almacenamiento remoto cifrado (S3 o equivalente).
-
-## Tests, reproducibilidad y artefactos
-
-- `test-postgres` (/.github/workflows/ci-postgres.yml): ejecuta la suite completa contra un servicio Postgres, genera `coverage.xml` y falla si la cobertura sobre `apps/` es menor al umbral (85%). También ejecuta `pip-audit` y sube artefactos.
-
-Requisitos locales para reproducir:
-
-1. Tener un contenedor Postgres accesible en 127.0.0.1:5432 con credenciales postgres/postgres y DB testdb.
-2. Exportar `DJANGO_SETTINGS_MODULE=config.settings.test` y, si quieres ejecutar concurrencia, `RUN_CONCURRENCY_TESTS=1`.
-
-Comandos útiles:
-
-Ejecutar tests con coverage localmente:
-
-```bash
-python -m pytest --cov=apps --cov-report=xml
-```
-
-Ejecutar solo integración contra Postgres:
-
-```bash
-set DJANGO_SETTINGS_MODULE=config.settings.test
-set DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/testdb
+python -m scripts.generate_docs --check
+pytest apps/ -q --ignore=tests
 pytest tests/integration -q
+pytest tests/ers -q
+pytest tests/concurrency -v
 ```
 
-Artefactos generados por el job CI:
+Para correr la suite completa:
 
-- `coverage.xml` — reporte cobertura (pyproject/pytest-cov)
-- `pip_audit.json` — listado de vulnerabilidades de dependencias (pip-audit)
+```bash
+pytest -q
+```
 
-Notas de seguridad:
+---
 
-- `pip-audit` se ejecuta en modo `continue-on-error` para no bloquear PRs por falsos positivos, pero el artefacto se sube para revisión manual. Podemos hacer que falle si se desea.
+## 4. Estado actual de pruebas
+
+Último estado verificado localmente:
+
+- `646 tests recolectados`
+- `637 pasan`
+- `9 skips legítimos`
+- `0 fallos`
+
+Referencia viva:
+
+- [docs/test/README_TEST.md](../test/README_TEST.md)
+- [docs/test/CHANGELOG_TESTING.md](../test/CHANGELOG_TESTING.md)
+
+---
+
+## 5. Artefactos de CI
+
+Los artefactos esperados en CI son:
+
+- `junit-unit.xml`
+- `coverage-unit.xml`
+- `junit-integration.xml`
+- `junit-gherkin.xml`
+- `coverage-integration.xml`
+- `coverage-gherkin.xml`
+- `junit-concurrency.xml`
+- `locust-results_*.csv`
+
+---
+
+## 6. Notas operativas
+
+- `python -m scripts.generate_docs --check` debe pasar en `quality`.
+- La documentación de pruebas debe mantenerse sincronizada cuando cambian tests o escenarios Gherkin.
+- La suite de concurrencia requiere PostgreSQL y no se ejecuta sobre SQLite.
+- El job `load_test` es informativo y depende de un servidor Django accesible dentro del runner.
+
