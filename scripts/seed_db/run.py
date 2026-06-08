@@ -25,6 +25,7 @@ sys.path.insert(0, str(_ROOT))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
 
 import django  # noqa: E402
+
 django.setup()
 
 from scripts.seed_db.seeder import SeedResult, Seeder  # noqa: E402
@@ -32,9 +33,13 @@ from scripts.seed_db.seeder import SeedResult, Seeder  # noqa: E402
 
 def _print_summary(result: SeedResult) -> None:
     print("\n--- Resumen ---")
-    print(f"  Categorias:          {result.categories_created} creadas, {result.categories_skipped} existentes")
+    print(
+        f"  Categorias:          {result.categories_created} creadas, {result.categories_skipped} existentes"
+    )
     print(f"  Marcas:              {result.subcategories_created} creadas")
-    print(f"  Productos:           {result.products_created} creados, {result.products_skipped} existentes")
+    print(
+        f"  Productos:           {result.products_created} creados, {result.products_skipped} existentes"
+    )
     print(f"  OC totales:          {result.purchase_orders}")
     print(f"  Movimientos totales: {result.movements}")
     print(f"  Filas de stock:      {result.stock_rows}")

@@ -129,7 +129,9 @@ class TestSeedConfig:
 
     def test_expiration_products_have_valid_skus(self):
         exp_products = [p for p in self.cfg.PRODUCTS if p.get("requires_expiration")]
-        assert exp_products, "Debe haber al menos un producto con requires_expiration=True"
+        assert (
+            exp_products
+        ), "Debe haber al menos un producto con requires_expiration=True"
         invalid = [p["sku"] for p in exp_products if not _SKU_RE.match(p["sku"])]
         assert not invalid
 

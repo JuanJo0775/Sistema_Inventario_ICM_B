@@ -35,6 +35,7 @@ sys.path.insert(0, str(_ROOT))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
 
 import django  # noqa: E402
+
 django.setup()
 
 
@@ -44,7 +45,9 @@ _BASE_LOCATION_CODES = {"bodega", "vitrina"}
 
 def _confirm() -> bool:
     print("\n  ADVERTENCIA: Esta operacion elimina TODOS los datos del seed.")
-    print("  Se conservan: almacenista, superusuarios y ubicaciones base (bodega/vitrina).")
+    print(
+        "  Se conservan: almacenista, superusuarios y ubicaciones base (bodega/vitrina)."
+    )
     answer = input("\n  Escriba 'SI' para continuar: ").strip()
     return answer == "SI"
 
@@ -70,7 +73,12 @@ def clean() -> None:
         ProductPriceHistory,
         Subcategory,
     )
-    from apps.inventory.models import Location, StockByLocation, StorageTemplate, StorageType
+    from apps.inventory.models import (
+        Location,
+        StockByLocation,
+        StorageTemplate,
+        StorageType,
+    )
     from apps.movements.models import Invoice, InvoiceCounter, Movement
     from apps.purchasing.models import (
         PurchaseOrder,
@@ -90,6 +98,7 @@ def clean() -> None:
             BlacklistedToken,
             OutstandingToken,
         )
+
         _deleted("BlacklistedToken", BlacklistedToken.objects.all().delete())
         _deleted("OutstandingToken", OutstandingToken.objects.all().delete())
     except Exception:
@@ -97,16 +106,16 @@ def clean() -> None:
     _deleted("Session Django", Session.objects.all().delete())
 
     print("\n--- Limpiando facturas ---")
-    _deleted("Invoice",          Invoice.objects.all().delete())
-    _deleted("InvoiceCounter",   InvoiceCounter.objects.all().delete())
+    _deleted("Invoice", Invoice.objects.all().delete())
+    _deleted("InvoiceCounter", InvoiceCounter.objects.all().delete())
 
     print("\n--- Limpiando ordenes de compra ---")
     # ReceptionItem referencia Movement con PROTECT: va primero
-    _deleted("ReceptionItem",         ReceptionItem.objects.all().delete())
-    _deleted("Reception",             Reception.objects.all().delete())
-    _deleted("PurchaseOrderItem",     PurchaseOrderItem.objects.all().delete())
-    _deleted("PurchaseOrder",         PurchaseOrder.objects.all().delete())
-    _deleted("PurchaseOrderCounter",  PurchaseOrderCounter.objects.all().delete())
+    _deleted("ReceptionItem", ReceptionItem.objects.all().delete())
+    _deleted("Reception", Reception.objects.all().delete())
+    _deleted("PurchaseOrderItem", PurchaseOrderItem.objects.all().delete())
+    _deleted("PurchaseOrder", PurchaseOrder.objects.all().delete())
+    _deleted("PurchaseOrderCounter", PurchaseOrderCounter.objects.all().delete())
 
     print("\n--- Limpiando movimientos ---")
     _deleted("Movement", Movement.objects.all().delete())
@@ -115,15 +124,15 @@ def clean() -> None:
     _deleted("Alert", Alert.objects.all().delete())
 
     print("\n--- Limpiando catalogo ---")
-    _deleted("ComboItem",           ComboItem.objects.all().delete())
-    _deleted("ProductCombo",        ProductCombo.objects.all().delete())
+    _deleted("ComboItem", ComboItem.objects.all().delete())
+    _deleted("ProductCombo", ProductCombo.objects.all().delete())
     _deleted("ProductPriceHistory", ProductPriceHistory.objects.all().delete())
-    _deleted("Lot",                 Lot.objects.all().delete())
-    _deleted("StockByLocation",     StockByLocation.objects.all().delete())
-    _deleted("Product",             Product.objects.all().delete())
-    _deleted("Subcategory",         Subcategory.objects.all().delete())
-    _deleted("Category",            Category.objects.all().delete())
-    _deleted("Supplier",            Supplier.objects.all().delete())
+    _deleted("Lot", Lot.objects.all().delete())
+    _deleted("StockByLocation", StockByLocation.objects.all().delete())
+    _deleted("Product", Product.objects.all().delete())
+    _deleted("Subcategory", Subcategory.objects.all().delete())
+    _deleted("Category", Category.objects.all().delete())
+    _deleted("Supplier", Supplier.objects.all().delete())
 
     print("\n--- Limpiando ubicaciones adicionales ---")
     extra_locs = Location.objects.exclude(code__in=_BASE_LOCATION_CODES)
@@ -135,16 +144,14 @@ def clean() -> None:
     # con PROTECT y no las tocamos.
 
     print("\n--- Limpiando usuarios adicionales ---")
-    extra_users = User.objects.filter(
-        role__in=["auxiliar_despacho", "administrador"]
-    )
+    extra_users = User.objects.filter(role__in=["auxiliar_despacho", "administrador"])
     _deleted("User adicional", extra_users.delete())
 
     print("\n--- Limpiando webhooks y auditoria ---")
-    _deleted("WebhookDelivery",  WebhookDelivery.objects.all().delete())
-    _deleted("WebhookEndpoint",  WebhookEndpoint.objects.all().delete())
-    _deleted("AuditLogArchive",  AuditLogArchive.objects.all().delete())
-    _deleted("AuditLog",         AuditLog.objects.all().delete())
+    _deleted("WebhookDelivery", WebhookDelivery.objects.all().delete())
+    _deleted("WebhookEndpoint", WebhookEndpoint.objects.all().delete())
+    _deleted("AuditLogArchive", AuditLogArchive.objects.all().delete())
+    _deleted("AuditLog", AuditLog.objects.all().delete())
     _deleted("LogEntry (admin)", LogEntry.objects.all().delete())
 
 
@@ -177,6 +184,7 @@ def main() -> None:
     except Exception as exc:
         print(f"\n[ERROR] {exc}", file=sys.stderr)
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 

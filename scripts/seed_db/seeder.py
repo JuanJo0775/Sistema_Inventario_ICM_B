@@ -93,9 +93,7 @@ class Seeder:
 
         # --- Movimientos (condicional a idempotencia) ---
         if not force and self._is_seeded():
-            self._warn(
-                "Movimientos ya sembrados. Usa --force para regenerar."
-            )
+            self._warn("Movimientos ya sembrados. Usa --force para regenerar.")
             result.skipped_movement_phase = True
         else:
             bodega = locations["bodega"]
@@ -139,6 +137,7 @@ class Seeder:
 
     def _get_almacenista(self):
         from django.contrib.auth import get_user_model
+
         User = get_user_model()
         user = User.objects.filter(role="almacenista", is_active=True).first()
         if not user:
@@ -155,14 +154,30 @@ class Seeder:
 
     def _ensure_extra_users(self, almacenista) -> None:
         from django.contrib.auth import get_user_model
+
         User = get_user_model()
         extra = [
-            {"username": "auxiliar_despacho_1", "email": "auxiliar1@icm.local",
-             "first_name": "Maria", "last_name": "Lopez Vega", "role": "auxiliar_despacho"},
-            {"username": "auxiliar_despacho_2", "email": "auxiliar2@icm.local",
-             "first_name": "Pedro", "last_name": "Garcia Mora", "role": "auxiliar_despacho"},
-            {"username": "administrador_icm", "email": "admin@icm.local",
-             "first_name": "Sofia", "last_name": "Martinez Cruz", "role": "administrador"},
+            {
+                "username": "auxiliar_despacho_1",
+                "email": "auxiliar1@icm.local",
+                "first_name": "Maria",
+                "last_name": "Lopez Vega",
+                "role": "auxiliar_despacho",
+            },
+            {
+                "username": "auxiliar_despacho_2",
+                "email": "auxiliar2@icm.local",
+                "first_name": "Pedro",
+                "last_name": "Garcia Mora",
+                "role": "auxiliar_despacho",
+            },
+            {
+                "username": "administrador_icm",
+                "email": "admin@icm.local",
+                "first_name": "Sofia",
+                "last_name": "Martinez Cruz",
+                "role": "administrador",
+            },
         ]
         for data in extra:
             user, created = User.objects.get_or_create(
@@ -214,7 +229,11 @@ class Seeder:
                 self._ok(f"  · Ubicacion existente: {loc.name}")
             result[loc.code] = loc
 
-        missing = [c for c in ("bodega", "vitrina", "bodega-norte", "vitrina-2") if c not in result]
+        missing = [
+            c
+            for c in ("bodega", "vitrina", "bodega-norte", "vitrina-2")
+            if c not in result
+        ]
         if missing:
             raise RuntimeError(f"Ubicaciones faltantes en BD: {missing}")
         return result
@@ -266,7 +285,9 @@ class Seeder:
         for cat_slug, brand_name, description in config.SUBCATEGORIES:
             cat = cats.get(cat_slug)
             if not cat:
-                self._warn(f"Categoria '{cat_slug}' no encontrada para marca '{brand_name}'")
+                self._warn(
+                    f"Categoria '{cat_slug}' no encontrada para marca '{brand_name}'"
+                )
                 continue
 
             existing = Subcategory.objects.filter(
@@ -382,6 +403,7 @@ class Seeder:
 
     def _is_seeded(self) -> bool:
         from apps.purchasing.models import Supplier
+
         supplier = Supplier.objects.filter(nit=config.SEED_MARKER_NIT).first()
         if not supplier:
             return False
@@ -426,8 +448,8 @@ class Seeder:
     ) -> None:
         sup_icm = suppliers["ICM Distribuidora Principal SAS"]
         sup_ter = suppliers["Terapias Medicas de Colombia Ltda"]
-        sup_ag  = suppliers["Distribuidora Agujas y Accesorios SAS"]
-        sup_eq  = suppliers["Equimed Colombia SAS"]
+        sup_ag = suppliers["Distribuidora Agujas y Accesorios SAS"]
+        sup_eq = suppliers["Equimed Colombia SAS"]
 
         # Grupo A: Electroterapia (devices con serial) + Masajeadores
         items_a, serial_a = self._split_by_serial(
@@ -447,10 +469,14 @@ class Seeder:
             if p.category.requires_serial_number
         ]
         if serial_pending:
-            self._create_pending_po(almacenista, sup_icm, serial_pending, "OC-REF serial pendiente")
+            self._create_pending_po(
+                almacenista, sup_icm, serial_pending, "OC-REF serial pendiente"
+            )
 
         # Grupo B: Bandas + Cintas + Pelotas
-        items_b, serial_b = self._split_by_serial(by_cat, ["bandas", "cintas", "pelotas"])
+        items_b, serial_b = self._split_by_serial(
+            by_cat, ["bandas", "cintas", "pelotas"]
+        )
         if items_b:
             self._purchase_and_receive(
                 almacenista, sup_ter, bodega, items_b, "OC-B Bandas+Cintas+Pelotas"
@@ -473,8 +499,7 @@ class Seeder:
         )
         if items_d:
             self._purchase_and_receive(
-                almacenista, sup_eq, bodega, items_d,
-                "OC-D Camillas+Pedales+Suelo+Mano"
+                almacenista, sup_eq, bodega, items_d, "OC-D Camillas+Pedales+Suelo+Mano"
             )
         for p, qty in serial_d:
             self._entry_with_serial(almacenista, p, qty, bodega)
@@ -492,11 +517,17 @@ class Seeder:
         sup_mr = suppliers["MedRehab Importaciones Ltda."]
         alta_rotacion = ["bandas", "accesorios", "pelotas", "cintas", "agujas"]
         sub_cat = {k: v[:3] for k, v in by_cat.items() if k in alta_rotacion}
-        items, serial_items = self._split_by_serial(sub_cat, alta_rotacion, qty_multiplier=0.5)
+        items, serial_items = self._split_by_serial(
+            sub_cat, alta_rotacion, qty_multiplier=0.5
+        )
         if items:
             self._purchase_and_receive(
-                almacenista, sup_mr, bodega_norte, items,
-                "OC-Norte Alta-Rotacion", delivery_days=12,
+                almacenista,
+                sup_mr,
+                bodega_norte,
+                items,
+                "OC-Norte Alta-Rotacion",
+                delivery_days=12,
             )
         for p, qty in serial_items:
             self._entry_with_serial(almacenista, p, qty, bodega_norte)
@@ -529,7 +560,9 @@ class Seeder:
             if cat_slug not in transfer_cats:
                 continue
             dest, pct = transfer_cats[cat_slug]
-            row = StockByLocation.objects.filter(product=product, location=bodega).first()
+            row = StockByLocation.objects.filter(
+                product=product, location=bodega
+            ).first()
             if not row or row.current_stock < 2:
                 continue
             qty = max(1, int(row.current_stock * pct))
@@ -581,7 +614,9 @@ class Seeder:
                 kwargs["cold_chain_acknowledged"] = True
             try:
                 register_dispatch(almacenista, **kwargs)
-                self._ok(f"  -> Venta menor {product.sku} x {qty} (queda {stock - qty})")
+                self._ok(
+                    f"  -> Venta menor {product.sku} x {qty} (queda {stock - qty})"
+                )
                 count += 1
             except Exception as exc:
                 self._warn(f"Venta {product.sku} omitida: {exc}")
@@ -598,15 +633,21 @@ class Seeder:
         from apps.movements.services import register_dispatch
 
         wholesale_cats = [
-            "electroterapia", "masajeadores", "camillas",
-            "pedales", "suelo-pelvico", "terapias-de-mano",
+            "electroterapia",
+            "masajeadores",
+            "camillas",
+            "pedales",
+            "suelo-pelvico",
+            "terapias-de-mano",
         ]
 
         customer_idx = 0
         count = 0
         for cat_slug in wholesale_cats:
             for product in by_cat.get(cat_slug, [])[:3]:
-                row = StockByLocation.objects.filter(product=product, location=bodega).first()
+                row = StockByLocation.objects.filter(
+                    product=product, location=bodega
+                ).first()
                 if not row or row.current_stock < 2:
                     continue
                 qty = min(3, row.current_stock // 3)
@@ -629,7 +670,9 @@ class Seeder:
                     kwargs["cold_chain_acknowledged"] = True
                 try:
                     register_dispatch(almacenista, **kwargs)
-                    self._ok(f"  -> Venta mayor {product.sku} x {qty} -- {customer['customer_name']}")
+                    self._ok(
+                        f"  -> Venta mayor {product.sku} x {qty} -- {customer['customer_name']}"
+                    )
                     count += 1
                 except Exception as exc:
                     self._warn(f"Venta mayor {product.sku} omitida: {exc}")
@@ -647,12 +690,16 @@ class Seeder:
         done = 0
 
         for product in by_cat.get("agujas", [])[:2]:
-            row = StockByLocation.objects.filter(product=product, location=bodega).first()
+            row = StockByLocation.objects.filter(
+                product=product, location=bodega
+            ).first()
             if row and row.current_stock > 5:
                 new_qty = row.current_stock - 3
                 try:
                     register_adjustment(
-                        almacenista, product_id=product.id, location_id=bodega.id,
+                        almacenista,
+                        product_id=product.id,
+                        location_id=bodega.id,
                         new_quantity=new_qty,
                         justification="Ajuste negativo: 3 unidades embalaje roto en conteo fisico.",
                     )
@@ -662,12 +709,16 @@ class Seeder:
                     self._warn(f"Ajuste {product.sku} omitido: {exc}")
 
         for product in by_cat.get("accesorios", [])[:2]:
-            row = StockByLocation.objects.filter(product=product, location=bodega).first()
+            row = StockByLocation.objects.filter(
+                product=product, location=bodega
+            ).first()
             if row:
                 new_qty = row.current_stock + 4
                 try:
                     register_adjustment(
-                        almacenista, product_id=product.id, location_id=bodega.id,
+                        almacenista,
+                        product_id=product.id,
+                        location_id=bodega.id,
                         new_quantity=new_qty,
                         justification="Ajuste positivo: 4 unidades halladas sin registrar en ultima recepcion.",
                     )
@@ -677,12 +728,16 @@ class Seeder:
                     self._warn(f"Ajuste {product.sku} omitido: {exc}")
 
         for product in by_cat.get("bandas", [])[:1]:
-            row = StockByLocation.objects.filter(product=product, location=bodega).first()
+            row = StockByLocation.objects.filter(
+                product=product, location=bodega
+            ).first()
             if row and row.current_stock > 8:
                 new_qty = row.current_stock - 5
                 try:
                     register_adjustment(
-                        almacenista, product_id=product.id, location_id=bodega.id,
+                        almacenista,
+                        product_id=product.id,
+                        location_id=bodega.id,
                         new_quantity=new_qty,
                         justification="Ajuste merma: 5 unidades deterioro por humedad en inspeccion bodega.",
                     )
@@ -801,7 +856,8 @@ class Seeder:
             {
                 "product_id": p.id,
                 "quantity_ordered": qty,
-                "unit_cost": p.unit_cost or config.CATEGORY_QTY.get(p.category.slug, 50000),
+                "unit_cost": p.unit_cost
+                or config.CATEGORY_QTY.get(p.category.slug, 50000),
             }
             for p, qty in items
         ]
@@ -827,7 +883,9 @@ class Seeder:
                     **(
                         {
                             "lot_code": f"SEED-{p.sku}-L01",
-                            "lot_expiration_date": date.today().replace(year=date.today().year + 2),
+                            "lot_expiration_date": date.today().replace(
+                                year=date.today().year + 2
+                            ),
                         }
                         if p.requires_expiration
                         else {}
@@ -840,7 +898,8 @@ class Seeder:
                 return po
 
             reception = create_reception(
-                almacenista, po.id,
+                almacenista,
+                po.id,
                 {
                     "destination_location_id": location.id,
                     "notes": f"[SEED] Recepcion {label}",
@@ -850,7 +909,9 @@ class Seeder:
             )
             confirm_reception(almacenista, reception.id, request=None)
 
-        self._ok(f"  + OC {po.number} confirmada ({len(items)} items -> {location.name})")
+        self._ok(
+            f"  + OC {po.number} confirmada ({len(items)} items -> {location.name})"
+        )
         return po
 
     def _create_pending_po(
@@ -860,7 +921,10 @@ class Seeder:
         items: list[tuple[Any, int]],
         label: str,
     ) -> Any | None:
-        from apps.purchasing.services import confirm_purchase_order, create_purchase_order
+        from apps.purchasing.services import (
+            confirm_purchase_order,
+            create_purchase_order,
+        )
 
         if not items:
             return None
@@ -935,11 +999,17 @@ class Seeder:
 
         for code, loc in locations.items():
             total = (
-                StockByLocation.objects.filter(location=loc)
-                .aggregate(s=Sum("current_stock"))["s"] or 0
+                StockByLocation.objects.filter(location=loc).aggregate(
+                    s=Sum("current_stock")
+                )["s"]
+                or 0
             )
-            activos = StockByLocation.objects.filter(location=loc, current_stock__gt=0).count()
-            agotados = StockByLocation.objects.filter(location=loc, current_stock=0).count()
+            activos = StockByLocation.objects.filter(
+                location=loc, current_stock__gt=0
+            ).count()
+            agotados = StockByLocation.objects.filter(
+                location=loc, current_stock=0
+            ).count()
             result.stock_by_location[loc.name] = {
                 "activos": activos,
                 "agotados": agotados,
