@@ -17237,7 +17237,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/test_seed_db.py::TestSeedIntegration::test_clean_removes_seed_data_preserves_base -v
 ```
 
-Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. línea 180)
+Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. línea 182)
 
 
 ---
@@ -17273,7 +17273,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/test_seed_db.py::TestSeedIntegration::test_seed_creates_catalog_and_movements -v
 ```
 
-Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. línea 149)
+Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. línea 151)
 
 
 ---
@@ -17309,7 +17309,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/test_seed_db.py::TestSeedIntegration::test_seed_is_idempotent -v
 ```
 
-Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. línea 165)
+Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. línea 167)
 
 
 ---
