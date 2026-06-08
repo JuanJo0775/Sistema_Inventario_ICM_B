@@ -137,7 +137,7 @@ icm_backend/
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
 │   │   ├── management/
 │   │   │   └── commands/                                       # Comandos administrativos del módulo
-│   │   │       └── import_catalog.py                           # Comando Django para automatización operativa
+│   │   │       └── create_almacenista.py                       # Comando Django para automatización operativa
 │   │   ├── models.py                                           # Entidades y constraints de persistencia
 │   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
 │   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
@@ -325,7 +325,7 @@ icm_backend/
 │   ├── evidence/                                               # Documento arquitectónico relevante
 │   │   └── README.md                                           # Documento técnico relevante
 │   ├── guias/                                                  # Documento arquitectónico relevante
-│   │   └── IMPORT_CATALOG.md                                   # Documento técnico relevante
+│   │   └── SEED_DB.md                                           # Documento técnico relevante
 │   ├── system_behavior/                                        # Documento arquitectónico relevante
 │   │   ├── pricing/                                            # Documento arquitectónico relevante
 │   │   │   ├── Plan Arquitectura de Precios y Facturación — Sistema Inventario ICM.md  # Documento técnico relevante
@@ -347,11 +347,11 @@ icm_backend/
 │   ├── generate_docs/                                          # Generadores compartidos de documentación
 │   │   ├── __main__.py                                         # Entry point oficial: python -m scripts.generate_docs
 │   │   └── utils.py                                            # Pipeline compartido: descubrimiento, renderizado y escritura
-│   ├── import_catalog/
-│   │   ├── config.py
-│   │   ├── importer.py
-│   │   ├── reader.py
-│   │   ├── reporter.py
+│   ├── seed_db/
+│   │   ├── config.py                                           # Datos estáticos del seed unificado
+│   │   ├── seeder.py                                           # Lógica principal del seed
+│   │   ├── run.py                                              # Punto de entrada ejecutable
+│   │   └── clean.py                                            # Limpieza de la base de datos del seed
 │   │   ├── transformer.py
 │   │   └── validator.py
 │   └── perf/

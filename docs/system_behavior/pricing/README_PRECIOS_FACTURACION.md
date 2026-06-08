@@ -208,12 +208,12 @@ Agregar columnas a partir de la columna D en cada hoja del Excel con cualquiera 
 | `IVA` / `IVA%` / `Tasa IVA` | `tax_rate_pct` |
 | `Moneda` | `currency` |
 
-Luego ejecutar:
+Luego, para la carga inicial del catálogo, ejecutar el seed unificado:
 ```bash
-python manage.py import_catalog
+python scripts/seed_db/run.py
 ```
 
-El comando es idempotente: productos ya existentes se omiten. Para re-importar con precios, primero agregar los productos en la BD y luego usar el endpoint individual.
+El seed es idempotente: los datos existentes se reutilizan. Para ajustes de precios posteriores, usar el endpoint individual de actualización de precios y no el seed.
 
 ---
 

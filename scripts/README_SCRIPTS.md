@@ -64,27 +64,44 @@ python -m scripts.generate_docs --only unit
 python -m scripts.generate_docs --check
 ```
 
-4) import_catalog (management command)
+4) seed_db (script independiente — seed unificado)
 
-- Propósito: importa el catálogo inicial de productos desde el Excel de ICM (`Clasificacion_Productos.xlsx`) de forma idempotente. Los productos ya existentes se omiten. Las categorías se crean si no existen.
-- Soporte de precios: si el Excel contiene columnas de precio a partir de la columna D, el comando las lee y las carga en el producto. Si no existen, los precios quedan en null y el comando sigue funcionando sin error.
-  - Columnas reconocidas: `Precio Venta`, `Precio Menor`, `Precio Minorista` → `sale_price_retail`; `Precio Mayorista`, `Precio Mayor` → `sale_price_wholesale`; `Costo`, `Costo Unitario` → `unit_cost`; `IVA`, `IVA%` → `tax_rate_pct`; `Moneda` → `currency`.
-- Dependencia: requiere que el usuario almacenista exista primero (`python manage.py create_almacenista`).
+- Ubicación: `scripts/seed_db/` — completamente independiente de las apps Django.
+  - `config.py`: todos los datos estáticos basados en `Clasificacion_Productos.xlsx` — 11 categorías, 27 marcas/subcategorías, ~215 productos con precios completos, 3 combos, 5 proveedores, 5 clientes, ubicaciones adicionales.
+  - `seeder.py`: clase `Seeder` con 14 fases ordenadas — desde catálogo hasta movimientos.
+  - `run.py`: punto de entrada ejecutable directamente con Python.
+  - `env.py`: credenciales del usuario inicial leídas desde `.env`.
+- Guía de uso detallada: [`docs/guias/SEED_DB.md`](../docs/guias/SEED_DB.md)
+- **Fuente de verdad**: todos los productos y categorías provienen de `Clasificacion_Productos.xlsx`. No depende del Excel en tiempo de ejecución — los datos están embebidos en `config.py`.
+- Prerequisito único: `python manage.py create_almacenista`.
+- Fases del seed:
+  1. Usuarios adicionales (2 auxiliares_despacho, 1 administrador)
+  2. Ubicaciones (Bodega Norte, Vitrina 2 adicionales)
+  3. Categorías (11 categorías con atributos correctos)
+  4. Subcategorías / Marcas (33 marcas distribuidas por categoría)
+  5. Productos (60 productos con precios, reorder_point, marca, IVA)
+  6. Proveedores (5 proveedores)
+  7–8. Stock via flujo OC completo (bodega principal + bodega norte)
+  9. Traslados internos a vitrina y vitrina-2
+  10. Ventas al por menor (vaciado parcial vitrina)
+  11. Ventas al por mayor con datos completos de cliente (BR-08, RNF-006)
+  12. Ajustes positivos y negativos con justificación (BR-07)
+  13. Escenario de agotamiento en vitrina
+  14. Combos de productos (KIT-1, KBND-1, KPIT-1)
+- **Idempotente**: fases 1–6 (catálogo) siempre corren y hacen get-or-create. Fases 7–14 (movimientos) se omiten si ya existen; usa `--force` para regenerar.
+- Respeta BR-04 (serial obligatorio en electroterapia si aplica), BR-07 (justificación en ajustes), BR-11 (no stock negativo), BR-14 (estado de ubicaciones).
 - Uso:
 
 ```bash
-# Importación real
-python manage.py import_catalog
+# Primera vez (solo necesita create_almacenista primero)
+python manage.py create_almacenista
+python scripts/seed_db/run.py
 
-# Dry-run (valida sin escribir en BD)
-python manage.py import_catalog --dry-run
-
-# Ruta personalizada al Excel
-python manage.py import_catalog --excel-path /ruta/al/archivo.xlsx
-
-# Usuario actor distinto al del .env
-python manage.py import_catalog --actor-username otro_almacenista
+# Regenerar movimientos completos
+python scripts/seed_db/run.py --force
 ```
+
+- Salida: resumen con conteo de categorías, marcas, productos, OC, movimientos por tipo, stock por ubicación y escenarios disponibles.
 
 5) create_almacenista (management command)
 
