@@ -130,7 +130,7 @@ He añadido estos escenarios verificables al final del documento para que cada a
 
 Se han añadido artefactos mínimos para proporcionar evidencia reproducible de los atributos y habilitar checks básicos en CI:
 
-- Workflow CI: `.github/workflows/basic_checks.yml` — ejecuta `pytest -q` y `bandit -r .` para validar comportamiento y SAST básico.
+- Workflow CI: `.github/workflows/ci.yml` — ejecuta los gates de calidad reales (black, isort, bandit, pip-audit, migraciones y documentación sincronizada).
 - Script de carga ligero: `scripts/perf/locustfile.py` — escenario mínimo que ejecuta `GET /health/` y consultas de stock (`GET /api/v1/inventory/stock/`).
 
 Cómo ejecutar localmente (entorno de desarrollo con la app corriendo):

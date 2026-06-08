@@ -57,7 +57,8 @@ python manage.py migrate
 Para tener datos iniciales (usuarios predeterminados, productos, ubicaciones) y poder probar el sistema de inmediato:
 
 ```bash
-python manage.py shell < scripts/seed.py
+python manage.py create_almacenista
+python scripts/seed_db/run.py
 ```
 
 ## 7. Crear superusuario (Opcional)
@@ -87,7 +88,7 @@ El proyecto estará disponible en:
 Para asegurar la calidad del código, puedes usar los siguientes comandos en tu día a día:
 
 ```bash
-# Ejecutar todos los tests (330 tests esperados)
+# Ejecutar todos los tests 
 pytest
 
 # Ejecutar tests de una aplicación específica

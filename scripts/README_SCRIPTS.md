@@ -67,7 +67,7 @@ python -m scripts.generate_docs --check
 4) seed_db (script independiente — seed unificado)
 
 - Ubicación: `scripts/seed_db/` — completamente independiente de las apps Django.
-  - `config.py`: todos los datos estáticos basados en `Clasificacion_Productos.xlsx` — 11 categorías, 27 marcas/subcategorías, ~215 productos con precios completos, 3 combos, 5 proveedores, 5 clientes, ubicaciones adicionales.
+  - `config.py`: todos los datos estáticos basados en `Clasificacion_Productos.xlsx` — 11 categorías, 26 marcas/subcategorías, 214 productos con precios completos, 3 combos, 5 proveedores, 5 clientes, ubicaciones adicionales.
   - `seeder.py`: clase `Seeder` con 14 fases ordenadas — desde catálogo hasta movimientos.
   - `run.py`: punto de entrada ejecutable directamente con Python.
   - `env.py`: credenciales del usuario inicial leídas desde `.env`.
@@ -79,7 +79,7 @@ python -m scripts.generate_docs --check
   2. Ubicaciones (Bodega Norte, Vitrina 2 adicionales)
   3. Categorías (11 categorías con atributos correctos)
   4. Subcategorías / Marcas (33 marcas distribuidas por categoría)
-  5. Productos (60 productos con precios, reorder_point, marca, IVA)
+  5. Productos (214 productos con precios, reorder_point, marca, IVA)
   6. Proveedores (5 proveedores)
   7–8. Stock via flujo OC completo (bodega principal + bodega norte)
   9. Traslados internos a vitrina y vitrina-2

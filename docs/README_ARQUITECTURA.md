@@ -137,7 +137,7 @@ icm_backend/
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
 │   │   ├── management/
 │   │   │   └── commands/                                       # Comandos administrativos del módulo
-│   │   │       └── create_almacenista.py                       # Comando Django para automatización operativa
+│   │   │       └── (sin comandos administrativos propios)
 │   │   ├── models.py                                           # Entidades y constraints de persistencia
 │   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
 │   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
@@ -2025,7 +2025,7 @@ Impacto:
 
 ### 11.4 CI/CD (GitHub Actions - Preparación)
 
-`.github/workflows/tests.yml`:
+`.github/workflows/ci.yml`:
 
 ```yaml
 name: Tests

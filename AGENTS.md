@@ -47,7 +47,8 @@ Antes de cambiar comportamiento o contratos, alinea el trabajo con la documentac
 
 # Migraciones y seed (local)
 python manage.py migrate
-python manage.py shell < scripts/seed.py  # opcional
+python manage.py create_almacenista  # opcional, requerido antes del seed
+python scripts/seed_db/run.py  # opcional
 
 # Desarrollo local
 python manage.py runserver 0.0.0.0:8000

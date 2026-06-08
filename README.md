@@ -63,7 +63,7 @@ Documentación funcional y arquitectónica disponible en el repositorio:
 - PostgreSQL 15
 - JWT con djangorestframework-simplejwt (rotación + blacklist)
 - OpenAPI 3 con **drf-spectacular** (Swagger UI y ReDoc)
-- pytest + pytest-django (330 tests — 0 fallos)
+- pytest + pytest-django (646 tests — 637 pasan — 9 skips)
 - Docker + Docker Compose
 - openpyxl (exportación XLSX)
 - WeasyPrint (facturas PDF)
@@ -93,7 +93,8 @@ Para iniciar el servidor de desarrollo y consultar la documentación localmente,
 python manage.py migrate
 
 # 2. (Opcional) Cargar datos semilla
-python manage.py shell < scripts/seed.py
+python manage.py create_almacenista
+python scripts/seed_db/run.py
 
 # 3. Iniciar el servidor
 python manage.py runserver

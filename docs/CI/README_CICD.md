@@ -10,7 +10,8 @@ Alcance actual:
 - seguridad estática y supply chain,
 - validación de migraciones,
 - documentación de tests sincronizada,
-- suite de pruebas unitarias, integración, Gherkin y concurrencia,
+- suite de pruebas unitarias, integración de scripts/tests, escenarios, concurrencia y locust,
+- seed DB end-to-end en PR,
 - carga opcional con Locust.
 
 No existe en este repositorio un flujo de despliegue automatizado completo. La canalización activa está enfocada en validación y pruebas.
@@ -27,9 +28,11 @@ Jobs reales:
 
 1. `quality`
 2. `unit_tests`
-3. `integration_gherkin`
-4. `concurrency_tests`
-5. `load_test`
+3. `integration_tests`
+4. `scenarios`
+5. `seed_db_tests` (solo `pull_request`)
+6. `concurrency_tests`
+7. `load_test`
 
 ### 2.2 Resumen de cada job
 
@@ -55,19 +58,35 @@ Genera:
 - `junit-unit.xml`
 - `coverage-unit.xml`
 
-#### `integration_gherkin`
+#### `integration_tests`
 
-Levanta PostgreSQL y ejecuta:
+Ejecuta los tests de integración liviana del repositorio:
 
-- `pytest tests/integration -q`
+- `pytest tests/integration tests/test_location_validators.py tests/test_generate_project_structure.py -q`
+
+Genera:
+
+- `junit-integration-tests.xml`
+- `coverage-integration-tests.xml`
+
+#### `scenarios`
+
+Levanta PostgreSQL y ejecuta los escenarios Gherkin / ERS:
+
 - `pytest tests/ers -q`
 
 Genera:
 
-- `junit-integration.xml`
 - `junit-gherkin.xml`
-- `coverage-integration.xml`
 - `coverage-gherkin.xml`
+
+#### `seed_db_tests`
+
+Ejecuta el seed end-to-end completo:
+
+- `pytest tests/test_seed_db.py -q`
+
+Este job corre solo en `pull_request`.
 
 #### `concurrency_tests`
 
@@ -105,8 +124,9 @@ pip-audit --progress=off
 python manage.py makemigrations --check --dry-run
 python -m scripts.generate_docs --check
 pytest apps/ -q --ignore=tests
-pytest tests/integration -q
+pytest tests/integration tests/test_location_validators.py tests/test_generate_project_structure.py -q
 pytest tests/ers -q
+pytest tests/test_seed_db.py -q
 pytest tests/concurrency -v
 ```
 
@@ -140,10 +160,11 @@ Los artefactos esperados en CI son:
 
 - `junit-unit.xml`
 - `coverage-unit.xml`
-- `junit-integration.xml`
+- `junit-integration-tests.xml`
+- `coverage-integration-tests.xml`
 - `junit-gherkin.xml`
-- `coverage-integration.xml`
 - `coverage-gherkin.xml`
+- `junit-seed-db.xml`
 - `junit-concurrency.xml`
 - `locust-results_*.csv`
 
@@ -155,4 +176,3 @@ Los artefactos esperados en CI son:
 - La documentación de pruebas debe mantenerse sincronizada cuando cambian tests o escenarios Gherkin.
 - La suite de concurrencia requiere PostgreSQL y no se ejecuta sobre SQLite.
 - El job `load_test` es informativo y depende de un servidor Django accesible dentro del runner.
-

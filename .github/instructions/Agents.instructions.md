@@ -19,7 +19,7 @@ Documentos de referencia (consultar siempre antes de cambiar comportamiento):
 - `docs/adr/ADR-001.md` — ADR-001 (referencia de ejemplo)
 - `docs/calidad_restricciones/README_ATRIBUTOS_CALIDAD.md` — Atributos de calidad y criterios
 - `docs/calidad_restricciones/README_RESTRICCIONES.md` — Restricciones y reglas no funcionales
--- `docs/CI/README_CICD.md` — Runbook de CI/CD: pipelines, despliegue, promoción por digest, backups, rollback y operación segura
+- `docs/CI/README_CICD.md` — Runbook de CI/CD: pipelines, despliegue, promoción por digest, backups, rollback y operación segura
 - `README.md` — Resumen del proyecto y enlaces rápidos
 - `AGENTS.md` — Guía rápida para asistentes de código (archivo en la raíz)
 
@@ -42,7 +42,8 @@ Inicio rápido (comandos frecuentes):
 
 # Migraciones y seed (local)
 python manage.py migrate
-python manage.py shell < scripts/seed.py  # opcional
+python manage.py create_almacenista  # opcional, requerido antes del seed
+python scripts/seed_db/run.py  # opcional
 
 # Desarrollo local
 python manage.py runserver 0.0.0.0:8000

@@ -242,6 +242,20 @@ pytest tests/ers -k "RF005 or RF006 or RF007" -v
 pytest apps/movements/tests/ -v
 ```
 
+### Tests raíz del repo
+
+```bash
+pytest tests/integration tests/test_location_validators.py tests/test_generate_project_structure.py -q
+```
+
+### Seed completo
+
+```bash
+pytest tests/test_seed_db.py -q
+```
+
+Este test está marcado como `slow`: en CI corre solo en `pull_request` para no penalizar los `push` frecuentes.
+
 ### Tests de integración
 
 ```bash
