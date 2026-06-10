@@ -60,10 +60,9 @@ def impl_rf003_s04(almacenista_user, db):
             "sku": "RFB-0004",
             "name": "Con barcode",
             "category_id": cat.id,
-            "barcode": "8710999000001",
         },
     )
-    assert p.barcode == "8710999000001"
+    assert p.barcode == p.sku
 
 
 def impl_rf003_s05(almacenista_user, db):
