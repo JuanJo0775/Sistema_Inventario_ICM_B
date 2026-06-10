@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-from shared.exceptions import (
-    DomainValidationError,
-    ImmutableRecordError,
-)
+from shared.exceptions import DomainValidationError, ImmutableRecordError
 
 
 class SupplierNITDuplicateError(DomainValidationError):
