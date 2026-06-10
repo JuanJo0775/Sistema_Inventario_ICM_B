@@ -194,7 +194,9 @@ class ReceptionItemSerializer(serializers.ModelSerializer):
         return obj.quantity_expected
 
     def get_allocations(self, obj):
-        return ReceptionItemAllocationSerializer(obj.allocations.all(), many=True).data
+        return ReceptionItemAllocationSerializer(
+            obj.allocations.all(), many=True
+        ).data
 
 
 class ReceptionItemAllocationSerializer(serializers.ModelSerializer):
@@ -239,7 +241,8 @@ class ReceptionItemWriteSerializer(serializers.Serializer):
         required=False,
         default=list,
         help_text=(
-            "Distribución avanzada opcional. Cada fila puede indicar ubicación, lote y cantidad."
+            "Distribución avanzada opcional. Cada fila puede indicar ubicación, lote "
+            "y cantidad."
         ),
     )
 
@@ -288,7 +291,10 @@ class ReceptionSerializer(serializers.ModelSerializer):
         )
 
     def get_has_allocations(self, obj) -> bool:
-        return any(getattr(item, "allocations", None) and item.allocations.exists() for item in obj.items.all())
+        return any(
+            getattr(item, "allocations", None) and item.allocations.exists()
+            for item in obj.items.all()
+        )
 
 
 class ReceptionCreateSerializer(serializers.Serializer):

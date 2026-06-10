@@ -29,7 +29,9 @@ class PurchaseOrderImmutableError(ImmutableRecordError):
 
 
 class InvalidPOStatusTransitionError(DomainValidationError):
-    default_message = "La transición de estado solicitada no está permitida para esta orden de compra."
+    default_message = (
+        "La transición de estado solicitada no está permitida para esta orden de compra."
+    )
     default_code = "INVALID_PO_STATUS_TRANSITION"
 
 
@@ -39,7 +41,9 @@ class POCancellationReasonRequiredError(DomainValidationError):
 
 
 class POHasConfirmedReceptionsError(DomainValidationError):
-    default_message = "No se puede cancelar la OC porque tiene recepciones confirmadas que ya generaron stock."
+    default_message = (
+        "No se puede cancelar la OC porque tiene recepciones confirmadas que ya generaron stock."
+    )
     default_code = "PO_HAS_CONFIRMED_RECEPTIONS"
 
 
@@ -63,7 +67,10 @@ class ReceptionNotInBorradorError(DomainValidationError):
 
 
 class ReceptionDiscrepancyNoteRequiredError(DomainValidationError):
-    default_message = "Debe registrar una nota de discrepancia cuando la cantidad recibida difiere de la esperada."
+    default_message = (
+        "Debe registrar una nota de discrepancia cuando la cantidad recibida difiere "
+        "de la esperada."
+    )
     default_code = "RECEPTION_DISCREPANCY_NOTE_REQUIRED"
 
 
@@ -82,5 +89,8 @@ class ReceptionAllocationQuantityMismatchError(DomainValidationError):
 
 
 class PONotReceivableError(DomainValidationError):
-    default_message = "La orden de compra no está en un estado que permita recepciones (debe estar PENDIENTE o PARCIALMENTE_RECIBIDA)."
+    default_message = (
+        "La orden de compra no está en un estado que permita recepciones (debe estar "
+        "PENDIENTE o PARCIALMENTE_RECIBIDA)."
+    )
     default_code = "PO_NOT_RECEIVABLE"

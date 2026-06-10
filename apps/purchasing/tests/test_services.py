@@ -399,7 +399,9 @@ def test_confirm_reception_discrepancy_requires_note(almacenista_user):
     )
     location = LocationFactory(name="Bodega Disc", code="bodega-disc")
     reception = ReceptionFactory(
-        purchase_order=po, destination_location=location, received_by=almacenista_user
+        purchase_order=po,
+        destination_location=location,
+        received_by=almacenista_user,
     )
     ReceptionItemFactory(
         reception=reception,
@@ -424,7 +426,9 @@ def test_confirm_reception_is_atomic_on_error(almacenista_user, monkeypatch):
     )
     location = LocationFactory(name="Bodega Atomic", code="bodega-atomic")
     reception = ReceptionFactory(
-        purchase_order=po, destination_location=location, received_by=almacenista_user
+        purchase_order=po,
+        destination_location=location,
+        received_by=almacenista_user,
     )
     ReceptionItemFactory(
         reception=reception, purchase_order_item=poi, quantity_received=5
@@ -457,7 +461,9 @@ def test_confirm_reception_unit_cost_flows_to_movement(almacenista_user):
     )
     location = LocationFactory(name="Bodega Cost", code="bodega-cost")
     reception = ReceptionFactory(
-        purchase_order=po, destination_location=location, received_by=almacenista_user
+        purchase_order=po,
+        destination_location=location,
+        received_by=almacenista_user,
     )
     ReceptionItemFactory(
         reception=reception, purchase_order_item=poi, quantity_received=5
@@ -542,9 +548,15 @@ def test_confirm_reception_advanced_distribution_by_lots_and_locations(
     assert Movement.objects.filter(
         product=product, movement_type=MovementType.ENTRADA
     ).count() == 3
-    assert StockByLocation.objects.get(product=product, location=b1).current_stock == 2
-    assert StockByLocation.objects.get(product=product, location=b2).current_stock == 3
-    assert StockByLocation.objects.get(product=product, location=vit).current_stock == 5
+    assert (
+        StockByLocation.objects.get(product=product, location=b1).current_stock == 2
+    )
+    assert (
+        StockByLocation.objects.get(product=product, location=b2).current_stock == 3
+    )
+    assert (
+        StockByLocation.objects.get(product=product, location=vit).current_stock == 5
+    )
     assert Movement.objects.filter(product=product, lot=lot_a).count() == 2
     assert Movement.objects.filter(product=product, lot=lot_b).count() == 1
 
@@ -583,10 +595,21 @@ def test_confirm_reception_advanced_distribution_by_locations_only(
 
     confirm_reception(almacenista_user, reception.id)
 
-    assert StockByLocation.objects.get(product=product, location=b1).current_stock == 2
-    assert StockByLocation.objects.get(product=product, location=b2).current_stock == 2
-    assert StockByLocation.objects.get(product=product, location=vit).current_stock == 6
-    assert Movement.objects.filter(product=product, movement_type=MovementType.ENTRADA).count() == 3
+    assert (
+        StockByLocation.objects.get(product=product, location=b1).current_stock == 2
+    )
+    assert (
+        StockByLocation.objects.get(product=product, location=b2).current_stock == 2
+    )
+    assert (
+        StockByLocation.objects.get(product=product, location=vit).current_stock == 6
+    )
+    assert (
+        Movement.objects.filter(
+            product=product, movement_type=MovementType.ENTRADA
+        ).count()
+        == 3
+    )
 
 
 @pytest.mark.django_db

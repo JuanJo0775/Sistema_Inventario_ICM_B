@@ -222,7 +222,9 @@ def create_purchase_order(
         "items": [{"product_id": UUID, "quantity_ordered": int, "unit_cost": Decimal, "notes": str}]
     }
     """
-    supplier = Supplier.objects.select_for_update().get(pk=data["supplier_id"])
+    supplier = Supplier.objects.select_for_update().get(
+        pk=data["supplier_id"]
+    )
     if not supplier.is_active:
         raise SupplierInactiveError()
 
@@ -405,7 +407,9 @@ def create_reception(
             f"La OC {po.number} está en estado '{po.status}' y no acepta recepciones."
         )
 
-    location = Location.objects.filter(pk=data["destination_location_id"]).first()
+    location = Location.objects.filter(
+        pk=data["destination_location_id"]
+    ).first()
     if location is None:
         raise DomainValidationError("La ubicación de destino no existe.")
 
@@ -441,7 +445,9 @@ def create_reception(
 
         allocations = list(item_data.get("allocations") or [])
         if allocations:
-            total_allocated = sum(int(a.get("quantity_received", 0)) for a in allocations)
+            total_allocated = sum(
+                int(a.get("quantity_received", 0)) for a in allocations
+            )
             if total_allocated != qty:
                 raise ReceptionAllocationQuantityMismatchError(
                     detail={
@@ -510,7 +516,10 @@ def confirm_reception(executor, reception_id: uuid.UUID, *, request=None) -> Rec
 
     items = list(
         reception.items.select_related("purchase_order_item__product")
-        .prefetch_related("allocations__location", "allocations__movement")
+        .prefetch_related(
+            "allocations__location",
+            "allocations__movement",
+        )
         .all()
     )
 

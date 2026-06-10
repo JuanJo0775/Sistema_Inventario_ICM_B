@@ -201,7 +201,9 @@ def test_create_reception(authenticated_almacenista_client, almacenista_user):
 
 
 @pytest.mark.django_db
-def test_create_reception_with_allocations(authenticated_almacenista_client, almacenista_user):
+def test_create_reception_with_allocations(
+    authenticated_almacenista_client, almacenista_user
+):
     po = PurchaseOrderFactory(
         created_by=almacenista_user, status=PurchaseOrderStatus.PENDIENTE
     )
@@ -254,7 +256,9 @@ def test_confirm_reception_endpoint(authenticated_almacenista_client, almacenist
     )
     location = LocationFactory(name="Bodega Endpoint", code="bodega-endpoint")
     reception = ReceptionFactory(
-        purchase_order=po, destination_location=location, received_by=almacenista_user
+        purchase_order=po,
+        destination_location=location,
+        received_by=almacenista_user,
     )
     ReceptionItemFactory(
         reception=reception, purchase_order_item=poi, quantity_received=5
