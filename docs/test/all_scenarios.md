@@ -5559,6 +5559,116 @@ Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes 
 
 ---
 
+<!-- file: RF021-S04.md -->
+# Recepción avanzada por lote y ubicación se crea correctamente
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF021_S04`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF021 — escenario 4.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF021` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una OC en estado PENDIENTE con un ítem de 10 unidades y 0 recibidas
+- Existen dos ubicaciones válidas y dos lotes válidos para el mismo producto
+
+**When (Cuando):**
+- El Almacenista crea una recepción en modo avanzado distribuyendo las 10 unidades en múltiples porciones
+- Cada porción indica ubicación, cantidad, código de lote y fecha de vencimiento
+
+**Then (Entonces):**
+- El sistema crea la recepción en estado BORRADOR
+- El sistema guarda las distribuciones asociadas al ítem de recepción
+- La suma de las cantidades distribuidas coincide con la cantidad total del ítem
+- La OC permanece en estado PENDIENTE hasta la confirmación
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF021_S04 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF021-S05.md -->
+# Recepción avanzada rechaza distribuciones cuya suma no coincide
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF021_S05`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF021 — escenario 5.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF021` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una OC en estado PENDIENTE con un ítem de 10 unidades
+- El Almacenista prepara una distribución avanzada que suma menos o más de 10 unidades
+
+**When (Cuando):**
+- Intenta crear la recepción con esa distribución inconsistente
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- No se crea ninguna recepción
+- No se crean distribuciones parciales
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF021_S05 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
 <!-- file: RF022-S01.md -->
 # Confirmación exitosa genera Movements y actualiza stock
 
@@ -5814,6 +5924,116 @@ Ejecutar:
 
 ```bash
 pytest tests/ers/test_gherkin_dynamic.py::test_RF022_S05 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF022-S06.md -->
+# Confirmación de recepción avanzada genera un Movement por porción
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF022_S06`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF022 — escenario 6.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF022` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una recepción en BORRADOR con un ítem distribuido en múltiples porciones
+- Cada porción especifica ubicación, lote, fecha de vencimiento y cantidad
+
+**When (Cuando):**
+- El Almacenista confirma la recepción
+
+**Then (Entonces):**
+- El sistema genera un Movement de entrada por cada porción distribuida
+- Cada Movement conserva el producto, lote, fecha de vencimiento, ubicación y cantidad correspondiente
+- El stock se incrementa de forma independiente en cada ubicación destino
+- La recepción pasa a estado CONFIRMADA
+- El log de auditoría registra RECEPTION_CONFIRMED
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF022_S06 -v
+```
+
+Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)
+
+---
+
+## Estado de automatización backend
+
+Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+
+
+---
+
+<!-- file: RF022-S07.md -->
+# Confirmación de recepción avanzada con suma inconsistente es rechazada
+
+## Nombre del test
+
+`tests/ers/test_gherkin_dynamic.py::test_RF022_S07`
+
+## Propósito
+
+Validar el criterio de aceptación Gherkin del ERS ICM para RF022 — escenario 7.
+
+## Requisito o caso de negocio asociado
+
+- **Requisito:** `RF022` (ver docs/requisitos/ERS_ICM_Requisitos.md).
+
+## Inputs (Given / When — extracto ERS)
+
+**Given (Dado que):**
+- Existe una recepción en BORRADOR con distribuciones cuya suma no coincide con la cantidad del ítem
+
+**When (Cuando):**
+- El Almacenista intenta confirmar la recepción
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- Ningún Movement es creado
+- La recepción permanece en BORRADOR
+- El stock no cambia
+
+---
+
+## Resultado esperado (Then)
+
+Ver la sección Then en el extracto anterior del ERS. En automatización backend, el test asociado comprueba el contrato API/servicio equivalente o queda explícitamente marcado como pendiente si el criterio es solo UI, infraestructura o legalidad operativa fuera del alcance de pytest.
+
+## Link directo al test
+
+Ejecutar:
+
+```bash
+pytest tests/ers/test_gherkin_dynamic.py::test_RF022_S07 -v
 ```
 
 Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../tests/ers/test_gherkin_dynamic.py)

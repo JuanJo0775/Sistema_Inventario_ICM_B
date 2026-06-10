@@ -1464,6 +1464,30 @@
     }
   },
   {
+    "id": "RF021-S04",
+    "rf": "RF021",
+    "scenario_number": 4,
+    "title": "Recepción avanzada por lote y ubicación se crea correctamente",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC en estado PENDIENTE con un ítem de 10 unidades y 0 recibidas\n- Existen dos ubicaciones válidas y dos lotes válidos para el mismo producto\n\n**When (Cuando):**\n- El Almacenista crea una recepción en modo avanzado distribuyendo las 10 unidades en múltiples porciones\n- Cada porción indica ubicación, cantidad, código de lote y fecha de vencimiento\n\n**Then (Entonces):**\n- El sistema crea la recepción en estado BORRADOR\n- El sistema guarda las distribuciones asociadas al ítem de recepción\n- La suma de las cantidades distribuidas coincide con la cantidad total del ítem\n- La OC permanece en estado PENDIENTE hasta la confirmación\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF021-S05",
+    "rf": "RF021",
+    "scenario_number": 5,
+    "title": "Recepción avanzada rechaza distribuciones cuya suma no coincide",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC en estado PENDIENTE con un ítem de 10 unidades\n- El Almacenista prepara una distribución avanzada que suma menos o más de 10 unidades\n\n**When (Cuando):**\n- Intenta crear la recepción con esa distribución inconsistente\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- No se crea ninguna recepción\n- No se crean distribuciones parciales\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
     "id": "RF022-S01",
     "rf": "RF022",
     "scenario_number": 1,
@@ -1517,6 +1541,30 @@
     "scenario_number": 5,
     "title": "Discrepancia sin nota es rechazada",
     "given_when_then": "**Given (Dado que):**\n- Existe una recepción en BORRADOR donde un ítem tiene quantity_received diferente a quantity_ordered\n- El campo discrepancy_note está vacío para ese ítem\n\n**When (Cuando):**\n- El Almacenista intenta confirmar la recepción\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- La recepción permanece en BORRADOR sin cambios en el stock\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF022-S06",
+    "rf": "RF022",
+    "scenario_number": 6,
+    "title": "Confirmación de recepción avanzada genera un Movement por porción",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción en BORRADOR con un ítem distribuido en múltiples porciones\n- Cada porción especifica ubicación, lote, fecha de vencimiento y cantidad\n\n**When (Cuando):**\n- El Almacenista confirma la recepción\n\n**Then (Entonces):**\n- El sistema genera un Movement de entrada por cada porción distribuida\n- Cada Movement conserva el producto, lote, fecha de vencimiento, ubicación y cantidad correspondiente\n- El stock se incrementa de forma independiente en cada ubicación destino\n- La recepción pasa a estado CONFIRMADA\n- El log de auditoría registra RECEPTION_CONFIRMED\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF022-S07",
+    "rf": "RF022",
+    "scenario_number": 7,
+    "title": "Confirmación de recepción avanzada con suma inconsistente es rechazada",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción en BORRADOR con distribuciones cuya suma no coincide con la cantidad del ítem\n\n**When (Cuando):**\n- El Almacenista intenta confirmar la recepción\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- Ningún Movement es creado\n- La recepción permanece en BORRADOR\n- El stock no cambia\n\n---",
     "source": "docs/requisitos/ERS_ICM_Requisitos.md",
     "automation_scope": {
       "reason": "",

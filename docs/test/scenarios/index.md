@@ -104,11 +104,15 @@
 | RF021-S01 | Recepción parcial de una OC | Implementado | [RF021-S01.md](./RF021-S01.md) |
 | RF021-S02 | Recepción que supera la cantidad pendiente es rechazada | Implementado | [RF021-S02.md](./RF021-S02.md) |
 | RF021-S03 | No se puede crear recepción para OC en BORRADOR | Implementado | [RF021-S03.md](./RF021-S03.md) |
+| RF021-S04 | Recepción avanzada por lote y ubicación se crea correctamente | Implementado | [RF021-S04.md](./RF021-S04.md) |
+| RF021-S05 | Recepción avanzada rechaza distribuciones cuya suma no coincide | Implementado | [RF021-S05.md](./RF021-S05.md) |
 | RF022-S01 | Confirmación exitosa genera Movements y actualiza stock | Implementado | [RF022-S01.md](./RF022-S01.md) |
 | RF022-S02 | Recepción completa marca la OC como COMPLETADA | Implementado | [RF022-S02.md](./RF022-S02.md) |
 | RF022-S03 | Recepción parcial marca la OC como PARCIALMENTE_RECIBIDA | Implementado | [RF022-S03.md](./RF022-S03.md) |
 | RF022-S04 | Error en generación de Movement revierte toda la recepción | Implementado | [RF022-S04.md](./RF022-S04.md) |
 | RF022-S05 | Discrepancia sin nota es rechazada | Implementado | [RF022-S05.md](./RF022-S05.md) |
+| RF022-S06 | Confirmación de recepción avanzada genera un Movement por porción | Implementado | [RF022-S06.md](./RF022-S06.md) |
+| RF022-S07 | Confirmación de recepción avanzada con suma inconsistente es rechazada | Implementado | [RF022-S07.md](./RF022-S07.md) |
 | RF023-S01 | Cancelación exitosa de recepción en BORRADOR | Implementado | [RF023-S01.md](./RF023-S01.md) |
 | RF023-S02 | No se puede cancelar una recepción CONFIRMADA | Implementado | [RF023-S02.md](./RF023-S02.md) |
 | RF024-S01 | Desde un Movement de ENTRADA se puede trazar la OC de origen | Implementado | [RF024-S01.md](./RF024-S01.md) |

@@ -171,6 +171,41 @@ Este documento enlaza pruebas automatizadas con **requisitos** y **criterios de 
 
 ---
 
+## RF-021 / BR-022 — Creación de recepciones con distribución avanzada
+
+| Criterio ERS | Cobertura |
+|--------------|-----------|
+| S01 — Recepción parcial simple de una OC | `apps/purchasing/tests/test_services.py::test_create_reception_borrador` + `apps/purchasing/tests/test_views.py::test_create_reception` |
+| S02 — Superar cantidad pendiente rechaza la creación | `apps/purchasing/tests/test_services.py::test_create_reception_exceeds_quantity_raises` |
+| S03 — OC en BORRADOR rechazada | `apps/purchasing/tests/test_services.py::test_create_reception_po_not_receivable_raises` |
+| S04 — Recepción avanzada por lote y ubicación | `apps/purchasing/tests/test_services.py::test_confirm_reception_advanced_distribution_by_lots_and_locations` + `apps/purchasing/tests/test_views.py::test_create_reception_with_allocations` |
+| S05 — Distribución avanzada con suma inconsistente rechazada | `apps/purchasing/tests/test_services.py::test_create_reception_advanced_distribution_requires_matching_quantity` |
+
+---
+
+## RF-022 / BR-022 — Confirmación de recepción y movimientos por porción
+
+| Criterio ERS | Cobertura |
+|--------------|-----------|
+| S01 — Confirmación simple crea Movement único y actualiza stock | `apps/purchasing/tests/test_services.py::test_confirm_reception_creates_movements_and_updates_stock` |
+| S02 — Recepción completa marca la OC como COMPLETADA | `apps/purchasing/tests/test_services.py::test_confirm_reception_partial_marks_po_partial` + `test_confirm_reception_partial_second_delivery_matches_pending_without_note` |
+| S03 — Recepción parcial marca la OC como PARCIALMENTE_RECIBIDA | `apps/purchasing/tests/test_services.py::test_confirm_reception_partial_marks_po_partial` |
+| S04 — Error en generación de Movement revierte toda la recepción | `apps/purchasing/tests/test_services.py::test_confirm_reception_is_atomic_on_error` |
+| S05 — Discrepancia sin nota es rechazada | `apps/purchasing/tests/test_services.py::test_confirm_reception_discrepancy_requires_note` |
+| S06 — Confirmación avanzada genera un Movement por porción | `apps/purchasing/tests/test_services.py::test_confirm_reception_advanced_distribution_by_lots_and_locations` + `test_confirm_reception_advanced_distribution_by_locations_only` |
+| S07 — Suma inconsistente en confirmación avanzada es rechazada | `apps/purchasing/tests/test_services.py::test_create_reception_advanced_distribution_requires_matching_quantity` |
+
+---
+
+## RF-024 / Trazabilidad ciclo de compras
+
+| Criterio | Cobertura |
+|----------|-----------|
+| Movement ENTRADA navega a ReceptionItem y a la OC | `apps/purchasing/tests/test_views.py::test_confirm_reception_endpoint` |
+| Distribuciones avanzadas navegan a su Location y Movement por porción | `apps/purchasing/tests/test_views.py::test_create_reception_with_allocations` |
+
+---
+
 ## Cómo ejecutar (por módulo / test)
 
 ```bash

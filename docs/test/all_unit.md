@@ -12809,7 +12809,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_activate_supplier -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 89)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 91)
 
 
 ---
@@ -12845,7 +12845,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_confirmed_reception_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 495)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 641)
 
 
 ---
@@ -12881,7 +12881,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_po_borrador -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 196)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 198)
 
 
 ---
@@ -12917,7 +12917,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_po_completada_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 212)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 214)
 
 
 ---
@@ -12953,7 +12953,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_po_requires_reason -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 205)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 207)
 
 
 ---
@@ -12989,7 +12989,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_po_with_confirmed_reception_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 219)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 221)
 
 
 ---
@@ -13025,7 +13025,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_reception_borrador -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 484)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 630)
 
 
 ---
@@ -13061,7 +13061,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_already_confirmed_reception_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 477)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 623)
 
 
 ---
@@ -13097,7 +13097,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_already_pendiente_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 189)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 191)
 
 
 ---
@@ -13133,13 +13133,85 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_po_changes_status -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 176)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 178)
 
 
 ---
 
 <!-- file: UNIT-0366.md -->
 **Código:** UNIT-0366
+
+# test_confirm_reception_advanced_distribution_by_locations_only
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_confirm_reception_advanced_distribution_by_locations_only`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_confirm_reception_advanced_distribution_by_locations_only -v
+```
+
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 553)
+
+
+---
+
+<!-- file: UNIT-0367.md -->
+**Código:** UNIT-0367
+
+# test_confirm_reception_advanced_distribution_by_lots_and_locations
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_confirm_reception_advanced_distribution_by_lots_and_locations`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_confirm_reception_advanced_distribution_by_lots_and_locations -v
+```
+
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 479)
+
+
+---
+
+<!-- file: UNIT-0368.md -->
+**Código:** UNIT-0368
 
 # test_confirm_reception_creates_movements_and_updates_stock
 
@@ -13169,13 +13241,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_creates_movements_and_updates_stock -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 287)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 289)
 
 
 ---
 
-<!-- file: UNIT-0367.md -->
-**Código:** UNIT-0367
+<!-- file: UNIT-0369.md -->
+**Código:** UNIT-0369
 
 # test_confirm_reception_discrepancy_requires_note
 
@@ -13205,13 +13277,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_discrepancy_requires_note -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 392)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 394)
 
 
 ---
 
-<!-- file: UNIT-0368.md -->
-**Código:** UNIT-0368
+<!-- file: UNIT-0370.md -->
+**Código:** UNIT-0370
 
 # test_confirm_reception_is_atomic_on_error
 
@@ -13241,13 +13313,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_is_atomic_on_error -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 414)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 416)
 
 
 ---
 
-<!-- file: UNIT-0369.md -->
-**Código:** UNIT-0369
+<!-- file: UNIT-0371.md -->
+**Código:** UNIT-0371
 
 # test_confirm_reception_partial_marks_po_partial
 
@@ -13277,13 +13349,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_partial_marks_po_partial -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 332)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 334)
 
 
 ---
 
-<!-- file: UNIT-0370.md -->
-**Código:** UNIT-0370
+<!-- file: UNIT-0372.md -->
+**Código:** UNIT-0372
 
 # test_confirm_reception_partial_second_delivery_matches_pending_without_note
 
@@ -13313,13 +13385,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_partial_second_delivery_matches_pending_without_note -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 358)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 360)
 
 
 ---
 
-<!-- file: UNIT-0371.md -->
-**Código:** UNIT-0371
+<!-- file: UNIT-0373.md -->
+**Código:** UNIT-0373
 
 # test_confirm_reception_unit_cost_flows_to_movement
 
@@ -13349,13 +13421,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_unit_cost_flows_to_movement -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 447)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 449)
 
 
 ---
 
-<!-- file: UNIT-0372.md -->
-**Código:** UNIT-0372
+<!-- file: UNIT-0374.md -->
+**Código:** UNIT-0374
 
 # test_create_po_with_inactive_supplier_raises
 
@@ -13385,13 +13457,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_po_with_inactive_supplier_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 156)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 158)
 
 
 ---
 
-<!-- file: UNIT-0373.md -->
-**Código:** UNIT-0373
+<!-- file: UNIT-0375.md -->
+**Código:** UNIT-0375
 
 # test_create_purchase_order
 
@@ -13421,13 +13493,49 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_purchase_order -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 135)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 137)
 
 
 ---
 
-<!-- file: UNIT-0374.md -->
-**Código:** UNIT-0374
+<!-- file: UNIT-0376.md -->
+**Código:** UNIT-0376
+
+# test_create_reception_advanced_distribution_requires_matching_quantity
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_create_reception_advanced_distribution_requires_matching_quantity`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_create_reception_advanced_distribution_requires_matching_quantity -v
+```
+
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 593)
+
+
+---
+
+<!-- file: UNIT-0377.md -->
+**Código:** UNIT-0377
 
 # test_create_reception_borrador
 
@@ -13457,13 +13565,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_reception_borrador -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 232)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 234)
 
 
 ---
 
-<!-- file: UNIT-0375.md -->
-**Código:** UNIT-0375
+<!-- file: UNIT-0378.md -->
+**Código:** UNIT-0378
 
 # test_create_reception_exceeds_quantity_raises
 
@@ -13493,13 +13601,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_reception_exceeds_quantity_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 271)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 273)
 
 
 ---
 
-<!-- file: UNIT-0376.md -->
-**Código:** UNIT-0376
+<!-- file: UNIT-0379.md -->
+**Código:** UNIT-0379
 
 # test_create_reception_po_not_receivable_raises
 
@@ -13529,13 +13637,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_reception_po_not_receivable_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 259)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 261)
 
 
 ---
 
-<!-- file: UNIT-0377.md -->
-**Código:** UNIT-0377
+<!-- file: UNIT-0380.md -->
+**Código:** UNIT-0380
 
 # test_create_supplier_duplicate_nit_raises
 
@@ -13565,13 +13673,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_supplier_duplicate_nit_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 68)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 70)
 
 
 ---
 
-<!-- file: UNIT-0378.md -->
-**Código:** UNIT-0378
+<!-- file: UNIT-0381.md -->
+**Código:** UNIT-0381
 
 # test_create_supplier_valid
 
@@ -13601,13 +13709,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_supplier_valid -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 52)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 54)
 
 
 ---
 
-<!-- file: UNIT-0379.md -->
-**Código:** UNIT-0379
+<!-- file: UNIT-0382.md -->
+**Código:** UNIT-0382
 
 # test_create_supplier_without_nit
 
@@ -13637,13 +13745,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_supplier_without_nit -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 104)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 106)
 
 
 ---
 
-<!-- file: UNIT-0380.md -->
-**Código:** UNIT-0380
+<!-- file: UNIT-0383.md -->
+**Código:** UNIT-0383
 
 # test_deactivate_supplier
 
@@ -13673,13 +13781,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_deactivate_supplier -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 78)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 80)
 
 
 ---
 
-<!-- file: UNIT-0381.md -->
-**Código:** UNIT-0381
+<!-- file: UNIT-0384.md -->
+**Código:** UNIT-0384
 
 # test_patch_supplier_with_empty_nit_clears_value
 
@@ -13709,13 +13817,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_patch_supplier_with_empty_nit_clears_value -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 122)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 124)
 
 
 ---
 
-<!-- file: UNIT-0382.md -->
-**Código:** UNIT-0382
+<!-- file: UNIT-0385.md -->
+**Código:** UNIT-0385
 
 # test_patch_supplier_without_nit_preserves_existing
 
@@ -13745,13 +13853,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_patch_supplier_without_nit_preserves_existing -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 114)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 116)
 
 
 ---
 
-<!-- file: UNIT-0383.md -->
-**Código:** UNIT-0383
+<!-- file: UNIT-0386.md -->
+**Código:** UNIT-0386
 
 # test_update_supplier_changes_fields
 
@@ -13781,13 +13889,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_update_supplier_changes_fields -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 97)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 99)
 
 
 ---
 
-<!-- file: UNIT-0384.md -->
-**Código:** UNIT-0384
+<!-- file: UNIT-0387.md -->
+**Código:** UNIT-0387
 
 # test_cancel_purchase_order
 
@@ -13822,8 +13930,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0385.md -->
-**Código:** UNIT-0385
+<!-- file: UNIT-0388.md -->
+**Código:** UNIT-0388
 
 # test_confirm_purchase_order
 
@@ -13858,8 +13966,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0386.md -->
-**Código:** UNIT-0386
+<!-- file: UNIT-0389.md -->
+**Código:** UNIT-0389
 
 # test_confirm_reception_endpoint
 
@@ -13889,13 +13997,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_views.py::test_confirm_reception_endpoint -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/tests/test_views.py) (aprox. línea 204)
+Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/tests/test_views.py) (aprox. línea 249)
 
 
 ---
 
-<!-- file: UNIT-0387.md -->
-**Código:** UNIT-0387
+<!-- file: UNIT-0390.md -->
+**Código:** UNIT-0390
 
 # test_confirm_reception_forbidden_administrador
 
@@ -13925,13 +14033,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_views.py::test_confirm_reception_forbidden_administrador -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/tests/test_views.py) (aprox. línea 235)
+Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/tests/test_views.py) (aprox. línea 280)
 
 
 ---
 
-<!-- file: UNIT-0388.md -->
-**Código:** UNIT-0388
+<!-- file: UNIT-0391.md -->
+**Código:** UNIT-0391
 
 # test_create_purchase_order
 
@@ -13966,8 +14074,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0389.md -->
-**Código:** UNIT-0389
+<!-- file: UNIT-0392.md -->
+**Código:** UNIT-0392
 
 # test_create_reception
 
@@ -14002,8 +14110,44 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0390.md -->
-**Código:** UNIT-0390
+<!-- file: UNIT-0393.md -->
+**Código:** UNIT-0393
+
+# test_create_reception_with_allocations
+
+## Nombre del test
+
+`apps/purchasing/tests/test_views.py::test_create_reception_with_allocations`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_views.py::test_create_reception_with_allocations -v
+```
+
+Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/tests/test_views.py) (aprox. línea 204)
+
+
+---
+
+<!-- file: UNIT-0394.md -->
+**Código:** UNIT-0394
 
 # test_create_supplier_almacenista
 
@@ -14038,8 +14182,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0391.md -->
-**Código:** UNIT-0391
+<!-- file: UNIT-0395.md -->
+**Código:** UNIT-0395
 
 # test_create_supplier_forbidden_administrador
 
@@ -14074,8 +14218,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0392.md -->
-**Código:** UNIT-0392
+<!-- file: UNIT-0396.md -->
+**Código:** UNIT-0396
 
 # test_create_supplier_forbidden_auxiliar
 
@@ -14110,8 +14254,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0393.md -->
-**Código:** UNIT-0393
+<!-- file: UNIT-0397.md -->
+**Código:** UNIT-0397
 
 # test_create_supplier_without_nit
 
@@ -14146,8 +14290,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0394.md -->
-**Código:** UNIT-0394
+<!-- file: UNIT-0398.md -->
+**Código:** UNIT-0398
 
 # test_deactivate_supplier
 
@@ -14182,8 +14326,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0395.md -->
-**Código:** UNIT-0395
+<!-- file: UNIT-0399.md -->
+**Código:** UNIT-0399
 
 # test_list_receptions_administrador_can_view
 
@@ -14213,13 +14357,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_views.py::test_list_receptions_administrador_can_view -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/tests/test_views.py) (aprox. línea 226)
+Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/tests/test_views.py) (aprox. línea 271)
 
 
 ---
 
-<!-- file: UNIT-0396.md -->
-**Código:** UNIT-0396
+<!-- file: UNIT-0400.md -->
+**Código:** UNIT-0400
 
 # test_list_suppliers_authenticated_almacenista
 
@@ -14254,8 +14398,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0397.md -->
-**Código:** UNIT-0397
+<!-- file: UNIT-0401.md -->
+**Código:** UNIT-0401
 
 # test_patch_supplier_with_empty_nit_clears_value
 
@@ -14290,8 +14434,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0398.md -->
-**Código:** UNIT-0398
+<!-- file: UNIT-0402.md -->
+**Código:** UNIT-0402
 
 # test_patch_supplier_without_nit_preserves_existing
 
@@ -14326,8 +14470,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0399.md -->
-**Código:** UNIT-0399
+<!-- file: UNIT-0403.md -->
+**Código:** UNIT-0403
 
 # test_alerts_export_csv
 
@@ -14362,8 +14506,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0400.md -->
-**Código:** UNIT-0400
+<!-- file: UNIT-0404.md -->
+**Código:** UNIT-0404
 
 # test_expiring_products_export_csv
 
@@ -14398,8 +14542,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0401.md -->
-**Código:** UNIT-0401
+<!-- file: UNIT-0405.md -->
+**Código:** UNIT-0405
 
 # test_expiring_products_export_xlsx
 
@@ -14434,8 +14578,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0402.md -->
-**Código:** UNIT-0402
+<!-- file: UNIT-0406.md -->
+**Código:** UNIT-0406
 
 # test_export_empty_param_returns_json
 
@@ -14470,8 +14614,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0403.md -->
-**Código:** UNIT-0403
+<!-- file: UNIT-0407.md -->
+**Código:** UNIT-0407
 
 # test_export_unknown_param_returns_json
 
@@ -14506,8 +14650,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0404.md -->
-**Código:** UNIT-0404
+<!-- file: UNIT-0408.md -->
+**Código:** UNIT-0408
 
 # test_inventory_export_csv
 
@@ -14542,8 +14686,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0405.md -->
-**Código:** UNIT-0405
+<!-- file: UNIT-0409.md -->
+**Código:** UNIT-0409
 
 # test_inventory_export_xlsx
 
@@ -14578,8 +14722,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0406.md -->
-**Código:** UNIT-0406
+<!-- file: UNIT-0410.md -->
+**Código:** UNIT-0410
 
 # test_movement_history_export_csv
 
@@ -14614,8 +14758,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0407.md -->
-**Código:** UNIT-0407
+<!-- file: UNIT-0411.md -->
+**Código:** UNIT-0411
 
 # test_movement_history_export_xlsx
 
@@ -14650,8 +14794,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0408.md -->
-**Código:** UNIT-0408
+<!-- file: UNIT-0412.md -->
+**Código:** UNIT-0412
 
 # test_movement_history_json_unchanged
 
@@ -14686,8 +14830,8 @@ Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/te
 
 ---
 
-<!-- file: UNIT-0409.md -->
-**Código:** UNIT-0409
+<!-- file: UNIT-0413.md -->
+**Código:** UNIT-0413
 
 # test_api_margin_by_product_returns_200
 
@@ -14722,8 +14866,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0410.md -->
-**Código:** UNIT-0410
+<!-- file: UNIT-0414.md -->
+**Código:** UNIT-0414
 
 # test_api_revenue_summary_requires_auth
 
@@ -14758,8 +14902,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0411.md -->
-**Código:** UNIT-0411
+<!-- file: UNIT-0415.md -->
+**Código:** UNIT-0415
 
 # test_api_revenue_summary_returns_200
 
@@ -14794,8 +14938,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0412.md -->
-**Código:** UNIT-0412
+<!-- file: UNIT-0416.md -->
+**Código:** UNIT-0416
 
 # test_api_sales_by_customer_returns_200
 
@@ -14830,8 +14974,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0413.md -->
-**Código:** UNIT-0413
+<!-- file: UNIT-0417.md -->
+**Código:** UNIT-0417
 
 # test_gross_margin_correct_when_cost_and_price_set
 
@@ -14866,8 +15010,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0414.md -->
-**Código:** UNIT-0414
+<!-- file: UNIT-0418.md -->
+**Código:** UNIT-0418
 
 # test_gross_margin_excludes_movements_without_price
 
@@ -14902,8 +15046,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0415.md -->
-**Código:** UNIT-0415
+<!-- file: UNIT-0419.md -->
+**Código:** UNIT-0419
 
 # test_revenue_summary_products_without_price_contribute_zero
 
@@ -14938,8 +15082,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0416.md -->
-**Código:** UNIT-0416
+<!-- file: UNIT-0420.md -->
+**Código:** UNIT-0420
 
 # test_revenue_summary_returns_correct_totals
 
@@ -14974,8 +15118,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0417.md -->
-**Código:** UNIT-0417
+<!-- file: UNIT-0421.md -->
+**Código:** UNIT-0421
 
 # test_revenue_summary_separates_wholesale_and_retail
 
@@ -15010,8 +15154,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0418.md -->
-**Código:** UNIT-0418
+<!-- file: UNIT-0422.md -->
+**Código:** UNIT-0422
 
 # test_sales_by_customer_aggregates_correctly
 
@@ -15046,8 +15190,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0419.md -->
-**Código:** UNIT-0419
+<!-- file: UNIT-0423.md -->
+**Código:** UNIT-0423
 
 # test_webhook_emitted_on_dispatch_with_price
 
@@ -15082,8 +15226,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0420.md -->
-**Código:** UNIT-0420
+<!-- file: UNIT-0424.md -->
+**Código:** UNIT-0424
 
 # test_reports_app_has_no_domain_models
 
@@ -15118,8 +15262,8 @@ Código fuente: [apps/reports/tests/test_models.py](../../apps/reports/tests/tes
 
 ---
 
-<!-- file: UNIT-0421.md -->
-**Código:** UNIT-0421
+<!-- file: UNIT-0425.md -->
+**Código:** UNIT-0425
 
 # test_get_discard_operational_summary_excludes_returns
 
@@ -15154,8 +15298,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0422.md -->
-**Código:** UNIT-0422
+<!-- file: UNIT-0426.md -->
+**Código:** UNIT-0426
 
 # test_get_lots_expiring_soon_filters_by_window
 
@@ -15190,8 +15334,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0423.md -->
-**Código:** UNIT-0423
+<!-- file: UNIT-0427.md -->
+**Código:** UNIT-0427
 
 # test_get_quality_operational_summary_groups_damage_and_returns
 
@@ -15226,8 +15370,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0424.md -->
-**Código:** UNIT-0424
+<!-- file: UNIT-0428.md -->
+**Código:** UNIT-0428
 
 # test_get_warehouse_occupancy_distribution_returns_expected_sections
 
@@ -15262,8 +15406,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0425.md -->
-**Código:** UNIT-0425
+<!-- file: UNIT-0429.md -->
+**Código:** UNIT-0429
 
 # test_get_warehouse_utilization_supports_relative_capacity_and_distributions
 
@@ -15298,8 +15442,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0426.md -->
-**Código:** UNIT-0426
+<!-- file: UNIT-0430.md -->
+**Código:** UNIT-0430
 
 # test_get_warehouse_utilization_uses_capacity_and_stock
 
@@ -15334,8 +15478,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0427.md -->
-**Código:** UNIT-0427
+<!-- file: UNIT-0431.md -->
+**Código:** UNIT-0431
 
 # test_rotation_by_category_counts_units
 
@@ -15370,8 +15514,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0428.md -->
-**Código:** UNIT-0428
+<!-- file: UNIT-0432.md -->
+**Código:** UNIT-0432
 
 # test_generate_kpis_returns_dashboard_keys
 
@@ -15406,8 +15550,8 @@ Código fuente: [apps/reports/tests/test_services.py](../../apps/reports/tests/t
 
 ---
 
-<!-- file: UNIT-0429.md -->
-**Código:** UNIT-0429
+<!-- file: UNIT-0433.md -->
+**Código:** UNIT-0433
 
 # test_get_expiring_products_returns_lot_rows
 
@@ -15442,8 +15586,8 @@ Código fuente: [apps/reports/tests/test_services.py](../../apps/reports/tests/t
 
 ---
 
-<!-- file: UNIT-0430.md -->
-**Código:** UNIT-0430
+<!-- file: UNIT-0434.md -->
+**Código:** UNIT-0434
 
 # test_dispatch_orders_endpoint_returns_samples
 
@@ -15478,8 +15622,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0431.md -->
-**Código:** UNIT-0431
+<!-- file: UNIT-0435.md -->
+**Código:** UNIT-0435
 
 # test_movement_history_filters_by_location_id
 
@@ -15514,8 +15658,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0432.md -->
-**Código:** UNIT-0432
+<!-- file: UNIT-0436.md -->
+**Código:** UNIT-0436
 
 # test_reports_dataset_view_is_available
 
@@ -15550,8 +15694,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0433.md -->
-**Código:** UNIT-0433
+<!-- file: UNIT-0437.md -->
+**Código:** UNIT-0437
 
 # test_reports_dataset_view_supports_discard_operational
 
@@ -15586,8 +15730,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0434.md -->
-**Código:** UNIT-0434
+<!-- file: UNIT-0438.md -->
+**Código:** UNIT-0438
 
 # test_reports_dataset_view_supports_dispatch_operational
 
@@ -15622,8 +15766,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0435.md -->
-**Código:** UNIT-0435
+<!-- file: UNIT-0439.md -->
+**Código:** UNIT-0439
 
 # test_reports_dataset_view_supports_quality_operational
 
@@ -15658,8 +15802,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0436.md -->
-**Código:** UNIT-0436
+<!-- file: UNIT-0440.md -->
+**Código:** UNIT-0440
 
 # test_reports_dataset_view_supports_warehouse_occupancy_distribution
 
@@ -15694,8 +15838,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0437.md -->
-**Código:** UNIT-0437
+<!-- file: UNIT-0441.md -->
+**Código:** UNIT-0441
 
 # test_reports_dataset_view_supports_warehouse_utilization
 
@@ -15730,8 +15874,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0438.md -->
-**Código:** UNIT-0438
+<!-- file: UNIT-0442.md -->
+**Código:** UNIT-0442
 
 # test_reports_discard_operational_view_returns_summary
 
@@ -15766,8 +15910,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0439.md -->
-**Código:** UNIT-0439
+<!-- file: UNIT-0443.md -->
+**Código:** UNIT-0443
 
 # test_reports_dispatch_operational_view_returns_summary
 
@@ -15802,8 +15946,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0440.md -->
-**Código:** UNIT-0440
+<!-- file: UNIT-0444.md -->
+**Código:** UNIT-0444
 
 # test_reports_expiring_view_returns_lots
 
@@ -15838,8 +15982,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0441.md -->
-**Código:** UNIT-0441
+<!-- file: UNIT-0445.md -->
+**Código:** UNIT-0445
 
 # test_reports_quality_operational_view_returns_summary
 
@@ -15874,8 +16018,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0442.md -->
-**Código:** UNIT-0442
+<!-- file: UNIT-0446.md -->
+**Código:** UNIT-0446
 
 # test_reports_views_are_available
 
@@ -15910,8 +16054,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0443.md -->
-**Código:** UNIT-0443
+<!-- file: UNIT-0447.md -->
+**Código:** UNIT-0447
 
 # test_reports_warehouse_utilization_view_returns_summary
 
@@ -15946,8 +16090,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0444.md -->
-**Código:** UNIT-0444
+<!-- file: UNIT-0448.md -->
+**Código:** UNIT-0448
 
 # test_warehouse_utilization_by_storage_type_grouping
 
@@ -15982,8 +16126,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0445.md -->
-**Código:** UNIT-0445
+<!-- file: UNIT-0449.md -->
+**Código:** UNIT-0449
 
 # test_patch_still_works_independently
 
@@ -16018,8 +16162,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0446.md -->
-**Código:** UNIT-0446
+<!-- file: UNIT-0450.md -->
+**Código:** UNIT-0450
 
 # test_put_404_on_nonexistent
 
@@ -16054,8 +16198,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0447.md -->
-**Código:** UNIT-0447
+<!-- file: UNIT-0451.md -->
+**Código:** UNIT-0451
 
 # test_put_replaces_endpoint
 
@@ -16090,8 +16234,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0448.md -->
-**Código:** UNIT-0448
+<!-- file: UNIT-0452.md -->
+**Código:** UNIT-0452
 
 # test_put_requires_all_fields
 
@@ -16126,8 +16270,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0449.md -->
-**Código:** UNIT-0449
+<!-- file: UNIT-0453.md -->
+**Código:** UNIT-0453
 
 # test_put_requires_almacenista
 
@@ -16162,8 +16306,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0450.md -->
-**Código:** UNIT-0450
+<!-- file: UNIT-0454.md -->
+**Código:** UNIT-0454
 
 # test_deliver_connection_error_schedules_retry
 
@@ -16198,8 +16342,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0451.md -->
-**Código:** UNIT-0451
+<!-- file: UNIT-0455.md -->
+**Código:** UNIT-0455
 
 # test_deliver_max_retries_marks_as_failed
 
@@ -16234,8 +16378,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0452.md -->
-**Código:** UNIT-0452
+<!-- file: UNIT-0456.md -->
+**Código:** UNIT-0456
 
 # test_deliver_success
 
@@ -16270,8 +16414,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0453.md -->
-**Código:** UNIT-0453
+<!-- file: UNIT-0457.md -->
+**Código:** UNIT-0457
 
 # test_queue_creates_delivery_for_subscribed_endpoint
 
@@ -16306,8 +16450,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0454.md -->
-**Código:** UNIT-0454
+<!-- file: UNIT-0458.md -->
+**Código:** UNIT-0458
 
 # test_queue_creates_multiple_deliveries_for_multiple_endpoints
 
@@ -16342,8 +16486,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0455.md -->
-**Código:** UNIT-0455
+<!-- file: UNIT-0459.md -->
+**Código:** UNIT-0459
 
 # test_queue_skips_inactive_endpoints
 
@@ -16378,8 +16522,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0456.md -->
-**Código:** UNIT-0456
+<!-- file: UNIT-0460.md -->
+**Código:** UNIT-0460
 
 # test_queue_skips_unsubscribed_event
 
@@ -16414,8 +16558,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0457.md -->
-**Código:** UNIT-0457
+<!-- file: UNIT-0461.md -->
+**Código:** UNIT-0461
 
 # test_sign_payload_differs_with_different_key
 
@@ -16450,8 +16594,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0458.md -->
-**Código:** UNIT-0458
+<!-- file: UNIT-0462.md -->
+**Código:** UNIT-0462
 
 # test_sign_payload_format
 
@@ -16486,8 +16630,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0459.md -->
-**Código:** UNIT-0459
+<!-- file: UNIT-0463.md -->
+**Código:** UNIT-0463
 
 # test_sign_payload_is_deterministic
 
@@ -16522,8 +16666,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0460.md -->
-**Código:** UNIT-0460
+<!-- file: UNIT-0464.md -->
+**Código:** UNIT-0464
 
 # test_administrador_cannot_manage_webhooks
 
@@ -16558,8 +16702,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0461.md -->
-**Código:** UNIT-0461
+<!-- file: UNIT-0465.md -->
+**Código:** UNIT-0465
 
 # test_auxiliar_cannot_manage_webhooks
 
@@ -16594,8 +16738,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0462.md -->
-**Código:** UNIT-0462
+<!-- file: UNIT-0466.md -->
+**Código:** UNIT-0466
 
 # test_create_endpoint
 
@@ -16630,8 +16774,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0463.md -->
-**Código:** UNIT-0463
+<!-- file: UNIT-0467.md -->
+**Código:** UNIT-0467
 
 # test_delete_endpoint_deactivates_it
 
@@ -16666,8 +16810,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0464.md -->
-**Código:** UNIT-0464
+<!-- file: UNIT-0468.md -->
+**Código:** UNIT-0468
 
 # test_deliveries_list
 
@@ -16702,8 +16846,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0465.md -->
-**Código:** UNIT-0465
+<!-- file: UNIT-0469.md -->
+**Código:** UNIT-0469
 
 # test_list_endpoints
 
@@ -16738,8 +16882,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0466.md -->
-**Código:** UNIT-0466
+<!-- file: UNIT-0470.md -->
+**Código:** UNIT-0470
 
 # test_stats_view
 
@@ -16774,8 +16918,8 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
-<!-- file: UNIT-0467.md -->
-**Código:** UNIT-0467
+<!-- file: UNIT-0471.md -->
+**Código:** UNIT-0471
 
 # test_change_report_detects_additions_and_removals
 
@@ -16810,8 +16954,8 @@ Código fuente: [tests/test_generate_project_structure.py](../../tests/test_gene
 
 ---
 
-<!-- file: UNIT-0468.md -->
-**Código:** UNIT-0468
+<!-- file: UNIT-0472.md -->
+**Código:** UNIT-0472
 
 # test_semantic_comment_for_services_is_specific
 
@@ -16846,8 +16990,8 @@ Código fuente: [tests/test_generate_project_structure.py](../../tests/test_gene
 
 ---
 
-<!-- file: UNIT-0469.md -->
-**Código:** UNIT-0469
+<!-- file: UNIT-0473.md -->
+**Código:** UNIT-0473
 
 # test_tree_ignores_noise_and_keeps_relevant_nodes
 
@@ -16882,8 +17026,8 @@ Código fuente: [tests/test_generate_project_structure.py](../../tests/test_gene
 
 ---
 
-<!-- file: UNIT-0470.md -->
-**Código:** UNIT-0470
+<!-- file: UNIT-0474.md -->
+**Código:** UNIT-0474
 
 # test_validate_destination_passes_for_non_blocked
 
@@ -16918,8 +17062,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0471.md -->
-**Código:** UNIT-0471
+<!-- file: UNIT-0475.md -->
+**Código:** UNIT-0475
 
 # test_validate_destination_raises_for_blocked_archived
 
@@ -16954,8 +17098,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0472.md -->
-**Código:** UNIT-0472
+<!-- file: UNIT-0476.md -->
+**Código:** UNIT-0476
 
 # test_validate_origin_passes_for_active
 
@@ -16990,8 +17134,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0473.md -->
-**Código:** UNIT-0473
+<!-- file: UNIT-0477.md -->
+**Código:** UNIT-0477
 
 # test_validate_origin_raises_for_blocked_archived
 
@@ -17026,8 +17170,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0474.md -->
-**Código:** UNIT-0474
+<!-- file: UNIT-0478.md -->
+**Código:** UNIT-0478
 
 # test_validate_origin_raises_for_maintenance_restricted
 
@@ -17062,8 +17206,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0475.md -->
-**Código:** UNIT-0475
+<!-- file: UNIT-0479.md -->
+**Código:** UNIT-0479
 
 # test_all_category_slugs_declared
 
@@ -17098,8 +17242,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0476.md -->
-**Código:** UNIT-0476
+<!-- file: UNIT-0480.md -->
+**Código:** UNIT-0480
 
 # test_all_product_skus_valid_format
 
@@ -17134,8 +17278,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0477.md -->
-**Código:** UNIT-0477
+<!-- file: UNIT-0481.md -->
+**Código:** UNIT-0481
 
 # test_combo_items_reference_known_skus
 
@@ -17170,8 +17314,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0478.md -->
-**Código:** UNIT-0478
+<!-- file: UNIT-0482.md -->
+**Código:** UNIT-0482
 
 # test_electroterapia_requires_serial
 
@@ -17206,8 +17350,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0479.md -->
-**Código:** UNIT-0479
+<!-- file: UNIT-0483.md -->
+**Código:** UNIT-0483
 
 # test_expiration_products_have_valid_skus
 
@@ -17242,8 +17386,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0480.md -->
-**Código:** UNIT-0480
+<!-- file: UNIT-0484.md -->
+**Código:** UNIT-0484
 
 # test_no_duplicate_product_skus
 
@@ -17278,8 +17422,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0481.md -->
-**Código:** UNIT-0481
+<!-- file: UNIT-0485.md -->
+**Código:** UNIT-0485
 
 # test_clean_removes_seed_data_preserves_base
 
@@ -17314,8 +17458,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0482.md -->
-**Código:** UNIT-0482
+<!-- file: UNIT-0486.md -->
+**Código:** UNIT-0486
 
 # test_seed_creates_catalog_and_movements
 
@@ -17350,8 +17494,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0483.md -->
-**Código:** UNIT-0483
+<!-- file: UNIT-0487.md -->
+**Código:** UNIT-0487
 
 # test_seed_is_idempotent
 

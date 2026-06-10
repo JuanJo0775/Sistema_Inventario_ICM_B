@@ -2419,6 +2419,40 @@ Feature: Creación de recepciones
 
 ---
 
+### Scenario 4: Recepción avanzada por lote y ubicación se crea correctamente
+
+**Given (Dado que):**
+- Existe una OC en estado PENDIENTE con un ítem de 10 unidades y 0 recibidas
+- Existen dos ubicaciones válidas y dos lotes válidos para el mismo producto
+
+**When (Cuando):**
+- El Almacenista crea una recepción en modo avanzado distribuyendo las 10 unidades en múltiples porciones
+- Cada porción indica ubicación, cantidad, código de lote y fecha de vencimiento
+
+**Then (Entonces):**
+- El sistema crea la recepción en estado BORRADOR
+- El sistema guarda las distribuciones asociadas al ítem de recepción
+- La suma de las cantidades distribuidas coincide con la cantidad total del ítem
+- La OC permanece en estado PENDIENTE hasta la confirmación
+
+---
+
+### Scenario 5: Recepción avanzada rechaza distribuciones cuya suma no coincide
+
+**Given (Dado que):**
+- Existe una OC en estado PENDIENTE con un ítem de 10 unidades
+- El Almacenista prepara una distribución avanzada que suma menos o más de 10 unidades
+
+**When (Cuando):**
+- Intenta crear la recepción con esa distribución inconsistente
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- No se crea ninguna recepción
+- No se crean distribuciones parciales
+
+---
+
 ## **RF-022 — Confirmación de Recepción y Generación de Movimientos**
 
 **Módulo:** Compras y Abastecimiento
@@ -2513,6 +2547,40 @@ Feature: Confirmación de recepciones
 **Then (Entonces):**
 - El sistema rechaza la operación con HTTP 422
 - La recepción permanece en BORRADOR sin cambios en el stock
+
+---
+
+### Scenario 6: Confirmación de recepción avanzada genera un Movement por porción
+
+**Given (Dado que):**
+- Existe una recepción en BORRADOR con un ítem distribuido en múltiples porciones
+- Cada porción especifica ubicación, lote, fecha de vencimiento y cantidad
+
+**When (Cuando):**
+- El Almacenista confirma la recepción
+
+**Then (Entonces):**
+- El sistema genera un Movement de entrada por cada porción distribuida
+- Cada Movement conserva el producto, lote, fecha de vencimiento, ubicación y cantidad correspondiente
+- El stock se incrementa de forma independiente en cada ubicación destino
+- La recepción pasa a estado CONFIRMADA
+- El log de auditoría registra RECEPTION_CONFIRMED
+
+---
+
+### Scenario 7: Confirmación de recepción avanzada con suma inconsistente es rechazada
+
+**Given (Dado que):**
+- Existe una recepción en BORRADOR con distribuciones cuya suma no coincide con la cantidad del ítem
+
+**When (Cuando):**
+- El Almacenista intenta confirmar la recepción
+
+**Then (Entonces):**
+- El sistema rechaza la operación con HTTP 422
+- Ningún Movement es creado
+- La recepción permanece en BORRADOR
+- El stock no cambia
 
 ---
 
