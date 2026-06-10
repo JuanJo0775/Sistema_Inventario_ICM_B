@@ -48,7 +48,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -101,7 +101,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -155,7 +155,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -208,7 +208,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -259,7 +259,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -314,7 +314,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -368,7 +368,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -424,7 +424,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -477,7 +477,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -529,7 +529,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -584,7 +584,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -636,7 +636,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -688,7 +688,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -741,7 +741,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -793,7 +793,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -847,7 +847,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -898,7 +898,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -951,7 +951,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1003,7 +1003,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1056,7 +1056,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1109,7 +1109,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1161,7 +1161,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1212,7 +1212,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1264,7 +1264,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1317,7 +1317,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1369,7 +1369,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1422,7 +1422,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1476,7 +1476,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1529,7 +1529,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1581,7 +1581,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1634,7 +1634,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1687,7 +1687,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1739,7 +1739,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1791,7 +1791,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1841,7 +1841,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1900,7 +1900,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -1955,7 +1955,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2010,7 +2010,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2065,7 +2065,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2120,7 +2120,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2174,7 +2174,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2226,7 +2226,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2287,7 +2287,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2342,7 +2342,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2398,7 +2398,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2455,7 +2455,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2512,7 +2512,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2567,7 +2567,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2619,7 +2619,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2677,7 +2677,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2731,7 +2731,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2784,7 +2784,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2840,7 +2840,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2892,7 +2892,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -2950,7 +2950,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3004,7 +3004,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3062,7 +3062,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3119,7 +3119,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3170,7 +3170,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3228,7 +3228,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3282,7 +3282,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3335,7 +3335,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3393,7 +3393,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3449,7 +3449,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3501,7 +3501,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3557,7 +3557,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3627,7 +3627,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3681,7 +3681,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3735,7 +3735,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3788,7 +3788,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3843,7 +3843,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3894,7 +3894,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -3949,7 +3949,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4002,7 +4002,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4056,7 +4056,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4109,7 +4109,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4163,7 +4163,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4216,7 +4216,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4267,7 +4267,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4329,7 +4329,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4381,7 +4381,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4433,7 +4433,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4485,7 +4485,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4539,7 +4539,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4592,7 +4592,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4646,7 +4646,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4699,7 +4699,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4754,7 +4754,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4808,7 +4808,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4863,7 +4863,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4922,7 +4922,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -4976,7 +4976,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5028,7 +5028,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5081,7 +5081,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5133,7 +5133,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5187,7 +5187,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5241,7 +5241,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5293,7 +5293,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5345,7 +5345,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5397,7 +5397,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5450,7 +5450,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5502,7 +5502,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5554,7 +5554,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5610,7 +5610,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5664,7 +5664,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5719,7 +5719,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5772,7 +5772,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5825,7 +5825,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5879,7 +5879,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5932,7 +5932,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -5988,7 +5988,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -6042,7 +6042,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -6095,7 +6095,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -6147,7 +6147,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -6200,7 +6200,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -6252,7 +6252,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -6303,7 +6303,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -6360,7 +6360,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -6411,7 +6411,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -6772,7 +6772,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -6825,7 +6825,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -6877,7 +6877,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -6928,7 +6928,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -6980,7 +6980,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -7031,7 +7031,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -7081,7 +7081,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -7134,7 +7134,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -7186,7 +7186,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -7238,7 +7238,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -7290,7 +7290,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -7342,7 +7342,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---
@@ -7426,7 +7426,7 @@ Archivo de definición dinámica: [tests/ers/test_gherkin_dynamic.py](../../test
 
 ## Estado de automatización backend
 
-Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS).
+Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS).
 
 
 ---

@@ -8,6 +8,11 @@ Usage (requires a running server and `pip install locust`):
 
 This is intentionally NOT part of the pytest suite — run it separately against
 a live server before releases or to catch N+1 regressions under realistic load.
+
+Read tasks (weights 1-4) simulate typical browse traffic.
+Write tasks (weight 1) simulate entry registrations; they require at least one
+product and location to exist. If none are found on startup, write tasks become
+no-ops so the suite still runs against a minimal seed environment.
 """
 
 from __future__ import annotations
@@ -18,6 +23,8 @@ from locust import HttpUser, between, task
 class ICMUser(HttpUser):
     wait_time = between(0.5, 2)
     token: str = ""
+    _product_id: str = ""
+    _location_id: str = ""
 
     def on_start(self):
         r = self.client.post(
@@ -27,8 +34,23 @@ class ICMUser(HttpUser):
         if r.status_code == 200:
             self.token = r.json().get("access", "")
 
+        # Cache first available product and location for write tasks
+        pr = self.client.get("/api/v1/catalog/products/", headers=self._auth())
+        if pr.status_code == 200:
+            results = pr.json().get("results") or pr.json()
+            if isinstance(results, list) and results:
+                self._product_id = str(results[0].get("id", ""))
+
+        lr = self.client.get("/api/v1/inventory/locations/", headers=self._auth())
+        if lr.status_code == 200:
+            results = lr.json().get("results") or lr.json()
+            if isinstance(results, list) and results:
+                self._location_id = str(results[0].get("id", ""))
+
     def _auth(self) -> dict:
         return {"Authorization": f"Bearer {self.token}"}
+
+    # ── Read tasks ────────────────────────────────────────────────────────────
 
     @task(4)
     def get_inventory(self):
@@ -51,3 +73,23 @@ class ICMUser(HttpUser):
     @task(1)
     def get_audit(self):
         self.client.get("/api/v1/audit/", headers=self._auth())
+
+    # ── Write tasks ───────────────────────────────────────────────────────────
+
+    @task(1)
+    def post_entry(self):
+        """Registra una entrada de 1 unidad. No-op si no hay producto/ubicación en seed."""
+        if not self._product_id or not self._location_id:
+            return
+        self.client.post(
+            "/api/v1/movements/entries/",
+            json={
+                "product_id": self._product_id,
+                "destination_location_id": self._location_id,
+                "quantity": 1,
+                "cold_chain_acknowledged": True,
+                "electrical_safety_acknowledged": True,
+            },
+            headers=self._auth(),
+            name="/api/v1/movements/entries/ [write]",
+        )

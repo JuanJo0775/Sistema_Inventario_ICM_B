@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import threading
+import os
 import time
 from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import patch
@@ -81,11 +81,6 @@ def test_concurrent_dispatches_does_not_produce_negative_stock(
     # sum of successful dispatched quantities cannot exceed initial stock (10)
     total_dispatched = sum(v for ok, v in results if ok and isinstance(v, int))
     assert total_dispatched <= 10
-
-
-import os
-
-import pytest
 
 
 @pytest.mark.skipif(
