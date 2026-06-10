@@ -12809,7 +12809,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_activate_supplier -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 91)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 90)
 
 
 ---
@@ -12845,7 +12845,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_confirmed_reception_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 641)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 655)
 
 
 ---
@@ -12881,7 +12881,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_po_borrador -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 198)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 197)
 
 
 ---
@@ -12917,7 +12917,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_po_completada_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 214)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 213)
 
 
 ---
@@ -12953,7 +12953,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_po_requires_reason -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 207)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 206)
 
 
 ---
@@ -12989,7 +12989,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_po_with_confirmed_reception_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 221)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 220)
 
 
 ---
@@ -13025,7 +13025,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_reception_borrador -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 630)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 644)
 
 
 ---
@@ -13061,7 +13061,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_already_confirmed_reception_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 623)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 637)
 
 
 ---
@@ -13097,7 +13097,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_already_pendiente_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 191)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 190)
 
 
 ---
@@ -13133,7 +13133,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_po_changes_status -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 178)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 177)
 
 
 ---
@@ -13169,7 +13169,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_advanced_distribution_by_locations_only -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 553)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 562)
 
 
 ---
@@ -13205,7 +13205,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_advanced_distribution_by_lots_and_locations -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 479)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 484)
 
 
 ---
@@ -13241,7 +13241,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_creates_movements_and_updates_stock -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 289)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 288)
 
 
 ---
@@ -13277,7 +13277,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_discrepancy_requires_note -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 394)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 393)
 
 
 ---
@@ -13313,7 +13313,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_is_atomic_on_error -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 416)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 417)
 
 
 ---
@@ -13349,7 +13349,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_partial_marks_po_partial -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 334)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 333)
 
 
 ---
@@ -13385,7 +13385,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_partial_second_delivery_matches_pending_without_note -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 360)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 359)
 
 
 ---
@@ -13421,7 +13421,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_unit_cost_flows_to_movement -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 449)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 452)
 
 
 ---
@@ -13457,7 +13457,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_po_with_inactive_supplier_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 158)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 157)
 
 
 ---
@@ -13493,7 +13493,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_purchase_order -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 137)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 136)
 
 
 ---
@@ -13529,7 +13529,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_reception_advanced_distribution_requires_matching_quantity -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 593)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 607)
 
 
 ---
@@ -13565,7 +13565,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_reception_borrador -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 234)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 233)
 
 
 ---
@@ -13601,7 +13601,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_reception_exceeds_quantity_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 273)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 272)
 
 
 ---
@@ -13637,7 +13637,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_reception_po_not_receivable_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 261)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 260)
 
 
 ---
@@ -13745,7 +13745,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_supplier_without_nit -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 106)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 105)
 
 
 ---
@@ -13781,7 +13781,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_deactivate_supplier -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 80)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 79)
 
 
 ---
@@ -13817,7 +13817,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_patch_supplier_with_empty_nit_clears_value -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 124)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 123)
 
 
 ---
@@ -13853,7 +13853,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_patch_supplier_without_nit_preserves_existing -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 116)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 115)
 
 
 ---
@@ -13889,7 +13889,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_update_supplier_changes_fields -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 99)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 98)
 
 
 ---
@@ -13997,7 +13997,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_views.py::test_confirm_reception_endpoint -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/tests/test_views.py) (aprox. línea 249)
+Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/tests/test_views.py) (aprox. línea 251)
 
 
 ---
@@ -14033,7 +14033,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_views.py::test_confirm_reception_forbidden_administrador -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/tests/test_views.py) (aprox. línea 280)
+Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/tests/test_views.py) (aprox. línea 284)
 
 
 ---
@@ -14357,7 +14357,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_views.py::test_list_receptions_administrador_can_view -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/tests/test_views.py) (aprox. línea 271)
+Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/tests/test_views.py) (aprox. línea 275)
 
 
 ---
