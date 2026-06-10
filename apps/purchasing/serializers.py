@@ -4,7 +4,14 @@ from __future__ import annotations
 
 from rest_framework import serializers
 
-from .models import PurchaseOrder, PurchaseOrderItem, Reception, ReceptionItem, Supplier
+from .models import (
+    PurchaseOrder,
+    PurchaseOrderItem,
+    Reception,
+    ReceptionItem,
+    ReceptionItemAllocation,
+    Supplier,
+)
 
 # ---------------------------------------------------------------------------
 # Supplier
@@ -164,6 +171,7 @@ class ReceptionItemSerializer(serializers.ModelSerializer):
     movement_id = serializers.UUIDField(
         source="movement.id", read_only=True, allow_null=True
     )
+    allocations = serializers.SerializerMethodField()
 
     class Meta:
         model = ReceptionItem
@@ -178,11 +186,44 @@ class ReceptionItemSerializer(serializers.ModelSerializer):
             "lot_expiration_date",
             "discrepancy_note",
             "movement_id",
+            "allocations",
         )
         read_only_fields = ("id", "movement_id")
 
     def get_quantity_expected(self, obj) -> int:
         return obj.quantity_expected
+
+    def get_allocations(self, obj):
+        return ReceptionItemAllocationSerializer(obj.allocations.all(), many=True).data
+
+
+class ReceptionItemAllocationSerializer(serializers.ModelSerializer):
+    location_name = serializers.CharField(source="location.name", read_only=True)
+    location_code = serializers.CharField(source="location.code", read_only=True)
+    movement_id = serializers.UUIDField(
+        source="movement.id", read_only=True, allow_null=True
+    )
+
+    class Meta:
+        model = ReceptionItemAllocation
+        fields = (
+            "id",
+            "location",
+            "location_code",
+            "location_name",
+            "quantity_received",
+            "lot_code",
+            "lot_expiration_date",
+            "movement_id",
+        )
+        read_only_fields = ("id", "movement_id")
+
+
+class ReceptionItemAllocationWriteSerializer(serializers.Serializer):
+    location_id = serializers.UUIDField()
+    quantity_received = serializers.IntegerField(min_value=1)
+    lot_code = serializers.CharField(required=False, allow_blank=True, default="")
+    lot_expiration_date = serializers.DateField(required=False, allow_null=True)
 
 
 class ReceptionItemWriteSerializer(serializers.Serializer):
@@ -192,6 +233,14 @@ class ReceptionItemWriteSerializer(serializers.Serializer):
     lot_expiration_date = serializers.DateField(required=False, allow_null=True)
     discrepancy_note = serializers.CharField(
         required=False, allow_blank=True, default=""
+    )
+    allocations = ReceptionItemAllocationWriteSerializer(
+        many=True,
+        required=False,
+        default=list,
+        help_text=(
+            "Distribución avanzada opcional. Cada fila puede indicar ubicación, lote y cantidad."
+        ),
     )
 
 
@@ -209,6 +258,7 @@ class ReceptionSerializer(serializers.ModelSerializer):
         source="destination_location.name", read_only=True
     )
     items = ReceptionItemSerializer(many=True, read_only=True)
+    has_allocations = serializers.SerializerMethodField()
 
     class Meta:
         model = Reception
@@ -223,6 +273,7 @@ class ReceptionSerializer(serializers.ModelSerializer):
             "received_by",
             "confirmed_at",
             "notes",
+            "has_allocations",
             "items",
             "created_at",
             "updated_at",
@@ -235,6 +286,9 @@ class ReceptionSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+
+    def get_has_allocations(self, obj) -> bool:
+        return any(getattr(item, "allocations", None) and item.allocations.exists() for item in obj.items.all())
 
 
 class ReceptionCreateSerializer(serializers.Serializer):

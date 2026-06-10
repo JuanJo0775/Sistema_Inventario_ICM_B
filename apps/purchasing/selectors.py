@@ -63,7 +63,12 @@ def get_receptions(
             "destination_location",
             "received_by",
         )
-        .prefetch_related("items__purchase_order_item__product", "items__movement")
+        .prefetch_related(
+            "items__purchase_order_item__product",
+            "items__movement",
+            "items__allocations__location",
+            "items__allocations__movement",
+        )
         .order_by("-created_at")
     )
     if po_id:
@@ -80,6 +85,11 @@ def get_reception(reception_id: uuid.UUID) -> Reception:
             "destination_location",
             "received_by",
         )
-        .prefetch_related("items__purchase_order_item__product", "items__movement")
+        .prefetch_related(
+            "items__purchase_order_item__product",
+            "items__movement",
+            "items__allocations__location",
+            "items__allocations__movement",
+        )
         .get(pk=reception_id)
     )

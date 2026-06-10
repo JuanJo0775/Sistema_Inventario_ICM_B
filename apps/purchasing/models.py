@@ -264,7 +264,8 @@ class ReceptionItem(BaseModel):
     Ítem de línea de una Recepción.
 
     Al confirmar la recepción, movement se enlaza al Movement ENTRADA generado
-    por movements.services.register_entry(). Esto garantiza trazabilidad completa.
+    por movements.services.register_entry() en el modo simple. En el modo avanzado,
+    las porciones distribuidas se registran en ReceptionItemAllocation.
     """
 
     reception = models.ForeignKey(
@@ -318,3 +319,52 @@ class ReceptionItem(BaseModel):
     @property
     def has_discrepancy(self) -> bool:
         return self.quantity_received != self.quantity_expected
+
+
+class ReceptionItemAllocation(BaseModel):
+    """
+    Porción distribuida de un ítem de recepción.
+
+    Permite segregar una cantidad recibida por lote y por ubicación sin romper el
+    flujo simple existente de Reception/ReceptionItem.
+    """
+
+    reception_item = models.ForeignKey(
+        ReceptionItem,
+        on_delete=models.CASCADE,
+        related_name="allocations",
+    )
+    location = models.ForeignKey(
+        "inventory.Location",
+        on_delete=models.PROTECT,
+        related_name="reception_item_allocations",
+    )
+    quantity_received = models.PositiveIntegerField()
+    lot_code = models.CharField(max_length=100, blank=True, null=True)
+    lot_expiration_date = models.DateField(null=True, blank=True)
+    movement = models.OneToOneField(
+        "movements.Movement",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="reception_allocation_link",
+        help_text="Movimiento ENTRADA generado para esta porción de recepción.",
+    )
+
+    class Meta:
+        verbose_name = "Distribución de ítem de recepción"
+        verbose_name_plural = "Distribuciones de ítems de recepción"
+        ordering = ("created_at", "id")
+        constraints = [
+            models.CheckConstraint(
+                check=Q(quantity_received__gt=0),
+                name="ria_qty_received_positive",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        lot = self.lot_code or "sin lote"
+        return (
+            f"{self.reception_item_id} -> {self.location_id} "
+            f"({lot}, qty={self.quantity_received})"
+        )

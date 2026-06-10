@@ -74,6 +74,13 @@ class ReceptionEmptyError(DomainValidationError):
     default_code = "RECEPTION_EMPTY"
 
 
+class ReceptionAllocationQuantityMismatchError(DomainValidationError):
+    default_message = (
+        "La suma de las distribuciones de recepción debe coincidir con la cantidad recibida."
+    )
+    default_code = "RECEPTION_ALLOCATION_QUANTITY_MISMATCH"
+
+
 class PONotReceivableError(DomainValidationError):
     default_message = "La orden de compra no está en un estado que permita recepciones (debe estar PENDIENTE o PARCIALMENTE_RECIBIDA)."
     default_code = "PO_NOT_RECEIVABLE"

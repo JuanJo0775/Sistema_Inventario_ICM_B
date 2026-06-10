@@ -11,6 +11,7 @@ from apps.purchasing.models import (
     PurchaseOrderStatus,
     Reception,
     ReceptionItem,
+    ReceptionItemAllocation,
     ReceptionStatus,
     Supplier,
 )
@@ -74,3 +75,14 @@ class ReceptionItemFactory(DjangoModelFactory):
     quantity_received = 5
     lot_code = ""
     discrepancy_note = ""
+
+
+class ReceptionItemAllocationFactory(DjangoModelFactory):
+    class Meta:
+        model = ReceptionItemAllocation
+
+    reception_item = factory.SubFactory(ReceptionItemFactory)
+    location = factory.SubFactory(LocationFactory)
+    quantity_received = 5
+    lot_code = ""
+    lot_expiration_date = None

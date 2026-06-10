@@ -8,6 +8,7 @@ from .models import (
     PurchaseOrderItem,
     Reception,
     ReceptionItem,
+    ReceptionItemAllocation,
     Supplier,
 )
 
@@ -47,6 +48,32 @@ class PurchaseOrderAdmin(admin.ModelAdmin):
 class ReceptionItemInline(admin.TabularInline):
     model = ReceptionItem
     extra = 0
+    readonly_fields = ("id", "movement", "created_at", "updated_at")
+
+
+class ReceptionItemAllocationInline(admin.TabularInline):
+    model = ReceptionItemAllocation
+    extra = 0
+    readonly_fields = ("id", "movement", "created_at", "updated_at")
+
+
+@admin.register(ReceptionItemAllocation)
+class ReceptionItemAllocationAdmin(admin.ModelAdmin):
+    list_display = (
+        "reception_item",
+        "location",
+        "quantity_received",
+        "lot_code",
+        "lot_expiration_date",
+        "movement",
+        "created_at",
+    )
+    search_fields = (
+        "reception_item__purchase_order_item__product__sku",
+        "reception_item__reception__purchase_order__number",
+        "location__code",
+        "lot_code",
+    )
     readonly_fields = ("id", "movement", "created_at", "updated_at")
 
 

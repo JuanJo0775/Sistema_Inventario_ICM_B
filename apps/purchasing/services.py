@@ -18,6 +18,7 @@ from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
 from apps.inventory.models import Location
 from apps.movements import services as movements_services
+from shared.exceptions import DomainValidationError
 
 from .exceptions import (
     InvalidPOStatusTransitionError,
@@ -26,6 +27,7 @@ from .exceptions import (
     POItemQuantityExceededError,
     PONotReceivableError,
     PurchaseOrderImmutableError,
+    ReceptionAllocationQuantityMismatchError,
     ReceptionDiscrepancyNoteRequiredError,
     ReceptionEmptyError,
     ReceptionNotInBorradorError,
@@ -39,6 +41,7 @@ from .models import (
     PurchaseOrderStatus,
     Reception,
     ReceptionItem,
+    ReceptionItemAllocation,
     ReceptionStatus,
     Supplier,
 )
@@ -72,6 +75,19 @@ def _update_po_status_from_receptions(po: PurchaseOrder) -> None:
     elif any_received:
         po.status = PurchaseOrderStatus.PARCIALMENTE_RECIBIDA
     po.save(update_fields=["status", "updated_at"])
+
+
+def _resolve_allocation_lot_values(
+    *,
+    item_lot_code: str | None,
+    item_lot_expiration_date,
+    allocation_lot_code: str | None,
+    allocation_lot_expiration_date,
+) -> tuple[str | None, Any | None]:
+    """Resuelve lote/fecha de una porción avanzando con fallback al ítem."""
+    lot_code = (allocation_lot_code or item_lot_code or "").strip() or None
+    lot_expiration_date = allocation_lot_expiration_date or item_lot_expiration_date
+    return lot_code, lot_expiration_date
 
 
 # ---------------------------------------------------------------------------
@@ -364,7 +380,10 @@ def create_reception(
     received_by, po_id: uuid.UUID, data: dict[str, Any], *, request=None
 ) -> Reception:
     """
-    Crea una Recepción en estado BORRADOR asociada a una OC.
+    RF-005 / BR-11 — Crea una Recepción en estado BORRADOR asociada a una OC.
+
+    Soporta modo simple (una ubicación destino por recepción) y modo avanzado
+    con distribuciones por porción de stock, lote y ubicación.
 
     data = {
         "destination_location_id": UUID,
@@ -386,7 +405,9 @@ def create_reception(
             f"La OC {po.number} está en estado '{po.status}' y no acepta recepciones."
         )
 
-    location = Location.objects.get(pk=data["destination_location_id"])
+    location = Location.objects.filter(pk=data["destination_location_id"]).first()
+    if location is None:
+        raise DomainValidationError("La ubicación de destino no existe.")
 
     reception = Reception.objects.create(
         purchase_order=po,
@@ -409,7 +430,7 @@ def create_reception(
                 f"para el producto '{poi.product}'."
             )
 
-        ReceptionItem.objects.create(
+        item = ReceptionItem.objects.create(
             reception=reception,
             purchase_order_item=poi,
             quantity_received=qty,
@@ -417,6 +438,33 @@ def create_reception(
             lot_expiration_date=item_data.get("lot_expiration_date"),
             discrepancy_note=item_data.get("discrepancy_note", ""),
         )
+
+        allocations = list(item_data.get("allocations") or [])
+        if allocations:
+            total_allocated = sum(int(a.get("quantity_received", 0)) for a in allocations)
+            if total_allocated != qty:
+                raise ReceptionAllocationQuantityMismatchError(
+                    detail={
+                        "purchase_order_item_id": str(poi.id),
+                        "quantity_received": qty,
+                        "allocated": total_allocated,
+                    }
+                )
+            for allocation_data in allocations:
+                allocation_location = Location.objects.filter(
+                    pk=allocation_data["location_id"]
+                ).first()
+                if allocation_location is None:
+                    raise DomainValidationError(
+                        "Una de las ubicaciones de distribución no existe."
+                    )
+                ReceptionItemAllocation.objects.create(
+                    reception_item=item,
+                    location=allocation_location,
+                    quantity_received=int(allocation_data["quantity_received"]),
+                    lot_code=(allocation_data.get("lot_code") or "").strip() or None,
+                    lot_expiration_date=allocation_data.get("lot_expiration_date"),
+                )
 
     log_event(
         AuditEventType.RECEPTION_CREATED,
@@ -436,15 +484,17 @@ def create_reception(
 @transaction.atomic
 def confirm_reception(executor, reception_id: uuid.UUID, *, request=None) -> Reception:
     """
-    BORRADOR → CONFIRMADA.
+    RF-005 / BR-11 — BORRADOR → CONFIRMADA.
 
     Por cada ReceptionItem con qty > 0:
     1. Valida discrepancy_note si qty difiere de lo esperado.
-    2. Llama movements.services.register_entry() — NUNCA toca StockByLocation directamente.
-    3. Enlaza item.movement con el Movement generado.
-    4. Actualiza PurchaseOrderItem.quantity_received.
-    5. Recalcula PurchaseOrder.status.
-    6. Marca la recepción como CONFIRMADA.
+    2. Si el ítem tiene allocaciones, crea un Movement por cada porción.
+    3. Si no tiene allocaciones, usa el flujo simple con una sola ubicación.
+    4. Llama movements.services.register_entry() — NUNCA toca StockByLocation directamente.
+    5. Enlaza los movimientos generados a la recepción.
+    6. Actualiza PurchaseOrderItem.quantity_received.
+    7. Recalcula PurchaseOrder.status.
+    8. Marca la recepción como CONFIRMADA.
     """
     reception = (
         Reception.objects.select_for_update()
@@ -458,7 +508,11 @@ def confirm_reception(executor, reception_id: uuid.UUID, *, request=None) -> Rec
     # Lock PO para evitar condición de carrera con otras recepciones
     po = PurchaseOrder.objects.select_for_update().get(pk=reception.purchase_order_id)
 
-    items = list(reception.items.select_related("purchase_order_item__product").all())
+    items = list(
+        reception.items.select_related("purchase_order_item__product")
+        .prefetch_related("allocations__location", "allocations__movement")
+        .all()
+    )
 
     active_items = [item for item in items if item.quantity_received > 0]
     if not active_items:
@@ -490,25 +544,64 @@ def confirm_reception(executor, reception_id: uuid.UUID, *, request=None) -> Rec
         poi = item.purchase_order_item
         product = poi.product
 
-        movement = movements_services.register_entry(
-            executor,
-            product_id=product.id,
-            quantity=item.quantity_received,
-            location_id=reception.destination_location_id,
-            lot_code=item.lot_code or None,
-            lot_expiration_date=item.lot_expiration_date,
-            qty_invoiced=item.quantity_received,
-            discrepancy_note=item.discrepancy_note or None,
-            unit_cost=poi.unit_cost,
-        )
+        allocations = list(item.allocations.all())
+        if allocations:
+            total_allocated = sum(a.quantity_received for a in allocations)
+            if total_allocated != item.quantity_received:
+                raise ReceptionAllocationQuantityMismatchError(
+                    detail={
+                        "reception_item_id": str(item.id),
+                        "quantity_received": item.quantity_received,
+                        "allocated": total_allocated,
+                    }
+                )
 
-        item.movement = movement
-        item.save(update_fields=["movement", "updated_at"])
+            last_movement = None
+            for allocation in allocations:
+                lot_code, lot_expiration_date = _resolve_allocation_lot_values(
+                    item_lot_code=item.lot_code,
+                    item_lot_expiration_date=item.lot_expiration_date,
+                    allocation_lot_code=allocation.lot_code,
+                    allocation_lot_expiration_date=allocation.lot_expiration_date,
+                )
+                movement = movements_services.register_entry(
+                    executor,
+                    product_id=product.id,
+                    quantity=allocation.quantity_received,
+                    location_id=allocation.location_id,
+                    lot_code=lot_code,
+                    lot_expiration_date=lot_expiration_date,
+                    qty_invoiced=allocation.quantity_received,
+                    discrepancy_note=item.discrepancy_note or None,
+                    unit_cost=poi.unit_cost,
+                )
+                allocation.movement = movement
+                allocation.save(update_fields=["movement", "updated_at"])
+                movement_ids.append(str(movement.id))
+                last_movement = movement
+
+            if len(allocations) == 1 and last_movement is not None:
+                item.movement = last_movement
+                item.save(update_fields=["movement", "updated_at"])
+        else:
+            movement = movements_services.register_entry(
+                executor,
+                product_id=product.id,
+                quantity=item.quantity_received,
+                location_id=reception.destination_location_id,
+                lot_code=item.lot_code or None,
+                lot_expiration_date=item.lot_expiration_date,
+                qty_invoiced=item.quantity_received,
+                discrepancy_note=item.discrepancy_note or None,
+                unit_cost=poi.unit_cost,
+            )
+
+            item.movement = movement
+            item.save(update_fields=["movement", "updated_at"])
+            movement_ids.append(str(movement.id))
 
         poi.quantity_received = (poi.quantity_received or 0) + item.quantity_received
         poi.save(update_fields=["quantity_received", "updated_at"])
-
-        movement_ids.append(str(movement.id))
 
     reception.status = ReceptionStatus.CONFIRMADA
     reception.confirmed_at = timezone.now()

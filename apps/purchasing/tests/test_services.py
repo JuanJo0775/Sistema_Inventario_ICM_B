@@ -15,6 +15,7 @@ from apps.purchasing.exceptions import (
     PONotReceivableError,
     PurchaseOrderImmutableError,
     ReceptionDiscrepancyNoteRequiredError,
+    ReceptionAllocationQuantityMismatchError,
     ReceptionEmptyError,
     ReceptionNotInBorradorError,
     SupplierInactiveError,
@@ -40,6 +41,7 @@ from .factories import (
     PurchaseOrderItemFactory,
     ReceptionFactory,
     ReceptionItemFactory,
+    ReceptionItemAllocationFactory,
     SupplierFactory,
 )
 
@@ -471,6 +473,150 @@ def test_confirm_reception_unit_cost_flows_to_movement(almacenista_user):
         destination_location=location,
     )
     assert movement.unit_cost == Decimal("12500.5000")
+
+
+@pytest.mark.django_db
+def test_confirm_reception_advanced_distribution_by_lots_and_locations(
+    almacenista_user,
+):
+    from datetime import timedelta
+
+    from apps.catalog.models import Lot
+    from django.utils import timezone
+
+    po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
+    product = ProductFactory(requires_expiration=True)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=10
+    )
+    lot_a = Lot.objects.create(
+        product=product,
+        code="LOTE-A",
+        expiration_date=timezone.now().date() + timedelta(days=90),
+    )
+    lot_b = Lot.objects.create(
+        product=product,
+        code="LOTE-B",
+        expiration_date=timezone.now().date() + timedelta(days=180),
+    )
+    b1 = LocationFactory(name="Bodega 1", code="bodega-1-adv")
+    b2 = LocationFactory(name="Bodega 2", code="bodega-2-adv")
+    vit = LocationFactory(name="Vitrina", code="vitrina-adv")
+
+    reception = create_reception(
+        almacenista_user,
+        po.id,
+        {
+            "destination_location_id": vit.id,
+            "items": [
+                {
+                    "purchase_order_item_id": poi.id,
+                    "quantity_received": 10,
+                    "allocations": [
+                        {
+                            "location_id": b1.id,
+                            "quantity_received": 2,
+                            "lot_code": lot_a.code,
+                            "lot_expiration_date": lot_a.expiration_date,
+                        },
+                        {
+                            "location_id": b2.id,
+                            "quantity_received": 3,
+                            "lot_code": lot_a.code,
+                            "lot_expiration_date": lot_a.expiration_date,
+                        },
+                        {
+                            "location_id": vit.id,
+                            "quantity_received": 5,
+                            "lot_code": lot_b.code,
+                            "lot_expiration_date": lot_b.expiration_date,
+                        },
+                    ],
+                }
+            ],
+        },
+    )
+
+    confirm_reception(almacenista_user, reception.id)
+
+    assert Movement.objects.filter(
+        product=product, movement_type=MovementType.ENTRADA
+    ).count() == 3
+    assert StockByLocation.objects.get(product=product, location=b1).current_stock == 2
+    assert StockByLocation.objects.get(product=product, location=b2).current_stock == 3
+    assert StockByLocation.objects.get(product=product, location=vit).current_stock == 5
+    assert Movement.objects.filter(product=product, lot=lot_a).count() == 2
+    assert Movement.objects.filter(product=product, lot=lot_b).count() == 1
+
+
+@pytest.mark.django_db
+def test_confirm_reception_advanced_distribution_by_locations_only(
+    almacenista_user,
+):
+    po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
+    product = ProductFactory()
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=10
+    )
+    b1 = LocationFactory(name="Bodega 1", code="bodega-1-loc")
+    b2 = LocationFactory(name="Bodega 2", code="bodega-2-loc")
+    vit = LocationFactory(name="Vitrina", code="vitrina-loc")
+
+    reception = create_reception(
+        almacenista_user,
+        po.id,
+        {
+            "destination_location_id": vit.id,
+            "items": [
+                {
+                    "purchase_order_item_id": poi.id,
+                    "quantity_received": 10,
+                    "allocations": [
+                        {"location_id": b1.id, "quantity_received": 2},
+                        {"location_id": b2.id, "quantity_received": 2},
+                        {"location_id": vit.id, "quantity_received": 6},
+                    ],
+                }
+            ],
+        },
+    )
+
+    confirm_reception(almacenista_user, reception.id)
+
+    assert StockByLocation.objects.get(product=product, location=b1).current_stock == 2
+    assert StockByLocation.objects.get(product=product, location=b2).current_stock == 2
+    assert StockByLocation.objects.get(product=product, location=vit).current_stock == 6
+    assert Movement.objects.filter(product=product, movement_type=MovementType.ENTRADA).count() == 3
+
+
+@pytest.mark.django_db
+def test_create_reception_advanced_distribution_requires_matching_quantity(
+    almacenista_user,
+):
+    po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
+    product = ProductFactory()
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=10
+    )
+    location = LocationFactory(name="Bodega Qty", code="bodega-qty")
+
+    with pytest.raises(ReceptionAllocationQuantityMismatchError):
+        create_reception(
+            almacenista_user,
+            po.id,
+            {
+                "destination_location_id": location.id,
+                "items": [
+                    {
+                        "purchase_order_item_id": poi.id,
+                        "quantity_received": 10,
+                        "allocations": [
+                            {"location_id": location.id, "quantity_received": 4}
+                        ],
+                    }
+                ],
+            },
+        )
 
 
 @pytest.mark.django_db

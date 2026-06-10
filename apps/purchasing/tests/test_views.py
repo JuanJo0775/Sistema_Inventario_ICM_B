@@ -201,6 +201,51 @@ def test_create_reception(authenticated_almacenista_client, almacenista_user):
 
 
 @pytest.mark.django_db
+def test_create_reception_with_allocations(authenticated_almacenista_client, almacenista_user):
+    po = PurchaseOrderFactory(
+        created_by=almacenista_user, status=PurchaseOrderStatus.PENDIENTE
+    )
+    product = ProductFactory()
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=10
+    )
+    b1 = LocationFactory(name="Bodega 1", code="bodega-1-api")
+    vit = LocationFactory(name="Vitrina", code="vitrina-api")
+
+    response = authenticated_almacenista_client.post(
+        "/api/v1/purchasing/receptions/",
+        {
+            "po_id": str(po.id),
+            "destination_location_id": str(vit.id),
+            "items": [
+                {
+                    "purchase_order_item_id": str(poi.id),
+                    "quantity_received": 10,
+                    "allocations": [
+                        {
+                            "location_id": str(b1.id),
+                            "quantity_received": 4,
+                        },
+                        {
+                            "location_id": str(vit.id),
+                            "quantity_received": 6,
+                        },
+                    ],
+                }
+            ],
+        },
+        format="json",
+    )
+    assert response.status_code == 201
+    assert len(response.data["items"][0]["allocations"]) == 2
+    assert {
+        str(allocation["location"])
+        for allocation in response.data["items"][0]["allocations"]
+    } == {str(b1.id), str(vit.id)}
+    assert response.data["has_allocations"] is True
+
+
+@pytest.mark.django_db
 def test_confirm_reception_endpoint(authenticated_almacenista_client, almacenista_user):
     po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
     product = ProductFactory()
