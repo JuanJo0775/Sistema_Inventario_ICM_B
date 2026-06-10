@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import base64
-from uuid import UUID
 
 try:
     from barcode import get_barcode_class  # type: ignore
@@ -14,13 +13,29 @@ except Exception:  # pragma: no cover - environment fallback for tests
     _HAS_BARCODE_LIB = False
 
 BARCODE_SYMBOLOGY = "Code128"
-BARCODE_PREFIX = "ICM-"
+# Configuración compacta para etiquetas pequeñas sin sacrificar demasiado la lectura.
+BARCODE_RENDER_OPTIONS = {
+    "module_width": 0.17,
+    "module_height": 9.0,
+    "quiet_zone": 1.0,
+    "font_size": 7,
+    "text_distance": 1.0,
+    "write_text": True,
+}
 
 
-def build_product_barcode(product_id: UUID) -> str:
-    """Genera un código estable y legible a partir del UUID del producto."""
-    payload = base64.b32encode(product_id.bytes).decode("ascii").rstrip("=")
-    return f"{BARCODE_PREFIX}{payload}"
+def build_product_barcode(sku: str) -> str:
+    """
+    Genera el barcode a partir del SKU del producto.
+
+    RF-003 / BR-13:
+    - El UUID queda como identificador técnico interno.
+    - El SKU es el alias de negocio y el barcode escaneable.
+    """
+    value = (sku or "").strip()
+    if not value:
+        raise ValueError("sku es obligatorio para generar el barcode.")
+    return value
 
 
 def render_code128_svg(value: str) -> str:
@@ -38,7 +53,7 @@ def render_code128_svg(value: str) -> str:
         return placeholder
     code128 = get_barcode_class("code128")
     barcode = code128(value, writer=SVGWriter())
-    svg_bytes = barcode.render(writer_options={"write_text": True})
+    svg_bytes = barcode.render(writer_options=BARCODE_RENDER_OPTIONS)
     return svg_bytes.decode("utf-8")
 
 
@@ -48,11 +63,9 @@ def barcode_svg_data_uri(svg: str) -> str:
     return f"data:image/svg+xml;base64,{encoded}"
 
 
-def build_product_barcode_payload(
-    product_id: UUID, barcode: str | None = None
-) -> dict[str, str]:
-    """Construye valor, simbología y representación SVG para un producto."""
-    value = barcode or build_product_barcode(product_id)
+def build_product_barcode_payload(barcode: str) -> dict[str, str]:
+    """Construye valor, simbología y representación SVG para un barcode dado."""
+    value = barcode.strip()
     svg = render_code128_svg(value)
     return {
         "type": BARCODE_SYMBOLOGY,

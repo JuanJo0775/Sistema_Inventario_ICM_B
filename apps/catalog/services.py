@@ -17,7 +17,7 @@ from apps.catalog.models import (
     Subcategory,
 )
 from shared.exceptions import (
-    InvalidSKUFormatError,
+    DomainValidationError,
     UnauthorizedCredentialManagementError,
 )
 from shared.utils.barcode import build_product_barcode
@@ -51,7 +51,7 @@ def create_product(
         name=data["name"],
         category=category,
         subcategory_id=data.get("subcategory_id"),
-        barcode=data.get("barcode") or None,
+        barcode=build_product_barcode(sku),
         brand=brand,
         expiration_date=data.get("expiration_date") or data.get("expiry_date"),
         requires_expiration=bool(data.get("requires_expiration")),
@@ -67,9 +67,6 @@ def create_product(
         tax_rate_pct=data.get("tax_rate_pct"),
         currency=data.get("currency") or "COP",
     )
-    if not product.barcode:
-        product.barcode = build_product_barcode(product.id)
-        product.save(update_fields=("barcode",))
     log_event(
         AuditEventType.PRODUCT_CREATED,
         description=f"Producto creado: {product.sku}",
@@ -102,12 +99,8 @@ def update_product(
         .get(pk=product_id)
     )
     new_sku = (data.get("sku") or product.sku or "").strip()
-    brand = (data.get("brand") or product.brand or "Can").strip() or "Can"
-    if new_sku != product.sku or brand != product.brand:
-        try:
-            validate_sku_format(new_sku)
-        except Exception as exc:
-            raise InvalidSKUFormatError(str(exc)) from exc
+    if new_sku != product.sku:
+        raise DomainValidationError("El SKU es inmutable; no puede modificarse.")
     for field in (
         "name",
         "sku",
@@ -127,7 +120,7 @@ def update_product(
     if "subcategory_id" in data:
         product.subcategory_id = data.get("subcategory_id")
     if not product.barcode:
-        product.barcode = data.get("barcode") or build_product_barcode(product.id)
+        product.barcode = build_product_barcode(product.sku)
     product.save()
     log_event(
         AuditEventType.PRODUCT_UPDATED,

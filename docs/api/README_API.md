@@ -284,12 +284,12 @@ Para el catálogo completo con ejemplos request/response, ver [REFERENCIA_ENDPOI
 | `GET/PUT/PATCH` | `/catalog/subcategories/<uuid:pk>/` | Detalle subcategoría |
 | `GET/POST` | `/catalog/products/` | Productos |
 | `GET/PUT/PATCH` | `/catalog/products/<uuid:pk>/` | Detalle producto |
-| `GET` | `/catalog/products/<uuid:pk>/barcode/` | Payload de código de barras (SVG, Data URI) |
+| `GET` | `/catalog/products/<uuid:pk>/barcode/` | Payload de código de barras del SKU (SVG, Data URI) |
 | `GET` | `/catalog/resolve/` | Resolución por SKU, barcode o nombre |
 | `GET/POST` | `/catalog/combos/` | Combos (kits de productos) |
 | `GET` | `/catalog/combos/<uuid:pk>/` | Detalle combo |
 
-> El detalle de producto expone `barcode`, `barcode_type`, `barcode_payload`, `barcode_svg` y `barcode_svg_data_uri` para impresión de etiquetas.
+> El detalle de producto expone `barcode`, `barcode_type`, `barcode_payload`, `barcode_svg` y `barcode_svg_data_uri` para impresión de etiquetas. En este diseño, `barcode` es el mismo valor que `sku`.
 
 ### 10.3 Inventario (`/api/v1/inventory/`)
 

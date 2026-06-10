@@ -101,7 +101,7 @@ Los siguientes endpoints ya existen y son la base de los reportes de solo lectur
 - `/api/v1/reports/invoices/` : historial de salidas con factura.
 - `/api/v1/reports/expiring/` : lotes con vencimiento proximo.
 
-**Nota sobre generación de códigos de barra:** el backend expone payloads listos para consumir con la forma `{ type, value, svg, svg_data_uri }` (por ejemplo desde el endpoint de producto). En entornos de test donde la librería de render `python-barcode` no está instalada se devuelve un `svg` placeholder con encabezado XML para mantener la compatibilidad del contrato; en producción recomendamos instalar `python-barcode` para obtener SVG completos y legibles.
+**Nota sobre generación de códigos de barra:** el backend expone payloads listos para consumir con la forma `{ type, value, svg, svg_data_uri }` (por ejemplo desde el endpoint de producto). En este diseño, `value` coincide con el `SKU` del producto, por lo que el barcode es corto, legible y estable. En entornos de test donde la librería de render `python-barcode` no está instalada se devuelve un `svg` placeholder con encabezado XML para mantener la compatibilidad del contrato; en producción recomendamos instalar `python-barcode` para obtener SVG completos y legibles.
 
 ### **Pendientes tecnicos explicitos**
 

@@ -2,6 +2,7 @@ import pytest
 
 from apps.catalog.serializers import ProductDetailSerializer
 from apps.catalog.services import create_product, resolve_identifier, update_product
+from shared.exceptions import DomainValidationError
 from shared.utils.barcode import build_product_barcode
 from tests.factories import CategoryFactory
 
@@ -46,7 +47,8 @@ def test_create_product_auto_generates_stable_barcode(almacenista_user):
         },
     )
 
-    assert product.barcode == build_product_barcode(product.id)
+    assert product.barcode == product.sku
+    assert product.barcode == build_product_barcode(product.sku)
 
     detail = ProductDetailSerializer(product).data
     assert detail["barcode"] == product.barcode
@@ -103,4 +105,44 @@ def test_update_product_backfills_missing_barcode(almacenista_user):
         {"name": "Producto sin barcode 2"},
     )
 
-    assert updated.barcode == build_product_barcode(product.id)
+    assert updated.barcode == product.sku
+
+
+@pytest.mark.django_db
+def test_create_product_uses_sku_as_barcode_even_if_barcode_provided(
+    almacenista_user,
+):
+    category = CategoryFactory()
+    product = create_product(
+        almacenista_user,
+        {
+            "sku": "JKL-1234",
+            "name": "Producto con colisión",
+            "category_id": category.id,
+            "barcode": "OTRO-CODIGO",
+        },
+    )
+
+    assert product.barcode == product.sku
+
+
+@pytest.mark.django_db
+def test_update_product_rejects_sku_changes(almacenista_user):
+    category = CategoryFactory()
+    product = create_product(
+        almacenista_user,
+        {
+            "sku": "MNO-1234",
+            "name": "Producto inmutable",
+            "category_id": category.id,
+        },
+    )
+
+    with pytest.raises(DomainValidationError) as exc_info:
+        update_product(
+            almacenista_user,
+            product.id,
+            {"sku": "MNO-9999"},
+        )
+
+    assert "SKU es inmutable" in str(exc_info.value)

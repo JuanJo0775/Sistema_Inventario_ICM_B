@@ -125,7 +125,7 @@ class ProductDetailSerializer(ProductSerializer):
         cache_attr = "_barcode_payload_cache"
         payload = getattr(obj, cache_attr, None)
         if payload is None:
-            payload = build_product_barcode_payload(obj.id, barcode=obj.barcode)
+            payload = build_product_barcode_payload(obj.barcode)
             setattr(obj, cache_attr, payload)
         return payload
 
@@ -142,7 +142,7 @@ class ProductBarcodeSerializer(serializers.Serializer):
 
     @classmethod
     def from_product(cls, product: Product) -> dict[str, str]:
-        payload = build_product_barcode_payload(product.id, barcode=product.barcode)
+        payload = build_product_barcode_payload(product.barcode)
         return {
             "product_id": str(product.id),
             "sku": product.sku,
@@ -162,7 +162,6 @@ class ProductUpdateSerializer(serializers.Serializer):
     sku = serializers.CharField(required=False)
     category_id = serializers.UUIDField(required=False)
     subcategory_id = serializers.UUIDField(required=False, allow_null=True)
-    barcode = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     brand = serializers.CharField(required=False, allow_blank=True)
     requires_cold_chain = serializers.BooleanField(required=False)
     requires_expiration = serializers.BooleanField(required=False)
@@ -180,7 +179,6 @@ class ProductCreateSerializer(serializers.Serializer):
     name = serializers.CharField()
     category_id = serializers.UUIDField()
     subcategory_id = serializers.UUIDField(required=False, allow_null=True)
-    barcode = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     brand = serializers.CharField(default="Can")
     requires_cold_chain = serializers.BooleanField(default=False)
     requires_expiration = serializers.BooleanField(default=False)

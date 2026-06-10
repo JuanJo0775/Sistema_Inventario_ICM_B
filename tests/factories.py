@@ -86,7 +86,7 @@ class ProductFactory(DjangoModelFactory):
     sku = factory.Sequence(lambda n: f"PRD-{n%9999+1:04d}")
     name = factory.Faker("word")
     category = factory.SubFactory(ManoCategoryFactory)
-    barcode = factory.Sequence(lambda n: f"BAR{n:08d}")
+    barcode = factory.SelfAttribute("sku")
     brand = "Can"
     reorder_point = 5
     requires_expiration = False
