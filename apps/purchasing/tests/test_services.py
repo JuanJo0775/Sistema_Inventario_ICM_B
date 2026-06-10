@@ -71,8 +71,7 @@ def test_create_supplier_duplicate_nit_raises(almacenista_user):
     SupplierFactory(nit="900000001-1")
     with pytest.raises(SupplierNITDuplicateError):
         create_supplier(
-            almacenista_user,
-            {"nombre_comercial": "Otro", "nit": "900000001-1"},
+            almacenista_user, {"nombre_comercial": "Otro", "nit": "900000001-1"}
         )
 
 
@@ -545,18 +544,15 @@ def test_confirm_reception_advanced_distribution_by_lots_and_locations(
 
     confirm_reception(almacenista_user, reception.id)
 
-    assert Movement.objects.filter(
-        product=product, movement_type=MovementType.ENTRADA
-    ).count() == 3
     assert (
-        StockByLocation.objects.get(product=product, location=b1).current_stock == 2
+        Movement.objects.filter(
+            product=product, movement_type=MovementType.ENTRADA
+        ).count()
+        == 3
     )
-    assert (
-        StockByLocation.objects.get(product=product, location=b2).current_stock == 3
-    )
-    assert (
-        StockByLocation.objects.get(product=product, location=vit).current_stock == 5
-    )
+    assert StockByLocation.objects.get(product=product, location=b1).current_stock == 2
+    assert StockByLocation.objects.get(product=product, location=b2).current_stock == 3
+    assert StockByLocation.objects.get(product=product, location=vit).current_stock == 5
     assert Movement.objects.filter(product=product, lot=lot_a).count() == 2
     assert Movement.objects.filter(product=product, lot=lot_b).count() == 1
 
@@ -595,15 +591,9 @@ def test_confirm_reception_advanced_distribution_by_locations_only(
 
     confirm_reception(almacenista_user, reception.id)
 
-    assert (
-        StockByLocation.objects.get(product=product, location=b1).current_stock == 2
-    )
-    assert (
-        StockByLocation.objects.get(product=product, location=b2).current_stock == 2
-    )
-    assert (
-        StockByLocation.objects.get(product=product, location=vit).current_stock == 6
-    )
+    assert StockByLocation.objects.get(product=product, location=b1).current_stock == 2
+    assert StockByLocation.objects.get(product=product, location=b2).current_stock == 2
+    assert StockByLocation.objects.get(product=product, location=vit).current_stock == 6
     assert (
         Movement.objects.filter(
             product=product, movement_type=MovementType.ENTRADA

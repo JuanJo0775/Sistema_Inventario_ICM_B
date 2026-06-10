@@ -29,9 +29,7 @@ class PurchaseOrderImmutableError(ImmutableRecordError):
 
 
 class InvalidPOStatusTransitionError(DomainValidationError):
-    default_message = (
-        "La transición de estado solicitada no está permitida para esta orden de compra."
-    )
+    default_message = "La transición de estado solicitada no está permitida para esta orden de compra."
     default_code = "INVALID_PO_STATUS_TRANSITION"
 
 
@@ -41,9 +39,7 @@ class POCancellationReasonRequiredError(DomainValidationError):
 
 
 class POHasConfirmedReceptionsError(DomainValidationError):
-    default_message = (
-        "No se puede cancelar la OC porque tiene recepciones confirmadas que ya generaron stock."
-    )
+    default_message = "No se puede cancelar la OC porque tiene recepciones confirmadas que ya generaron stock."
     default_code = "PO_HAS_CONFIRMED_RECEPTIONS"
 
 
@@ -82,9 +78,7 @@ class ReceptionEmptyError(DomainValidationError):
 
 
 class ReceptionAllocationQuantityMismatchError(DomainValidationError):
-    default_message = (
-        "La suma de las distribuciones de recepción debe coincidir con la cantidad recibida."
-    )
+    default_message = "La suma de las distribuciones de recepción debe coincidir con la cantidad recibida."
     default_code = "RECEPTION_ALLOCATION_QUANTITY_MISMATCH"
 
 

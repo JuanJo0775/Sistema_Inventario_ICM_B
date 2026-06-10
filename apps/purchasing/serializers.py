@@ -194,9 +194,7 @@ class ReceptionItemSerializer(serializers.ModelSerializer):
         return obj.quantity_expected
 
     def get_allocations(self, obj):
-        return ReceptionItemAllocationSerializer(
-            obj.allocations.all(), many=True
-        ).data
+        return ReceptionItemAllocationSerializer(obj.allocations.all(), many=True).data
 
 
 class ReceptionItemAllocationSerializer(serializers.ModelSerializer):

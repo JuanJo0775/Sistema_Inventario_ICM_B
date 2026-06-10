@@ -641,6 +641,264 @@ def impl_rf022_s05(
     assert r_confirm.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
+def impl_rf021_s04(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
+    """Recepción avanzada por lote y ubicación se crea correctamente."""
+    supplier = _create_supplier_via_api(
+        authenticated_almacenista_client, nit="555666888-5"
+    )
+    po = _create_po_via_api(
+        authenticated_almacenista_client,
+        supplier["id"],
+        str(sample_product.id),
+        quantity_ordered=10,
+    )
+    poi_id = po["items"][0]["id"]
+    _confirm_po(authenticated_almacenista_client, po["id"])
+
+    loc_a = sample_locations[0]
+    loc_b = sample_locations[1]
+    reception = authenticated_almacenista_client.post(
+        reverse("reception-list-create"),
+        {
+            "po_id": po["id"],
+            "destination_location_id": str(loc_a.id),
+            "items": [
+                {
+                    "purchase_order_item_id": poi_id,
+                    "quantity_received": 10,
+                    "allocations": [
+                        {
+                            "location_id": str(loc_a.id),
+                            "quantity_received": 4,
+                            "lot_code": "LOTE-A",
+                            "lot_expiration_date": "2027-12-31",
+                        },
+                        {
+                            "location_id": str(loc_b.id),
+                            "quantity_received": 6,
+                            "lot_code": "LOTE-B",
+                            "lot_expiration_date": "2028-01-31",
+                        },
+                    ],
+                }
+            ],
+        },
+        format="json",
+    )
+    assert reception.status_code == status.HTTP_201_CREATED, reception.data
+    assert reception.data["status"] == ReceptionStatus.BORRADOR
+    assert len(reception.data["items"]) == 1
+    assert len(reception.data["items"][0]["allocations"]) == 2
+
+    r_po = authenticated_almacenista_client.get(
+        reverse("po-detail", kwargs={"pk": po["id"]})
+    )
+    assert r_po.data["status"] == PurchaseOrderStatus.PENDIENTE
+
+
+def impl_rf021_s05(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
+    """Recepción avanzada rechaza distribuciones cuya suma no coincide."""
+    supplier = _create_supplier_via_api(
+        authenticated_almacenista_client, nit="666777999-6"
+    )
+    po = _create_po_via_api(
+        authenticated_almacenista_client,
+        supplier["id"],
+        str(sample_product.id),
+        quantity_ordered=10,
+    )
+    poi_id = po["items"][0]["id"]
+    _confirm_po(authenticated_almacenista_client, po["id"])
+
+    loc_a = sample_locations[0]
+    loc_b = sample_locations[1]
+    response = authenticated_almacenista_client.post(
+        reverse("reception-list-create"),
+        {
+            "po_id": po["id"],
+            "destination_location_id": str(loc_a.id),
+            "items": [
+                {
+                    "purchase_order_item_id": poi_id,
+                    "quantity_received": 10,
+                    "allocations": [
+                        {
+                            "location_id": str(loc_a.id),
+                            "quantity_received": 4,
+                        },
+                        {
+                            "location_id": str(loc_b.id),
+                            "quantity_received": 5,
+                        },
+                    ],
+                }
+            ],
+        },
+        format="json",
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+def impl_rf022_s06(
+    authenticated_almacenista_client: APIClient, sample_product, sample_locations, db
+):
+    """Confirmación de recepción avanzada genera un Movement por porción."""
+    from apps.inventory.models import StockByLocation
+    from apps.movements.models import Movement, MovementType
+    from apps.purchasing.models import ReceptionItem
+
+    supplier = _create_supplier_via_api(
+        authenticated_almacenista_client, nit="777888000-7"
+    )
+    po = _create_po_via_api(
+        authenticated_almacenista_client,
+        supplier["id"],
+        str(sample_product.id),
+        quantity_ordered=10,
+    )
+    poi_id = po["items"][0]["id"]
+    _confirm_po(authenticated_almacenista_client, po["id"])
+
+    loc_a = sample_locations[0]
+    loc_b = sample_locations[1]
+    reception = authenticated_almacenista_client.post(
+        reverse("reception-list-create"),
+        {
+            "po_id": po["id"],
+            "destination_location_id": str(loc_a.id),
+            "items": [
+                {
+                    "purchase_order_item_id": poi_id,
+                    "quantity_received": 10,
+                    "allocations": [
+                        {
+                            "location_id": str(loc_a.id),
+                            "quantity_received": 4,
+                            "lot_code": "LOTE-A",
+                            "lot_expiration_date": "2027-12-31",
+                        },
+                        {
+                            "location_id": str(loc_b.id),
+                            "quantity_received": 6,
+                            "lot_code": "LOTE-B",
+                            "lot_expiration_date": "2028-01-31",
+                        },
+                    ],
+                }
+            ],
+        },
+        format="json",
+    )
+    assert reception.status_code == status.HTTP_201_CREATED, reception.data
+
+    confirmed = _confirm_reception(
+        authenticated_almacenista_client, reception.data["id"]
+    )
+    assert confirmed["status"] == ReceptionStatus.CONFIRMADA
+
+    movements = Movement.objects.filter(
+        product=sample_product,
+        movement_type=MovementType.ENTRADA,
+    ).order_by("created_at")
+    assert movements.count() == 2
+
+    assert (
+        StockByLocation.objects.get(
+            product=sample_product, location=loc_a
+        ).current_stock
+        == 4
+    )
+    assert (
+        StockByLocation.objects.get(
+            product=sample_product, location=loc_b
+        ).current_stock
+        == 6
+    )
+
+    ri = ReceptionItem.objects.get(reception_id=reception.data["id"])
+    assert ri.allocations.count() == 2
+    assert ri.allocations.filter(movement__isnull=False).count() == 2
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.RECEPTION_CONFIRMED
+    ).exists()
+
+
+def impl_rf022_s07(
+    almacenista_user,
+    authenticated_almacenista_client: APIClient,
+    sample_product,
+    sample_locations,
+    db,
+):
+    """Confirmación de recepción avanzada con suma inconsistente es rechazada."""
+    from apps.inventory.models import StockByLocation
+    from apps.purchasing.models import (
+        PurchaseOrder,
+        PurchaseOrderItem,
+        Reception,
+        ReceptionItem,
+        ReceptionItemAllocation,
+        ReceptionStatus,
+    )
+
+    supplier = _create_supplier_via_api(
+        authenticated_almacenista_client, nit="888999111-8"
+    )
+    po = _create_po_via_api(
+        authenticated_almacenista_client,
+        supplier["id"],
+        str(sample_product.id),
+        quantity_ordered=10,
+    )
+    poi_id = po["items"][0]["id"]
+    _confirm_po(authenticated_almacenista_client, po["id"])
+
+    loc_a = sample_locations[0]
+    loc_b = sample_locations[1]
+    po_db = PurchaseOrder.objects.get(pk=po["id"])
+    poi_db = PurchaseOrderItem.objects.get(pk=poi_id)
+    reception = Reception.objects.create(
+        purchase_order=po_db,
+        destination_location=loc_a,
+        received_by=almacenista_user,
+        status=ReceptionStatus.BORRADOR,
+    )
+    item = ReceptionItem.objects.create(
+        reception=reception,
+        purchase_order_item=poi_db,
+        quantity_received=10,
+        discrepancy_note="Distribución cargada manualmente para validar rechazo en confirmación.",
+    )
+    ReceptionItemAllocation.objects.create(
+        reception_item=item,
+        location=loc_a,
+        quantity_received=4,
+    )
+    ReceptionItemAllocation.objects.create(
+        reception_item=item,
+        location=loc_b,
+        quantity_received=5,
+    )
+
+    response = authenticated_almacenista_client.post(
+        reverse("reception-confirm", kwargs={"pk": reception.id})
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    rec = Reception.objects.get(pk=reception.id)
+    assert rec.status == ReceptionStatus.BORRADOR
+    assert not StockByLocation.objects.filter(
+        product=sample_product, location=loc_a
+    ).exists()
+    assert not StockByLocation.objects.filter(
+        product=sample_product, location=loc_b
+    ).exists()
+
+
 # ---------------------------------------------------------------------------
 # RF-023 — Cancelación de recepciones
 # ---------------------------------------------------------------------------
@@ -926,11 +1184,15 @@ IMPLEMENTATIONS: dict[str, object] = {
     "RF021-S01": impl_rf021_s01,
     "RF021-S02": impl_rf021_s02,
     "RF021-S03": impl_rf021_s03,
+    "RF021-S04": impl_rf021_s04,
+    "RF021-S05": impl_rf021_s05,
     "RF022-S01": impl_rf022_s01,
     "RF022-S02": impl_rf022_s02,
     "RF022-S03": impl_rf022_s03,
     "RF022-S04": impl_rf022_s04,
     "RF022-S05": impl_rf022_s05,
+    "RF022-S06": impl_rf022_s06,
+    "RF022-S07": impl_rf022_s07,
     "RF023-S01": impl_rf023_s01,
     "RF023-S02": impl_rf023_s02,
     "RF024-S01": impl_rf024_s01,

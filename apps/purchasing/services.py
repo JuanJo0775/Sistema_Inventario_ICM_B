@@ -222,9 +222,7 @@ def create_purchase_order(
         "items": [{"product_id": UUID, "quantity_ordered": int, "unit_cost": Decimal, "notes": str}]
     }
     """
-    supplier = Supplier.objects.select_for_update().get(
-        pk=data["supplier_id"]
-    )
+    supplier = Supplier.objects.select_for_update().get(pk=data["supplier_id"])
     if not supplier.is_active:
         raise SupplierInactiveError()
 
@@ -407,9 +405,7 @@ def create_reception(
             f"La OC {po.number} está en estado '{po.status}' y no acepta recepciones."
         )
 
-    location = Location.objects.filter(
-        pk=data["destination_location_id"]
-    ).first()
+    location = Location.objects.filter(pk=data["destination_location_id"]).first()
     if location is None:
         raise DomainValidationError("La ubicación de destino no existe.")
 
