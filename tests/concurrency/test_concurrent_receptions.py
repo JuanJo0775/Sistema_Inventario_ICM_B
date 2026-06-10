@@ -112,8 +112,12 @@ def test_concurrent_reception_confirmation_does_not_duplicate_stock(
     errors = [r for r in results if r[0] == "error"]
 
     assert not errors, f"Errores inesperados: {errors}"
-    assert len(successes) == 1, f"Solo una confirmación debe tener éxito; resultados: {results}"
-    assert len(not_borrador) == 1, "El segundo hilo debe recibir ReceptionNotInBorradorError"
+    assert (
+        len(successes) == 1
+    ), f"Solo una confirmación debe tener éxito; resultados: {results}"
+    assert (
+        len(not_borrador) == 1
+    ), "El segundo hilo debe recibir ReceptionNotInBorradorError"
 
     # Stock final debe reflejar solo una confirmación
     stock_row = StockByLocation.objects.get(product=product, location=loc)

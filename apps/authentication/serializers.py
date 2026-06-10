@@ -13,6 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.authentication.models import UserRole
 from apps.authentication.services import OutsideOperatingHoursError, authenticate_user
+
 User = get_user_model()
 
 
