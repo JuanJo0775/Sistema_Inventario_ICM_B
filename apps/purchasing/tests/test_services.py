@@ -14,8 +14,8 @@ from apps.purchasing.exceptions import (
     POItemQuantityExceededError,
     PONotReceivableError,
     PurchaseOrderImmutableError,
-    ReceptionDiscrepancyNoteRequiredError,
     ReceptionAllocationQuantityMismatchError,
+    ReceptionDiscrepancyNoteRequiredError,
     ReceptionEmptyError,
     ReceptionNotInBorradorError,
     SupplierInactiveError,
@@ -40,8 +40,8 @@ from .factories import (
     PurchaseOrderFactory,
     PurchaseOrderItemFactory,
     ReceptionFactory,
-    ReceptionItemFactory,
     ReceptionItemAllocationFactory,
+    ReceptionItemFactory,
     SupplierFactory,
 )
 
@@ -486,8 +486,9 @@ def test_confirm_reception_advanced_distribution_by_lots_and_locations(
 ):
     from datetime import timedelta
 
-    from apps.catalog.models import Lot
     from django.utils import timezone
+
+    from apps.catalog.models import Lot
 
     po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
     product = ProductFactory(requires_expiration=True)
