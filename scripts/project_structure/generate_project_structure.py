@@ -686,7 +686,7 @@ def should_include_file(path: Path, root: Path, config: TreeConfig) -> bool:
             return path.name in {"conftest.py", "factories.py"}
         if path.suffix == ".py":
             if "/ers/" in rel:
-                return path.name in {"gherkin_impl.py", "test_gherkin_dynamic.py"}
+                return path.name == "test_gherkin_dynamic.py"
             if "/integration/" in rel:
                 return path.name.startswith("test_") or path.name == "conftest.py"
             return path.name.startswith("test_") or path.name in {

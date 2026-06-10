@@ -26,7 +26,6 @@ from shared.exceptions import (
     DiscrepancyNoteRequiredError,
     ImmutableRecordError,
     InsufficientStockError,
-    LocationStateNotAllowedError,
     LotCodeRequiredError,
     LotExpirationDateRequiredError,
     PrivacyConsentRequiredError,
@@ -1415,7 +1414,7 @@ def dispatch_combo(
         InsufficientStockError: Si no hay stock suficiente de algún ítem.
         ProductCombo.DoesNotExist: Si el combo no existe o está inactivo.
     """
-    from apps.catalog.models import ComboItem, ProductCombo
+    from apps.catalog.models import ProductCombo
 
     combo = ProductCombo.objects.prefetch_related("combo_items__product__category").get(
         pk=combo_id, is_active=True

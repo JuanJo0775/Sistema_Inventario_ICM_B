@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from shared.models import BaseModel
-from shared.utils.validators import normalize_sku, validate_can_sku, validate_sku_format
+from shared.utils.validators import normalize_sku, validate_sku_format
 
 
 class Category(BaseModel):

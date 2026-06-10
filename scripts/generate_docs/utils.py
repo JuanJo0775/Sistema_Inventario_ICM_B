@@ -344,7 +344,7 @@ def _render_gherkin_doc(scenario: dict, automation_scope: dict[str, str]) -> str
         "Fuera de alcance del backend/pytest; debe validarse en frontend o E2E. "
         f"Motivo: {reason}"
         if reason
-        else "Implementada en tests/ers/gherkin_impl.py (comprueba API/servicios equivalentes al Then del ERS)."
+        else "Implementada en tests/ers/impl/ (comprueba API/servicios equivalentes al Then del ERS)."
     )
     excerpt = scenario.get("given_when_then", "")
     excerpt = excerpt[:4000] + ("…" if len(excerpt) > 4000 else "")

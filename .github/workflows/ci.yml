@@ -54,6 +54,9 @@ jobs:
       - name: Formatting — isort
         run: isort --check-only .
 
+      - name: Linting — flake8
+        run: flake8 apps/ shared/ --max-line-length=88 --extend-ignore=E203,W503,E501 --exclude=*/tests*,*/migrations*
+
       - name: SAST — bandit
         continue-on-error: true
         run: bandit -r apps shared -ll || true

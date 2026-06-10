@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from uuid import UUID
-
 from rest_framework import serializers
 
 from apps.catalog.models import Category, ComboItem, Product, ProductCombo, Subcategory

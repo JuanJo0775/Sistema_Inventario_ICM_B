@@ -19,9 +19,9 @@ TAG_ALERTS = "alerts"
 TAG_AUDIT = "audit"
 TAG_WEBHOOKS = "webhooks"
 
-from typing import Any
+from typing import Any  # noqa: E402
 
-from drf_spectacular.utils import OpenApiResponse
+from drf_spectacular.utils import OpenApiResponse  # noqa: E402
 
 
 def standardize_errors_hook(

@@ -725,8 +725,6 @@ def get_expiring_products(days: int = 30):
             )
             if qty <= 0:
                 continue
-            from apps.inventory.models import Location
-
             location = (
                 Location.objects.filter(pk=location_id)
                 .only("id", "code", "name")

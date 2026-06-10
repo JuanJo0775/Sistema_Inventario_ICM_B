@@ -96,8 +96,6 @@ def check_user_access(user: User, dt: datetime | None = None) -> bool:
     if getattr(user, "role", None) != "auxiliar_despacho":
         return True
 
-    from datetime import datetime
-
     from django.utils import timezone
 
     from apps.authentication.models import TemporaryAccessPermit, UserSchedule

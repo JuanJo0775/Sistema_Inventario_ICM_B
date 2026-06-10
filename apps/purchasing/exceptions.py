@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-from rest_framework import status
-
 from shared.exceptions import (
     DomainValidationError,
-    ICMBaseException,
     ImmutableRecordError,
 )
 

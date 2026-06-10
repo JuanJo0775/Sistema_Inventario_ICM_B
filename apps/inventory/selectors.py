@@ -10,7 +10,7 @@ from django.db.models import Prefetch, Q, Sum
 from django.db.models.query import QuerySet
 
 from apps.catalog.models import Product
-from apps.inventory.models import Location, StockByLocation
+from apps.inventory.models import StockByLocation
 from apps.movements.services import ledger_net_quantity_for_location
 
 

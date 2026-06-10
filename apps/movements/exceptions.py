@@ -1,6 +1,6 @@
 """Re-exporta excepciones de dominio usadas por movimientos (README_ARQUITECTURA §7.5)."""
 
-from shared.exceptions import (
+from shared.exceptions import (  # noqa: F401
     AdjustmentJustificationRequiredError,
     CrossValidationFailedError,
     DiscrepancyNoteRequiredError,
