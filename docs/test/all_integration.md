@@ -65,13 +65,49 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/concurrency/test_concurrent_movements.py::test_concurrent_movements_do_not_create_negative_stock -v
 ```
 
-Código fuente: [tests/concurrency/test_concurrent_movements.py](../../tests/concurrency/test_concurrent_movements.py) (aprox. línea 96)
+Código fuente: [tests/concurrency/test_concurrent_movements.py](../../tests/concurrency/test_concurrent_movements.py) (aprox. línea 91)
 
 
 ---
 
 <!-- file: INT-0003.md -->
 **Código:** INT-0003
+
+# test_concurrent_reception_confirmation_does_not_duplicate_stock
+
+## Nombre del test
+
+`tests/concurrency/test_concurrent_receptions.py::test_concurrent_reception_confirmation_does_not_duplicate_stock`
+
+## Propósito
+
+Prueba de integración HTTP para validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/concurrency/test_concurrent_receptions.py::test_concurrent_reception_confirmation_does_not_duplicate_stock -v
+```
+
+Código fuente: [tests/concurrency/test_concurrent_receptions.py](../../tests/concurrency/test_concurrent_receptions.py) (aprox. línea 32)
+
+
+---
+
+<!-- file: INT-0004.md -->
+**Código:** INT-0004
 
 # test_alerts_list_uses_is_resolved_filter
 
@@ -106,8 +142,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0004.md -->
-**Código:** INT-0004
+<!-- file: INT-0005.md -->
+**Código:** INT-0005
 
 # test_auth_login_with_email_returns_jwt
 
@@ -142,8 +178,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0005.md -->
-**Código:** INT-0005
+<!-- file: INT-0006.md -->
+**Código:** INT-0006
 
 # test_auth_login_with_username_returns_jwt_and_profile
 
@@ -178,8 +214,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0006.md -->
-**Código:** INT-0006
+<!-- file: INT-0007.md -->
+**Código:** INT-0007
 
 # test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window
 
@@ -214,8 +250,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0007.md -->
-**Código:** INT-0007
+<!-- file: INT-0008.md -->
+**Código:** INT-0008
 
 # test_auth_token_refresh_auxiliar_outside_hours_forbidden
 
@@ -250,8 +286,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0008.md -->
-**Código:** INT-0008
+<!-- file: INT-0009.md -->
+**Código:** INT-0009
 
 # test_auth_user_disable_route
 
@@ -286,8 +322,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0009.md -->
-**Código:** INT-0009
+<!-- file: INT-0010.md -->
+**Código:** INT-0010
 
 # test_catalog_resolve_identifier_param
 
@@ -322,8 +358,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0010.md -->
-**Código:** INT-0010
+<!-- file: INT-0011.md -->
+**Código:** INT-0011
 
 # test_inventory_full_list_authenticated
 
@@ -358,8 +394,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0011.md -->
-**Código:** INT-0011
+<!-- file: INT-0012.md -->
+**Código:** INT-0012
 
 # test_reports_kpi_almacenista_200
 
@@ -394,8 +430,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0012.md -->
-**Código:** INT-0012
+<!-- file: INT-0013.md -->
+**Código:** INT-0013
 
 # test_reports_kpi_requires_auth
 
@@ -430,8 +466,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0013.md -->
-**Código:** INT-0013
+<!-- file: INT-0014.md -->
+**Código:** INT-0014
 
 # test_integration_fefo_multi_lot
 
@@ -466,8 +502,8 @@ Código fuente: [tests/integration/test_movements_integration.py](../../tests/in
 
 ---
 
-<!-- file: INT-0014.md -->
-**Código:** INT-0014
+<!-- file: INT-0015.md -->
+**Código:** INT-0015
 
 # test_reports_inventory_summary_endpoint
 
@@ -502,8 +538,8 @@ Código fuente: [tests/integration/test_smoke_endpoints.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0015.md -->
-**Código:** INT-0015
+<!-- file: INT-0016.md -->
+**Código:** INT-0016
 
 # test_reports_kpi_endpoint_available
 
