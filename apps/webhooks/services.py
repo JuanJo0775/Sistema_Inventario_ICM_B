@@ -125,7 +125,7 @@ def _attempt_delivery(delivery: WebhookDelivery) -> None:
         scheme = urlparse(endpoint.url).scheme
         if scheme not in ("http", "https"):
             raise ValueError(f"Unsupported URL scheme: {scheme}")
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=10) as resp:  # nosec B310 — scheme validated above
             delivery.response_code = resp.status
             delivery.response_body = resp.read(512).decode("utf-8", errors="replace")
             delivery.status = WebhookDelivery.Status.DELIVERED
