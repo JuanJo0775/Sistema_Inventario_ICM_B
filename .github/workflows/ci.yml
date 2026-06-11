@@ -58,8 +58,7 @@ jobs:
         run: flake8 apps/ shared/ --max-line-length=88 --extend-ignore=E203,W503,E501 --exclude=*/tests*,*/migrations*
 
       - name: SAST — bandit
-        continue-on-error: true
-        run: bandit -r apps shared -ll || true
+        run: bandit -r apps shared -ll
 
       - name: Supply-chain — pip-audit
         continue-on-error: true
@@ -71,9 +70,8 @@ jobs:
       - name: Test documentation in sync
         run: python -m scripts.generate_docs --check
 
-      - name: Type checking — mypy (informativo)
-        continue-on-error: true
-        run: mypy apps/ shared/ --ignore-missing-imports --no-error-summary || true
+      - name: Type checking — mypy
+        run: mypy apps/ shared/ --ignore-missing-imports --no-error-summary
 
 
   # ── 2. Tests unitarios — SQLite, sin base de datos externa ────────────────
