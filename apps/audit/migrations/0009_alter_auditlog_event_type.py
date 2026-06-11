@@ -74,8 +74,14 @@ class Migration(migrations.Migration):
                     ("PURCHASE_ORDER_UPDATED", "Orden de compra actualizada"),
                     ("BATCH_JOB_EXECUTED", "Job batch ejecutado"),
                     ("PASSWORD_CHANGED", "Contraseña cambiada por el usuario"),
-                    ("PASSWORD_RESET_REQUESTED", "Recuperación de contraseña solicitada"),
-                    ("PASSWORD_RESET_COMPLETED", "Contraseña restablecida exitosamente"),
+                    (
+                        "PASSWORD_RESET_REQUESTED",
+                        "Recuperación de contraseña solicitada",
+                    ),
+                    (
+                        "PASSWORD_RESET_COMPLETED",
+                        "Contraseña restablecida exitosamente",
+                    ),
                 ],
                 max_length=64,
             ),

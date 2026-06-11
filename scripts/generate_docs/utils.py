@@ -607,9 +607,7 @@ def write_auxiliary_docs(
 
         codes = assign_codes(nodes, subkind, custom_prefix=config["prefix"])
 
-        expected_names = {"index.md"} | {
-            f"{codes[n.nodeid]}.md" for n in nodes
-        }
+        expected_names = {"index.md"} | {f"{codes[n.nodeid]}.md" for n in nodes}
 
         removed = _remove_stale_markdown(sub_dir, expected_names, check=check)
         if removed:
@@ -646,7 +644,9 @@ def write_auxiliary_docs(
         summary.changed = True
         summary.removed.extend(top_removed)
 
-    _write_auxiliary_top_index(aux_dir, groups, force=force, check=check, summary=summary)
+    _write_auxiliary_top_index(
+        aux_dir, groups, force=force, check=check, summary=summary
+    )
 
     # ── Aggregate all_auxiliary.md ────────────────────────────────────────
     _write_auxiliary_aggregate(aux_dir, force=force, check=check, summary=summary)

@@ -107,9 +107,7 @@ class TestChangePasswordView:
         ).count()
         assert after_blacklisted > before_blacklisted or outstanding == 0
 
-    def test_wrong_current_password_returns_422(
-        self, authenticated_almacenista_client
-    ):
+    def test_wrong_current_password_returns_422(self, authenticated_almacenista_client):
         response = authenticated_almacenista_client.post(
             CHANGE_URL,
             {
@@ -213,9 +211,7 @@ class TestForgotPasswordView:
         assert len(mail.outbox) == 0
 
     def test_invalid_email_format_returns_400(self, api_client):
-        response = api_client.post(
-            FORGOT_URL, {"email": "not-an-email"}, format="json"
-        )
+        response = api_client.post(FORGOT_URL, {"email": "not-an-email"}, format="json")
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_second_request_invalidates_previous_token(
@@ -223,17 +219,13 @@ class TestForgotPasswordView:
     ):
         from apps.authentication.models import PasswordResetToken
 
-        api_client.post(
-            FORGOT_URL, {"email": almacenista_user.email}, format="json"
-        )
+        api_client.post(FORGOT_URL, {"email": almacenista_user.email}, format="json")
         first_token = PasswordResetToken.objects.filter(
             user=almacenista_user, used=False
         ).first()
         assert first_token is not None
 
-        api_client.post(
-            FORGOT_URL, {"email": almacenista_user.email}, format="json"
-        )
+        api_client.post(FORGOT_URL, {"email": almacenista_user.email}, format="json")
 
         first_token.refresh_from_db()
         assert first_token.used is True
@@ -246,9 +238,7 @@ class TestForgotPasswordView:
     def test_creates_audit_log(self, api_client, almacenista_user):
         from apps.audit.models import AuditEventType, AuditLog
 
-        api_client.post(
-            FORGOT_URL, {"email": almacenista_user.email}, format="json"
-        )
+        api_client.post(FORGOT_URL, {"email": almacenista_user.email}, format="json")
 
         assert AuditLog.objects.filter(
             event_type=AuditEventType.PASSWORD_RESET_REQUESTED,
@@ -288,9 +278,7 @@ class TestResetPasswordView:
         assert reset_token.used is True
         assert reset_token.used_at is not None
 
-    def test_success_blacklists_active_sessions(
-        self, api_client, almacenista_user
-    ):
+    def test_success_blacklists_active_sessions(self, api_client, almacenista_user):
         from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
         from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -307,9 +295,7 @@ class TestResetPasswordView:
             format="json",
         )
 
-        assert BlacklistedToken.objects.filter(
-            token__user=almacenista_user
-        ).exists()
+        assert BlacklistedToken.objects.filter(token__user=almacenista_user).exists()
 
     def test_success_creates_audit_log(self, api_client, almacenista_user):
         from apps.audit.models import AuditEventType, AuditLog

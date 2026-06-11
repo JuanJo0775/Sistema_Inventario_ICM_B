@@ -516,7 +516,9 @@ def request_password_reset(
     from apps.authentication.models import PasswordResetToken, User as UserModel
     from shared.email_service import send_password_reset_email
 
-    target = UserModel.objects.filter(email__iexact=email.strip(), is_active=True).first()
+    target = UserModel.objects.filter(
+        email__iexact=email.strip(), is_active=True
+    ).first()
     if target is None:
         return  # silencioso — anti-enumeración
 

@@ -170,7 +170,8 @@ class UserListCreateView(APIView):
         params = request.query_params
         users = get_all_users(
             request.user,
-            include_inactive=params.get("include_inactive", "").lower() in ("1", "true", "yes"),
+            include_inactive=params.get("include_inactive", "").lower()
+            in ("1", "true", "yes"),
             role=params.get("role") or None,
             search=params.get("search") or None,
         )
@@ -178,7 +179,9 @@ class UserListCreateView(APIView):
             paginator = ICMPageNumberPagination()
             page = paginator.paginate_queryset(users, request)
             if page is not None:
-                return paginator.get_paginated_response(UserSerializer(page, many=True).data)
+                return paginator.get_paginated_response(
+                    UserSerializer(page, many=True).data
+                )
         return Response(UserSerializer(users, many=True).data)
 
     @extend_schema(

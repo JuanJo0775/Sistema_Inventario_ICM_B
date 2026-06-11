@@ -91,8 +91,14 @@ class AuditEventType(models.TextChoices):
     BATCH_JOB_EXECUTED = "BATCH_JOB_EXECUTED", "Job batch ejecutado"
     # Contraseñas — self-service y recuperación (RF-001)
     PASSWORD_CHANGED = "PASSWORD_CHANGED", "Contraseña cambiada por el usuario"
-    PASSWORD_RESET_REQUESTED = "PASSWORD_RESET_REQUESTED", "Recuperación de contraseña solicitada"
-    PASSWORD_RESET_COMPLETED = "PASSWORD_RESET_COMPLETED", "Contraseña restablecida exitosamente"
+    PASSWORD_RESET_REQUESTED = (
+        "PASSWORD_RESET_REQUESTED",
+        "Recuperación de contraseña solicitada",
+    )
+    PASSWORD_RESET_COMPLETED = (
+        "PASSWORD_RESET_COMPLETED",
+        "Contraseña restablecida exitosamente",
+    )
 
 
 class AuditLog(models.Model):
