@@ -71,6 +71,10 @@ jobs:
       - name: Test documentation in sync
         run: python -m scripts.generate_docs --check
 
+      - name: Type checking — mypy (informativo)
+        continue-on-error: true
+        run: mypy apps/ shared/ --ignore-missing-imports --no-error-summary || true
+
 
   # ── 2. Tests unitarios — SQLite, sin base de datos externa ────────────────
   # Pruebas rápidas de servicios y vistas. No necesitan Postgres.
@@ -103,7 +107,8 @@ jobs:
             --junitxml=junit-unit.xml \
             --cov=apps \
             --cov-report=xml:coverage-unit.xml \
-            --cov-report=term-missing
+            --cov-report=term-missing \
+            --cov-fail-under=85
 
       - uses: actions/upload-artifact@v5
         if: always()
@@ -142,7 +147,7 @@ jobs:
 
       - name: Run integration tests
         run: |
-          pytest tests/integration tests/test_location_validators.py tests/test_generate_project_structure.py -q \
+          pytest tests/integration tests/test_location_validators.py tests/test_generate_project_structure.py tests/test_generate_docs.py tests/test_service_sla.py -q \
             --junitxml=junit-integration-tests.xml \
             --cov=apps \
             --cov-report=xml:coverage-integration-tests.xml
@@ -385,7 +390,9 @@ jobs:
           User = get_user_model()
           if not User.objects.filter(username='almacenista').exists():
               User.objects.create_user('almacenista', password='testpass123', role=UserRole.ALMACENISTA)
-          print('User ready.')
+          if not User.objects.filter(username='auxiliar').exists():
+              User.objects.create_user('auxiliar', password='testpass123', role=UserRole.AUXILIAR_DESPACHO)
+          print('Users ready.')
           "
 
       - name: Start Django server
@@ -406,6 +413,35 @@ jobs:
             --run-time 30s \
             --only-summary \
             --csv=locust-results
+
+      - name: Check load test SLAs (informativo)
+        continue-on-error: true
+        run: |
+          python -c "
+          import csv, pathlib, sys
+          stats_file = next(pathlib.Path('.').glob('locust-results_stats.csv'), None)
+          if not stats_file:
+              print('No Locust stats CSV found — skipping SLA check.')
+              sys.exit(0)
+          failures = []
+          with open(stats_file) as f:
+              for row in csv.DictReader(f):
+                  name = row.get('Name', '')
+                  if name in ('Aggregated', ''):
+                      continue
+                  fail_pct = float(row.get('Failure Count', 0) or 0) / max(float(row.get('Request Count', 1) or 1), 1) * 100
+                  p95 = float(row.get('95%', 0) or 0)
+                  if fail_pct > 1.0:
+                      failures.append(f'  FAIL ratio {fail_pct:.1f}% > 1% for: {name}')
+                  if p95 > 500:
+                      failures.append(f'  p95={p95:.0f}ms > 500ms for: {name}')
+          if failures:
+              print('SLA violations (informativo — no bloquea merge):')
+              for f in failures:
+                  print(f)
+          else:
+              print('All SLAs passed.')
+          "
 
       - name: Stop Django server
         if: always()

@@ -13,6 +13,11 @@ Read tasks (weights 1-4) simulate typical browse traffic.
 Write tasks (weight 1) simulate entry registrations; they require at least one
 product and location to exist. If none are found on startup, write tasks become
 no-ops so the suite still runs against a minimal seed environment.
+
+Two user classes model the two main roles with different access patterns:
+- ICMUser (almacenista): full read/write access, no time restriction.
+- AuxiliarUser (auxiliar_despacho): read-only browse — no write tasks
+  because the time-window restriction would cause 403s outside business hours.
 """
 
 from __future__ import annotations
@@ -21,6 +26,8 @@ from locust import HttpUser, between, task
 
 
 class ICMUser(HttpUser):
+    """Simula un almacenista con acceso completo de lectura y escritura."""
+
     wait_time = between(0.5, 2)
     token: str = ""
     _product_id: str = ""
@@ -74,6 +81,10 @@ class ICMUser(HttpUser):
     def get_audit(self):
         self.client.get("/api/v1/audit/", headers=self._auth())
 
+    @task(1)
+    def get_dashboard_overview(self):
+        self.client.get("/api/v1/dashboard/overview/", headers=self._auth())
+
     # ── Write tasks ───────────────────────────────────────────────────────────
 
     @task(1)
@@ -92,4 +103,40 @@ class ICMUser(HttpUser):
             },
             headers=self._auth(),
             name="/api/v1/movements/entries/ [write]",
+        )
+
+
+class AuxiliarUser(HttpUser):
+    """Simula un auxiliar de despacho — solo tareas de lectura (sin restricción horaria)."""
+
+    wait_time = between(1, 3)
+    token: str = ""
+
+    def on_start(self):
+        r = self.client.post(
+            "/api/v1/auth/login/",
+            json={"username": "auxiliar", "password": "testpass123"},
+        )
+        if r.status_code == 200:
+            self.token = r.json().get("access", "")
+
+    def _auth(self) -> dict:
+        return {"Authorization": f"Bearer {self.token}"}
+
+    @task(4)
+    def get_inventory(self):
+        self.client.get("/api/v1/inventory/", headers=self._auth())
+
+    @task(3)
+    def get_movements(self):
+        self.client.get("/api/v1/movements/", headers=self._auth())
+
+    @task(2)
+    def get_alerts(self):
+        self.client.get("/api/v1/alerts/", headers=self._auth())
+
+    @task(1)
+    def search_product(self):
+        self.client.get(
+            "/api/v1/inventory/search/", params={"q": "CAN"}, headers=self._auth()
         )
