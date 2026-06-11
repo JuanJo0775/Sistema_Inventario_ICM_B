@@ -110,12 +110,7 @@ class ICMUser(HttpUser):
 
 
 class AuxiliarUser(HttpUser):
-    """Simula un auxiliar de despacho — solo tareas de lectura.
-
-    Usa credenciales de almacenista (sin restricción horaria) porque el login
-    de auxiliares se rechaza fuera de su franja (07:00-12:00 / 14:00-17:00
-    America/Bogota) y el CI corre a cualquier hora.
-    """
+    """Simula un auxiliar de despacho — solo tareas de lectura."""
 
     wait_time = between(1, 3)
     token: str = ""
@@ -123,7 +118,7 @@ class AuxiliarUser(HttpUser):
     def on_start(self):
         r = self.client.post(
             "/api/v1/auth/login/",
-            json={"username": "almacenista", "password": "testpass123"},
+            json={"username": "auxiliar", "password": "testpass123"},
         )
         if r.status_code == 200:
             data = r.json()

@@ -385,13 +385,38 @@ jobs:
         run: |
           python manage.py migrate --noinput
           python manage.py shell -c "
+          from datetime import timedelta
           from django.contrib.auth import get_user_model
-          from apps.authentication.models import UserRole
+          from django.utils import timezone
+          from apps.authentication.models import UserRole, TemporaryAccessPermit
           User = get_user_model()
-          if not User.objects.filter(username='almacenista').exists():
-              User.objects.create_user('almacenista', 'almacenista@icm.local', password='testpass123', role=UserRole.ALMACENISTA)
-          if not User.objects.filter(username='auxiliar').exists():
-              User.objects.create_user('auxiliar', 'auxiliar@icm.local', password='testpass123', role=UserRole.AUXILIAR_DESPACHO)
+
+          almacenista, _ = User.objects.get_or_create(
+              username='almacenista',
+              defaults={'email': 'almacenista@icm.local', 'role': UserRole.ALMACENISTA},
+          )
+          if not almacenista.password:
+              almacenista.set_password('testpass123')
+              almacenista.save()
+
+          auxiliar, _ = User.objects.get_or_create(
+              username='auxiliar',
+              defaults={'email': 'auxiliar@icm.local', 'role': UserRole.AUXILIAR_DESPACHO},
+          )
+          if not auxiliar.password:
+              auxiliar.set_password('testpass123')
+              auxiliar.save()
+
+          now = timezone.now()
+          if not TemporaryAccessPermit.objects.filter(user=auxiliar, allow_24_7=True, is_active=True).exists():
+              TemporaryAccessPermit.objects.create(
+                  user=auxiliar,
+                  start_datetime=now - timedelta(hours=1),
+                  end_datetime=now + timedelta(hours=2),
+                  allow_24_7=True,
+                  reason='CI load test',
+                  granted_by=almacenista,
+              )
           print('Users ready.')
           "
 
