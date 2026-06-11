@@ -5,10 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
-from django.db import IntegrityError, transaction
+from django.db import transaction
 from django.utils.text import slugify
 
-import apps.alerts.services as alert_services
 from apps.alerts.models import Alert, AlertType
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
