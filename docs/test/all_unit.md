@@ -2369,7 +2369,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestChangePasswordView::test_auxiliar_can_change_own_password -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 153)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 151)
 
 
 ---
@@ -2405,7 +2405,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestChangePasswordView::test_passwords_mismatch_returns_400 -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 124)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 122)
 
 
 ---
@@ -2513,7 +2513,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestChangePasswordView::test_unauthenticated_returns_401 -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 141)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 139)
 
 
 ---
@@ -2585,7 +2585,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestForgotPasswordView::test_creates_audit_log -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 246)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 238)
 
 
 ---
@@ -2621,7 +2621,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestForgotPasswordView::test_existing_email_returns_200_and_sends_email -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 177)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 175)
 
 
 ---
@@ -2657,7 +2657,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestForgotPasswordView::test_inactive_user_returns_same_200_anti_enumeration -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 201)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 199)
 
 
 ---
@@ -2693,7 +2693,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestForgotPasswordView::test_invalid_email_format_returns_400 -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 215)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 213)
 
 
 ---
@@ -2729,7 +2729,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestForgotPasswordView::test_nonexistent_email_returns_same_200_anti_enumeration -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 191)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 189)
 
 
 ---
@@ -2765,7 +2765,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestForgotPasswordView::test_second_request_invalidates_previous_token -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 221)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 217)
 
 
 ---
@@ -2801,7 +2801,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestResetPasswordView::test_expired_token_returns_422 -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 346)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 332)
 
 
 ---
@@ -2837,7 +2837,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestResetPasswordView::test_inactive_user_token_returns_422 -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 374)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 360)
 
 
 ---
@@ -2873,7 +2873,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestResetPasswordView::test_invalid_token_returns_422 -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 334)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 320)
 
 
 ---
@@ -2909,7 +2909,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestResetPasswordView::test_old_password_fails_after_reset -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 429)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 415)
 
 
 ---
@@ -2945,7 +2945,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestResetPasswordView::test_passwords_mismatch_returns_400 -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 390)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 376)
 
 
 ---
@@ -2981,7 +2981,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestResetPasswordView::test_success_blacklists_active_sessions -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 291)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 281)
 
 
 ---
@@ -3017,7 +3017,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestResetPasswordView::test_success_creates_audit_log -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 314)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 300)
 
 
 ---
@@ -3053,7 +3053,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestResetPasswordView::test_success_resets_password_and_marks_token_used -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 266)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 256)
 
 
 ---
@@ -3089,7 +3089,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestResetPasswordView::test_token_reuse_after_success_returns_422 -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 404)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 390)
 
 
 ---
@@ -3125,7 +3125,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestResetPasswordView::test_used_token_returns_422 -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 360)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 346)
 
 
 ---
@@ -3161,7 +3161,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestUserListFilters::test_filter_by_role -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 462)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 448)
 
 
 ---
@@ -3197,7 +3197,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestUserListFilters::test_pagination_with_page_param -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 487)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 473)
 
 
 ---
@@ -3233,7 +3233,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_password.py::TestUserListFilters::test_search_by_username -v
 ```
 
-Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 475)
+Código fuente: [apps/authentication/tests/test_password.py](../../apps/authentication/tests/test_password.py) (aprox. línea 461)
 
 
 ---
