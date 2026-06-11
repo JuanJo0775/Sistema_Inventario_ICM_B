@@ -9,8 +9,6 @@ from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 
-from apps.audit.models import AuditEventType
-from apps.audit.services import log_event
 from apps.alerts.models import (
     ALERT_TYPE_DEFAULTS,
     Alert,
@@ -18,6 +16,8 @@ from apps.alerts.models import (
     AlertSeverity,
     AlertType,
 )
+from apps.audit.models import AuditEventType
+from apps.audit.services import log_event
 from apps.authentication.models import RoleChoices
 from apps.catalog.models import Lot, Product
 from apps.inventory.models import Location, StockByLocation

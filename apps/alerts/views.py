@@ -9,8 +9,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.audit.models import AuditEventType
-from apps.audit.services import log_event
 from apps.alerts.models import Alert
 from apps.alerts.selectors import (
     get_active_alerts,
@@ -19,6 +17,8 @@ from apps.alerts.selectors import (
 )
 from apps.alerts.serializers import AlertSerializer
 from apps.alerts.services import resolve_alert
+from apps.audit.models import AuditEventType
+from apps.audit.services import log_event
 from shared.exporters import export_to_csv, export_to_xlsx
 from shared.openapi import TAG_ALERTS, standard_error_responses
 from shared.pagination import ICMPageNumberPagination

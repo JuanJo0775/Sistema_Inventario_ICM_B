@@ -20,13 +20,13 @@ import time
 
 from django.core.management.base import BaseCommand
 
-from apps.audit.models import AuditEventType
-from apps.audit.services import log_event
 from apps.alerts.services import (
     scan_all_expiry_alerts,
     scan_all_location_alerts,
     scan_all_stock_alerts,
 )
+from apps.audit.models import AuditEventType
+from apps.audit.services import log_event
 
 logger = logging.getLogger(__name__)
 

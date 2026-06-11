@@ -5,9 +5,9 @@ from __future__ import annotations
 import pytest
 from django.urls import reverse
 
-from apps.audit.models import AuditEventType, AuditLog
 from apps.alerts.models import Alert, AlertType
 from apps.alerts.services import check_and_create_minimum_stock_alert
+from apps.audit.models import AuditEventType, AuditLog
 from apps.inventory.models import StockByLocation
 from apps.movements.services import register_entry
 from tests.factories import LocationFactory, ProductFactory

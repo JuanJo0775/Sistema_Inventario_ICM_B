@@ -5,7 +5,6 @@ from datetime import timedelta
 import pytest
 from django.utils import timezone
 
-from apps.audit.models import AuditEventType, AuditLog
 from apps.alerts.models import (
     ALERT_TYPE_DEFAULTS,
     Alert,
@@ -21,6 +20,7 @@ from apps.alerts.services import (
     sync_location_blocked_alerts_for_location,
     sync_stock_alerts_for_product,
 )
+from apps.audit.models import AuditEventType, AuditLog
 from apps.inventory.models import Location, StockByLocation
 from shared.exceptions import UnauthorizedDomainActionError
 from tests.factories import LocationFactory, LotFactory, ProductFactory
