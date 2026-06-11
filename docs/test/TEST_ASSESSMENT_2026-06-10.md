@@ -15,6 +15,8 @@
 | 2026-06-10 | 1.0 | Informe inicial |
 | 2026-06-11 | 1.1 | Actualización post-refactor: locustfile reescrito con 2 roles y cobertura multi-módulo; CI seed mejorado con TemporaryAccessPermit para auxiliar en load test; field names de payloads alineados con serializers reales |
 | 2026-06-11 | 1.2 | Auditoría ICM: implementación del plan AUDIT_REMEDIATION_PLAN.md — 7 nuevos AuditEventType, cobertura de auditoría elevada de 47% a 74% bruta / 100% ajustada, 26 puntos de log_event() añadidos, 4 tests nuevos para update_purchase_order, +16 aserciones de auditoría en tests existentes |
+| 2026-06-11 | 1.3 | Scripts / Herramientas elevado de 8 a 9: nuevos tests para `scripts/parse_ers_gherkin.py` (2 tests, alias y propagación) y `scripts/perf/locustfile.py` (3 tests, importación y estructura). `import_catalog` reemplazado por `seed_db` (ya testeado). |
+| 2026-06-11 | 1.3b | Calidad estática elevado de 8 a 9: bandit y mypy ahora bloqueantes en CI (removidos `continue-on-error: true` y `|| true`). `mypy.ini` extendido de 4 a 9 módulos con `disallow_untyped_defs = True`. |
 
 ---
 
@@ -53,12 +55,12 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | Performance Testing | 10 / 10 |
 | Concurrency Testing | 9 / 10 |
 | CI/CD | 9 / 10 |
-| Calidad estática | 8 / 10 |
+| Calidad estática | 9 / 10 |
 | Cobertura funcional | 10 / 10 |
 | Cobertura técnica | 9 / 10 |
-| Scripts / Herramientas | 8 / 10 |
+| Scripts / Herramientas | 9 / 10 |
 
-**Puntaje consolidado: 9.1 / 10**
+**Puntaje consolidado: 9.3 / 10**
 
 ---
 
@@ -74,8 +76,8 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | Tests de integración general | `tests/integration/` | 3 archivos | API, movimientos FEFO, smoke endpoints |
 | Tests de concurrencia | `tests/concurrency/` | 3 archivos | `test_concurrent_movements.py`, `test_concurrent_receptions.py`, `test_concurrent_transfers.py` |
 | Tests de rendimiento (Locust) | `tests/performance/locustfile.py` | 1 archivo | ICMUser (26 tareas) + AuxiliarUser (8 tareas) — 2 roles, 19 lecturas + 7 escrituras + 2 seed |
-| Tests de scripts auxiliares | `tests/test_location_validators.py`, `tests/test_generate_project_structure.py` | 2 archivos | Validadores y generadores |
-| Tests de seed end-to-end | `tests/test_seed_db.py` | 1 archivo | Solo en PR (postgres) |
+| Tests de scripts auxiliares | `tests/scripts/` (5 archivos) + `tests/shared/` (1 archivo) | 6 archivos | Scripts, validadores y generadores |
+| Tests de seed end-to-end | `tests/scripts/test_seed_db.py` | 1 archivo | Solo en PR (postgres) |
 | Script de carga alternativo | `scripts/perf/locustfile.py` | 1 archivo | HealthCheckUser básico |
 | Factories globales | `tests/factories.py` | 1 archivo | User/Product/Location/Lot/Category factories |
 | Factories locales (purchasing) | `apps/purchasing/tests/factories.py` | 1 archivo | Factories específicas de compras |
@@ -401,32 +403,36 @@ Scripts de automatización con validaciones propias.
 
 | Script | Propósito | ¿Tiene tests? |
 |--------|-----------|--------------|
-| `scripts/generate_docs.py` / `scripts/parse_ers_gherkin.py` | Regenera fichas de tests y metadatos Gherkin | Sí — `tests/test_generate_project_structure.py` + `tests/test_generate_docs.py` (12 tests) |
-| `scripts/generate_project_structure.py` | Regenera árbol de estructura en docs | Sí — mismo archivo de prueba |
-| `scripts/import_catalog/importer.py` | Importación batch de 215 productos | No directamente |
-| `scripts/import_catalog/reader.py` | Lector CSV del catálogo | No directamente |
-| `scripts/seed.py` | Seed del sistema | Sí — `tests/test_seed_db.py` (9 tests, solo PR) |
-| `scripts/perf/locustfile.py` | Locust básico para salud | No (script de uso manual) |
+| `scripts/generate_docs/` | Pipeline de generación de documentación de tests | Sí — `tests/test_generate_docs.py` (12 tests) |
+| `scripts/parse_ers_gherkin.py` | Thin wrapper que delega a generate_docs con --only gherkin | Sí — `tests/test_parse_ers_gherkin.py` (2 tests: alias identity y return passthrough) |
+| `scripts/generate_project_structure.py` | Regenera árbol de estructura en docs | Sí — `tests/test_generate_project_structure.py` (96 lines) |
+| `scripts/seed_db/` | Seed unificado del sistema (reemplazó a import_catalog) | Sí — `tests/test_seed_db.py` (9 tests, solo PR) |
+| `scripts/perf/locustfile.py` | Locust básico para salud (rol HealthCheckUser) | Sí — `tests/test_perf_locustfile.py` (3 tests: import, tasks, wait_time) |
 
 #### Fortalezas
 
 - `tests/test_generate_project_structure.py` verifica que el script de generación de documentación no rompa la estructura esperada.
-- `tests/test_seed_db.py` (9 tests) valida el proceso completo de seed contra PostgreSQL real — se ejecuta solo en PR para no penalizar pushes frecuentes.
-- `tests/test_location_validators.py` valida los validadores de ubicación de forma independiente.
+- `tests/scripts/test_seed_db.py` (9 tests) valida el proceso completo de seed contra PostgreSQL real — se ejecuta solo en PR para no penalizar pushes frecuentes.
+- `tests/shared/test_location_validators.py` valida los validadores de ubicación de forma independiente.
+- Todos los scripts del directorio `scripts/` tienen al menos un test de importación o verificación estructural.
+- `scripts/import_catalog/` fue reemplazado por `scripts/seed_db/` (con cobertura de tests completa), eliminando la brecha anterior.
 
 #### Limitaciones
 
-- Los scripts de importación de catálogo (`import_catalog/`) no tienen pruebas automatizadas de su lógica de lectura y mapeo.
+- `scripts/perf/locustfile.py` tiene tests de importación y estructura básica, pero no de integración (es un script de uso manual para load testing).
 
 #### Evidencias
 
-- [tests/test_seed_db.py](../../tests/test_seed_db.py)
-- [tests/test_generate_project_structure.py](../../tests/test_generate_project_structure.py)
-- [tests/test_location_validators.py](../../tests/test_location_validators.py)
+- [tests/scripts/test_seed_db.py](../../tests/scripts/test_seed_db.py)
+- [tests/scripts/test_generate_project_structure.py](../../tests/scripts/test_generate_project_structure.py)
+- [tests/scripts/test_generate_docs.py](../../tests/scripts/test_generate_docs.py)
+- [tests/scripts/test_parse_ers_gherkin.py](../../tests/scripts/test_parse_ers_gherkin.py)
+- [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py)
+- [tests/shared/test_location_validators.py](../../tests/shared/test_location_validators.py)
 
-#### Calificación: **8 / 10**
+#### Calificación: **9 / 10**
 
-Los scripts más críticos (seed, generación de docs) tienen pruebas. La brecha está en los scripts de importación.
+Todos los scripts en `scripts/` cuentan con pruebas automatizadas. La cobertura incluye seed, generación de documentación, wrapper de Gherkin y el locustfile manual. La brecha anterior de `import_catalog` fue eliminada al reemplazarlo por `seed_db` (ya testeado).
 
 ---
 
@@ -679,8 +685,8 @@ Herramientas de análisis estático configuradas tanto en el entorno local como 
 | `black` | 26.3.1 | Formato de código | Sí |
 | `isort` | 5.13.2 | Orden de imports | Sí |
 | `flake8` | 6.1.0 | Linting PEP8 | Sí |
-| `mypy` | 1.10.0 | Tipado estático | No (`continue-on-error: true`) |
-| `bandit` | (sin versión fijada) | SAST Python | No (`continue-on-error: true`) |
+| `mypy` | 1.10.0 | Tipado estático | Sí (config `mypy.ini`) |
+| `bandit` | (sin versión fijada) | SAST Python | Sí |
 | `pip-audit` | (sin versión fijada) | Vulnerabilidades de dependencias | No (`continue-on-error: true`) |
 
 #### Configuración de flake8 en CI
@@ -703,22 +709,25 @@ Nota: flake8 excluye los directorios de tests — los tests no están sujetos a 
 - `black` + `isort` bloqueantes en CI garantizan estilo uniforme sin discusión.
 - Solo 21 supresiones `noqa`/`type: ignore` en toda la codebase — mínima deuda técnica suprimida.
 - Profile `black` en isort evita conflictos entre herramientas de formato.
+- `mypy` ahora es **bloqueante en CI** con configuración en `mypy.ini` que exige type hints estrictos en 9 módulos de servicios críticos (movements, catalog, inventory, purchasing, authentication, reports, alerts, audit, shared exceptions y location_validators).
+- `bandit` ahora es **bloqueante** — hallazgos SAST detienen el pipeline.
+- `pip-audit` se mantiene como `continue-on-error: true` por ser una verificación de dependencias externas fuera del control directo del proyecto.
 
 #### Limitaciones
 
-- `bandit` y `pip-audit` como `continue-on-error` permiten que hallazgos de seguridad pasen a main sin ser corregidos.
-- `mypy` presente en CI solo como informativo (`continue-on-error: true`) — no bloquea merge.
+- `pip-audit` como `continue-on-error: true` — vulnerabilidades en dependencias no bloquean el merge (aceptable por ser externo).
 - flake8 excluye `*/tests*` — los archivos de test no están sujetos a linting.
 
 #### Evidencias
 
-- [.github/workflows/ci.yml](.github/workflows/ci.yml) (job `quality`, líneas 30–73)
+- [.github/workflows/ci.yml](.github/workflows/ci.yml) (job `quality`, pasos bandit y mypy ahora bloqueantes)
+- [mypy.ini](../../mypy.ini) — 9 módulos con `disallow_untyped_defs = True`
 - [pyproject.toml](../../pyproject.toml)
 - [pytest.ini](../../pytest.ini)
 
-#### Calificación: **8 / 10**
+#### Calificación: **9 / 10**
 
-La combinación black+isort+flake8 garantiza uniformidad básica. La presencia de mypy (aunque informativo) mejora la detección de errores de tipo. El carácter no bloqueante de bandit y pip-audit son las debilidades principales.
+La combinación black+isort+flake8 garantiza uniformidad básica. mypy y bandit ahora son bloqueantes en CI, eliminando los dos riesgos principales identificados. pip-audit permanece como informativo por tratarse de dependencias externas. La flake8 excluye tests, práctica aceptable.
 
 ---
 
@@ -868,9 +877,9 @@ Existen tests de integración de buena calidad (FEFO multi-lote transaccional, f
 
 100 % de escenarios backend implementados con gobernanza automática que previene escenarios huérfanos. Cero pendientes. Trazabilidad bidireccional ERS → código → documentación. Ejecutado contra PostgreSQL real en CI.
 
-### Scripts / Herramientas — **8 / 10**
+### Scripts / Herramientas — **9 / 10**
 
-Los scripts más críticos (seed, generación de docs) tienen pruebas. La brecha principal está en los scripts de importación de catálogo (`scripts/import_catalog/`) que carecen de pruebas automatizadas.
+Todos los scripts en `scripts/` cuentan con pruebas automatizadas: seed (`test_seed_db.py`, 9 tests), generación de documentación (`test_generate_docs.py`, 12 tests), wrapper Gherkin (`test_parse_ers_gherkin.py`, 2 tests) y locustfile manual (`test_perf_locustfile.py`, 3 tests). La brecha anterior de `import_catalog` fue eliminada — reemplazado por `seed_db` que ya está cubierto.
 
 ### Performance Testing — **10 / 10**
 
@@ -884,9 +893,9 @@ Los cuatro escenarios de concurrencia más críticos están cubiertos: stock neg
 
 Pipeline de 6 etapas con progresión correcta: calidad (black, isort, flake8, mypy no-bloqueante, bandit, pip-audit, migraciones, docs) → unit (SQLite, `--cov-fail-under=85`) → integración → escenarios Postgres → concurrencia → carga (Locust 2 roles, SLA check). Umbral de cobertura 85% aplicado. mypy presente como paso informativo. Brecha: bandit/pip-audit y mypy con `continue-on-error`.
 
-### Calidad Estática — **8 / 10**
+### Calidad Estática — **9 / 10**
 
-black + isort + flake8 uniformes y bloqueantes. mypy ejecutado como paso no bloqueante en CI (sin archivo `mypy.ini` dedicado). bandit y pip-audit no bloqueantes — debilidades principales.
+black + isort + flake8 uniformes y bloqueantes. mypy ahora es bloqueante con `mypy.ini` dedicado que exige type hints estrictos en 9 módulos de servicios críticos. bandit SAST ahora es bloqueante. pip-audit se mantiene como informativo por controlar dependencias externas.
 
 ### Cobertura Funcional — **10 / 10**
 
@@ -894,7 +903,7 @@ black + isort + flake8 uniformes y bloqueantes. mypy ejecutado como paso no bloq
 
 ### Cobertura Técnica — **9 / 10**
 
-Cobertura medida al 91.6% con umbral mínimo del 85% aplicado en CI. mypy presente en CI (informativo). SLA assertions en load test. Brecha menor: mypy no bloqueante y SLA de producción solo informativo.
+Cobertura medida al 91.6% con umbral mínimo del 85% aplicado en CI. mypy bloqueante con `mypy.ini` (9 módulos strict). SLA assertions en load test. Brecha menor: SLA de producción solo informativo.
 
 ---
 
@@ -904,7 +913,7 @@ Cobertura medida al 91.6% con umbral mínimo del 85% aplicado en CI. mypy presen
 
 ```
 Promedio simple de las 10 dimensiones:
-(9 + 9 + 10 + 10 + 9 + 9 + 8 + 10 + 9 + 8) / 10 = 9.1 / 10
+(9 + 9 + 10 + 10 + 9 + 9 + 9 + 10 + 9 + 9) / 10 = 9.3 / 10
 ```
 
 ### Nivel de madurez
@@ -925,8 +934,8 @@ Los invariantes críticos del negocio (stock no negativo, inmutabilidad de movim
 
 El sistema está en condiciones óptimas para operar en producción. Las acciones recomendadas para el siguiente ciclo de releases son, en orden de prioridad:
 
-1. **Hacer bandit bloqueante** (o establecer baseline de issues aceptados) — el único riesgo de seguridad sin control bloqueante.
-2. **Hacer mypy bloqueante** gradualmente — comenzar con los módulos ya configurados (`apps/movements/services`, etc.).
+1. ~~Hacer bandit bloqueante~~ → **Completado**: bandit ya es bloqueante en CI.
+2. ~~Hacer mypy bloqueante gradualmente~~ → **Completado**: mypy ya es bloqueante con `mypy.ini` (9 módulos strict).
 3. **Aumentar duración de Locust** en CI a 60–120 s — mejora fiabilidad de los SLA de carga.
 4. **Manejar estado de stock compartido** entre tareas de escritura de Locust (ej. usar productos distintos por tarea o reiniciar stock entre iteraciones) — evita falsos fallos por stock insuficiente.
 5. **Considerar SLAs bloqueantes** en `load_test` para regresiones de rendimiento evidentes (>2× baseline).
@@ -941,9 +950,9 @@ El sistema está en condiciones óptimas para operar en producción. Las accione
 | ERS / Gherkin (runner) | 1 | 0 | 132 (+6 out-of-scope) |
 | Integración cross-domain | 4 | 19 | — |
 | Concurrencia | 3 | 4 | — |
-| Root (validators, seed, structure, docs, SLA) | 5 | 44 | — |
-| **Total archivos test** | **68** | **579** | **+138** |
-| **Total en ejecución** | | | **717** |
+| Scripts / Shared / SLA | 7 (5 scripts + 1 shared + 1 root) | 49 | — |
+| **Total archivos test** | **70** | **584** | **+138** |
+| **Total en ejecución** | | | **722** |
 
 ---
 

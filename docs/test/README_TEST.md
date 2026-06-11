@@ -17,6 +17,7 @@
 | `docs/test/scenarios/` | Un `.md` por escenario Gherkin del ERS (`RF001-S01.md`, etc.) |
 | `docs/test/unit/` | Un `.md` por test unitario (`UNIT-0001.md`, etc.) |
 | `docs/test/integration/` | Un `.md` por test de integración (`INT-0001.md`, etc.) |
+| `docs/test/auxiliary/` | Un `.md` por test auxiliar (scripts, shared, SLA) — segregado en `scripts/`, `shared/`, `sla/` con prefijos `SCR`, `SHA`, `SLA` |
 | `docs/test/gherkin_scenarios.json` | Metadatos parseados del ERS (generado, no editar a mano) |
 | `docs/test/gherkin_pending.json` | Escenarios backend aún sin automatizar — registrar aquí para que CI haga skip limpio |
 | `docs/test/gherkin_out_of_scope.json` | Escenarios solo verificables por E2E/UI — skip permanente en backend |
@@ -245,13 +246,19 @@ pytest apps/movements/tests/ -v
 ### Tests raíz del repo
 
 ```bash
-pytest tests/integration tests/test_location_validators.py tests/test_generate_project_structure.py -q
+pytest tests/integration tests/scripts tests/shared -q
+```
+
+### Tests auxiliares (scripts, shared, SLA)
+
+```bash
+pytest tests/scripts tests/shared tests/test_service_sla.py -q
 ```
 
 ### Seed completo
 
 ```bash
-pytest tests/test_seed_db.py -q
+pytest tests/scripts/test_seed_db.py -q
 ```
 
 Este test está marcado como `slow`: en CI corre solo en `pull_request` para no penalizar los `push` frecuentes.
@@ -279,6 +286,9 @@ python -m scripts.generate_docs
 # Solo bloque Gherkin
 python -m scripts.generate_docs --only gherkin
 
+# Solo tests auxiliares (scripts, shared, SLA)
+python -m scripts.generate_docs --only auxiliary
+
 # Validar sin escribir archivos
 python -m scripts.generate_docs --check
 
@@ -294,6 +304,33 @@ python -m scripts.generate_docs --force
 - Nuevo escenario ERS → entrada en el ERS → `generate_docs` → implementación en `impl/<dominio>.py` → registrada en `IMPLEMENTATIONS` → entrada eliminada de `gherkin_pending.json` si existía.
 - Nuevo RF sin implementación inmediata → entrada en `gherkin_pending.json` antes del merge.
 - Contratos RF/BR nuevos reflejados en la traza `TRAZABILIDAD_ERS_GHERKIN.md`.
+
+---
+
+## Arquitectura de documentación auxiliar
+
+La documentación de tests auxiliares (scripts, shared, SLA) se genera con el mismo sistema que unitarios e integración, pero organizada en subcategorías dentro de `docs/test/auxiliary/`:
+
+```
+docs/test/auxiliary/
+├── index.md              ← índice global (enlaza a sub-índices)
+├── scripts/
+│   ├── index.md          ← índice con prefijo SCR
+│   ├── SCR-0001.md
+│   └── SCR-000N.md
+├── shared/
+│   ├── index.md          ← índice con prefijo SHA
+│   ├── SHA-0001.md
+│   └── SHA-000N.md
+└── sla/
+    ├── index.md          ← índice con prefijo SLA
+    ├── SLA-0001.md
+    └── SLA-000N.md
+
+docs/test/all_auxiliary.md  ← agregado (concatena todos los .md de las 3 subcarpetas)
+```
+
+Cada subcategoría tiene su propia numeración: `SCR-*` para scripts, `SHA-*` para shared utilities, `SLA-*` para tests de Service Level Agreement.
 
 ---
 

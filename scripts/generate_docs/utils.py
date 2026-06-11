@@ -15,22 +15,48 @@ ROOT = Path(__file__).resolve().parents[2]
 TEST_DOC_ROOT = ROOT / "docs" / "test"
 GHERKIN_SCOPE_FILE = TEST_DOC_ROOT / "gherkin_out_of_scope.json"
 
-KIND_ORDER = ("unit", "integration", "gherkin")
-KIND_PREFIXES = {"unit": "UNIT", "integration": "INT", "gherkin": "GEN"}
+KIND_ORDER = ("unit", "integration", "gherkin", "auxiliary")
+KIND_PREFIXES = {
+    "unit": "UNIT",
+    "integration": "INT",
+    "gherkin": "GEN",
+    "auxiliary": "AUX",
+}
 KIND_TITLES = {
     "unit": "tests unitarios",
     "integration": "tests de integración",
     "gherkin": "escenarios Gherkin",
+    "auxiliary": "tests auxiliares (scripts, shared, SLA)",
 }
 KIND_OUTPUT_DIRS = {
     "unit": TEST_DOC_ROOT / "unit",
     "integration": TEST_DOC_ROOT / "integration",
     "gherkin": TEST_DOC_ROOT / "scenarios",
+    "auxiliary": TEST_DOC_ROOT / "auxiliary",
 }
 KIND_AGGREGATES = {
     "unit": TEST_DOC_ROOT / "all_unit.md",
     "integration": TEST_DOC_ROOT / "all_integration.md",
     "gherkin": TEST_DOC_ROOT / "all_scenarios.md",
+    "auxiliary": TEST_DOC_ROOT / "all_auxiliary.md",
+}
+
+AUX_SUBKINDS: dict[str, dict] = {
+    "scripts": {
+        "prefix": "SCR",
+        "title": "tests de scripts",
+        "filter": lambda r: r.startswith("tests/scripts/"),
+    },
+    "shared": {
+        "prefix": "SHA",
+        "title": "tests de utilidades compartidas",
+        "filter": lambda r: r.startswith("tests/shared/"),
+    },
+    "sla": {
+        "prefix": "SLA",
+        "title": "tests de SLA (Service Level Agreement)",
+        "filter": lambda r: r == "tests/test_service_sla.py",
+    },
 }
 
 
@@ -134,6 +160,12 @@ def classify_test(rel_path: str) -> str:
         return "integration"
     if re.match(r"apps/[^/]+/tests/integration_.*\.py", rel_path):
         return "integration"
+    if (
+        rel_path.startswith("tests/scripts/")
+        or rel_path.startswith("tests/shared/")
+        or rel_path == "tests/test_service_sla.py"
+    ):
+        return "auxiliary"
     return "unit"
 
 
@@ -188,9 +220,12 @@ def _nodeid(entry: TestNode | tuple[str, str, int]) -> str:
 
 
 def assign_codes(
-    nodes: Sequence[TestNode | tuple[str, str, int]], kind: str
+    nodes: Sequence[TestNode | tuple[str, str, int]],
+    kind: str,
+    *,
+    custom_prefix: str | None = None,
 ) -> dict[str, str]:
-    prefix = KIND_PREFIXES.get(kind, "GEN")
+    prefix = custom_prefix or KIND_PREFIXES.get(kind, "GEN")
     out: dict[str, str] = {}
     for index, entry in enumerate(sorted(nodes, key=_nodeid), start=1):
         out[_nodeid(entry)] = f"{prefix}-{index:04d}"
@@ -207,6 +242,8 @@ def render_doc(
         )
     elif kind == "gherkin":
         purpose = "Escenario Gherkin derivado del ERS; ver docs/requisitos/ERS_ICM_Requisitos.md."
+    elif kind == "auxiliary":
+        purpose = "Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento)."
     else:
         purpose = "Prueba unitaria del backend ICM."
 
@@ -538,6 +575,164 @@ def concat_markdown(
     return _write_text_if_needed(out_file, "".join(parts), force=force, check=check)
 
 
+def _group_auxiliary_nodes(
+    nodes: list[TestNode],
+) -> dict[str, list[TestNode]]:
+    groups: dict[str, list[TestNode]] = {}
+    for subkind, config in AUX_SUBKINDS.items():
+        groups[subkind] = [n for n in nodes if config["filter"](n.rel_path)]
+    return groups
+
+
+def write_auxiliary_docs(
+    *, force: bool = False, check: bool = False
+) -> GenerationSummary:
+    summary = GenerationSummary("auxiliary")
+    aux_dir = KIND_OUTPUT_DIRS["auxiliary"]
+
+    all_nodes = [n for n in discover_test_nodes() if n.kind == "auxiliary"]
+    if not all_nodes:
+        return summary
+
+    groups = _group_auxiliary_nodes(all_nodes)
+
+    # ── Process each subkind ──────────────────────────────────────────────
+    for subkind, config in AUX_SUBKINDS.items():
+        nodes = groups.get(subkind, [])
+        if not nodes:
+            continue
+
+        sub_dir = aux_dir / subkind
+        sub_dir.mkdir(parents=True, exist_ok=True)
+
+        codes = assign_codes(nodes, subkind, custom_prefix=config["prefix"])
+
+        expected_names = {"index.md"} | {
+            f"{codes[n.nodeid]}.md" for n in nodes
+        }
+
+        removed = _remove_stale_markdown(sub_dir, expected_names, check=check)
+        if removed:
+            summary.changed = True
+            summary.removed.extend(removed)
+
+        if write_index(nodes, codes, subkind, sub_dir, force=force, check=check):
+            summary.changed = True
+            summary.written.append(sub_dir / "index.md")
+        else:
+            summary.unchanged.append(sub_dir / "index.md")
+
+        for node in sorted(nodes, key=lambda n: n.nodeid):
+            code = codes[node.nodeid]
+            doc_path = sub_dir / f"{code}.md"
+            content = render_doc(
+                node.nodeid,
+                node.rel_path,
+                node.line_no,
+                kind="auxiliary",
+                code=code,
+            )
+            if _write_text_if_needed(doc_path, content, force=force, check=check):
+                summary.changed = True
+                summary.written.append(doc_path)
+            else:
+                summary.unchanged.append(doc_path)
+
+    # ── Top-level index.md in auxiliary/ ──────────────────────────────────
+    aux_dir.mkdir(parents=True, exist_ok=True)
+    top_expected = {"index.md"}
+    top_removed = _remove_stale_markdown(aux_dir, top_expected, check=check)
+    if top_removed:
+        summary.changed = True
+        summary.removed.extend(top_removed)
+
+    _write_auxiliary_top_index(aux_dir, groups, force=force, check=check, summary=summary)
+
+    # ── Aggregate all_auxiliary.md ────────────────────────────────────────
+    _write_auxiliary_aggregate(aux_dir, force=force, check=check, summary=summary)
+
+    return summary
+
+
+def _write_auxiliary_top_index(
+    aux_dir: Path,
+    groups: dict[str, list[TestNode]],
+    *,
+    force: bool,
+    check: bool,
+    summary: GenerationSummary,
+) -> None:
+    lines = ["# Índice de tests auxiliares\n\n"]
+    lines.append("| Categoría | Prefijo | Tests | Sub-índice |\n")
+    lines.append("|---|---|---|---|\n")
+    for subkind, config in AUX_SUBKINDS.items():
+        nodes = groups.get(subkind, [])
+        if nodes:
+            lines.append(
+                f"| {config['title']} | {config['prefix']} | {len(nodes)} | [{subkind}/index.md](./{subkind}/index.md) |\n"
+            )
+    lines.append("\n---\n\n")
+    for subkind, config in AUX_SUBKINDS.items():
+        nodes = groups.get(subkind, [])
+        if nodes:
+            codes = assign_codes(nodes, subkind, custom_prefix=config["prefix"])
+            lines.append(f"## {config['title']}\n\n")
+            lines.append("| Código | Test | Archivo |\n")
+            lines.append("|---|---|---|\n")
+            for node in sorted(nodes, key=lambda n: n.nodeid):
+                code = codes[node.nodeid]
+                short = node.short_name
+                lines.append(
+                    f"| {code} | {short} | [{code}.md](./{subkind}/{code}.md) |\n"
+                )
+            lines.append("\n")
+
+    index_path = aux_dir / "index.md"
+    if _write_text_if_needed(index_path, "".join(lines), force=force, check=check):
+        summary.changed = True
+        summary.written.append(index_path)
+    else:
+        summary.unchanged.append(index_path)
+
+
+def _write_auxiliary_aggregate(
+    aux_dir: Path,
+    *,
+    force: bool,
+    check: bool,
+    summary: GenerationSummary,
+) -> None:
+    all_files: list[Path] = []
+    for subkind in AUX_SUBKINDS:
+        sub_dir = aux_dir / subkind
+        if sub_dir.exists():
+            for path in sorted(sub_dir.glob("*.md")):
+                if path.name != "index.md" and not path.name.startswith("all_"):
+                    all_files.append(path)
+
+    aggregate_path = KIND_AGGREGATES["auxiliary"]
+    if not all_files:
+        if check:
+            return
+        if aggregate_path.exists():
+            aggregate_path.unlink()
+            summary.changed = True
+            summary.removed.append(aggregate_path)
+        return
+
+    parts: list[str] = []
+    for path in all_files:
+        rel = path.relative_to(KIND_OUTPUT_DIRS["auxiliary"]).as_posix()
+        parts.append(f"<!-- file: {rel} -->\n")
+        parts.append(path.read_text(encoding="utf-8"))
+        parts.append("\n\n---\n\n")
+    if _write_text_if_needed(aggregate_path, "".join(parts), force=force, check=check):
+        summary.changed = True
+        summary.written.append(aggregate_path)
+    else:
+        summary.unchanged.append(aggregate_path)
+
+
 def generate_kind_docs(
     kind: str, *, force: bool = False, check: bool = False
 ) -> GenerationSummary:
@@ -545,6 +740,8 @@ def generate_kind_docs(
         raise ValueError(f"Unsupported kind: {kind}")
     if kind == "gherkin":
         return write_gherkin_docs(parse_ers(), force=force, check=check)
+    if kind == "auxiliary":
+        return write_auxiliary_docs(force=force, check=check)
     nodes = [node for node in discover_test_nodes() if node.kind == kind]
     return write_test_docs(nodes, kind, force=force, check=check)
 

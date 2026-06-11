@@ -147,7 +147,7 @@ jobs:
 
       - name: Run integration tests
         run: |
-          pytest tests/integration tests/test_location_validators.py tests/test_generate_project_structure.py tests/test_generate_docs.py tests/test_service_sla.py -q \
+          pytest tests/integration tests/scripts tests/shared tests/test_service_sla.py -q \
             --junitxml=junit-integration-tests.xml \
             --cov=apps \
             --cov-report=xml:coverage-integration-tests.xml
@@ -271,7 +271,7 @@ jobs:
 
       - name: Run seed DB tests
         run: |
-          pytest tests/test_seed_db.py -q \
+          pytest tests/scripts/test_seed_db.py -q \
             --junitxml=junit-seed-db.xml
 
       - uses: actions/upload-artifact@v5

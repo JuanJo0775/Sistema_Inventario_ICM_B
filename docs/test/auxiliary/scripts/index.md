@@ -1,0 +1,32 @@
+# Índice de scripts
+| Código | Test | Archivo |
+|---|---|---|
+| SCR-0001 | test_classify_test_coverage | [SCR-0001.md](./SCR-0001.md) |
+| SCR-0002 | test_docnode_short_name_class_method | [SCR-0002.md](./SCR-0002.md) |
+| SCR-0003 | test_docnode_short_name_simple | [SCR-0003.md](./SCR-0003.md) |
+| SCR-0004 | test_generation_summary_absorb_does_not_unset_changed | [SCR-0004.md](./SCR-0004.md) |
+| SCR-0005 | test_generation_summary_absorb_merges_paths | [SCR-0005.md](./SCR-0005.md) |
+| SCR-0006 | test_remove_stale_check_mode_does_not_delete | [SCR-0006.md](./SCR-0006.md) |
+| SCR-0007 | test_remove_stale_deletes_unexpected_files | [SCR-0007.md](./SCR-0007.md) |
+| SCR-0008 | test_remove_stale_nonexistent_dir_returns_empty | [SCR-0008.md](./SCR-0008.md) |
+| SCR-0009 | test_write_check_mode_does_not_write | [SCR-0009.md](./SCR-0009.md) |
+| SCR-0010 | test_write_creates_file | [SCR-0010.md](./SCR-0010.md) |
+| SCR-0011 | test_write_skips_if_content_unchanged | [SCR-0011.md](./SCR-0011.md) |
+| SCR-0012 | test_write_updates_if_content_changed | [SCR-0012.md](./SCR-0012.md) |
+| SCR-0013 | test_change_report_detects_additions_and_removals | [SCR-0013.md](./SCR-0013.md) |
+| SCR-0014 | test_semantic_comment_for_services_is_specific | [SCR-0014.md](./SCR-0014.md) |
+| SCR-0015 | test_tree_ignores_noise_and_keeps_relevant_nodes | [SCR-0015.md](./SCR-0015.md) |
+| SCR-0016 | test_wrapper_is_alias_of_generate_docs_main | [SCR-0016.md](./SCR-0016.md) |
+| SCR-0017 | test_wrapper_passthrough_return_values | [SCR-0017.md](./SCR-0017.md) |
+| SCR-0018 | test_has_wait_time | [SCR-0018.md](./SCR-0018.md) |
+| SCR-0019 | test_imports_cleanly | [SCR-0019.md](./SCR-0019.md) |
+| SCR-0020 | test_tasks_defined | [SCR-0020.md](./SCR-0020.md) |
+| SCR-0021 | test_all_category_slugs_declared | [SCR-0021.md](./SCR-0021.md) |
+| SCR-0022 | test_all_product_skus_valid_format | [SCR-0022.md](./SCR-0022.md) |
+| SCR-0023 | test_combo_items_reference_known_skus | [SCR-0023.md](./SCR-0023.md) |
+| SCR-0024 | test_electroterapia_requires_serial | [SCR-0024.md](./SCR-0024.md) |
+| SCR-0025 | test_expiration_products_have_valid_skus | [SCR-0025.md](./SCR-0025.md) |
+| SCR-0026 | test_no_duplicate_product_skus | [SCR-0026.md](./SCR-0026.md) |
+| SCR-0027 | test_clean_removes_seed_data_preserves_base | [SCR-0027.md](./SCR-0027.md) |
+| SCR-0028 | test_seed_creates_catalog_and_movements | [SCR-0028.md](./SCR-0028.md) |
+| SCR-0029 | test_seed_is_idempotent | [SCR-0029.md](./SCR-0029.md) |

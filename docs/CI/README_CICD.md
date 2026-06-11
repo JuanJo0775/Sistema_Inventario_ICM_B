@@ -62,7 +62,7 @@ Genera:
 
 Ejecuta los tests de integración liviana del repositorio:
 
-- `pytest tests/integration tests/test_location_validators.py tests/test_generate_project_structure.py -q`
+- `pytest tests/integration tests/scripts tests/shared -q`
 
 Genera:
 
@@ -84,7 +84,7 @@ Genera:
 
 Ejecuta el seed end-to-end completo:
 
-- `pytest tests/test_seed_db.py -q`
+- `pytest tests/scripts/test_seed_db.py -q`
 
 Este job corre solo en `pull_request`.
 
@@ -124,9 +124,9 @@ pip-audit --progress=off
 python manage.py makemigrations --check --dry-run
 python -m scripts.generate_docs --check
 pytest apps/ -q --ignore=tests
-pytest tests/integration tests/test_location_validators.py tests/test_generate_project_structure.py -q
+pytest tests/integration tests/scripts tests/shared -q
 pytest tests/ers -q
-pytest tests/test_seed_db.py -q
+pytest tests/scripts/test_seed_db.py -q
 pytest tests/concurrency -v
 ```
 
