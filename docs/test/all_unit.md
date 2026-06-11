@@ -29,7 +29,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_commands.py::test_scan_alerts_all_types_default -v
 ```
 
-Código fuente: [apps/alerts/tests/test_commands.py](../../apps/alerts/tests/test_commands.py) (aprox. línea 104)
+Código fuente: [apps/alerts/tests/test_commands.py](../../apps/alerts/tests/test_commands.py) (aprox. línea 110)
 
 
 ---
@@ -65,7 +65,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_commands.py::test_scan_alerts_dry_run_creates_no_alerts -v
 ```
 
-Código fuente: [apps/alerts/tests/test_commands.py](../../apps/alerts/tests/test_commands.py) (aprox. línea 18)
+Código fuente: [apps/alerts/tests/test_commands.py](../../apps/alerts/tests/test_commands.py) (aprox. línea 19)
 
 
 ---
@@ -101,7 +101,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_commands.py::test_scan_alerts_expiry_type_creates_lot_expired_alert -v
 ```
 
-Código fuente: [apps/alerts/tests/test_commands.py](../../apps/alerts/tests/test_commands.py) (aprox. línea 33)
+Código fuente: [apps/alerts/tests/test_commands.py](../../apps/alerts/tests/test_commands.py) (aprox. línea 34)
 
 
 ---
@@ -137,7 +137,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_commands.py::test_scan_alerts_idempotent -v
 ```
 
-Código fuente: [apps/alerts/tests/test_commands.py](../../apps/alerts/tests/test_commands.py) (aprox. línea 80)
+Código fuente: [apps/alerts/tests/test_commands.py](../../apps/alerts/tests/test_commands.py) (aprox. línea 86)
 
 
 ---
@@ -173,7 +173,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_commands.py::test_scan_alerts_location_type_creates_blocked_alert -v
 ```
 
-Código fuente: [apps/alerts/tests/test_commands.py](../../apps/alerts/tests/test_commands.py) (aprox. línea 61)
+Código fuente: [apps/alerts/tests/test_commands.py](../../apps/alerts/tests/test_commands.py) (aprox. línea 67)
 
 
 ---
@@ -209,7 +209,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_commands.py::test_scan_alerts_stock_type_creates_low_stock_alert -v
 ```
 
-Código fuente: [apps/alerts/tests/test_commands.py](../../apps/alerts/tests/test_commands.py) (aprox. línea 48)
+Código fuente: [apps/alerts/tests/test_commands.py](../../apps/alerts/tests/test_commands.py) (aprox. línea 54)
 
 
 ---
@@ -245,7 +245,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_commands.py::test_scan_alerts_unknown_type_is_ignored -v
 ```
 
-Código fuente: [apps/alerts/tests/test_commands.py](../../apps/alerts/tests/test_commands.py) (aprox. línea 93)
+Código fuente: [apps/alerts/tests/test_commands.py](../../apps/alerts/tests/test_commands.py) (aprox. línea 99)
 
 
 ---
@@ -1145,7 +1145,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_services.py::test_alert_type_defaults_map_covers_all_alert_types -v
 ```
 
-Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 235)
+Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 240)
 
 
 ---
@@ -1181,7 +1181,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_services.py::test_expiry_60_resolved_when_crossing_30_days -v
 ```
 
-Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 109)
+Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 114)
 
 
 ---
@@ -1217,7 +1217,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_services.py::test_resolve_alert_almacenista -v
 ```
 
-Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 29)
+Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 30)
 
 
 ---
@@ -1253,7 +1253,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_services.py::test_resolve_alert_rejects_auxiliar -v
 ```
 
-Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 42)
+Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 47)
 
 
 ---
@@ -1289,7 +1289,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_services.py::test_scan_resolves_stale_alerts_on_unblocked_location -v
 ```
 
-Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 139)
+Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 144)
 
 
 ---
@@ -1325,7 +1325,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_services.py::test_severity_and_category_canonical -v
 ```
 
-Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 215)
+Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 220)
 
 
 ---
@@ -1361,7 +1361,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_services.py::test_severity_unknown_type_returns_defaults -v
 ```
 
-Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 228)
+Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 233)
 
 
 ---
@@ -1397,7 +1397,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_services.py::test_sync_expiry_30_days_sets_critical -v
 ```
 
-Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 89)
+Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 94)
 
 
 ---
@@ -1433,7 +1433,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_services.py::test_sync_expiry_alerts_for_product_creates_lot_alert -v
 ```
 
-Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 54)
+Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 59)
 
 
 ---
@@ -1469,7 +1469,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/alerts/tests/test_services.py::test_sync_stock_alerts_sets_severity_and_category -v
 ```
 
-Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 77)
+Código fuente: [apps/alerts/tests/test_services.py](../../apps/alerts/tests/test_services.py) (aprox. línea 82)
 
 
 ---
@@ -1793,7 +1793,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/audit/tests/test_archive_command.py::test_archive_batch_processing -v
 ```
 
-Código fuente: [apps/audit/tests/test_archive_command.py](../../apps/audit/tests/test_archive_command.py) (aprox. línea 73)
+Código fuente: [apps/audit/tests/test_archive_command.py](../../apps/audit/tests/test_archive_command.py) (aprox. línea 78)
 
 
 ---
@@ -1829,7 +1829,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/audit/tests/test_archive_command.py::test_archive_dry_run_makes_no_changes -v
 ```
 
-Código fuente: [apps/audit/tests/test_archive_command.py](../../apps/audit/tests/test_archive_command.py) (aprox. línea 54)
+Código fuente: [apps/audit/tests/test_archive_command.py](../../apps/audit/tests/test_archive_command.py) (aprox. línea 59)
 
 
 ---
@@ -1865,7 +1865,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/audit/tests/test_archive_command.py::test_archive_empty_returns_early -v
 ```
 
-Código fuente: [apps/audit/tests/test_archive_command.py](../../apps/audit/tests/test_archive_command.py) (aprox. línea 91)
+Código fuente: [apps/audit/tests/test_archive_command.py](../../apps/audit/tests/test_archive_command.py) (aprox. línea 96)
 
 
 ---
@@ -1937,7 +1937,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/audit/tests/test_archive_command.py::test_archive_preserves_recent_records -v
 ```
 
-Código fuente: [apps/audit/tests/test_archive_command.py](../../apps/audit/tests/test_archive_command.py) (aprox. línea 42)
+Código fuente: [apps/audit/tests/test_archive_command.py](../../apps/audit/tests/test_archive_command.py) (aprox. línea 47)
 
 
 ---
@@ -8021,7 +8021,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_commands.py::test_verify_integrity_detects_divergence -v
 ```
 
-Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tests/test_commands.py) (aprox. línea 41)
+Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tests/test_commands.py) (aprox. línea 42)
 
 
 ---
@@ -8057,7 +8057,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_commands.py::test_verify_integrity_empty_stock -v
 ```
 
-Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tests/test_commands.py) (aprox. línea 68)
+Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tests/test_commands.py) (aprox. línea 72)
 
 
 ---
@@ -8093,7 +8093,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_commands.py::test_verify_integrity_fix_flag -v
 ```
 
-Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tests/test_commands.py) (aprox. línea 55)
+Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tests/test_commands.py) (aprox. línea 56)
 
 
 ---
@@ -8129,7 +8129,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_commands.py::test_verify_integrity_no_divergence -v
 ```
 
-Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tests/test_commands.py) (aprox. línea 32)
+Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tests/test_commands.py) (aprox. línea 33)
 
 
 ---
@@ -8165,7 +8165,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_commands.py::test_verify_integrity_no_fix_without_flag -v
 ```
 
-Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tests/test_commands.py) (aprox. línea 76)
+Código fuente: [apps/inventory/tests/test_commands.py](../../apps/inventory/tests/test_commands.py) (aprox. línea 80)
 
 
 ---
@@ -8201,7 +8201,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_location_threshold.py::test_effective_reorder_point_uses_global_when_no_override -v
 ```
 
-Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inventory/tests/test_location_threshold.py) (aprox. línea 32)
+Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inventory/tests/test_location_threshold.py) (aprox. línea 33)
 
 
 ---
@@ -8237,7 +8237,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_location_threshold.py::test_effective_reorder_point_uses_local_override -v
 ```
 
-Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inventory/tests/test_location_threshold.py) (aprox. línea 40)
+Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inventory/tests/test_location_threshold.py) (aprox. línea 41)
 
 
 ---
@@ -8273,7 +8273,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_location_threshold.py::test_global_threshold_generates_alert_without_local_override -v
 ```
 
-Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inventory/tests/test_location_threshold.py) (aprox. línea 64)
+Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inventory/tests/test_location_threshold.py) (aprox. línea 65)
 
 
 ---
@@ -8309,7 +8309,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_location_threshold.py::test_local_threshold_prevents_alert_when_stock_above_local -v
 ```
 
-Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inventory/tests/test_location_threshold.py) (aprox. línea 50)
+Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inventory/tests/test_location_threshold.py) (aprox. línea 51)
 
 
 ---
@@ -8345,7 +8345,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_location_threshold.py::test_patch_threshold_null_removes_override -v
 ```
 
-Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inventory/tests/test_location_threshold.py) (aprox. línea 96)
+Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inventory/tests/test_location_threshold.py) (aprox. línea 101)
 
 
 ---
@@ -8381,7 +8381,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_location_threshold.py::test_patch_threshold_via_api -v
 ```
 
-Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inventory/tests/test_location_threshold.py) (aprox. línea 76)
+Código fuente: [apps/inventory/tests/test_location_threshold.py](../../apps/inventory/tests/test_location_threshold.py) (aprox. línea 77)
 
 
 ---
@@ -9317,7 +9317,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_views.py::test_auxiliar_cannot_manage_locations -v
 ```
 
-Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 71)
+Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 80)
 
 
 ---
@@ -9353,7 +9353,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_views.py::test_inventory_full_list_returns_200 -v
 ```
 
-Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 11)
+Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 13)
 
 
 ---
@@ -9389,7 +9389,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_views.py::test_inventory_search_returns_200 -v
 ```
 
-Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 18)
+Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 20)
 
 
 ---
@@ -9425,7 +9425,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_views.py::test_location_create_returns_201 -v
 ```
 
-Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 35)
+Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 37)
 
 
 ---
@@ -9461,7 +9461,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_views.py::test_location_state_transition_returns_200 -v
 ```
 
-Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 46)
+Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 51)
 
 
 ---
@@ -9497,7 +9497,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_views.py::test_product_stock_returns_200 -v
 ```
 
-Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 26)
+Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 28)
 
 
 ---
@@ -9533,7 +9533,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_views.py::test_storage_type_create_returns_201 -v
 ```
 
-Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 60)
+Código fuente: [apps/inventory/tests/test_views.py](../../apps/inventory/tests/test_views.py) (aprox. línea 69)
 
 
 ---
@@ -9749,7 +9749,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_dispatch_pricing.py::test_customer_snapshot_persisted_on_wholesale_dispatch -v
 ```
 
-Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 160)
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 167)
 
 
 ---
@@ -9785,7 +9785,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_dispatch_pricing.py::test_damage_dispatch_uses_unit_cost_as_price_type -v
 ```
 
-Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 236)
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 243)
 
 
 ---
@@ -9821,7 +9821,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_dispatch_pricing.py::test_dispatch_calculates_subtotal_tax_total_correctly -v
 ```
 
-Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 84)
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 91)
 
 
 ---
@@ -9857,7 +9857,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_dispatch_pricing.py::test_dispatch_retail_captures_sale_price_retail_as_unit_price -v
 ```
 
-Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 28)
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 29)
 
 
 ---
@@ -9893,7 +9893,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_dispatch_pricing.py::test_dispatch_wholesale_captures_sale_price_wholesale -v
 ```
 
-Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 52)
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 59)
 
 
 ---
@@ -9929,7 +9929,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_dispatch_pricing.py::test_dispatch_with_discount_calculates_correctly -v
 ```
 
-Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 112)
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 119)
 
 
 ---
@@ -9965,7 +9965,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_dispatch_pricing.py::test_dispatch_without_product_price_stores_null_gracefully -v
 ```
 
-Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 139)
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 146)
 
 
 ---
@@ -10001,7 +10001,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_dispatch_pricing.py::test_movement_serializer_exposes_price_fields -v
 ```
 
-Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 258)
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 265)
 
 
 ---
@@ -10037,7 +10037,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_dispatch_pricing.py::test_price_snapshot_immutable_after_product_price_change -v
 ```
 
-Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 204)
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 211)
 
 
 ---
@@ -10073,7 +10073,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_dispatch_pricing.py::test_retail_dispatch_has_no_customer_snapshot -v
 ```
 
-Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 188)
+Código fuente: [apps/movements/tests/test_dispatch_pricing.py](../../apps/movements/tests/test_dispatch_pricing.py) (aprox. línea 195)
 
 
 ---
@@ -10109,7 +10109,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_invoice.py::test_api_invoice_detail_404_for_unknown_number -v
 ```
 
-Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 181)
+Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 196)
 
 
 ---
@@ -10145,7 +10145,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_invoice.py::test_api_invoice_detail_returns_correct_data -v
 ```
 
-Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 152)
+Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 167)
 
 
 ---
@@ -10181,7 +10181,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_invoice.py::test_create_invoice_from_movements_manually -v
 ```
 
-Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 121)
+Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 132)
 
 
 ---
@@ -10217,7 +10217,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_invoice.py::test_invoice_created_on_dispatch -v
 ```
 
-Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 29)
+Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 30)
 
 
 ---
@@ -10253,7 +10253,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_invoice.py::test_invoice_has_customer_data_on_wholesale -v
 ```
 
-Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 74)
+Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 85)
 
 
 ---
@@ -10289,7 +10289,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_invoice.py::test_invoice_totals_match_sum_of_movements -v
 ```
 
-Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 50)
+Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 61)
 
 
 ---
@@ -10325,7 +10325,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_invoice.py::test_invoice_without_price_has_zero_totals -v
 ```
 
-Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 103)
+Código fuente: [apps/movements/tests/test_invoice.py](../../apps/movements/tests/test_invoice.py) (aprox. línea 114)
 
 
 ---
@@ -13457,7 +13457,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_activate_supplier -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 90)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 98)
 
 
 ---
@@ -13493,7 +13493,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_confirmed_reception_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 655)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 740)
 
 
 ---
@@ -13529,7 +13529,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_po_borrador -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 197)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 282)
 
 
 ---
@@ -13565,7 +13565,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_po_completada_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 213)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 298)
 
 
 ---
@@ -13601,7 +13601,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_po_requires_reason -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 206)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 291)
 
 
 ---
@@ -13637,7 +13637,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_po_with_confirmed_reception_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 220)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 305)
 
 
 ---
@@ -13673,7 +13673,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_cancel_reception_borrador -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 644)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 729)
 
 
 ---
@@ -13709,7 +13709,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_already_confirmed_reception_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 637)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 722)
 
 
 ---
@@ -13745,7 +13745,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_already_pendiente_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 190)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 275)
 
 
 ---
@@ -13781,7 +13781,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_po_changes_status -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 177)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 262)
 
 
 ---
@@ -13817,7 +13817,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_advanced_distribution_by_locations_only -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 562)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 647)
 
 
 ---
@@ -13853,7 +13853,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_advanced_distribution_by_lots_and_locations -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 484)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 569)
 
 
 ---
@@ -13889,7 +13889,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_creates_movements_and_updates_stock -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 288)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 373)
 
 
 ---
@@ -13925,7 +13925,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_discrepancy_requires_note -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 393)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 478)
 
 
 ---
@@ -13961,7 +13961,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_is_atomic_on_error -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 417)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 502)
 
 
 ---
@@ -13997,7 +13997,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_partial_marks_po_partial -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 333)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 418)
 
 
 ---
@@ -14033,7 +14033,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_partial_second_delivery_matches_pending_without_note -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 359)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 444)
 
 
 ---
@@ -14069,7 +14069,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_confirm_reception_unit_cost_flows_to_movement -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 452)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 537)
 
 
 ---
@@ -14105,7 +14105,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_po_with_inactive_supplier_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 157)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 242)
 
 
 ---
@@ -14141,7 +14141,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_purchase_order -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 136)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 144)
 
 
 ---
@@ -14177,7 +14177,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_reception_advanced_distribution_requires_matching_quantity -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 607)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 692)
 
 
 ---
@@ -14213,7 +14213,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_reception_borrador -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 233)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 318)
 
 
 ---
@@ -14249,7 +14249,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_reception_exceeds_quantity_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 272)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 357)
 
 
 ---
@@ -14285,7 +14285,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_reception_po_not_receivable_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 260)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 345)
 
 
 ---
@@ -14321,7 +14321,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_supplier_duplicate_nit_raises -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 70)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 78)
 
 
 ---
@@ -14357,7 +14357,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_supplier_valid -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 54)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 62)
 
 
 ---
@@ -14393,7 +14393,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_create_supplier_without_nit -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 105)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 113)
 
 
 ---
@@ -14429,7 +14429,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_deactivate_supplier -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 79)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 87)
 
 
 ---
@@ -14465,7 +14465,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_patch_supplier_with_empty_nit_clears_value -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 123)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 131)
 
 
 ---
@@ -14501,13 +14501,157 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_patch_supplier_without_nit_preserves_existing -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 115)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 123)
 
 
 ---
 
 <!-- file: UNIT-0404.md -->
 **Código:** UNIT-0404
+
+# test_update_purchase_order_empty_data_still_logs
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_update_purchase_order_empty_data_still_logs`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_update_purchase_order_empty_data_still_logs -v
+```
+
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 226)
+
+
+---
+
+<!-- file: UNIT-0405.md -->
+**Código:** UNIT-0405
+
+# test_update_purchase_order_raises_on_confirmed_po
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_update_purchase_order_raises_on_confirmed_po`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_update_purchase_order_raises_on_confirmed_po -v
+```
+
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 214)
+
+
+---
+
+<!-- file: UNIT-0406.md -->
+**Código:** UNIT-0406
+
+# test_update_purchase_order_replaces_items
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_update_purchase_order_replaces_items`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_update_purchase_order_replaces_items -v
+```
+
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 184)
+
+
+---
+
+<!-- file: UNIT-0407.md -->
+**Código:** UNIT-0407
+
+# test_update_purchase_order_updates_notes_and_fields
+
+## Nombre del test
+
+`apps/purchasing/tests/test_services.py::test_update_purchase_order_updates_notes_and_fields`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/purchasing/tests/test_services.py::test_update_purchase_order_updates_notes_and_fields -v
+```
+
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 165)
+
+
+---
+
+<!-- file: UNIT-0408.md -->
+**Código:** UNIT-0408
 
 # test_update_supplier_changes_fields
 
@@ -14537,13 +14681,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/purchasing/tests/test_services.py::test_update_supplier_changes_fields -v
 ```
 
-Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 98)
+Código fuente: [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) (aprox. línea 106)
 
 
 ---
 
-<!-- file: UNIT-0405.md -->
-**Código:** UNIT-0405
+<!-- file: UNIT-0409.md -->
+**Código:** UNIT-0409
 
 # test_cancel_purchase_order
 
@@ -14578,8 +14722,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0406.md -->
-**Código:** UNIT-0406
+<!-- file: UNIT-0410.md -->
+**Código:** UNIT-0410
 
 # test_confirm_purchase_order
 
@@ -14614,8 +14758,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0407.md -->
-**Código:** UNIT-0407
+<!-- file: UNIT-0411.md -->
+**Código:** UNIT-0411
 
 # test_confirm_reception_endpoint
 
@@ -14650,8 +14794,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0408.md -->
-**Código:** UNIT-0408
+<!-- file: UNIT-0412.md -->
+**Código:** UNIT-0412
 
 # test_confirm_reception_forbidden_administrador
 
@@ -14686,8 +14830,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0409.md -->
-**Código:** UNIT-0409
+<!-- file: UNIT-0413.md -->
+**Código:** UNIT-0413
 
 # test_create_purchase_order
 
@@ -14722,8 +14866,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0410.md -->
-**Código:** UNIT-0410
+<!-- file: UNIT-0414.md -->
+**Código:** UNIT-0414
 
 # test_create_reception
 
@@ -14758,8 +14902,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0411.md -->
-**Código:** UNIT-0411
+<!-- file: UNIT-0415.md -->
+**Código:** UNIT-0415
 
 # test_create_reception_with_allocations
 
@@ -14794,8 +14938,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0412.md -->
-**Código:** UNIT-0412
+<!-- file: UNIT-0416.md -->
+**Código:** UNIT-0416
 
 # test_create_supplier_almacenista
 
@@ -14830,8 +14974,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0413.md -->
-**Código:** UNIT-0413
+<!-- file: UNIT-0417.md -->
+**Código:** UNIT-0417
 
 # test_create_supplier_forbidden_administrador
 
@@ -14866,8 +15010,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0414.md -->
-**Código:** UNIT-0414
+<!-- file: UNIT-0418.md -->
+**Código:** UNIT-0418
 
 # test_create_supplier_forbidden_auxiliar
 
@@ -14902,8 +15046,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0415.md -->
-**Código:** UNIT-0415
+<!-- file: UNIT-0419.md -->
+**Código:** UNIT-0419
 
 # test_create_supplier_without_nit
 
@@ -14938,8 +15082,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0416.md -->
-**Código:** UNIT-0416
+<!-- file: UNIT-0420.md -->
+**Código:** UNIT-0420
 
 # test_deactivate_supplier
 
@@ -14974,8 +15118,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0417.md -->
-**Código:** UNIT-0417
+<!-- file: UNIT-0421.md -->
+**Código:** UNIT-0421
 
 # test_list_receptions_administrador_can_view
 
@@ -15010,8 +15154,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0418.md -->
-**Código:** UNIT-0418
+<!-- file: UNIT-0422.md -->
+**Código:** UNIT-0422
 
 # test_list_suppliers_authenticated_almacenista
 
@@ -15046,8 +15190,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0419.md -->
-**Código:** UNIT-0419
+<!-- file: UNIT-0423.md -->
+**Código:** UNIT-0423
 
 # test_patch_supplier_with_empty_nit_clears_value
 
@@ -15082,8 +15226,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0420.md -->
-**Código:** UNIT-0420
+<!-- file: UNIT-0424.md -->
+**Código:** UNIT-0424
 
 # test_patch_supplier_without_nit_preserves_existing
 
@@ -15118,8 +15262,8 @@ Código fuente: [apps/purchasing/tests/test_views.py](../../apps/purchasing/test
 
 ---
 
-<!-- file: UNIT-0421.md -->
-**Código:** UNIT-0421
+<!-- file: UNIT-0425.md -->
+**Código:** UNIT-0425
 
 # test_alerts_export_csv
 
@@ -15149,13 +15293,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_exports.py::test_alerts_export_csv -v
 ```
 
-Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 150)
+Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 161)
 
 
 ---
 
-<!-- file: UNIT-0422.md -->
-**Código:** UNIT-0422
+<!-- file: UNIT-0426.md -->
+**Código:** UNIT-0426
 
 # test_expiring_products_export_csv
 
@@ -15185,13 +15329,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_exports.py::test_expiring_products_export_csv -v
 ```
 
-Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 85)
+Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 91)
 
 
 ---
 
-<!-- file: UNIT-0423.md -->
-**Código:** UNIT-0423
+<!-- file: UNIT-0427.md -->
+**Código:** UNIT-0427
 
 # test_expiring_products_export_xlsx
 
@@ -15221,13 +15365,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_exports.py::test_expiring_products_export_xlsx -v
 ```
 
-Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 98)
+Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 104)
 
 
 ---
 
-<!-- file: UNIT-0424.md -->
-**Código:** UNIT-0424
+<!-- file: UNIT-0428.md -->
+**Código:** UNIT-0428
 
 # test_export_empty_param_returns_json
 
@@ -15257,13 +15401,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_exports.py::test_export_empty_param_returns_json -v
 ```
 
-Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 185)
+Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 201)
 
 
 ---
 
-<!-- file: UNIT-0425.md -->
-**Código:** UNIT-0425
+<!-- file: UNIT-0429.md -->
+**Código:** UNIT-0429
 
 # test_export_unknown_param_returns_json
 
@@ -15293,13 +15437,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_exports.py::test_export_unknown_param_returns_json -v
 ```
 
-Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 166)
+Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 182)
 
 
 ---
 
-<!-- file: UNIT-0426.md -->
-**Código:** UNIT-0426
+<!-- file: UNIT-0430.md -->
+**Código:** UNIT-0430
 
 # test_inventory_export_csv
 
@@ -15329,13 +15473,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_exports.py::test_inventory_export_csv -v
 ```
 
-Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 116)
+Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 122)
 
 
 ---
 
-<!-- file: UNIT-0427.md -->
-**Código:** UNIT-0427
+<!-- file: UNIT-0431.md -->
+**Código:** UNIT-0431
 
 # test_inventory_export_xlsx
 
@@ -15365,13 +15509,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_exports.py::test_inventory_export_xlsx -v
 ```
 
-Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 132)
+Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 143)
 
 
 ---
 
-<!-- file: UNIT-0428.md -->
-**Código:** UNIT-0428
+<!-- file: UNIT-0432.md -->
+**Código:** UNIT-0432
 
 # test_movement_history_export_csv
 
@@ -15401,13 +15545,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_exports.py::test_movement_history_export_csv -v
 ```
 
-Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 36)
+Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 37)
 
 
 ---
 
-<!-- file: UNIT-0429.md -->
-**Código:** UNIT-0429
+<!-- file: UNIT-0433.md -->
+**Código:** UNIT-0433
 
 # test_movement_history_export_xlsx
 
@@ -15437,13 +15581,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_exports.py::test_movement_history_export_xlsx -v
 ```
 
-Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 52)
+Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 58)
 
 
 ---
 
-<!-- file: UNIT-0430.md -->
-**Código:** UNIT-0430
+<!-- file: UNIT-0434.md -->
+**Código:** UNIT-0434
 
 # test_movement_history_json_unchanged
 
@@ -15473,13 +15617,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/reports/tests/test_exports.py::test_movement_history_json_unchanged -v
 ```
 
-Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 68)
+Código fuente: [apps/reports/tests/test_exports.py](../../apps/reports/tests/test_exports.py) (aprox. línea 74)
 
 
 ---
 
-<!-- file: UNIT-0431.md -->
-**Código:** UNIT-0431
+<!-- file: UNIT-0435.md -->
+**Código:** UNIT-0435
 
 # test_api_margin_by_product_returns_200
 
@@ -15514,8 +15658,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0432.md -->
-**Código:** UNIT-0432
+<!-- file: UNIT-0436.md -->
+**Código:** UNIT-0436
 
 # test_api_revenue_summary_requires_auth
 
@@ -15550,8 +15694,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0433.md -->
-**Código:** UNIT-0433
+<!-- file: UNIT-0437.md -->
+**Código:** UNIT-0437
 
 # test_api_revenue_summary_returns_200
 
@@ -15586,8 +15730,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0434.md -->
-**Código:** UNIT-0434
+<!-- file: UNIT-0438.md -->
+**Código:** UNIT-0438
 
 # test_api_sales_by_customer_returns_200
 
@@ -15622,8 +15766,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0435.md -->
-**Código:** UNIT-0435
+<!-- file: UNIT-0439.md -->
+**Código:** UNIT-0439
 
 # test_gross_margin_correct_when_cost_and_price_set
 
@@ -15658,8 +15802,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0436.md -->
-**Código:** UNIT-0436
+<!-- file: UNIT-0440.md -->
+**Código:** UNIT-0440
 
 # test_gross_margin_excludes_movements_without_price
 
@@ -15694,8 +15838,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0437.md -->
-**Código:** UNIT-0437
+<!-- file: UNIT-0441.md -->
+**Código:** UNIT-0441
 
 # test_revenue_summary_products_without_price_contribute_zero
 
@@ -15730,8 +15874,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0438.md -->
-**Código:** UNIT-0438
+<!-- file: UNIT-0442.md -->
+**Código:** UNIT-0442
 
 # test_revenue_summary_returns_correct_totals
 
@@ -15766,8 +15910,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0439.md -->
-**Código:** UNIT-0439
+<!-- file: UNIT-0443.md -->
+**Código:** UNIT-0443
 
 # test_revenue_summary_separates_wholesale_and_retail
 
@@ -15802,8 +15946,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0440.md -->
-**Código:** UNIT-0440
+<!-- file: UNIT-0444.md -->
+**Código:** UNIT-0444
 
 # test_sales_by_customer_aggregates_correctly
 
@@ -15838,8 +15982,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0441.md -->
-**Código:** UNIT-0441
+<!-- file: UNIT-0445.md -->
+**Código:** UNIT-0445
 
 # test_webhook_emitted_on_dispatch_with_price
 
@@ -15874,8 +16018,8 @@ Código fuente: [apps/reports/tests/test_financial_reports.py](../../apps/report
 
 ---
 
-<!-- file: UNIT-0442.md -->
-**Código:** UNIT-0442
+<!-- file: UNIT-0446.md -->
+**Código:** UNIT-0446
 
 # test_reports_app_has_no_domain_models
 
@@ -15910,8 +16054,8 @@ Código fuente: [apps/reports/tests/test_models.py](../../apps/reports/tests/tes
 
 ---
 
-<!-- file: UNIT-0443.md -->
-**Código:** UNIT-0443
+<!-- file: UNIT-0447.md -->
+**Código:** UNIT-0447
 
 # test_get_discard_operational_summary_excludes_returns
 
@@ -15946,8 +16090,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0444.md -->
-**Código:** UNIT-0444
+<!-- file: UNIT-0448.md -->
+**Código:** UNIT-0448
 
 # test_get_lots_expiring_soon_filters_by_window
 
@@ -15982,8 +16126,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0445.md -->
-**Código:** UNIT-0445
+<!-- file: UNIT-0449.md -->
+**Código:** UNIT-0449
 
 # test_get_quality_operational_summary_groups_damage_and_returns
 
@@ -16018,8 +16162,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0446.md -->
-**Código:** UNIT-0446
+<!-- file: UNIT-0450.md -->
+**Código:** UNIT-0450
 
 # test_get_warehouse_occupancy_distribution_returns_expected_sections
 
@@ -16054,8 +16198,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0447.md -->
-**Código:** UNIT-0447
+<!-- file: UNIT-0451.md -->
+**Código:** UNIT-0451
 
 # test_get_warehouse_utilization_supports_relative_capacity_and_distributions
 
@@ -16090,8 +16234,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0448.md -->
-**Código:** UNIT-0448
+<!-- file: UNIT-0452.md -->
+**Código:** UNIT-0452
 
 # test_get_warehouse_utilization_uses_capacity_and_stock
 
@@ -16126,8 +16270,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0449.md -->
-**Código:** UNIT-0449
+<!-- file: UNIT-0453.md -->
+**Código:** UNIT-0453
 
 # test_rotation_by_category_counts_units
 
@@ -16162,8 +16306,8 @@ Código fuente: [apps/reports/tests/test_selectors.py](../../apps/reports/tests/
 
 ---
 
-<!-- file: UNIT-0450.md -->
-**Código:** UNIT-0450
+<!-- file: UNIT-0454.md -->
+**Código:** UNIT-0454
 
 # test_generate_kpis_returns_dashboard_keys
 
@@ -16198,8 +16342,8 @@ Código fuente: [apps/reports/tests/test_services.py](../../apps/reports/tests/t
 
 ---
 
-<!-- file: UNIT-0451.md -->
-**Código:** UNIT-0451
+<!-- file: UNIT-0455.md -->
+**Código:** UNIT-0455
 
 # test_get_expiring_products_returns_lot_rows
 
@@ -16234,8 +16378,8 @@ Código fuente: [apps/reports/tests/test_services.py](../../apps/reports/tests/t
 
 ---
 
-<!-- file: UNIT-0452.md -->
-**Código:** UNIT-0452
+<!-- file: UNIT-0456.md -->
+**Código:** UNIT-0456
 
 # test_dispatch_orders_endpoint_returns_samples
 
@@ -16270,8 +16414,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0453.md -->
-**Código:** UNIT-0453
+<!-- file: UNIT-0457.md -->
+**Código:** UNIT-0457
 
 # test_movement_history_filters_by_location_id
 
@@ -16306,8 +16450,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0454.md -->
-**Código:** UNIT-0454
+<!-- file: UNIT-0458.md -->
+**Código:** UNIT-0458
 
 # test_reports_dataset_view_is_available
 
@@ -16342,8 +16486,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0455.md -->
-**Código:** UNIT-0455
+<!-- file: UNIT-0459.md -->
+**Código:** UNIT-0459
 
 # test_reports_dataset_view_supports_discard_operational
 
@@ -16378,8 +16522,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0456.md -->
-**Código:** UNIT-0456
+<!-- file: UNIT-0460.md -->
+**Código:** UNIT-0460
 
 # test_reports_dataset_view_supports_dispatch_operational
 
@@ -16414,8 +16558,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0457.md -->
-**Código:** UNIT-0457
+<!-- file: UNIT-0461.md -->
+**Código:** UNIT-0461
 
 # test_reports_dataset_view_supports_quality_operational
 
@@ -16450,8 +16594,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0458.md -->
-**Código:** UNIT-0458
+<!-- file: UNIT-0462.md -->
+**Código:** UNIT-0462
 
 # test_reports_dataset_view_supports_warehouse_occupancy_distribution
 
@@ -16486,8 +16630,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0459.md -->
-**Código:** UNIT-0459
+<!-- file: UNIT-0463.md -->
+**Código:** UNIT-0463
 
 # test_reports_dataset_view_supports_warehouse_utilization
 
@@ -16522,8 +16666,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0460.md -->
-**Código:** UNIT-0460
+<!-- file: UNIT-0464.md -->
+**Código:** UNIT-0464
 
 # test_reports_discard_operational_view_returns_summary
 
@@ -16558,8 +16702,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0461.md -->
-**Código:** UNIT-0461
+<!-- file: UNIT-0465.md -->
+**Código:** UNIT-0465
 
 # test_reports_dispatch_operational_view_returns_summary
 
@@ -16594,8 +16738,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0462.md -->
-**Código:** UNIT-0462
+<!-- file: UNIT-0466.md -->
+**Código:** UNIT-0466
 
 # test_reports_expiring_view_returns_lots
 
@@ -16630,8 +16774,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0463.md -->
-**Código:** UNIT-0463
+<!-- file: UNIT-0467.md -->
+**Código:** UNIT-0467
 
 # test_reports_quality_operational_view_returns_summary
 
@@ -16666,8 +16810,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0464.md -->
-**Código:** UNIT-0464
+<!-- file: UNIT-0468.md -->
+**Código:** UNIT-0468
 
 # test_reports_views_are_available
 
@@ -16702,8 +16846,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0465.md -->
-**Código:** UNIT-0465
+<!-- file: UNIT-0469.md -->
+**Código:** UNIT-0469
 
 # test_reports_warehouse_utilization_view_returns_summary
 
@@ -16738,8 +16882,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0466.md -->
-**Código:** UNIT-0466
+<!-- file: UNIT-0470.md -->
+**Código:** UNIT-0470
 
 # test_warehouse_utilization_by_storage_type_grouping
 
@@ -16774,8 +16918,8 @@ Código fuente: [apps/reports/tests/test_views.py](../../apps/reports/tests/test
 
 ---
 
-<!-- file: UNIT-0467.md -->
-**Código:** UNIT-0467
+<!-- file: UNIT-0471.md -->
+**Código:** UNIT-0471
 
 # test_deliver_webhooks_custom_batch_size
 
@@ -16805,13 +16949,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/webhooks/tests/test_commands.py::test_deliver_webhooks_custom_batch_size -v
 ```
 
-Código fuente: [apps/webhooks/tests/test_commands.py](../../apps/webhooks/tests/test_commands.py) (aprox. línea 40)
+Código fuente: [apps/webhooks/tests/test_commands.py](../../apps/webhooks/tests/test_commands.py) (aprox. línea 47)
 
 
 ---
 
-<!-- file: UNIT-0468.md -->
-**Código:** UNIT-0468
+<!-- file: UNIT-0472.md -->
+**Código:** UNIT-0472
 
 # test_deliver_webhooks_no_pending
 
@@ -16841,13 +16985,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/webhooks/tests/test_commands.py::test_deliver_webhooks_no_pending -v
 ```
 
-Código fuente: [apps/webhooks/tests/test_commands.py](../../apps/webhooks/tests/test_commands.py) (aprox. línea 13)
+Código fuente: [apps/webhooks/tests/test_commands.py](../../apps/webhooks/tests/test_commands.py) (aprox. línea 15)
 
 
 ---
 
-<!-- file: UNIT-0469.md -->
-**Código:** UNIT-0469
+<!-- file: UNIT-0473.md -->
+**Código:** UNIT-0473
 
 # test_deliver_webhooks_with_deliveries
 
@@ -16877,13 +17021,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/webhooks/tests/test_commands.py::test_deliver_webhooks_with_deliveries -v
 ```
 
-Código fuente: [apps/webhooks/tests/test_commands.py](../../apps/webhooks/tests/test_commands.py) (aprox. línea 25)
+Código fuente: [apps/webhooks/tests/test_commands.py](../../apps/webhooks/tests/test_commands.py) (aprox. línea 27)
 
 
 ---
 
-<!-- file: UNIT-0470.md -->
-**Código:** UNIT-0470
+<!-- file: UNIT-0474.md -->
+**Código:** UNIT-0474
 
 # test_patch_still_works_independently
 
@@ -16918,8 +17062,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0471.md -->
-**Código:** UNIT-0471
+<!-- file: UNIT-0475.md -->
+**Código:** UNIT-0475
 
 # test_put_404_on_nonexistent
 
@@ -16954,8 +17098,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0472.md -->
-**Código:** UNIT-0472
+<!-- file: UNIT-0476.md -->
+**Código:** UNIT-0476
 
 # test_put_replaces_endpoint
 
@@ -16990,8 +17134,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0473.md -->
-**Código:** UNIT-0473
+<!-- file: UNIT-0477.md -->
+**Código:** UNIT-0477
 
 # test_put_requires_all_fields
 
@@ -17026,8 +17170,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0474.md -->
-**Código:** UNIT-0474
+<!-- file: UNIT-0478.md -->
+**Código:** UNIT-0478
 
 # test_put_requires_almacenista
 
@@ -17062,8 +17206,8 @@ Código fuente: [apps/webhooks/tests/test_endpoint_put.py](../../apps/webhooks/t
 
 ---
 
-<!-- file: UNIT-0475.md -->
-**Código:** UNIT-0475
+<!-- file: UNIT-0479.md -->
+**Código:** UNIT-0479
 
 # test_deliver_connection_error_schedules_retry
 
@@ -17098,8 +17242,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0476.md -->
-**Código:** UNIT-0476
+<!-- file: UNIT-0480.md -->
+**Código:** UNIT-0480
 
 # test_deliver_max_retries_marks_as_failed
 
@@ -17134,8 +17278,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0477.md -->
-**Código:** UNIT-0477
+<!-- file: UNIT-0481.md -->
+**Código:** UNIT-0481
 
 # test_deliver_success
 
@@ -17170,8 +17314,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0478.md -->
-**Código:** UNIT-0478
+<!-- file: UNIT-0482.md -->
+**Código:** UNIT-0482
 
 # test_queue_creates_delivery_for_subscribed_endpoint
 
@@ -17206,8 +17350,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0479.md -->
-**Código:** UNIT-0479
+<!-- file: UNIT-0483.md -->
+**Código:** UNIT-0483
 
 # test_queue_creates_multiple_deliveries_for_multiple_endpoints
 
@@ -17242,8 +17386,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0480.md -->
-**Código:** UNIT-0480
+<!-- file: UNIT-0484.md -->
+**Código:** UNIT-0484
 
 # test_queue_skips_inactive_endpoints
 
@@ -17278,8 +17422,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0481.md -->
-**Código:** UNIT-0481
+<!-- file: UNIT-0485.md -->
+**Código:** UNIT-0485
 
 # test_queue_skips_unsubscribed_event
 
@@ -17314,8 +17458,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0482.md -->
-**Código:** UNIT-0482
+<!-- file: UNIT-0486.md -->
+**Código:** UNIT-0486
 
 # test_sign_payload_differs_with_different_key
 
@@ -17350,8 +17494,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0483.md -->
-**Código:** UNIT-0483
+<!-- file: UNIT-0487.md -->
+**Código:** UNIT-0487
 
 # test_sign_payload_format
 
@@ -17386,8 +17530,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0484.md -->
-**Código:** UNIT-0484
+<!-- file: UNIT-0488.md -->
+**Código:** UNIT-0488
 
 # test_sign_payload_is_deterministic
 
@@ -17422,8 +17566,8 @@ Código fuente: [apps/webhooks/tests/test_services.py](../../apps/webhooks/tests
 
 ---
 
-<!-- file: UNIT-0485.md -->
-**Código:** UNIT-0485
+<!-- file: UNIT-0489.md -->
+**Código:** UNIT-0489
 
 # test_administrador_cannot_manage_webhooks
 
@@ -17453,13 +17597,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/webhooks/tests/test_views.py::test_administrador_cannot_manage_webhooks -v
 ```
 
-Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/test_views.py) (aprox. línea 75)
+Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/test_views.py) (aprox. línea 84)
 
 
 ---
 
-<!-- file: UNIT-0486.md -->
-**Código:** UNIT-0486
+<!-- file: UNIT-0490.md -->
+**Código:** UNIT-0490
 
 # test_auxiliar_cannot_manage_webhooks
 
@@ -17489,13 +17633,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/webhooks/tests/test_views.py::test_auxiliar_cannot_manage_webhooks -v
 ```
 
-Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/test_views.py) (aprox. línea 94)
+Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/test_views.py) (aprox. línea 103)
 
 
 ---
 
-<!-- file: UNIT-0487.md -->
-**Código:** UNIT-0487
+<!-- file: UNIT-0491.md -->
+**Código:** UNIT-0491
 
 # test_create_endpoint
 
@@ -17525,13 +17669,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/webhooks/tests/test_views.py::test_create_endpoint -v
 ```
 
-Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/test_views.py) (aprox. línea 41)
+Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/test_views.py) (aprox. línea 42)
 
 
 ---
 
-<!-- file: UNIT-0488.md -->
-**Código:** UNIT-0488
+<!-- file: UNIT-0492.md -->
+**Código:** UNIT-0492
 
 # test_delete_endpoint_deactivates_it
 
@@ -17561,13 +17705,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/webhooks/tests/test_views.py::test_delete_endpoint_deactivates_it -v
 ```
 
-Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/test_views.py) (aprox. línea 66)
+Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/test_views.py) (aprox. línea 71)
 
 
 ---
 
-<!-- file: UNIT-0489.md -->
-**Código:** UNIT-0489
+<!-- file: UNIT-0493.md -->
+**Código:** UNIT-0493
 
 # test_deliveries_list
 
@@ -17597,13 +17741,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/webhooks/tests/test_views.py::test_deliveries_list -v
 ```
 
-Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/test_views.py) (aprox. línea 114)
+Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/test_views.py) (aprox. línea 123)
 
 
 ---
 
-<!-- file: UNIT-0490.md -->
-**Código:** UNIT-0490
+<!-- file: UNIT-0494.md -->
+**Código:** UNIT-0494
 
 # test_list_endpoints
 
@@ -17633,13 +17777,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/webhooks/tests/test_views.py::test_list_endpoints -v
 ```
 
-Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/test_views.py) (aprox. línea 59)
+Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/test_views.py) (aprox. línea 64)
 
 
 ---
 
-<!-- file: UNIT-0491.md -->
-**Código:** UNIT-0491
+<!-- file: UNIT-0495.md -->
+**Código:** UNIT-0495
 
 # test_stats_view
 
@@ -17669,13 +17813,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/webhooks/tests/test_views.py::test_stats_view -v
 ```
 
-Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/test_views.py) (aprox. línea 102)
+Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/test_views.py) (aprox. línea 111)
 
 
 ---
 
-<!-- file: UNIT-0492.md -->
-**Código:** UNIT-0492
+<!-- file: UNIT-0496.md -->
+**Código:** UNIT-0496
 
 # test_classify_test_coverage
 
@@ -17710,8 +17854,8 @@ Código fuente: [tests/test_generate_docs.py](../../tests/test_generate_docs.py)
 
 ---
 
-<!-- file: UNIT-0493.md -->
-**Código:** UNIT-0493
+<!-- file: UNIT-0497.md -->
+**Código:** UNIT-0497
 
 # test_docnode_short_name_class_method
 
@@ -17746,8 +17890,8 @@ Código fuente: [tests/test_generate_docs.py](../../tests/test_generate_docs.py)
 
 ---
 
-<!-- file: UNIT-0494.md -->
-**Código:** UNIT-0494
+<!-- file: UNIT-0498.md -->
+**Código:** UNIT-0498
 
 # test_docnode_short_name_simple
 
@@ -17782,8 +17926,8 @@ Código fuente: [tests/test_generate_docs.py](../../tests/test_generate_docs.py)
 
 ---
 
-<!-- file: UNIT-0495.md -->
-**Código:** UNIT-0495
+<!-- file: UNIT-0499.md -->
+**Código:** UNIT-0499
 
 # test_generation_summary_absorb_does_not_unset_changed
 
@@ -17818,8 +17962,8 @@ Código fuente: [tests/test_generate_docs.py](../../tests/test_generate_docs.py)
 
 ---
 
-<!-- file: UNIT-0496.md -->
-**Código:** UNIT-0496
+<!-- file: UNIT-0500.md -->
+**Código:** UNIT-0500
 
 # test_generation_summary_absorb_merges_paths
 
@@ -17854,8 +17998,8 @@ Código fuente: [tests/test_generate_docs.py](../../tests/test_generate_docs.py)
 
 ---
 
-<!-- file: UNIT-0497.md -->
-**Código:** UNIT-0497
+<!-- file: UNIT-0501.md -->
+**Código:** UNIT-0501
 
 # test_remove_stale_check_mode_does_not_delete
 
@@ -17890,8 +18034,8 @@ Código fuente: [tests/test_generate_docs.py](../../tests/test_generate_docs.py)
 
 ---
 
-<!-- file: UNIT-0498.md -->
-**Código:** UNIT-0498
+<!-- file: UNIT-0502.md -->
+**Código:** UNIT-0502
 
 # test_remove_stale_deletes_unexpected_files
 
@@ -17926,8 +18070,8 @@ Código fuente: [tests/test_generate_docs.py](../../tests/test_generate_docs.py)
 
 ---
 
-<!-- file: UNIT-0499.md -->
-**Código:** UNIT-0499
+<!-- file: UNIT-0503.md -->
+**Código:** UNIT-0503
 
 # test_remove_stale_nonexistent_dir_returns_empty
 
@@ -17962,8 +18106,8 @@ Código fuente: [tests/test_generate_docs.py](../../tests/test_generate_docs.py)
 
 ---
 
-<!-- file: UNIT-0500.md -->
-**Código:** UNIT-0500
+<!-- file: UNIT-0504.md -->
+**Código:** UNIT-0504
 
 # test_write_check_mode_does_not_write
 
@@ -17998,8 +18142,8 @@ Código fuente: [tests/test_generate_docs.py](../../tests/test_generate_docs.py)
 
 ---
 
-<!-- file: UNIT-0501.md -->
-**Código:** UNIT-0501
+<!-- file: UNIT-0505.md -->
+**Código:** UNIT-0505
 
 # test_write_creates_file
 
@@ -18034,8 +18178,8 @@ Código fuente: [tests/test_generate_docs.py](../../tests/test_generate_docs.py)
 
 ---
 
-<!-- file: UNIT-0502.md -->
-**Código:** UNIT-0502
+<!-- file: UNIT-0506.md -->
+**Código:** UNIT-0506
 
 # test_write_skips_if_content_unchanged
 
@@ -18070,8 +18214,8 @@ Código fuente: [tests/test_generate_docs.py](../../tests/test_generate_docs.py)
 
 ---
 
-<!-- file: UNIT-0503.md -->
-**Código:** UNIT-0503
+<!-- file: UNIT-0507.md -->
+**Código:** UNIT-0507
 
 # test_write_updates_if_content_changed
 
@@ -18106,8 +18250,8 @@ Código fuente: [tests/test_generate_docs.py](../../tests/test_generate_docs.py)
 
 ---
 
-<!-- file: UNIT-0504.md -->
-**Código:** UNIT-0504
+<!-- file: UNIT-0508.md -->
+**Código:** UNIT-0508
 
 # test_change_report_detects_additions_and_removals
 
@@ -18142,8 +18286,8 @@ Código fuente: [tests/test_generate_project_structure.py](../../tests/test_gene
 
 ---
 
-<!-- file: UNIT-0505.md -->
-**Código:** UNIT-0505
+<!-- file: UNIT-0509.md -->
+**Código:** UNIT-0509
 
 # test_semantic_comment_for_services_is_specific
 
@@ -18178,8 +18322,8 @@ Código fuente: [tests/test_generate_project_structure.py](../../tests/test_gene
 
 ---
 
-<!-- file: UNIT-0506.md -->
-**Código:** UNIT-0506
+<!-- file: UNIT-0510.md -->
+**Código:** UNIT-0510
 
 # test_tree_ignores_noise_and_keeps_relevant_nodes
 
@@ -18214,8 +18358,8 @@ Código fuente: [tests/test_generate_project_structure.py](../../tests/test_gene
 
 ---
 
-<!-- file: UNIT-0507.md -->
-**Código:** UNIT-0507
+<!-- file: UNIT-0511.md -->
+**Código:** UNIT-0511
 
 # test_validate_destination_passes_for_non_blocked
 
@@ -18250,8 +18394,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0508.md -->
-**Código:** UNIT-0508
+<!-- file: UNIT-0512.md -->
+**Código:** UNIT-0512
 
 # test_validate_destination_raises_for_blocked_archived
 
@@ -18286,8 +18430,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0509.md -->
-**Código:** UNIT-0509
+<!-- file: UNIT-0513.md -->
+**Código:** UNIT-0513
 
 # test_validate_origin_passes_for_active
 
@@ -18322,8 +18466,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0510.md -->
-**Código:** UNIT-0510
+<!-- file: UNIT-0514.md -->
+**Código:** UNIT-0514
 
 # test_validate_origin_raises_for_blocked_archived
 
@@ -18358,8 +18502,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0511.md -->
-**Código:** UNIT-0511
+<!-- file: UNIT-0515.md -->
+**Código:** UNIT-0515
 
 # test_validate_origin_raises_for_maintenance_restricted
 
@@ -18394,8 +18538,8 @@ Código fuente: [tests/test_location_validators.py](../../tests/test_location_va
 
 ---
 
-<!-- file: UNIT-0512.md -->
-**Código:** UNIT-0512
+<!-- file: UNIT-0516.md -->
+**Código:** UNIT-0516
 
 # test_all_category_slugs_declared
 
@@ -18430,8 +18574,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0513.md -->
-**Código:** UNIT-0513
+<!-- file: UNIT-0517.md -->
+**Código:** UNIT-0517
 
 # test_all_product_skus_valid_format
 
@@ -18466,8 +18610,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0514.md -->
-**Código:** UNIT-0514
+<!-- file: UNIT-0518.md -->
+**Código:** UNIT-0518
 
 # test_combo_items_reference_known_skus
 
@@ -18502,8 +18646,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0515.md -->
-**Código:** UNIT-0515
+<!-- file: UNIT-0519.md -->
+**Código:** UNIT-0519
 
 # test_electroterapia_requires_serial
 
@@ -18538,8 +18682,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0516.md -->
-**Código:** UNIT-0516
+<!-- file: UNIT-0520.md -->
+**Código:** UNIT-0520
 
 # test_expiration_products_have_valid_skus
 
@@ -18574,8 +18718,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0517.md -->
-**Código:** UNIT-0517
+<!-- file: UNIT-0521.md -->
+**Código:** UNIT-0521
 
 # test_no_duplicate_product_skus
 
@@ -18610,8 +18754,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0518.md -->
-**Código:** UNIT-0518
+<!-- file: UNIT-0522.md -->
+**Código:** UNIT-0522
 
 # test_clean_removes_seed_data_preserves_base
 
@@ -18646,8 +18790,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0519.md -->
-**Código:** UNIT-0519
+<!-- file: UNIT-0523.md -->
+**Código:** UNIT-0523
 
 # test_seed_creates_catalog_and_movements
 
@@ -18682,8 +18826,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0520.md -->
-**Código:** UNIT-0520
+<!-- file: UNIT-0524.md -->
+**Código:** UNIT-0524
 
 # test_seed_is_idempotent
 
@@ -18718,8 +18862,8 @@ Código fuente: [tests/test_seed_db.py](../../tests/test_seed_db.py) (aprox. lí
 
 ---
 
-<!-- file: UNIT-0521.md -->
-**Código:** UNIT-0521
+<!-- file: UNIT-0525.md -->
+**Código:** UNIT-0525
 
 # test_dashboard_kpis_completes_within_sla
 
@@ -18754,8 +18898,8 @@ Código fuente: [tests/test_service_sla.py](../../tests/test_service_sla.py) (ap
 
 ---
 
-<!-- file: UNIT-0522.md -->
-**Código:** UNIT-0522
+<!-- file: UNIT-0526.md -->
+**Código:** UNIT-0526
 
 # test_inventory_selector_completes_within_sla
 
@@ -18790,8 +18934,8 @@ Código fuente: [tests/test_service_sla.py](../../tests/test_service_sla.py) (ap
 
 ---
 
-<!-- file: UNIT-0523.md -->
-**Código:** UNIT-0523
+<!-- file: UNIT-0527.md -->
+**Código:** UNIT-0527
 
 # test_ledger_net_qty_completes_within_sla
 
@@ -18826,8 +18970,8 @@ Código fuente: [tests/test_service_sla.py](../../tests/test_service_sla.py) (ap
 
 ---
 
-<!-- file: UNIT-0524.md -->
-**Código:** UNIT-0524
+<!-- file: UNIT-0528.md -->
+**Código:** UNIT-0528
 
 # test_register_entry_completes_within_sla
 
