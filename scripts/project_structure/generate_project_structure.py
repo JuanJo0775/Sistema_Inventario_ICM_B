@@ -100,6 +100,7 @@ SHARED_ORDER = [
     "mixins.py",
     "pagination.py",
     "openapi.py",
+    "email_service.py",
     "utils",
 ]
 DOCS_ORDER = [
@@ -110,6 +111,8 @@ DOCS_ORDER = [
     "calidad_restricciones",
     "architecture",
     "adr",
+    "guias",
+    "CI",
 ]
 SCRIPTS_ORDER = [
     "README_SCRIPTS.md",
@@ -121,7 +124,7 @@ REQUIREMENTS_ORDER = ["base.txt", "development.txt", "production.txt"]
 DOCKER_ORDER = ["Dockerfile", "entrypoint.sh"]
 TESTS_ORDER = ["conftest.py", "factories.py", "ers", "integration"]
 DOCS_CHILDREN = {
-    "api": ["README_API.md", "README_MATRIZ_PERMISOS.md"],
+    "api": ["README_API.md", "README_MATRIZ_PERMISOS.md", "REFERENCIA_ENDPOINTS.md"],
     "requisitos": ["ERS_ICM_Requisitos.md", "ICM_Informe_Elicitacion_v2_plus.docx.md"],
     "test": [
         "README_TEST.md",
@@ -135,7 +138,11 @@ DOCS_CHILDREN = {
         "integration",
         "scenarios",
     ],
-    "calidad_restricciones": ["README_ATRIBUTOS_CALIDAD.md", "README_RESTRICCIONES.md"],
+    "calidad_restricciones": [
+        "README_ATRIBUTOS_CALIDAD.md",
+        "README_RESTRICCIONES.md",
+        "INFORME_COMPLETITUD_PRINCIPIOS_Y_CALIDAD.md",
+    ],
     "architecture": [
         "architecture_drivers.md",
         "utility_tree.md",
@@ -143,6 +150,8 @@ DOCS_CHILDREN = {
         "adr_relationships.md",
     ],
     "adr": [],
+    "guias": ["ENV_GUIDE.md", "SEED_DB.md"],
+    "CI": ["README_CICD.md"],
 }
 
 IMPORTANT_COMMENT_PATHS = {
@@ -164,6 +173,7 @@ IMPORTANT_COMMENT_PATHS = {
     "shared/mixins.py": "Mixins transversales para vistas",
     "shared/pagination.py": "Paginación reutilizable",
     "shared/openapi.py": "Tags OpenAPI y contratos compartidos",
+    "shared/email_service.py": "Servicio de email desacoplado (porta-adaptador SMTP)",
     "shared/utils": "Utilidades transversales",
     "tests": "Tests de integración cross-módulo",
     "tests/factories.py": "Factories de datos de prueba",
@@ -180,6 +190,14 @@ IMPORTANT_COMMENT_PATHS = {
     "docs/architecture/utility_tree.md": "Utility Tree con escenarios y trade-offs",
     "docs/architecture/architectural_constraints.md": "Restricciones arquitectónicas y riesgos",
     "docs/architecture/adr_relationships.md": "Trazabilidad entre drivers y ADRs",
+    "docs/guias": "Guías operativas del proyecto",
+    "docs/guias/ENV_GUIDE.md": "Guía completa de variables de entorno",
+    "docs/guias/SEED_DB.md": "Guía de carga de datos semilla",
+    "docs/CI": "Runbook operativo de CI/CD",
+    "docs/CI/README_CICD.md": "Runbook CI/CD: pipelines, despliegue, backups y rollback",
+    "docs/api/README_API.md": "Especificación de la API: endpoints, contratos y estándares",
+    "docs/api/README_MATRIZ_PERMISOS.md": "Matriz de permisos por rol para todos los endpoints",
+    "docs/api/REFERENCIA_ENDPOINTS.md": "Referencia completa de endpoints con ejemplos request/response",
     "scripts": "Automatizaciones reutilizables del repositorio",
     "scripts/README_SCRIPTS.md": "Índice y contexto de las automatizaciones",
     "scripts/project_structure": "Generador semántico de la estructura arquitectónica",
@@ -196,7 +214,7 @@ IMPORTANT_COMMENT_PATHS = {
 }
 
 APP_OVERVIEW_COMMENT = {
-    "authentication": "Autenticación JWT, RBAC y control de acceso",
+    "authentication": "Autenticación JWT, RBAC, gestión de usuarios y recuperación de contraseña",
     "catalog": "Catálogo, SKUs definidos por usuario y validación de productos",
     "inventory": "Consulta de stock en tiempo real",
     "movements": "Ledger inmutable y consistencia de inventario",
@@ -222,8 +240,17 @@ APP_FILE_COMMENTS = {
 
 APP_ROLE_EXTRA = {
     "authentication": {
-        "services.py": "Autenticación JWT, RBAC y verificación de identidad",
+        "models.py": "User (UUID, role, RBAC), UserSchedule, TemporaryAccessPermit, PasswordResetToken",
+        "serializers.py": "UserSerializer (created_by_username, is_active read-only), password serializers",
+        "views.py": "17 endpoints: JWT, CRUD usuarios, horarios, permisos temporales, change/forgot/reset-password",
+        "services.py": "Autenticación JWT, RBAC, gestión de usuarios, change_own_password, forgot/reset-password",
+        "selectors.py": "get_all_users (filtros role/search/inactive), check_user_access, get_user_by_id",
         "signals.py": "Sincronización de eventos de identidad",
+        "test_password.py": "Flujo completo de cambio y recuperación de contraseña",
+        "test_services.py": "Política de acceso y restricciones de rol",
+        "test_permissions_api.py": "Cobertura de permisos por rol y endpoint",
+        "test_permissions_reorganization.py": "Cobertura de reorganización de permisos",
+        "test_user_enable.py": "Ciclo de vida: deshabilitar y rehabilitar usuarios",
     },
     "catalog": {
         "services.py": "Catálogo, SKU definido por usuario y validación de producto",
@@ -885,6 +912,13 @@ def visible_children(dir_path: Path, root: Path, config: TreeConfig) -> list[Pat
             for name in DOCS_CHILDREN[key]:
                 candidate = dir_path / name
                 if candidate.exists() and not is_excluded(candidate, root, config):
+                    result.append(candidate)
+            # fallback: include any remaining .md files not in the explicit list
+            listed = {c.name for c in result}
+            for candidate in sorted(dir_path.iterdir()):
+                if candidate.name in listed or is_excluded(candidate, root, config):
+                    continue
+                if candidate.suffix in {".md", ".json", ".yml", ".yaml"}:
                     result.append(candidate)
             return result
     if rel.startswith("apps/"):
