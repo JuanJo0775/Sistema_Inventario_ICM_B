@@ -8,10 +8,8 @@ from rest_framework_simplejwt.serializers import (
 )
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.authentication.models import UserRole
+from apps.authentication.models import User, UserRole
 from apps.authentication.services import OutsideOperatingHoursError, authenticate_user
-
-from apps.authentication.models import User
 
 
 def user_login_profile(user: User) -> dict:

@@ -13,6 +13,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
+from apps.authentication.models import User
 from apps.authentication.permissions import IsAlmacenista, IsAlmacenistaOrAdministrador
 from apps.authentication.serializers import (
     ChangePasswordSerializer,
@@ -37,8 +38,6 @@ from apps.authentication.services import (
     update_user_password,
 )
 from shared.openapi import TAG_AUTH, TAG_SYSTEM, standard_error_responses
-
-from apps.authentication.models import User
 
 
 @extend_schema(
