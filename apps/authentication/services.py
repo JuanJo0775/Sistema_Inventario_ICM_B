@@ -513,7 +513,8 @@ def request_password_reset(
 
     from django.conf import settings
 
-    from apps.authentication.models import PasswordResetToken, User as UserModel
+    from apps.authentication.models import PasswordResetToken
+    from apps.authentication.models import User as UserModel
     from shared.email_service import send_password_reset_email
 
     target = UserModel.objects.filter(
