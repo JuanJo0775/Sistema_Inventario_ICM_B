@@ -109,6 +109,42 @@ Código fuente: [tests/concurrency/test_concurrent_receptions.py](../../tests/co
 <!-- file: INT-0004.md -->
 **Código:** INT-0004
 
+# test_concurrent_transfers_do_not_produce_negative_stock_at_origin
+
+## Nombre del test
+
+`tests/concurrency/test_concurrent_transfers.py::test_concurrent_transfers_do_not_produce_negative_stock_at_origin`
+
+## Propósito
+
+Prueba de integración HTTP para validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/concurrency/test_concurrent_transfers.py::test_concurrent_transfers_do_not_produce_negative_stock_at_origin -v
+```
+
+Código fuente: [tests/concurrency/test_concurrent_transfers.py](../../tests/concurrency/test_concurrent_transfers.py) (aprox. línea 25)
+
+
+---
+
+<!-- file: INT-0005.md -->
+**Código:** INT-0005
+
 # test_alerts_list_uses_is_resolved_filter
 
 ## Nombre del test
@@ -142,8 +178,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0005.md -->
-**Código:** INT-0005
+<!-- file: INT-0006.md -->
+**Código:** INT-0006
 
 # test_auth_login_with_email_returns_jwt
 
@@ -178,8 +214,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0006.md -->
-**Código:** INT-0006
+<!-- file: INT-0007.md -->
+**Código:** INT-0007
 
 # test_auth_login_with_username_returns_jwt_and_profile
 
@@ -214,8 +250,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0007.md -->
-**Código:** INT-0007
+<!-- file: INT-0008.md -->
+**Código:** INT-0008
 
 # test_auth_token_refresh_almacenista_allowed_outside_auxiliar_window
 
@@ -250,8 +286,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0008.md -->
-**Código:** INT-0008
+<!-- file: INT-0009.md -->
+**Código:** INT-0009
 
 # test_auth_token_refresh_auxiliar_outside_hours_forbidden
 
@@ -286,8 +322,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0009.md -->
-**Código:** INT-0009
+<!-- file: INT-0010.md -->
+**Código:** INT-0010
 
 # test_auth_user_disable_route
 
@@ -322,8 +358,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0010.md -->
-**Código:** INT-0010
+<!-- file: INT-0011.md -->
+**Código:** INT-0011
 
 # test_catalog_resolve_identifier_param
 
@@ -358,8 +394,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0011.md -->
-**Código:** INT-0011
+<!-- file: INT-0012.md -->
+**Código:** INT-0012
 
 # test_inventory_full_list_authenticated
 
@@ -394,8 +430,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0012.md -->
-**Código:** INT-0012
+<!-- file: INT-0013.md -->
+**Código:** INT-0013
 
 # test_reports_kpi_almacenista_200
 
@@ -430,8 +466,8 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0013.md -->
-**Código:** INT-0013
+<!-- file: INT-0014.md -->
+**Código:** INT-0014
 
 # test_reports_kpi_requires_auth
 
@@ -466,8 +502,224 @@ Código fuente: [tests/integration/test_api_integration.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0014.md -->
-**Código:** INT-0014
+<!-- file: INT-0015.md -->
+**Código:** INT-0015
+
+# test_dispatch_reduces_stock_and_entry_audit_log_exists
+
+## Nombre del test
+
+`tests/integration/test_cross_domain.py::test_dispatch_reduces_stock_and_entry_audit_log_exists`
+
+## Propósito
+
+Prueba de integración HTTP para validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/integration/test_cross_domain.py::test_dispatch_reduces_stock_and_entry_audit_log_exists -v
+```
+
+Código fuente: [tests/integration/test_cross_domain.py](../../tests/integration/test_cross_domain.py) (aprox. línea 147)
+
+
+---
+
+<!-- file: INT-0016.md -->
+**Código:** INT-0016
+
+# test_dispatch_reflected_in_reports_kpi
+
+## Nombre del test
+
+`tests/integration/test_cross_domain.py::test_dispatch_reflected_in_reports_kpi`
+
+## Propósito
+
+Prueba de integración HTTP para validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/integration/test_cross_domain.py::test_dispatch_reflected_in_reports_kpi -v
+```
+
+Código fuente: [tests/integration/test_cross_domain.py](../../tests/integration/test_cross_domain.py) (aprox. línea 85)
+
+
+---
+
+<!-- file: INT-0017.md -->
+**Código:** INT-0017
+
+# test_entry_creates_movement_and_audit_log
+
+## Nombre del test
+
+`tests/integration/test_cross_domain.py::test_entry_creates_movement_and_audit_log`
+
+## Propósito
+
+Prueba de integración HTTP para validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/integration/test_cross_domain.py::test_entry_creates_movement_and_audit_log -v
+```
+
+Código fuente: [tests/integration/test_cross_domain.py](../../tests/integration/test_cross_domain.py) (aprox. línea 23)
+
+
+---
+
+<!-- file: INT-0018.md -->
+**Código:** INT-0018
+
+# test_entry_stock_visible_in_inventory_api
+
+## Nombre del test
+
+`tests/integration/test_cross_domain.py::test_entry_stock_visible_in_inventory_api`
+
+## Propósito
+
+Prueba de integración HTTP para validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/integration/test_cross_domain.py::test_entry_stock_visible_in_inventory_api -v
+```
+
+Código fuente: [tests/integration/test_cross_domain.py](../../tests/integration/test_cross_domain.py) (aprox. línea 123)
+
+
+---
+
+<!-- file: INT-0019.md -->
+**Código:** INT-0019
+
+# test_entry_then_stock_alert_resolved_when_above_reorder_point
+
+## Nombre del test
+
+`tests/integration/test_cross_domain.py::test_entry_then_stock_alert_resolved_when_above_reorder_point`
+
+## Propósito
+
+Prueba de integración HTTP para validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/integration/test_cross_domain.py::test_entry_then_stock_alert_resolved_when_above_reorder_point -v
+```
+
+Código fuente: [tests/integration/test_cross_domain.py](../../tests/integration/test_cross_domain.py) (aprox. línea 46)
+
+
+---
+
+<!-- file: INT-0020.md -->
+**Código:** INT-0020
+
+# test_internal_transfer_preserves_global_stock_and_updates_locations
+
+## Nombre del test
+
+`tests/integration/test_cross_domain.py::test_internal_transfer_preserves_global_stock_and_updates_locations`
+
+## Propósito
+
+Prueba de integración HTTP para validar flujos y contratos entre capas.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/integration/test_cross_domain.py::test_internal_transfer_preserves_global_stock_and_updates_locations -v
+```
+
+Código fuente: [tests/integration/test_cross_domain.py](../../tests/integration/test_cross_domain.py) (aprox. línea 190)
+
+
+---
+
+<!-- file: INT-0021.md -->
+**Código:** INT-0021
 
 # test_integration_fefo_multi_lot
 
@@ -502,8 +754,8 @@ Código fuente: [tests/integration/test_movements_integration.py](../../tests/in
 
 ---
 
-<!-- file: INT-0015.md -->
-**Código:** INT-0015
+<!-- file: INT-0022.md -->
+**Código:** INT-0022
 
 # test_reports_inventory_summary_endpoint
 
@@ -538,8 +790,8 @@ Código fuente: [tests/integration/test_smoke_endpoints.py](../../tests/integrat
 
 ---
 
-<!-- file: INT-0016.md -->
-**Código:** INT-0016
+<!-- file: INT-0023.md -->
+**Código:** INT-0023
 
 # test_reports_kpi_endpoint_available
 
