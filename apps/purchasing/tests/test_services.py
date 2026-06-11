@@ -24,7 +24,11 @@ from apps.purchasing.exceptions import (
     SupplierInactiveError,
     SupplierNITDuplicateError,
 )
-from apps.purchasing.models import PurchaseOrderItem, PurchaseOrderStatus, ReceptionStatus
+from apps.purchasing.models import (
+    PurchaseOrderItem,
+    PurchaseOrderStatus,
+    ReceptionStatus,
+)
 from apps.purchasing.services import (
     activate_supplier,
     cancel_purchase_order,

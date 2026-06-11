@@ -281,7 +281,11 @@ class MovementHistoryReportView(APIView):
             log_event(
                 AuditEventType.REPORT_GENERATED,
                 user=request.user,
-                detail={"kind": "movements-history", "format": "xlsx", "_origin": "API"},
+                detail={
+                    "kind": "movements-history",
+                    "format": "xlsx",
+                    "_origin": "API",
+                },
             )
             return export_to_xlsx(_MOVEMENT_EXPORT_HEADERS, rows, "movements.xlsx")
         return Response(MovementSerializer(qs, many=True).data)
@@ -578,7 +582,11 @@ class ExpiringProductsReportView(APIView):
             log_event(
                 AuditEventType.REPORT_GENERATED,
                 user=request.user,
-                detail={"kind": "expiring-products", "format": "xlsx", "_origin": "API"},
+                detail={
+                    "kind": "expiring-products",
+                    "format": "xlsx",
+                    "_origin": "API",
+                },
             )
             return export_to_xlsx(
                 _EXPIRING_EXPORT_HEADERS, data, "expiring_products.xlsx"
