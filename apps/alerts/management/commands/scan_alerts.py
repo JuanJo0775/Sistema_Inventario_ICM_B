@@ -16,9 +16,12 @@ from __future__ import annotations
 
 import logging
 import sys
+import time
 
 from django.core.management.base import BaseCommand
 
+from apps.audit.models import AuditEventType
+from apps.audit.services import log_event
 from apps.alerts.services import (
     scan_all_expiry_alerts,
     scan_all_location_alerts,
@@ -54,6 +57,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        start_time = time.monotonic()
         dry_run: bool = options["dry_run"]
         strict: bool = options["strict"]
         requested = {
@@ -67,6 +71,17 @@ class Command(BaseCommand):
                 )
             )
         active_types = requested & VALID_TYPES
+
+        log_event(
+            AuditEventType.BATCH_JOB_EXECUTED,
+            detail={
+                "job_name": "scan_alerts",
+                "status": "STARTED",
+                "types": sorted(active_types),
+                "dry_run": dry_run,
+                "strict": strict,
+            },
+        )
 
         mode = "[DRY RUN] " if dry_run else ""
         self.stdout.write(
@@ -84,20 +99,53 @@ class Command(BaseCommand):
                 self.stderr.write(self.style.ERROR(f"  {label:<10} -> ERROR: {exc}"))
                 scan_errors.append(label)
 
-        if "expiry" in active_types:
-            _run("expiry", scan_all_expiry_alerts, dry_run=dry_run)
-        if "stock" in active_types:
-            _run("stock", scan_all_stock_alerts, dry_run=dry_run)
-        if "location" in active_types:
-            _run("location", scan_all_location_alerts, dry_run=dry_run)
+        try:
+            if "expiry" in active_types:
+                _run("expiry", scan_all_expiry_alerts, dry_run=dry_run)
+            if "stock" in active_types:
+                _run("stock", scan_all_stock_alerts, dry_run=dry_run)
+            if "location" in active_types:
+                _run("location", scan_all_location_alerts, dry_run=dry_run)
 
-        if scan_errors:
-            self.stderr.write(
-                self.style.ERROR(
-                    f"{mode}scan_alerts completado con errores: {', '.join(scan_errors)}"
+            elapsed = time.monotonic() - start_time
+            if scan_errors:
+                log_event(
+                    AuditEventType.BATCH_JOB_EXECUTED,
+                    detail={
+                        "job_name": "scan_alerts",
+                        "status": "COMPLETED",
+                        "types": sorted(active_types),
+                        "errors": scan_errors,
+                        "elapsed_seconds": round(elapsed, 2),
+                    },
                 )
+                self.stderr.write(
+                    self.style.ERROR(
+                        f"{mode}scan_alerts completado con errores: {', '.join(scan_errors)}"
+                    )
+                )
+                if strict:
+                    sys.exit(1)
+            else:
+                log_event(
+                    AuditEventType.BATCH_JOB_EXECUTED,
+                    detail={
+                        "job_name": "scan_alerts",
+                        "status": "COMPLETED",
+                        "types": sorted(active_types),
+                        "elapsed_seconds": round(elapsed, 2),
+                    },
+                )
+                self.stdout.write(self.style.SUCCESS(f"{mode}scan_alerts completado."))
+        except Exception:
+            elapsed = time.monotonic() - start_time
+            log_event(
+                AuditEventType.BATCH_JOB_EXECUTED,
+                detail={
+                    "job_name": "scan_alerts",
+                    "status": "FAILED",
+                    "types": sorted(active_types),
+                    "elapsed_seconds": round(elapsed, 2),
+                },
             )
-            if strict:
-                sys.exit(1)
-        else:
-            self.stdout.write(self.style.SUCCESS(f"{mode}scan_alerts completado."))
+            raise

@@ -77,10 +77,16 @@ def get_current_stock(product_id: UUID, location_id: UUID) -> int:
 
 
 @transaction.atomic
-def ensure_stock_row_for_tests(
+def _ensure_stock_row_for_tests(
     product_id: UUID, location_id: UUID, quantity: int
 ) -> StockByLocation:
     """Utilidad interna para pruebas y cargas controladas (no usar en producción desde vistas)."""
+    from django.conf import settings
+
+    if not settings.DEBUG:
+        raise RuntimeError(
+            "_ensure_stock_row_for_tests solo puede ejecutarse con DEBUG=True."
+        )
     from apps.inventory.models import StockByLocation
 
     row, _ = StockByLocation.objects.select_for_update().get_or_create(
@@ -240,6 +246,18 @@ def create_location(
         try:
             loc = Location.objects.create(code=code, **create_kwargs)
             transaction.savepoint_commit(sid)
+            log_event(
+                AuditEventType.LOCATION_CREATED,
+                user=executor,
+                detail={
+                    "location_id": str(loc.id),
+                    "location_code": loc.code,
+                    "_entity_type": "Location",
+                    "_entity_id": str(loc.id),
+                    "_origin": "API",
+                    "_action": "created",
+                },
+            )
             return loc
         except IntegrityError:
             transaction.savepoint_rollback(sid)
@@ -369,6 +387,25 @@ def update_location(executor: Any, location_id: UUID, data: dict[str, Any]) -> L
         elif not requested_active:
             loc.operational_status = Location.OperationalStatus.ARCHIVED
     loc.save()
+    if data.get("is_active") is False:
+        _action = "deactivated"
+    elif data.get("operational_status") == Location.OperationalStatus.ARCHIVED:
+        _action = "deactivated"
+    elif "operational_status" in data:
+        _action = "state_changed"
+    else:
+        _action = "updated"
+    log_event(
+        AuditEventType.LOCATION_MODIFIED,
+        user=executor,
+        detail={
+            "location_id": str(loc.id),
+            "_entity_type": "Location",
+            "_entity_id": str(loc.id),
+            "_origin": "API",
+            "_action": _action,
+        },
+    )
     return loc
 
 

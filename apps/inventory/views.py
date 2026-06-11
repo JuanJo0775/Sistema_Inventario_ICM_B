@@ -11,6 +11,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.audit.models import AuditEventType
+from apps.audit.services import log_event
 from apps.inventory.models import Location, StockByLocation
 from apps.inventory.selectors import (
     get_full_inventory,
@@ -144,6 +146,15 @@ class InventoryFullListView(APIView):
 
         export = request.query_params.get("export", "").lower()
         if export in ("csv", "xlsx"):
+            log_event(
+                AuditEventType.REPORT_GENERATED,
+                user=request.user,
+                detail={
+                    "kind": "inventory-full",
+                    "format": export,
+                    "_origin": "API",
+                },
+            )
             # Aplanar estructura anidada producto→ubicación a una fila por registro
             rows = [
                 {
@@ -703,8 +714,23 @@ class StockThresholdView(APIView):
         from django.shortcuts import get_object_or_404
 
         row = get_object_or_404(StockByLocation, pk=pk)
+        old_value = row.location_reorder_point
         ser = StockThresholdSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         row.location_reorder_point = ser.validated_data["location_reorder_point"]
         row.save(update_fields=["location_reorder_point", "updated_at"])
+        log_event(
+            AuditEventType.STOCK_THRESHOLD_UPDATED,
+            user=request.user,
+            detail={
+                "stock_id": str(row.id),
+                "product_id": str(row.product_id),
+                "location_id": str(row.location_id),
+                "old_reorder_point": old_value,
+                "new_reorder_point": row.location_reorder_point,
+                "_entity_type": "StockByLocation",
+                "_entity_id": str(row.id),
+                "_origin": "API",
+            },
+        )
         return Response(StockByLocationSerializer(row).data)

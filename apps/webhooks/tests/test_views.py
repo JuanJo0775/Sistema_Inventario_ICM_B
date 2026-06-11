@@ -9,6 +9,7 @@ from __future__ import annotations
 import pytest
 from django.urls import reverse
 
+from apps.audit.models import AuditEventType, AuditLog
 from apps.webhooks.models import WebhookDelivery, WebhookEndpoint
 from tests.factories import AdministradorFactory, AlmacenistaFactory
 
@@ -53,6 +54,10 @@ def test_create_endpoint(almacenista_client):
     assert WebhookEndpoint.objects.filter(
         url="https://hook.example.com/events"
     ).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.WEBHOOK_ENDPOINT_CHANGED,
+        metadata___action="created",
+    ).exists()
 
 
 @pytest.mark.django_db
@@ -69,6 +74,10 @@ def test_delete_endpoint_deactivates_it(almacenista_client, endpoint):
     assert response.status_code == 204
     endpoint.refresh_from_db()
     assert not endpoint.is_active
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.WEBHOOK_ENDPOINT_CHANGED,
+        metadata___action="deactivated",
+    ).exists()
 
 
 @pytest.mark.django_db

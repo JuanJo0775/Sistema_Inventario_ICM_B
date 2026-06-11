@@ -10,6 +10,7 @@ from django.core.management import call_command
 from django.utils import timezone
 
 from apps.alerts.models import Alert, AlertType
+from apps.audit.models import AuditEventType, AuditLog
 from apps.inventory.models import Location, StockByLocation
 from tests.factories import LocationFactory, LotFactory, ProductFactory
 
@@ -42,6 +43,11 @@ def test_scan_alerts_expiry_type_creates_lot_expired_alert():
         product=product, alert_type=AlertType.LOT_EXPIRED, is_resolved=False
     ).exists()
     assert "expiry" in out.getvalue()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.BATCH_JOB_EXECUTED,
+        metadata__job_name="scan_alerts",
+        metadata__status="COMPLETED",
+    ).exists()
 
 
 @pytest.mark.django_db

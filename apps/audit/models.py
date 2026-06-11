@@ -76,6 +76,19 @@ class AuditEventType(models.TextChoices):
     RECEPTION_CREATED = "RECEPTION_CREATED", "Recepción de mercancía creada"
     RECEPTION_CONFIRMED = "RECEPTION_CONFIRMED", "Recepción de mercancía confirmada"
     RECEPTION_CANCELLED = "RECEPTION_CANCELLED", "Recepción de mercancía cancelada"
+    # Ubicaciones — entidad de negocio con operaciones protegidas
+    LOCATION_CREATED = "LOCATION_CREATED", "Ubicación creada"
+    LOCATION_MODIFIED = "LOCATION_MODIFIED", "Ubicación modificada"
+    # Webhook endpoints — seguridad: vector de exfiltración
+    WEBHOOK_ENDPOINT_CHANGED = "WEBHOOK_ENDPOINT_CHANGED", "Endpoint webhook modificado"
+    # Umbrales de reorden — afecta comportamiento operativo
+    STOCK_THRESHOLD_UPDATED = "STOCK_THRESHOLD_UPDATED", "Umbral de stock actualizado"
+    # Alertas — accountability de resolución
+    ALERT_RESOLVED = "ALERT_RESOLVED", "Alerta resuelta"
+    # Órdenes de compra — documento financiero
+    PURCHASE_ORDER_UPDATED = "PURCHASE_ORDER_UPDATED", "Orden de compra actualizada"
+    # Procesos batch — accountability de jobs automáticos
+    BATCH_JOB_EXECUTED = "BATCH_JOB_EXECUTED", "Job batch ejecutado"
 
 
 class AuditLog(models.Model):
@@ -150,6 +163,13 @@ class AuditLogArchive(models.Model):
         indexes = [
             models.Index(fields=("created_at",)),
         ]
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            from shared.exceptions import ImmutableRecordError
+
+            raise ImmutableRecordError("AuditLogArchive records cannot be modified.")
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"[ARCHIVO] {self.event_type} @ {self.created_at}"

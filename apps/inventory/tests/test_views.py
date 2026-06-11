@@ -6,6 +6,8 @@ import pytest
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from apps.audit.models import AuditEventType, AuditLog
+
 
 @pytest.mark.django_db
 def test_inventory_full_list_returns_200(authenticated_almacenista_client):
@@ -40,6 +42,9 @@ def test_location_create_returns_201(authenticated_almacenista_client):
     )
     assert response.status_code == status.HTTP_201_CREATED
     assert response.data["name"] == "Bodega Test Nueva"
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.LOCATION_CREATED,
+    ).exists()
 
 
 @pytest.mark.django_db
@@ -54,6 +59,10 @@ def test_location_state_transition_returns_200(
     )
     assert response.status_code == status.HTTP_200_OK
     assert response.data["operational_status"] == "maintenance"
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.LOCATION_MODIFIED,
+        metadata___action="state_changed",
+    ).exists()
 
 
 @pytest.mark.django_db

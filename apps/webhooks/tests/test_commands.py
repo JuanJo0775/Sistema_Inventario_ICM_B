@@ -8,6 +8,8 @@ from unittest.mock import patch
 import pytest
 from django.core.management import call_command
 
+from apps.audit.models import AuditEventType, AuditLog
+
 
 @pytest.mark.django_db
 def test_deliver_webhooks_no_pending():
@@ -34,6 +36,11 @@ def test_deliver_webhooks_with_deliveries():
     assert "6" in output  # total procesados
     assert "5" in output  # entregados
     assert "1" in output  # fallidos
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.BATCH_JOB_EXECUTED,
+        metadata__job_name="deliver_webhooks",
+        metadata__status="COMPLETED",
+    ).exists()
 
 
 @pytest.mark.django_db

@@ -13,6 +13,8 @@ import logging
 
 from django.core.management.base import BaseCommand
 
+from apps.audit.models import AuditEventType
+from apps.audit.services import log_event
 from apps.inventory.models import StockByLocation
 from apps.movements.services import _ledger_net_qty
 
@@ -74,6 +76,14 @@ class Command(BaseCommand):
             for row, expected in divergences:
                 row.current_stock = expected
                 row.save(update_fields=["current_stock"])
+            log_event(
+                AuditEventType.STOCK_RECONSTRUCTED,
+                detail={
+                    "divergences_fixed": len(divergences),
+                    "_origin": "BATCH",
+                    "source": "verify_stock_integrity --fix",
+                },
+            )
             self.stdout.write(
                 self.style.SUCCESS(
                     f"REPARADO: {len(divergences)} divergencias corregidas desde el ledger."

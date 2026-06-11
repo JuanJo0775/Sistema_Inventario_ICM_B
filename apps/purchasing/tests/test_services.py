@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
+
 import pytest
+from django.utils import timezone
 
 from apps.audit.models import AuditEventType, AuditLog
 from apps.inventory.models import StockByLocation
@@ -21,7 +24,7 @@ from apps.purchasing.exceptions import (
     SupplierInactiveError,
     SupplierNITDuplicateError,
 )
-from apps.purchasing.models import PurchaseOrderStatus, ReceptionStatus
+from apps.purchasing.models import PurchaseOrderItem, PurchaseOrderStatus, ReceptionStatus
 from apps.purchasing.services import (
     activate_supplier,
     cancel_purchase_order,
@@ -32,6 +35,7 @@ from apps.purchasing.services import (
     create_reception,
     create_supplier,
     deactivate_supplier,
+    update_purchase_order,
     update_supplier,
 )
 from tests.factories import AlmacenistaFactory, LocationFactory, ProductFactory
@@ -150,6 +154,83 @@ def test_create_purchase_order(almacenista_user):
     assert po.number.startswith("OC-")
     assert AuditLog.objects.filter(
         event_type=AuditEventType.PURCHASE_ORDER_CREATED
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_update_purchase_order_updates_notes_and_fields(almacenista_user):
+    po = PurchaseOrderFactory(created_by=almacenista_user)
+    PurchaseOrderItemFactory(purchase_order=po)
+    now = timezone.now().date() + timedelta(days=7)
+
+    updated = update_purchase_order(
+        almacenista_user,
+        po.id,
+        {"notes": "Nueva nota", "expected_delivery": now},
+    )
+    assert updated.notes == "Nueva nota"
+    assert updated.expected_delivery == now
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.PURCHASE_ORDER_UPDATED,
+        metadata__purchase_order_id=str(po.id),
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_update_purchase_order_replaces_items(almacenista_user):
+    po = PurchaseOrderFactory(created_by=almacenista_user)
+    old_item = PurchaseOrderItemFactory(purchase_order=po)
+    new_product = ProductFactory()
+
+    updated = update_purchase_order(
+        almacenista_user,
+        po.id,
+        {
+            "items": [
+                {
+                    "product_id": new_product.id,
+                    "quantity_ordered": 3,
+                    "unit_cost": "20000",
+                }
+            ]
+        },
+    )
+    assert updated.items.count() == 1
+    new_item = updated.items.first()
+    assert new_item.product_id == new_product.id
+    assert new_item.quantity_ordered == 3
+    assert not PurchaseOrderItem.objects.filter(pk=old_item.pk).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.PURCHASE_ORDER_UPDATED,
+        metadata__purchase_order_id=str(po.id),
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_update_purchase_order_raises_on_confirmed_po(almacenista_user):
+    po = PurchaseOrderFactory(
+        created_by=almacenista_user, status=PurchaseOrderStatus.PENDIENTE
+    )
+    PurchaseOrderItemFactory(purchase_order=po)
+    with pytest.raises(PurchaseOrderImmutableError):
+        update_purchase_order(
+            almacenista_user, po.id, {"notes": "No debería funcionar"}
+        )
+
+
+@pytest.mark.django_db
+def test_update_purchase_order_empty_data_still_logs(almacenista_user):
+    po = PurchaseOrderFactory(created_by=almacenista_user)
+    PurchaseOrderItemFactory(purchase_order=po)
+    expected_delivery_before = po.expected_delivery
+
+    updated = update_purchase_order(almacenista_user, po.id, {})
+    updated.refresh_from_db()
+    assert updated.expected_delivery == expected_delivery_before
+    assert updated.notes == ""
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.PURCHASE_ORDER_UPDATED,
+        metadata__purchase_order_id=str(po.id),
     ).exists()
 
 

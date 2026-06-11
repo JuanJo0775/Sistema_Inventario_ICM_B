@@ -10,6 +10,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.audit.models import AuditEventType
+from apps.audit.services import log_event
 from apps.webhooks.models import WebhookDelivery, WebhookEndpoint
 from apps.webhooks.serializers import (
     WebhookDeliverySerializer,
@@ -67,6 +69,17 @@ class WebhookEndpointListCreateView(APIView):
             max_retries=d.get("max_retries", 3),
             created_by=request.user,
         )
+        log_event(
+            AuditEventType.WEBHOOK_ENDPOINT_CHANGED,
+            user=request.user,
+            detail={
+                "endpoint_id": str(endpoint.id),
+                "_entity_type": "WebhookEndpoint",
+                "_entity_id": str(endpoint.id),
+                "_origin": "API",
+                "_action": "created",
+            },
+        )
         return Response(
             WebhookEndpointSerializer(endpoint).data, status=status.HTTP_201_CREATED
         )
@@ -108,6 +121,17 @@ class WebhookEndpointDetailView(APIView):
         for field, value in ser.validated_data.items():
             setattr(endpoint, field, value)
         endpoint.save()
+        log_event(
+            AuditEventType.WEBHOOK_ENDPOINT_CHANGED,
+            user=request.user,
+            detail={
+                "endpoint_id": str(endpoint.id),
+                "_entity_type": "WebhookEndpoint",
+                "_entity_id": str(endpoint.id),
+                "_origin": "API",
+                "_action": "updated",
+            },
+        )
         return Response(WebhookEndpointSerializer(endpoint).data)
 
     @extend_schema(
@@ -127,6 +151,17 @@ class WebhookEndpointDetailView(APIView):
         for field, value in ser.validated_data.items():
             setattr(endpoint, field, value)
         endpoint.save()
+        log_event(
+            AuditEventType.WEBHOOK_ENDPOINT_CHANGED,
+            user=request.user,
+            detail={
+                "endpoint_id": str(endpoint.id),
+                "_entity_type": "WebhookEndpoint",
+                "_entity_id": str(endpoint.id),
+                "_origin": "API",
+                "_action": "updated",
+            },
+        )
         return Response(WebhookEndpointSerializer(endpoint).data)
 
     @extend_schema(
@@ -145,6 +180,17 @@ class WebhookEndpointDetailView(APIView):
         endpoint = get_object_or_404(WebhookEndpoint, pk=pk)
         endpoint.is_active = False
         endpoint.save(update_fields=["is_active", "updated_at"])
+        log_event(
+            AuditEventType.WEBHOOK_ENDPOINT_CHANGED,
+            user=request.user,
+            detail={
+                "endpoint_id": str(endpoint.id),
+                "_entity_type": "WebhookEndpoint",
+                "_entity_id": str(endpoint.id),
+                "_origin": "API",
+                "_action": "deactivated",
+            },
+        )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

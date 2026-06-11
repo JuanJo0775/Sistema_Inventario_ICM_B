@@ -21,6 +21,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.audit.models import AuditEventType
+from apps.audit.services import log_event
 from apps.movements.serializers import MovementSerializer
 from apps.reports.selectors import (
     get_discard_operational_summary,
@@ -268,9 +270,19 @@ class MovementHistoryReportView(APIView):
         export = request.query_params.get("export", "").lower()
         if export == "csv":
             rows = [dict(item) for item in MovementSerializer(qs, many=True).data]
+            log_event(
+                AuditEventType.REPORT_GENERATED,
+                user=request.user,
+                detail={"kind": "movements-history", "format": "csv", "_origin": "API"},
+            )
             return export_to_csv(_MOVEMENT_EXPORT_HEADERS, rows, "movements.csv")
         if export == "xlsx":
             rows = [dict(item) for item in MovementSerializer(qs, many=True).data]
+            log_event(
+                AuditEventType.REPORT_GENERATED,
+                user=request.user,
+                detail={"kind": "movements-history", "format": "xlsx", "_origin": "API"},
+            )
             return export_to_xlsx(_MOVEMENT_EXPORT_HEADERS, rows, "movements.xlsx")
         return Response(MovementSerializer(qs, many=True).data)
 
@@ -554,10 +566,20 @@ class ExpiringProductsReportView(APIView):
 
         export = request.query_params.get("export", "").lower()
         if export == "csv":
+            log_event(
+                AuditEventType.REPORT_GENERATED,
+                user=request.user,
+                detail={"kind": "expiring-products", "format": "csv", "_origin": "API"},
+            )
             return export_to_csv(
                 _EXPIRING_EXPORT_HEADERS, data, "expiring_products.csv"
             )
         if export == "xlsx":
+            log_event(
+                AuditEventType.REPORT_GENERATED,
+                user=request.user,
+                detail={"kind": "expiring-products", "format": "xlsx", "_origin": "API"},
+            )
             return export_to_xlsx(
                 _EXPIRING_EXPORT_HEADERS, data, "expiring_products.xlsx"
             )
@@ -802,6 +824,16 @@ class ReportDatasetView(APIView):
                 }
             )
 
+        log_event(
+            AuditEventType.REPORT_GENERATED,
+            user=request.user,
+            detail={
+                "kind": kind,
+                "format": "json",
+                "filters": filters,
+                "_origin": "API",
+            },
+        )
         payload = {
             "report": kind,
             "generated_at": generated_at,

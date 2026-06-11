@@ -7,6 +7,7 @@ from decimal import Decimal
 import pytest
 from django.urls import reverse
 
+from apps.audit.models import AuditEventType, AuditLog
 from apps.movements.models import Invoice, MovementType
 from apps.movements.services import (
     create_invoice_from_movements,
@@ -44,6 +45,16 @@ def test_invoice_created_on_dispatch(almacenista_user, sample_locations):
     invoice = Invoice.objects.filter(number=m.invoice_number).first()
     assert invoice is not None
     assert m in invoice.movements.all()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.MOVEMENT_CREATED,
+    ).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.INVOICE_GENERATED,
+        metadata__invoice_number=invoice.number,
+    ).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.DISPATCH_WITH_PRICE_COMPLETED,
+    ).exists()
 
 
 @pytest.mark.django_db
@@ -141,6 +152,10 @@ def test_create_invoice_from_movements_manually(almacenista_user, sample_locatio
     )
     assert invoice.subtotal == Decimal("6000.0000")
     assert invoice.movements.count() == len(movements)
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.INVOICE_GENERATED,
+        metadata__invoice_number=inv_number + "-DUP",
+    ).exists()
 
 
 # ---------------------------------------------------------------------------

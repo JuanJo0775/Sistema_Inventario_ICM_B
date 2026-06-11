@@ -6,6 +6,7 @@ from decimal import Decimal
 
 import pytest
 
+from apps.audit.models import AuditEventType, AuditLog
 from apps.movements.models import Movement, MovementType
 from apps.movements.services import register_dispatch, register_entry
 from tests.factories import ProductFactory
@@ -46,6 +47,12 @@ def test_dispatch_retail_captures_sale_price_retail_as_unit_price(
     assert m.unit_price == Decimal("12000.0000")
     assert m.price_type == "retail"
     assert m.currency == "COP"
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.MOVEMENT_CREATED,
+    ).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.DISPATCH_WITH_PRICE_COMPLETED,
+    ).exists()
 
 
 @pytest.mark.django_db

@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 from django.urls import reverse
 
+from apps.audit.models import AuditEventType, AuditLog
 from apps.alerts.models import Alert, AlertType
 from apps.alerts.services import check_and_create_minimum_stock_alert
 from apps.inventory.models import StockByLocation
@@ -90,6 +91,10 @@ def test_patch_threshold_via_api(authenticated_almacenista_client, threshold_set
 
     stock.refresh_from_db()
     assert stock.location_reorder_point == 3
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.STOCK_THRESHOLD_UPDATED,
+        metadata__stock_id=str(stock.id),
+    ).exists()
 
 
 @pytest.mark.django_db

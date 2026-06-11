@@ -288,6 +288,18 @@ def update_purchase_order(
                 notes=item_data.get("notes", ""),
             )
 
+    log_event(
+        AuditEventType.PURCHASE_ORDER_UPDATED,
+        user=executor,
+        detail={
+            "purchase_order_id": str(po.id),
+            "po_number": po.number,
+            "updated_fields": list(data.keys()),
+            "_entity_type": "PurchaseOrder",
+            "_entity_id": str(po.id),
+            "_origin": "API",
+        },
+    )
     return po
 
 

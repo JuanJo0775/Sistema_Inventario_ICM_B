@@ -5,6 +5,7 @@ from datetime import timedelta
 import pytest
 from django.utils import timezone
 
+from apps.audit.models import AuditEventType, AuditLog
 from apps.alerts.models import (
     ALERT_TYPE_DEFAULTS,
     Alert,
@@ -36,6 +37,10 @@ def test_resolve_alert_almacenista(almacenista_user):
     out = resolve_alert(almacenista_user, alert.id)
     assert out.is_resolved
     assert out.resolved_by_id == almacenista_user.id
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.ALERT_RESOLVED,
+        metadata__alert_id=str(alert.id),
+    ).exists()
 
 
 @pytest.mark.django_db

@@ -9,7 +9,8 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 
-from apps.audit.models import AuditLog, AuditLogArchive
+from apps.audit.models import AuditEventType, AuditLog, AuditLogArchive
+from apps.audit.services import log_event
 
 
 class Command(BaseCommand):
@@ -38,10 +39,46 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        start_time = time.monotonic()
         older_than = timezone.now() - timedelta(days=options["older_than_days"])
         dry_run = options["dry_run"]
         batch_size = options["batch_size"]
 
+        log_event(
+            AuditEventType.BATCH_JOB_EXECUTED,
+            detail={
+                "job_name": "archive_old_audit_logs",
+                "status": "STARTED",
+                "older_than_days": options["older_than_days"],
+                "dry_run": dry_run,
+            },
+        )
+        try:
+            result = self._run(older_than, dry_run, batch_size)
+            elapsed = time.monotonic() - start_time
+            log_event(
+                AuditEventType.BATCH_JOB_EXECUTED,
+                detail={
+                    "job_name": "archive_old_audit_logs",
+                    "status": "COMPLETED",
+                    "archived_count": result,
+                    "elapsed_seconds": round(elapsed, 2),
+                },
+            )
+            return result
+        except Exception:
+            elapsed = time.monotonic() - start_time
+            log_event(
+                AuditEventType.BATCH_JOB_EXECUTED,
+                detail={
+                    "job_name": "archive_old_audit_logs",
+                    "status": "FAILED",
+                    "elapsed_seconds": round(elapsed, 2),
+                },
+            )
+            raise
+
+    def _run(self, older_than, dry_run, batch_size):
         total_qs = AuditLog.objects.filter(created_at__lt=older_than)
         total_count = total_qs.count()
 

@@ -9,6 +9,8 @@ from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 
+from apps.audit.models import AuditEventType
+from apps.audit.services import log_event
 from apps.alerts.models import (
     ALERT_TYPE_DEFAULTS,
     Alert,
@@ -485,4 +487,17 @@ def resolve_alert(executor: User, alert_id: UUID) -> Alert:
     alert.resolved_at = timezone.now()
     alert.resolved_by = executor
     alert.save(update_fields=["is_resolved", "resolved_at", "resolved_by"])
+    log_event(
+        AuditEventType.ALERT_RESOLVED,
+        user=executor,
+        detail={
+            "alert_id": str(alert.id),
+            "alert_type": alert.alert_type,
+            "product_id": str(alert.product_id) if alert.product_id else None,
+            "location_id": str(alert.location_id) if alert.location_id else None,
+            "_entity_type": "Alert",
+            "_entity_id": str(alert.id),
+            "_origin": "API",
+        },
+    )
     return alert

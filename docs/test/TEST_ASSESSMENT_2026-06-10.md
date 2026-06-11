@@ -14,6 +14,7 @@
 |-------|---------|---------|
 | 2026-06-10 | 1.0 | Informe inicial |
 | 2026-06-11 | 1.1 | Actualización post-refactor: locustfile reescrito con 2 roles y cobertura multi-módulo; CI seed mejorado con TemporaryAccessPermit para auxiliar en load test; field names de payloads alineados con serializers reales |
+| 2026-06-11 | 1.2 | Auditoría ICM: implementación del plan AUDIT_REMEDIATION_PLAN.md — 7 nuevos AuditEventType, cobertura de auditoría elevada de 47% a 74% bruta / 100% ajustada, 26 puntos de log_event() añadidos, 4 tests nuevos para update_purchase_order, +16 aserciones de auditoría en tests existentes |
 
 ---
 
@@ -26,6 +27,7 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 ### Principales fortalezas
 
 - **Cobertura Gherkin al 100 %:** los 132 escenarios de backend definidos en el ERS tienen implementaciones registradas y activas. Ningún escenario backend queda sin automatizar.
+- **Auditoría completa al 100% ajustado:** implementación del plan AUDIT_REMEDIATION_PLAN.md — 7 nuevos `AuditEventType`, cobertura elevada de 47% a 74% bruta / 100% ajustada, 26 puntos de `log_event()` añadidos en servicios, vistas y comandos batch sin nuevas capas ni cambios de esquema.
 - **Pipeline CI/CD de 6 etapas** con separación progresiva de confianza (calidad estática → unitarios → integración → escenarios Postgres → concurrencia → carga), con barreras de fallo en cascada.
 - **Cobertura de invariantes críticas:** inmutabilidad de movimientos, stock no negativo, serial obligatorio para Electroterapia, validación cruzada de despacho, franjas horarias de auxiliar, consistencia de ledger — todos cubiertos por pruebas.
 - **Pruebas de concurrencia reales** sobre PostgreSQL con `SELECT FOR UPDATE`, probando la resistencia a race conditions en stock.
@@ -67,8 +69,8 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | Categoría | Ruta | Cantidad | Observaciones |
 |-----------|------|----------|---------------|
 | Tests unitarios / integración (app-level) | `apps/*/tests/test_*.py` | 55 archivos | Un directorio `tests/` por app |
-| Escenarios ERS/Gherkin — implementaciones | `tests/ers/impl/*.py` | 11 archivos de dominio | 1 por módulo ERS |
-| Escenarios ERS/Gherkin — runner dinámico | `tests/ers/test_gherkin_dynamic.py` | 1 archivo | Genera 132 tests en tiempo de colección |
+| Escenarios ERS/Gherkin — implementaciones | `tests/ers/impl/*.py` | 10 archivos de dominio + 3 de infraestructura | 1 por módulo ERS |
+| Escenarios ERS/Gherkin — runner dinámico | `tests/ers/test_gherkin_dynamic.py` | 1 archivo | Genera 138 tests en tiempo de colección (132 activos + 6 out-of-scope skippeados) |
 | Tests de integración general | `tests/integration/` | 3 archivos | API, movimientos FEFO, smoke endpoints |
 | Tests de concurrencia | `tests/concurrency/` | 3 archivos | `test_concurrent_movements.py`, `test_concurrent_receptions.py`, `test_concurrent_transfers.py` |
 | Tests de rendimiento (Locust) | `tests/performance/locustfile.py` | 1 archivo | ICMUser (26 tareas) + AuxiliarUser (8 tareas) — 2 roles, 19 lecturas + 7 escrituras + 2 seed |
@@ -84,8 +86,8 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | Categoría | Ruta | Cantidad | Observaciones |
 |-----------|------|----------|---------------|
 | Fichas de escenarios Gherkin | `docs/test/scenarios/*.md` | 139 fichas | Una por escenario ERS |
-| Fichas de tests unitarios | `docs/test/unit/*.md` + `index.md` | 488 fichas + índice | Auto-generadas por `generate_docs` |
-| Fichas de tests de integración | `docs/test/integration/*.md` | 17 fichas | Auto-generadas |
+| Fichas de tests unitarios | `docs/test/unit/*.md` + `index.md` | 525 fichas + índice | Auto-generadas por `generate_docs` |
+| Fichas de tests de integración | `docs/test/integration/*.md` | 24 fichas | Auto-generadas |
 | Metadata JSON de escenarios | `docs/test/gherkin_scenarios.json` | 1 archivo | 138 escenarios parseados |
 | Escenarios fuera de alcance | `docs/test/gherkin_out_of_scope.json` | 1 archivo | 6 escenarios (RNF001, RNF002) |
 | Escenarios pendientes | `docs/test/gherkin_pending.json` | 1 archivo | 0 escenarios pendientes |
@@ -123,14 +125,14 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 
 | Módulo / App | Tests app-level | ERS backend | Concurrencia | Integración | Cobertura estimada |
 |-------------|----------------|-------------|--------------|-------------|-------------------|
-| `authentication` | 56 | 10 (RF001-RF002) | — | 4 | Alta |
+| `authentication` | 59 | 10 (RF001-RF002) | — | 4 | Alta |
 | `catalog` | 84 | 7 (RF003) | — | 1 | Alta |
 | `inventory` | 44 | 18 (RF004) | — | 2 | Alta |
-| `movements` | 70 | 35 (RF005-RF009) | 2 | 1 (FEFO) | Alta |
+| `movements` | 80 | 35 (RF005-RF009) | 2 | 1 (FEFO) | Alta |
 | `reports` | 46 | 7 (RF010) | — | 2 | Alta |
 | `alerts` | 49 | 7 (RF011) | — | 1 | Alta |
-| `audit` | 15 | 8 (RF012) | — | — | Media-Alta |
-| `purchasing` | 81 | 23 (RF019-RF025) | 1 | — | Alta |
+| `audit` | 15 | 8 (RF012) | — | — | Alta |
+| `purchasing` | 85 | 23 (RF019-RF025) | 1 | — | Alta |
 | `webhooks` | 22 | — | — | — | Media |
 | `dashboard` | 17 | — | — | — | Media-Alta |
 | `shared` (excepciones) | — (indirectos) | 13 (RNF003-RNF006) | — | — | Media |
@@ -190,35 +192,35 @@ apps/webhooks/tests/
 
 | App | Archivos | Tests |
 |-----|----------|-------|
-| alerts | 6 archivos | 49 |
+| alerts | 6 archivos | 57 |
 | audit | 4 archivos | 15 |
-| authentication | 7 archivos | 56 |
+| authentication | 6 archivos | 59 |
 | catalog | 6 archivos | 84 |
 | dashboard | 1 archivo | 17 |
-| inventory | 10 archivos | 54 |
+| inventory | 10 archivos | 44 |
 | movements | 8 archivos | 80 |
-| purchasing | 5 archivos | 81 |
+| purchasing | 4 archivos | 85 |
 | reports | 6 archivos | 46 |
 | webhooks | 4 archivos | 25 |
-| **Total** | **57 archivos** | **~510** |
+| **Total** | **55 archivos** | **512** |
 
 #### Cobertura funcional
 
-- **Servicios:** testeo directo de servicios de dominio (`services.py`) con llamadas reales a la capa de persistencia. El módulo `apps/movements/tests/test_services.py` (855 líneas, 30 tests) es el test más extenso e incluye todos los tipos de movimiento, invariantes de estado de ubicación, validación cruzada y correcciones.
+- **Servicios:** testeo directo de servicios de dominio (`services.py`) con llamadas reales a la capa de persistencia. El módulo `apps/movements/tests/test_services.py` (855 líneas, 30 tests) es uno de los más extensos e incluye todos los tipos de movimiento, invariantes de estado de ubicación, validación cruzada y correcciones.
 - **Vistas:** cada app incluye `test_views.py` con pruebas HTTP usando `APIClient` de DRF.
 - **Modelos:** `test_models.py` por app valida constraints, full_clean y SKU patterns.
 - **Selectores:** `test_selectors.py` en inventory, reports y purchasing valida consultas complejas.
 - **Precios y facturación:** `test_product_pricing.py`, `test_combo_pricing.py`, `test_dispatch_pricing.py`, `test_pricing_optional.py`, `test_invoice.py` — 5 archivos especializados.
 - **Alertas especializadas:** `test_new_alert_types.py` (14 tests) cubre los 8 tipos de alerta.
-- **Compras:** `test_services.py` de purchasing tiene 31 tests, el segundo mayor archivo.
+- **Compras:** `test_services.py` de purchasing tiene 35 tests, el segundo mayor archivo (incluye 4 tests nuevos para `update_purchase_order` con verificación de auditoría).
 
 #### Cobertura técnica
 
-- 63 instancias de `pytest.raises` — cobertura de rutas de error.
-- 417 referencias a mocking (`mock`/`patch`/`MagicMock`) — aislamientos de dependencias externas.
+- 65 instancias de `pytest.raises` — cobertura de rutas de error.
+- 78 referencias a mocking (`mock`/`patch`/`MagicMock`) — aislamientos de dependencias externas.
 - 13 instancias de `@pytest.mark.parametrize` — bajo uso relativo al tamaño de la suite.
-- 10 supresiones `noqa`/`type: ignore` — supresión muy contenida.
-- `@pytest.mark.django_db` en 421 test functions.
+- 21 supresiones `noqa`/`type: ignore` — supresión muy contenida.
+- `@pytest.mark.django_db` en 460 test functions.
 
 #### Fortalezas
 
@@ -321,8 +323,8 @@ docs/test/scenarios/                    ← Fichas individuales por escenario
 
 #### Archivos identificados
 
-| Archivo de implementación | Dominio |
-|---------------------------|---------|
+| Archivo de implementación (dominio) | Dominio |
+|--------------------------------------|---------|
 | `impl/auth.py` | RF001–RF002 (Autenticación) |
 | `impl/catalog.py` | RF003 (Catálogo) |
 | `impl/inventory.py` | RF004 (Inventario / Storage) |
@@ -399,7 +401,7 @@ Scripts de automatización con validaciones propias.
 
 | Script | Propósito | ¿Tiene tests? |
 |--------|-----------|--------------|
-| `scripts/generate_docs.py` / `scripts/parse_ers_gherkin.py` | Regenera fichas de tests y metadatos Gherkin | Sí — `tests/test_generate_project_structure.py` |
+| `scripts/generate_docs.py` / `scripts/parse_ers_gherkin.py` | Regenera fichas de tests y metadatos Gherkin | Sí — `tests/test_generate_project_structure.py` + `tests/test_generate_docs.py` (12 tests) |
 | `scripts/generate_project_structure.py` | Regenera árbol de estructura en docs | Sí — mismo archivo de prueba |
 | `scripts/import_catalog/importer.py` | Importación batch de 215 productos | No directamente |
 | `scripts/import_catalog/reader.py` | Lector CSV del catálogo | No directamente |
@@ -699,7 +701,7 @@ Nota: flake8 excluye los directorios de tests — los tests no están sujetos a 
 #### Fortalezas
 
 - `black` + `isort` bloqueantes en CI garantizan estilo uniforme sin discusión.
-- Solo 10 supresiones `noqa`/`type: ignore` en toda la codebase — mínima deuda técnica suprimida.
+- Solo 21 supresiones `noqa`/`type: ignore` en toda la codebase — mínima deuda técnica suprimida.
 - Profile `black` en isort evita conflictos entre herramientas de formato.
 
 #### Limitaciones
@@ -730,7 +732,7 @@ La combinación black+isort+flake8 garantiza uniformidad básica. La presencia d
 | **Seguridad (JWT / roles)** | Unit + Integration + Gherkin | Alta | Franja horaria auxiliar, roles, tokens, disable/enable usuario. |
 | **Validaciones de dominio** | Unit (pytest.raises) + Gherkin | Alta | 63 tests de excepción cubren SerialNumberRequiredError, InsufficientStockError, CrossValidationFailed, etc. |
 | **Manejo de errores** | Unit + Gherkin | Alta | Jerarquía `ICMBaseException` con excepciones tipadas y handler centralizado. |
-| **Observabilidad / Auditoría** | Unit + Gherkin | Media-Alta | `test_services.py` audit, `test_archive_command.py`. Cobertura de auditoría en movimientos. |
+| **Observabilidad / Auditoría** | Unit + Gherkin | Alta | `test_services.py` audit, `test_archive_command.py`. Cobertura completa: 7 nuevos event types, 26 puntos de `log_event()`, cobertura elevada de 47% → 100% ajustada. Auditoría en movimientos, ubicaciones, webhooks, umbrales de stock, alertas, órdenes de compra y jobs batch. |
 | **Eventos / Webhooks** | Unit | Media | 22 tests en webhooks pero sin escenarios Gherkin. |
 | **Exportaciones / Reportes** | Unit + Gherkin | Alta | `test_exports.py` (10 tests), `test_financial_reports.py`, `test_selectors.py`. |
 | **Integraciones externas** | — | Sin evidencia | No se encontraron integraciones con servicios externos (email, SMS, ERP). |
@@ -933,15 +935,15 @@ El sistema está en condiciones óptimas para operar en producción. Las accione
 
 ## Apéndice A — Resumen de Conteo de Pruebas
 
-| Categoría | Archivos | Tests definidos | Tests generados en runtime |
-|-----------|----------|----------------|--------------------------|
-| Unit / app-level | 57 | ~510 | — |
-| ERS / Gherkin (implementaciones) | 11 impl + 1 runner | 0 funciones estáticas | 132 |
+| Categoría | Archivos test_*.py | Tests definidos | Tests generados en runtime |
+|-----------|--------------------|----------------|--------------------------|
+| Unit / app-level | 55 | 512 | — |
+| ERS / Gherkin (runner) | 1 | 0 | 132 (+6 out-of-scope) |
 | Integración cross-domain | 4 | 19 | — |
 | Concurrencia | 3 | 4 | — |
-| Root (validators, seed, structure, generate-docs, SLA) | 6 | ~40 | — |
-| **Total** | **82** | **~573** | **+132** |
-| **Total en ejecución** | | | **~705** |
+| Root (validators, seed, structure, docs, SLA) | 5 | 44 | — |
+| **Total archivos test** | **68** | **579** | **+138** |
+| **Total en ejecución** | | | **717** |
 
 ---
 

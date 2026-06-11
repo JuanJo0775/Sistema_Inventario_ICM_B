@@ -36,6 +36,11 @@ def test_archive_moves_old_records(db):
     assert not AuditLog.objects.filter(pk=old_log.pk).exists()
     assert AuditLogArchive.objects.filter(id=old_log.id).exists()
     assert AuditLog.objects.filter(pk=recent_log.pk).exists()
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.BATCH_JOB_EXECUTED,
+        metadata__job_name="archive_old_audit_logs",
+        metadata__status="COMPLETED",
+    ).exists()
 
 
 @pytest.mark.django_db

@@ -241,6 +241,19 @@ def create_invoice_from_movements(
         if pdf:
             invoice.pdf.save(f"{invoice_number}.pdf", pdf, save=True)
 
+    log_event(
+        AuditEventType.INVOICE_GENERATED,
+        description=f"Factura {invoice_number} generada",
+        user=user,
+        detail={
+            "invoice_number": invoice_number,
+            "movement_ids": [str(m.id) for m in movements],
+            "total_amount": str(invoice.total_amount),
+            "_entity_type": "Invoice",
+            "_entity_id": str(invoice.id),
+            "_origin": "API",
+        },
+    )
     return invoice
 
 
@@ -745,6 +758,16 @@ def register_dispatch(
     for m in movements_created:
         m.refresh_from_db()
 
+    log_event(
+        AuditEventType.MOVEMENT_CREATED,
+        description="Despacho registrado",
+        user=user,
+        detail={
+            "movements": [str(m.id) for m in movements_created],
+            "type": movement_type,
+        },
+    )
+
     # Crear el modelo Invoice consolidado con precio
     try:
         create_invoice_from_movements(
@@ -791,6 +814,21 @@ def register_dispatch(
         logger.exception(
             "queue_webhook_event dispatch.completed falló para invoice=%s; despacho ya registrado.",
             invoice_number,
+        )
+
+    if all(m.unit_price is not None for m in movements_created):
+        log_event(
+            AuditEventType.DISPATCH_WITH_PRICE_COMPLETED,
+            description=f"Despacho con precio completado — factura {invoice_number}",
+            user=user,
+            detail={
+                "invoice_number": invoice_number,
+                "movement_ids": [str(m.id) for m in movements_created],
+                "movement_type": movement_type,
+                "_entity_type": "Dispatch",
+                "_entity_id": invoice_number,
+                "_origin": "API",
+            },
         )
 
     return movements_created

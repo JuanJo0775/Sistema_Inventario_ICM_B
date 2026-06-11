@@ -7,6 +7,7 @@ from io import StringIO
 import pytest
 from django.core.management import call_command
 
+from apps.audit.models import AuditEventType, AuditLog
 from apps.inventory.models import StockByLocation
 from apps.movements.services import register_entry
 from tests.factories import LocationFactory, ProductFactory
@@ -62,6 +63,9 @@ def test_verify_integrity_fix_flag(stock_setup):
 
     stock.refresh_from_db()
     assert stock.current_stock == 10  # valor correcto según ledger
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.STOCK_RECONSTRUCTED,
+    ).exists()
 
 
 @pytest.mark.django_db

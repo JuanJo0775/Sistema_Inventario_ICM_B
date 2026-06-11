@@ -9,6 +9,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.audit.models import AuditEventType
+from apps.audit.services import log_event
 from apps.alerts.models import Alert
 from apps.alerts.selectors import (
     get_active_alerts,
@@ -124,6 +126,15 @@ class AlertListView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         export = request.query_params.get("export", "").lower()
         if export in ("csv", "xlsx"):
+            log_event(
+                AuditEventType.REPORT_GENERATED,
+                user=request.user,
+                detail={
+                    "kind": "alerts",
+                    "format": export,
+                    "_origin": "API",
+                },
+            )
             qs = self.get_queryset()
             rows = [dict(item) for item in AlertSerializer(qs, many=True).data]
             if export == "csv":

@@ -8,6 +8,7 @@ import io
 import pytest
 from django.urls import reverse
 
+from apps.audit.models import AuditEventType, AuditLog
 from apps.inventory.models import StockByLocation
 from apps.movements.services import register_entry
 from tests.factories import LocationFactory, ProductFactory
@@ -46,6 +47,11 @@ def test_movement_history_export_csv(authenticated_almacenista_client, export_se
     rows = list(reader)
     assert len(rows) >= 1
     assert "movement_type" in reader.fieldnames
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.REPORT_GENERATED,
+        metadata__kind="movements-history",
+        metadata__format="csv",
+    ).exists()
 
 
 @pytest.mark.django_db
@@ -126,6 +132,11 @@ def test_inventory_export_csv(authenticated_almacenista_client, export_setup):
     assert len(rows) >= 1
     assert "sku" in reader.fieldnames
     assert "quantity" in reader.fieldnames
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.REPORT_GENERATED,
+        metadata__kind="inventory-full",
+        metadata__format="csv",
+    ).exists()
 
 
 @pytest.mark.django_db
@@ -157,6 +168,11 @@ def test_alerts_export_csv(authenticated_almacenista_client, db):
     content = b"".join(response.streaming_content).decode("utf-8")
     reader = csv.DictReader(io.StringIO(content))
     assert "alert_type" in reader.fieldnames
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.REPORT_GENERATED,
+        metadata__kind="alerts",
+        metadata__format="csv",
+    ).exists()
 
 
 # ── Parámetro export inválido ─────────────────────────────────────────────────
