@@ -50,3 +50,6 @@ CLAUDE.md
 # Graphify
 graphify-out/
 .graphifyignore
+
+# Personal guides (local use only)
+docs/guias/GRAPHIFY_GUIDE.md
