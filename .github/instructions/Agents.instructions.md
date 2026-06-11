@@ -118,10 +118,25 @@ Uso práctico para asistentes:
 
 Regla: cada vez que se modifica código de pruebas o los escenarios Gherkin (`tests/`, `tests/ers/`, `apps/*/tests/`), el autor del cambio debe regenerar la documentación de pruebas antes de hacer `commit` y `push`.
 
-- Comando recomendado (regenera documentación de escenarios Gherkin y tests relacionados):
+- Comando principal (regenera TODA la documentación de tests: unit, integration, gherkin y auxiliary):
+
+```bash
+python -m scripts.generate_docs
+```
+
+- También disponible (legacy alias, mismo efecto):
 
 ```bash
 python scripts/parse_ers_gherkin.py
+```
+
+- Para regenerar solo una categoría específica:
+
+```bash
+python -m scripts.generate_docs --only auxiliary
+python -m scripts.generate_docs --only unit
+python -m scripts.generate_docs --only integration
+python -m scripts.generate_docs --only gherkin
 ```
 
 - Incluir los archivos generados en el mismo commit que introduce los cambios en los tests (no separar en commits independientes).
@@ -138,7 +153,7 @@ python scripts/generate_project_structure.py
 
 Checklist rápido antes de `git push` cuando tocas tests o estructura:
 
-- Ejecutaste `python scripts/parse_ers_gherkin.py` si cambiaste tests/gherkin
+- Ejecutaste `python -m scripts.generate_docs` (o `python scripts/parse_ers_gherkin.py`) si cambiaste tests/gherkin
 - Ejecutaste `python scripts/generate_project_structure.py` si cambiaste la estructura del repo
 - Añadiste los archivos generados al `git add` y están incluidos en el mismo commit
 - En la descripción del PR listaste explícitamente los comandos usados para regenerar la documentación
