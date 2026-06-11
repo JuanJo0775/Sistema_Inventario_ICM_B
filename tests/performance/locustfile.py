@@ -39,18 +39,21 @@ class ICMUser(HttpUser):
             json={"username": "almacenista", "password": "testpass123"},
         )
         if r.status_code == 200:
-            self.token = r.json().get("access", "")
+            data = r.json()
+            self.token = data.get("access", "") if isinstance(data, dict) else ""
 
         # Cache first available product and location for write tasks
         pr = self.client.get("/api/v1/catalog/products/", headers=self._auth())
         if pr.status_code == 200:
-            results = pr.json().get("results") or pr.json()
+            data = pr.json()
+            results = data if isinstance(data, list) else (data.get("results") or data)
             if isinstance(results, list) and results:
                 self._product_id = str(results[0].get("id", ""))
 
         lr = self.client.get("/api/v1/inventory/locations/", headers=self._auth())
         if lr.status_code == 200:
-            results = lr.json().get("results") or lr.json()
+            data = lr.json()
+            results = data if isinstance(data, list) else (data.get("results") or data)
             if isinstance(results, list) and results:
                 self._location_id = str(results[0].get("id", ""))
 
@@ -118,7 +121,8 @@ class AuxiliarUser(HttpUser):
             json={"username": "auxiliar", "password": "testpass123"},
         )
         if r.status_code == 200:
-            self.token = r.json().get("access", "")
+            data = r.json()
+            self.token = data.get("access", "") if isinstance(data, dict) else ""
 
     def _auth(self) -> dict:
         return {"Authorization": f"Bearer {self.token}"}
