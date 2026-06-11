@@ -10,6 +10,7 @@ import time
 import urllib.error
 import urllib.request
 from datetime import timedelta
+from urllib.parse import urlparse
 
 from django.db import transaction
 from django.utils import timezone
@@ -121,6 +122,9 @@ def _attempt_delivery(delivery: WebhookDelivery) -> None:
             },
             method="POST",
         )
+        scheme = urlparse(endpoint.url).scheme
+        if scheme not in ("http", "https"):
+            raise ValueError(f"Unsupported URL scheme: {scheme}")
         with urllib.request.urlopen(req, timeout=10) as resp:
             delivery.response_code = resp.status
             delivery.response_body = resp.read(512).decode("utf-8", errors="replace")
