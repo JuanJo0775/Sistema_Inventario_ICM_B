@@ -262,6 +262,7 @@ def create_location(
                 raise DomainValidationError(
                     "No se pudo generar un código único para la ubicación."
                 )
+    raise RuntimeError("create_location: loop exited without return or raise")
 
 
 @transaction.atomic
