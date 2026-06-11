@@ -152,6 +152,10 @@ class ICMTokenRefreshSerializer(TokenRefreshSerializer):
 class UserSerializer(serializers.ModelSerializer):
     """Perfil de usuario (RF-002) — lectura y actualización parcial por almacenista."""
 
+    created_by_username = serializers.CharField(
+        source="created_by.username", read_only=True, allow_null=True
+    )
+
     class Meta:
         model = User
         fields = (
@@ -165,16 +169,19 @@ class UserSerializer(serializers.ModelSerializer):
             "is_active",
             "is_staff",
             "created_by",
+            "created_by_username",
             "created_at",
             "updated_at",
             "last_login",
         )
         read_only_fields = (
             "id",
+            "is_active",
             "created_at",
             "updated_at",
             "last_login",
             "created_by",
+            "created_by_username",
             "is_staff",
         )
 
@@ -365,4 +372,40 @@ class TemporaryAccessPermitSerializer(serializers.ModelSerializer):
                 "La hora de inicio de la tarde debe ser anterior a la de fin."
             )
 
+        return attrs
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    """Cambio de contraseña self-service (RF-001)."""
+
+    current_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True, min_length=8)
+    new_password_confirm = serializers.CharField(write_only=True)
+
+    def validate(self, attrs: dict) -> dict:
+        if attrs["new_password"] != attrs["new_password_confirm"]:
+            raise serializers.ValidationError(
+                {"new_password_confirm": "Las contraseñas no coinciden."}
+            )
+        return attrs
+
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    """Solicitud de recuperación de contraseña por email (RF-001)."""
+
+    email = serializers.EmailField()
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    """Restablecimiento de contraseña con token de recuperación (RF-001)."""
+
+    token = serializers.CharField()
+    new_password = serializers.CharField(write_only=True, min_length=8)
+    new_password_confirm = serializers.CharField(write_only=True)
+
+    def validate(self, attrs: dict) -> dict:
+        if attrs["new_password"] != attrs["new_password_confirm"]:
+            raise serializers.ValidationError(
+                {"new_password_confirm": "Las contraseñas no coinciden."}
+            )
         return attrs

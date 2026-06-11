@@ -448,6 +448,175 @@ def grant_temporary_permit(
 
 
 @transaction.atomic
+def change_own_password(
+    user: User,
+    current_password: str,
+    new_password: str,
+    *,
+    request: HttpRequest | None = None,
+) -> None:
+    """
+    RF-001 — El usuario autenticado cambia su propia contraseña (self-service).
+
+    Verifica la contraseña actual, aplica AUTH_PASSWORD_VALIDATORS, actualiza el hash
+    e invalida todos los tokens JWT activos (fuerza re-login).
+
+    Raises:
+        DomainValidationError: Contraseña actual incorrecta o nueva inválida.
+    """
+    from django.contrib.auth import authenticate
+    from django.contrib.auth.password_validation import validate_password
+    from django.core.exceptions import ValidationError as DjangoValidationError
+
+    from apps.authentication.models import User as UserModel
+
+    target = UserModel.objects.select_for_update().get(pk=user.pk)
+    auth_result = authenticate(username=target.username, password=current_password)
+    if auth_result is None:
+        raise DomainValidationError("La contraseña actual es incorrecta.")
+
+    try:
+        validate_password(new_password, target)
+    except DjangoValidationError as exc:
+        raise DomainValidationError("; ".join(exc.messages)) from exc
+
+    target.set_password(new_password)
+    target.save(update_fields=["password", "updated_at"])
+
+    for token in OutstandingToken.objects.filter(user=target):
+        BlacklistedToken.objects.get_or_create(token=token)
+
+    log_event(
+        AuditEventType.PASSWORD_CHANGED,
+        description=f"Contraseña cambiada por el usuario: {target.username}",
+        user=target,
+        request=request,
+        detail={"username": target.username},
+    )
+
+
+@transaction.atomic
+def request_password_reset(
+    email: str,
+    *,
+    request: HttpRequest | None = None,
+) -> None:
+    """
+    RF-001 — Genera un token de recuperación de contraseña y lo envía por email.
+
+    No revela si el email existe en el sistema (anti-enumeración).
+    Invalida tokens activos previos del mismo usuario antes de crear uno nuevo.
+    """
+    import hashlib
+    import secrets
+    from datetime import timedelta
+
+    from django.conf import settings
+
+    from apps.authentication.models import PasswordResetToken, User as UserModel
+    from shared.email_service import send_password_reset_email
+
+    target = UserModel.objects.filter(email__iexact=email.strip(), is_active=True).first()
+    if target is None:
+        return  # silencioso — anti-enumeración
+
+    now = timezone.now()
+    PasswordResetToken.objects.filter(user=target, used=False).update(
+        used=True, used_at=now
+    )
+
+    raw_token = secrets.token_urlsafe(32)
+    token_hash = hashlib.sha256(raw_token.encode()).hexdigest()
+    expiry_minutes = getattr(settings, "PASSWORD_RESET_TOKEN_EXPIRY_MINUTES", 10)
+    expires_at = now + timedelta(minutes=expiry_minutes)
+    PasswordResetToken.objects.create(
+        user=target, token_hash=token_hash, expires_at=expires_at
+    )
+
+    frontend_url = getattr(settings, "FRONTEND_URL", "http://localhost:3000")
+    reset_url = f"{frontend_url}/reset-password?token={raw_token}"
+
+    try:
+        send_password_reset_email(target.email, target.username, reset_url)
+    except Exception:
+        import logging
+
+        logging.getLogger(__name__).exception(
+            "Error al enviar email de recuperación a %s", target.email
+        )
+
+    log_event(
+        AuditEventType.PASSWORD_RESET_REQUESTED,
+        description=f"Recuperación de contraseña solicitada: {target.username}",
+        user=target,
+        request=request,
+        detail={"email": target.email},
+    )
+
+
+@transaction.atomic
+def reset_password_with_token(
+    token: str,
+    new_password: str,
+    *,
+    request: HttpRequest | None = None,
+) -> None:
+    """
+    RF-001 — Valida el token de recuperación y restablece la contraseña.
+
+    El token es de un solo uso y expira según PASSWORD_RESET_TOKEN_EXPIRY_MINUTES (default 10 min).
+    Invalida todas las sesiones JWT activas tras el cambio.
+
+    Raises:
+        DomainValidationError: Token inválido, expirado o contraseña no cumple políticas.
+    """
+    import hashlib
+
+    from django.contrib.auth.password_validation import validate_password
+    from django.core.exceptions import ValidationError as DjangoValidationError
+
+    from apps.authentication.models import PasswordResetToken
+
+    token_hash = hashlib.sha256(token.encode()).hexdigest()
+    reset_token = (
+        PasswordResetToken.objects.select_for_update()
+        .filter(token_hash=token_hash, used=False, expires_at__gt=timezone.now())
+        .select_related("user")
+        .first()
+    )
+
+    if reset_token is None or not reset_token.user.is_active:
+        raise DomainValidationError(
+            "El enlace de recuperación es inválido o ha expirado."
+        )
+
+    target = reset_token.user
+
+    try:
+        validate_password(new_password, target)
+    except DjangoValidationError as exc:
+        raise DomainValidationError("; ".join(exc.messages)) from exc
+
+    target.set_password(new_password)
+    target.save(update_fields=["password", "updated_at"])
+
+    reset_token.used = True
+    reset_token.used_at = timezone.now()
+    reset_token.save(update_fields=["used", "used_at"])
+
+    for tok in OutstandingToken.objects.filter(user=target):
+        BlacklistedToken.objects.get_or_create(token=tok)
+
+    log_event(
+        AuditEventType.PASSWORD_RESET_COMPLETED,
+        description=f"Contraseña restablecida para: {target.username}",
+        user=target,
+        request=request,
+        detail={"username": target.username},
+    )
+
+
+@transaction.atomic
 def revoke_temporary_permit(
     almacenista_user: User,
     permit_id: UUID | str,

@@ -240,3 +240,36 @@ class TemporaryAccessPermit(models.Model):
 
     def __str__(self) -> str:
         return f"Permit for {self.user.username} (Active: {self.is_active}, 24/7: {self.allow_24_7})"
+
+
+class PasswordResetToken(models.Model):
+    """
+    Token criptográfico de recuperación de contraseña (RF-001).
+
+    Almacena el SHA-256 del token enviado por email, nunca el valor en claro.
+    Un solo token activo por usuario (los anteriores se invalidan al solicitar uno nuevo).
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        "User",
+        on_delete=models.CASCADE,
+        related_name="password_reset_tokens",
+    )
+    # SHA-256 hex del raw token (32 bytes → 64 chars hex)
+    token_hash = models.CharField(max_length=64, unique=True)
+    expires_at = models.DateTimeField()
+    used = models.BooleanField(default=False)
+    used_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Token de recuperación de contraseña"
+        verbose_name_plural = "Tokens de recuperación de contraseña"
+        indexes = [
+            models.Index(fields=("token_hash",)),
+            models.Index(fields=("user", "used", "expires_at")),
+        ]
+
+    def __str__(self) -> str:
+        return f"PasswordResetToken for {self.user_id} (used={self.used})"

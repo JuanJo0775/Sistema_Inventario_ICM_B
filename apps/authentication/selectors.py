@@ -32,7 +32,13 @@ def get_user_by_id(user_id: UUID | str) -> User:
     return User.objects.get(pk=user_id)
 
 
-def get_all_users(executor: User, *, include_inactive: bool = False) -> QuerySet[User]:
+def get_all_users(
+    executor: User,
+    *,
+    include_inactive: bool = False,
+    role: str | None = None,
+    search: str | None = None,
+) -> QuerySet[User]:
     """
     RF-002, BR-02 — Lista usuarios ordenados por fecha de creación.
 
@@ -41,13 +47,26 @@ def get_all_users(executor: User, *, include_inactive: bool = False) -> QuerySet
     Args:
         executor: Usuario que ejecuta la consulta (debe ser almacenista).
         include_inactive: Si True, incluye usuarios deshabilitados en el resultado.
+        role: Filtrar por rol exacto (almacenista|auxiliar_despacho|administrador).
+        search: Búsqueda insensible a mayúsculas en username, email, first_name, last_name.
 
     Returns:
         QuerySet de usuarios.
     """
+    from django.db.models import Q
+
     qs = User.objects.all().order_by("-created_at", "-id")
     if not include_inactive:
         qs = qs.filter(is_active=True)
+    if role:
+        qs = qs.filter(role=role)
+    if search:
+        qs = qs.filter(
+            Q(username__icontains=search)
+            | Q(email__icontains=search)
+            | Q(first_name__icontains=search)
+            | Q(last_name__icontains=search)
+        )
     return qs
 
 

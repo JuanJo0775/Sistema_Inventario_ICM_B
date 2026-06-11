@@ -103,6 +103,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 INVOICE_SEQUENCE_PREFIX = config("INVOICE_SEQUENCE_PREFIX", default="ICM")
 
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="noreply@icm.local")
+FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:3000")
+PASSWORD_RESET_TOKEN_EXPIRY_MINUTES = config(
+    "PASSWORD_RESET_TOKEN_EXPIRY_MINUTES", default=10, cast=int
+)
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",

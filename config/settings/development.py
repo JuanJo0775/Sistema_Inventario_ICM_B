@@ -28,7 +28,13 @@ DATABASES = {
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = []
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# Mailtrap Sandbox — recibe todos los emails de desarrollo sin enviarlos realmente
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = config("EMAIL_HOST", default="sandbox.smtp.mailtrap.io")
+EMAIL_PORT = config("EMAIL_PORT", default=2525, cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="5171af463f59b9")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="b43eec639a12e6")
 
 SIMPLE_JWT.update(
     {

@@ -18,18 +18,24 @@ from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
 from apps.authentication.permissions import IsAlmacenista, IsAlmacenistaOrAdministrador
 from apps.authentication.serializers import (
+    ChangePasswordSerializer,
+    ForgotPasswordSerializer,
     ICMTokenObtainPairSerializer,
     ICMTokenRefreshSerializer,
     LoginRequestSerializer,
+    ResetPasswordSerializer,
     TemporaryAccessPermitSerializer,
     UserCreateSerializer,
     UserScheduleSerializer,
     UserSerializer,
 )
 from apps.authentication.services import (
+    change_own_password,
     create_user,
     disable_user,
     enable_user,
+    request_password_reset,
+    reset_password_with_token,
     update_user,
     update_user_password,
 )
@@ -146,7 +152,11 @@ class UserListCreateView(APIView):
 
     @extend_schema(
         summary="Listar usuarios",
-        description="Almacenista o administrador. Vista de lectura protegida (RF-002, BR-02).",
+        description=(
+            "Almacenista o administrador. Vista de lectura protegida (RF-002, BR-02). "
+            "Parámetros opcionales: `include_inactive` (1/true), `role` (almacenista|auxiliar_despacho|administrador), "
+            "`search` (username/email/nombre), `page` y `page_size` para paginación."
+        ),
         tags=[TAG_AUTH],
         responses={
             200: UserSerializer(many=True),
@@ -155,12 +165,20 @@ class UserListCreateView(APIView):
     )
     def get(self, request):
         from apps.authentication.selectors import get_all_users
+        from shared.pagination import ICMPageNumberPagination
 
-        include_inactive = request.query_params.get("include_inactive", "").lower()
+        params = request.query_params
         users = get_all_users(
             request.user,
-            include_inactive=include_inactive in ("1", "true", "yes"),
+            include_inactive=params.get("include_inactive", "").lower() in ("1", "true", "yes"),
+            role=params.get("role") or None,
+            search=params.get("search") or None,
         )
+        if "page" in params or "page_size" in params:
+            paginator = ICMPageNumberPagination()
+            page = paginator.paginate_queryset(users, request)
+            if page is not None:
+                return paginator.get_paginated_response(UserSerializer(page, many=True).data)
         return Response(UserSerializer(users, many=True).data)
 
     @extend_schema(
@@ -442,3 +460,106 @@ class TemporaryPermitRevokeView(APIView):
         permit = get_object_or_404(TemporaryAccessPermit, pk=pk)
         revoked = revoke_temporary_permit(request.user, permit.id, request=request)
         return Response(TemporaryAccessPermitSerializer(revoked).data)
+
+
+class ChangePasswordView(APIView):
+    """POST — Usuario autenticado cambia su propia contraseña (RF-001)."""
+
+    permission_classes = (IsAuthenticated,)
+
+    @extend_schema(
+        summary="Cambiar contraseña (self-service)",
+        description=(
+            "RF-001 — El usuario autenticado cambia su propia contraseña proporcionando "
+            "la contraseña actual y la nueva. Invalida todos los tokens JWT activos "
+            "(fuerza re-login) y registra evento de auditoría."
+        ),
+        tags=[TAG_AUTH],
+        request=ChangePasswordSerializer,
+        responses={
+            200: {
+                "type": "object",
+                "properties": {"message": {"type": "string"}},
+            },
+            **standard_error_responses(include_403=False),
+        },
+    )
+    def post(self, request):
+        ser = ChangePasswordSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        change_own_password(
+            request.user,
+            ser.validated_data["current_password"],
+            ser.validated_data["new_password"],
+            request=request,
+        )
+        return Response({"message": "Contraseña actualizada correctamente."})
+
+
+class ForgotPasswordView(APIView):
+    """POST — Solicitar recuperación de contraseña por email (sin autenticación)."""
+
+    permission_classes = (AllowAny,)
+
+    @extend_schema(
+        summary="Solicitar recuperación de contraseña",
+        description=(
+            "RF-001 — Envía un email con enlace de recuperación válido por 1 hora. "
+            "La respuesta es siempre genérica para no revelar si el email existe (anti-enumeración)."
+        ),
+        tags=[TAG_AUTH],
+        auth=[],
+        request=ForgotPasswordSerializer,
+        responses={
+            200: {
+                "type": "object",
+                "properties": {"message": {"type": "string"}},
+            },
+            **standard_error_responses(include_401=False, include_422=False),
+        },
+    )
+    def post(self, request):
+        ser = ForgotPasswordSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        request_password_reset(ser.validated_data["email"], request=request)
+        return Response(
+            {
+                "message": (
+                    "Si el correo está registrado recibirás instrucciones "
+                    "para recuperar tu contraseña."
+                )
+            }
+        )
+
+
+class ResetPasswordView(APIView):
+    """POST — Restablecer contraseña usando el token recibido por email."""
+
+    permission_classes = (AllowAny,)
+
+    @extend_schema(
+        summary="Restablecer contraseña con token",
+        description=(
+            "RF-001 — Valida el token de recuperación (1 h de vigencia, un solo uso), "
+            "cambia la contraseña e invalida todas las sesiones JWT activas."
+        ),
+        tags=[TAG_AUTH],
+        auth=[],
+        request=ResetPasswordSerializer,
+        responses={
+            200: {
+                "type": "object",
+                "properties": {"message": {"type": "string"}},
+            },
+            **standard_error_responses(include_401=False),
+        },
+    )
+    def post(self, request):
+        ser = ResetPasswordSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        reset_password_with_token(
+            ser.validated_data["token"],
+            ser.validated_data["new_password"],
+            request=request,
+        )
+        return Response({"message": "Contraseña restablecida correctamente."})
