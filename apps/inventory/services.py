@@ -148,61 +148,6 @@ def create_location(
     if Location.objects.filter(name__iexact=name).exists():
         raise DomainValidationError(f"Ya existe una ubicación con el nombre '{name}'.")
 
-    if not is_retail:
-        is_retail = _is_retail_by_name(name)
-
-    location = Location.objects.create(
-        code=_generate_unique_code(name),
-        name=name,
-        description=description or "",
-        is_retail=bool(is_retail),
-        max_capacity=max_capacity,
-        storage_type_id=storage_type_id,
-        storage_template_id=storage_template_id,
-        operational_status=operational_status,
-        capacity_mode=capacity_mode,
-        capacity_level=capacity_level,
-        capacity_score=capacity_score,
-        occupancy_estimate_pct=occupancy_estimate_pct,
-    )
-    return location
-
-
-@transaction.atomic
-def create_location(
-    executor: Any,
-    *,
-    name: str,
-    description: str = "",
-    max_capacity: int | None = None,
-    is_retail: bool | None = None,
-    storage_type_id: UUID | None = None,
-    storage_template_id: UUID | None = None,
-    operational_status: str = Location.OperationalStatus.ACTIVE,
-    capacity_mode: str = Location.CapacityMode.NONE,
-    capacity_level: int | None = None,
-    capacity_score: int | None = None,
-    occupancy_estimate_pct: float | None = None,
-) -> Location:
-    """
-    RF-004, BR-14, BR-15 — Alta de ubicación física (solo almacenista).
-
-    El `code` se genera automáticamente desde el nombre usando slugify.
-    `is_retail` se auto-detecta si el nombre contiene palabras clave como
-    'vitrina', 'mostrador', etc. Puede forzarse manualmente.
-    `max_capacity` es opcional; se recomienda para vitrinas.
-    BR-15: el `storage_type_id` debe corresponder a un StorageType activo.
-    """
-    if getattr(executor, "role", None) != "almacenista":
-        raise UnauthorizedDomainActionError(
-            "Solo el almacenista puede crear ubicaciones."
-        )
-    name = (name or "").strip()
-    if not name:
-        raise DomainValidationError("El nombre de la ubicación es obligatorio.")
-    if Location.objects.filter(name__iexact=name).exists():
-        raise DomainValidationError(f"Ya existe una ubicación con el nombre '{name}'.")
-
     storage_template = None
     if storage_template_id is not None:
         storage_template = StorageTemplate.objects.filter(
