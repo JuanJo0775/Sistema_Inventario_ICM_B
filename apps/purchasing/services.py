@@ -96,7 +96,9 @@ def _resolve_allocation_lot_values(
 
 
 @transaction.atomic
-def create_supplier(created_by: Any, data: dict[str, Any], *, request: Any = None) -> Supplier:
+def create_supplier(
+    created_by: Any, data: dict[str, Any], *, request: Any = None
+) -> Supplier:
     """Registra un nuevo proveedor. Solo almacenista."""
     nit = (data.get("nit") or "").strip() or None
     if nit and Supplier.objects.filter(nit=nit).exists():
@@ -170,7 +172,9 @@ def update_supplier(
 
 
 @transaction.atomic
-def deactivate_supplier(executor: Any, supplier_id: uuid.UUID, *, request: Any = None) -> Supplier:
+def deactivate_supplier(
+    executor: Any, supplier_id: uuid.UUID, *, request: Any = None
+) -> Supplier:
     """Desactiva un proveedor. No cancela OC existentes."""
     supplier = Supplier.objects.select_for_update().get(pk=supplier_id)
     supplier.is_active = False
@@ -187,7 +191,9 @@ def deactivate_supplier(executor: Any, supplier_id: uuid.UUID, *, request: Any =
 
 
 @transaction.atomic
-def activate_supplier(executor: Any, supplier_id: uuid.UUID, *, request: Any = None) -> Supplier:
+def activate_supplier(
+    executor: Any, supplier_id: uuid.UUID, *, request: Any = None
+) -> Supplier:
     """Reactiva un proveedor previamente desactivado."""
     supplier = Supplier.objects.select_for_update().get(pk=supplier_id)
     supplier.is_active = True
@@ -496,7 +502,9 @@ def create_reception(
 
 
 @transaction.atomic
-def confirm_reception(executor: Any, reception_id: uuid.UUID, *, request: Any = None) -> Reception:
+def confirm_reception(
+    executor: Any, reception_id: uuid.UUID, *, request: Any = None
+) -> Reception:
     """
     RF-005 / BR-11 — BORRADOR → CONFIRMADA.
 
@@ -648,7 +656,9 @@ def confirm_reception(executor: Any, reception_id: uuid.UUID, *, request: Any = 
 
 
 @transaction.atomic
-def cancel_reception(executor: Any, reception_id: uuid.UUID, *, request: Any = None) -> Reception:
+def cancel_reception(
+    executor: Any, reception_id: uuid.UUID, *, request: Any = None
+) -> Reception:
     """Cancela una recepción en estado BORRADOR. No tiene efecto en inventario."""
     reception = Reception.objects.select_for_update().get(pk=reception_id)
 

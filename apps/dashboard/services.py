@@ -219,7 +219,7 @@ def _warehouse_utilization() -> dict[str, Any]:
         if capacity_configured:
             configured_locations += 1
             configured_occupied += occupied_units
-            configured_capacity += (capacity_units or 0)
+            configured_capacity += capacity_units or 0
         else:
             unconfigured_locations += 1
             unconfigured_occupied += occupied_units
