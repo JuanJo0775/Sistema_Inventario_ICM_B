@@ -389,9 +389,9 @@ jobs:
           from apps.authentication.models import UserRole
           User = get_user_model()
           if not User.objects.filter(username='almacenista').exists():
-              User.objects.create_user('almacenista', password='testpass123', role=UserRole.ALMACENISTA)
+              User.objects.create_user('almacenista', 'almacenista@icm.local', password='testpass123', role=UserRole.ALMACENISTA)
           if not User.objects.filter(username='auxiliar').exists():
-              User.objects.create_user('auxiliar', password='testpass123', role=UserRole.AUXILIAR_DESPACHO)
+              User.objects.create_user('auxiliar', 'auxiliar@icm.local', password='testpass123', role=UserRole.AUXILIAR_DESPACHO)
           print('Users ready.')
           "
 
