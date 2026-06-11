@@ -10,9 +10,9 @@ from pathlib import Path
 
 import pytest
 
+from scripts.generate_docs.utils import GenerationSummary
+from scripts.generate_docs.utils import TestNode as DocTestNode
 from scripts.generate_docs.utils import (
-    GenerationSummary,
-    TestNode as DocTestNode,
     _remove_stale_markdown,
     _write_text_if_needed,
     classify_test,
