@@ -17,8 +17,8 @@ from apps.movements.services import (
 )
 from shared.exceptions import LocationStateNotAllowedError
 
-
 # ── Despacho: estados de origen que bloquean la salida ───────────────────────
+
 
 @pytest.mark.parametrize(
     "blocking_state",
@@ -33,7 +33,9 @@ def test_dispatch_fails_for_all_blocking_origin_states(
     loc = sample_locations[0]
     loc.operational_status = blocking_state
     loc.save(update_fields=["operational_status", "updated_at"])
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=5)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=5
+    )
 
     with pytest.raises(LocationStateNotAllowedError):
         register_dispatch(
@@ -48,6 +50,7 @@ def test_dispatch_fails_for_all_blocking_origin_states(
 
 
 # ── Entrada: estados de destino que bloquean la recepción ────────────────────
+
 
 @pytest.mark.parametrize(
     "blocking_state",
@@ -75,6 +78,7 @@ def test_entry_fails_for_blocking_destination_states(
 
 
 # ── Traslado: estados de destino que bloquean el traslado ────────────────────
+
 
 @pytest.mark.parametrize(
     "blocking_state",
@@ -107,6 +111,7 @@ def test_internal_transfer_fails_for_blocking_destination_states(
 
 
 # ── Entrada: estado mantenimiento y restringido permiten entrada ──────────────
+
 
 @pytest.mark.parametrize(
     "permissive_state",

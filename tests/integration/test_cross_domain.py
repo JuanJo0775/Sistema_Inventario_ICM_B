@@ -167,7 +167,9 @@ def test_dispatch_reduces_stock_and_entry_audit_log_exists(
     ).first()
     assert entry_log is not None, "La entrada debe tener AuditLog MOVEMENT_CREATED"
 
-    with patch("apps.movements.services.generate_invoice_number", return_value="F-INT-001"):
+    with patch(
+        "apps.movements.services.generate_invoice_number", return_value="F-INT-001"
+    ):
         register_dispatch(
             almacenista_user,
             sample_product.id,

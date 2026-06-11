@@ -20,7 +20,6 @@ import pytest
 from apps.movements.services import register_entry
 from tests.factories import LocationFactory, ProductFactory
 
-
 SLA_SINGLE_ENTRY_MS = 500
 SLA_LEDGER_NET_QTY_MS = 100
 SLA_DASHBOARD_KPI_MS = 500
@@ -44,9 +43,9 @@ def test_register_entry_completes_within_sla(almacenista_user):
     )
     elapsed_ms = (time.perf_counter() - start) * 1000
 
-    assert elapsed_ms < SLA_SINGLE_ENTRY_MS, (
-        f"register_entry tardó {elapsed_ms:.1f}ms — supera SLA de {SLA_SINGLE_ENTRY_MS}ms"
-    )
+    assert (
+        elapsed_ms < SLA_SINGLE_ENTRY_MS
+    ), f"register_entry tardó {elapsed_ms:.1f}ms — supera SLA de {SLA_SINGLE_ENTRY_MS}ms"
 
 
 @pytest.mark.django_db
@@ -70,9 +69,9 @@ def test_ledger_net_qty_completes_within_sla(almacenista_user):
     elapsed_ms = (time.perf_counter() - start) * 1000
 
     assert qty == 10
-    assert elapsed_ms < SLA_LEDGER_NET_QTY_MS, (
-        f"_ledger_net_qty tardó {elapsed_ms:.1f}ms — supera SLA de {SLA_LEDGER_NET_QTY_MS}ms"
-    )
+    assert (
+        elapsed_ms < SLA_LEDGER_NET_QTY_MS
+    ), f"_ledger_net_qty tardó {elapsed_ms:.1f}ms — supera SLA de {SLA_LEDGER_NET_QTY_MS}ms"
 
 
 @pytest.mark.django_db
@@ -88,9 +87,9 @@ def test_dashboard_kpis_completes_within_sla(db):
     build_dashboard_kpis()
     elapsed_ms = (time.perf_counter() - start) * 1000
 
-    assert elapsed_ms < SLA_DASHBOARD_KPI_MS, (
-        f"build_dashboard_kpis tardó {elapsed_ms:.1f}ms — supera SLA de {SLA_DASHBOARD_KPI_MS}ms"
-    )
+    assert (
+        elapsed_ms < SLA_DASHBOARD_KPI_MS
+    ), f"build_dashboard_kpis tardó {elapsed_ms:.1f}ms — supera SLA de {SLA_DASHBOARD_KPI_MS}ms"
 
     cache.clear()
 
@@ -104,6 +103,6 @@ def test_inventory_selector_completes_within_sla(sample_product, sample_location
     get_full_inventory()
     elapsed_ms = (time.perf_counter() - start) * 1000
 
-    assert elapsed_ms < SLA_INVENTORY_SELECTOR_MS, (
-        f"get_full_inventory tardó {elapsed_ms:.1f}ms — supera SLA de {SLA_INVENTORY_SELECTOR_MS}ms"
-    )
+    assert (
+        elapsed_ms < SLA_INVENTORY_SELECTOR_MS
+    ), f"get_full_inventory tardó {elapsed_ms:.1f}ms — supera SLA de {SLA_INVENTORY_SELECTOR_MS}ms"

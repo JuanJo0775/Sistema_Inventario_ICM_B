@@ -89,9 +89,7 @@ def test_dashboard_metrics_stock_total_reflects_stock_by_location(
 
 
 @pytest.mark.django_db
-def test_dashboard_metrics_reorder_count_uses_reorder_point(
-    sample_locations, db
-):
+def test_dashboard_metrics_reorder_count_uses_reorder_point(sample_locations, db):
     from apps.inventory.models import StockByLocation
     from tests.factories import ProductFactory
 

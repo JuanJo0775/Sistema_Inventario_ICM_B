@@ -18,35 +18,47 @@ from scripts.generate_docs.utils import (
     classify_test,
 )
 
-
 # ── DocTestNode (TestNode del script de docs) ─────────────────────────────────
 
+
 def test_docnode_short_name_simple():
-    node = DocTestNode("apps/foo/tests/test_views.py::test_list_ok", "apps/foo/tests/test_views.py", 10, "unit")
+    node = DocTestNode(
+        "apps/foo/tests/test_views.py::test_list_ok",
+        "apps/foo/tests/test_views.py",
+        10,
+        "unit",
+    )
     assert node.short_name == "test_list_ok"
 
 
 def test_docnode_short_name_class_method():
-    node = DocTestNode("tests/test_x.py::SomeClass::test_method", "tests/test_x.py", 5, "integration")
+    node = DocTestNode(
+        "tests/test_x.py::SomeClass::test_method", "tests/test_x.py", 5, "integration"
+    )
     assert node.short_name == "test_method"
 
 
 # ── classify_test ─────────────────────────────────────────────────────────────
 
-@pytest.mark.parametrize("rel_path,expected", [
-    ("tests/ers/impl/movements.py", "gherkin"),
-    ("tests/ers/test_gherkin_dynamic.py", "gherkin"),
-    ("tests/integration/test_api_integration.py", "integration"),
-    ("tests/concurrency/test_concurrent_movements.py", "integration"),
-    ("apps/movements/tests/test_services.py", "unit"),
-    ("apps/catalog/tests/test_views.py", "unit"),
-    ("tests/test_seed_db.py", "unit"),
-])
+
+@pytest.mark.parametrize(
+    "rel_path,expected",
+    [
+        ("tests/ers/impl/movements.py", "gherkin"),
+        ("tests/ers/test_gherkin_dynamic.py", "gherkin"),
+        ("tests/integration/test_api_integration.py", "integration"),
+        ("tests/concurrency/test_concurrent_movements.py", "integration"),
+        ("apps/movements/tests/test_services.py", "unit"),
+        ("apps/catalog/tests/test_views.py", "unit"),
+        ("tests/test_seed_db.py", "unit"),
+    ],
+)
 def test_classify_test_coverage(rel_path: str, expected: str):
     assert classify_test(rel_path) == expected
 
 
 # ── GenerationSummary ─────────────────────────────────────────────────────────
+
 
 def test_generation_summary_absorb_merges_paths(tmp_path: Path):
     a = GenerationSummary(kind="unit")
@@ -69,6 +81,7 @@ def test_generation_summary_absorb_does_not_unset_changed():
 
 
 # ── _write_text_if_needed ─────────────────────────────────────────────────────
+
 
 def test_write_creates_file(tmp_path: Path):
     target = tmp_path / "sub" / "output.md"
@@ -101,6 +114,7 @@ def test_write_check_mode_does_not_write(tmp_path: Path):
 
 
 # ── _remove_stale_markdown ────────────────────────────────────────────────────
+
 
 def test_remove_stale_deletes_unexpected_files(tmp_path: Path):
     (tmp_path / "keep.md").write_text("keep")
