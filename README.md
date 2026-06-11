@@ -54,6 +54,7 @@ Documentación funcional y arquitectónica disponible en el repositorio:
 - [README_CICD.md](docs/CI/README_CICD.md): runbook operativo de CI/CD (gates, deploy, promoción, backup, rollback, seguridad y secretos).
 - **[REFERENCIA_ENDPOINTS.md](docs/api/REFERENCIA_ENDPOINTS.md)**: referencia completa de endpoints con ejemplos request/response para el equipo de frontend.
 - [README_MATRIZ_PERMISOS.md](docs/api/README_MATRIZ_PERMISOS.md): matriz de permisos por rol para todos los endpoints.
+- **[ENV_GUIDE.md](docs/guias/ENV_GUIDE.md)**: guía de variables de entorno — desarrollo, email (Mailtrap), producción y token de recuperación.
 
 ## Stack tecnológico
 
@@ -63,7 +64,7 @@ Documentación funcional y arquitectónica disponible en el repositorio:
 - PostgreSQL 15
 - JWT con djangorestframework-simplejwt (rotación + blacklist)
 - OpenAPI 3 con **drf-spectacular** (Swagger UI y ReDoc)
-- pytest + pytest-django (646 tests — 637 pasan — 9 skips)
+- pytest + pytest-django (736+ tests — suite completa con recuperación de contraseña)
 - Docker + Docker Compose
 - openpyxl (exportación XLSX)
 - WeasyPrint (facturas PDF)
@@ -83,6 +84,10 @@ Flujo recomendado:
 Esto permite que cada integrante use credenciales distintas (usuario, contraseña, host, puertos) sin tocar código ni generar conflictos al bajar cambios.
 
 ### Variables mínimas importantes
+
+Para una referencia completa de cada variable, entornos (Mailtrap, Gmail, producción) y ejemplos listos para copiar, ver la guía dedicada:
+
+**[docs/guias/ENV_GUIDE.md](docs/guias/ENV_GUIDE.md)**
 
 ## Inicio rápido
 
@@ -189,6 +194,7 @@ Para mantener el historial limpio y fácil de revisar, el trabajo debe organizar
 
 - Estructura modular de apps y carpeta `shared`.
 - Settings por entorno (`base`, `development`, `production`, `test`).
-- Configuración por variables de entorno.
+- Configuración por variables de entorno — guía completa en [ENV_GUIDE.md](docs/guias/ENV_GUIDE.md).
 - API bajo `/api/v1/` con documentación **OpenAPI 3** y **Swagger UI**; el contrato detallado vive en [README_API.md](docs/api/README_API.md).
-- Setup de Docker y dependencias; tests automatizados con pytest.
+- Autenticación JWT con cambio y recuperación de contraseña por email (Mailtrap Sandbox en dev).
+- Setup de Docker y dependencias; 736+ tests automatizados con pytest.

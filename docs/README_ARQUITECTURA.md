@@ -106,23 +106,24 @@ Estructura de Directorios del Proyecto:
 ```text
 icm_backend/
 ├── apps/                                                       # Dominios Django del backend
-│   ├── authentication/                                         # Autenticación JWT, RBAC y control de acceso
+│   ├── authentication/                                         # Autenticación JWT, RBAC, gestión de usuarios y recuperación de contraseña
 │   │   ├── tests/                                              # Pruebas del subdominio
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
-│   │   │   ├── test_permissions_api.py                         # Cobertura crítica del módulo
-│   │   │   ├── test_permissions_reorganization.py              # Cobertura crítica del módulo
+│   │   │   ├── test_password.py                                # Flujo completo de cambio y recuperación de contraseña
+│   │   │   ├── test_permissions_api.py                         # Cobertura de permisos por rol y endpoint
+│   │   │   ├── test_permissions_reorganization.py              # Cobertura de reorganización de permisos
 │   │   │   ├── test_services.py                                # Política de acceso y restricciones de rol
-│   │   │   ├── test_user_enable.py                             # Cobertura crítica del módulo
+│   │   │   ├── test_user_enable.py                             # Ciclo de vida: deshabilitar y rehabilitar usuarios
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
 │   │   ├── management/
 │   │   │   └── commands/                                       # Comandos administrativos del módulo
 │   │   │       └── create_almacenista.py                       # Comando Django para automatización operativa
-│   │   ├── models.py                                           # Entidades y constraints de persistencia
-│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
-│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── models.py                                           # User (UUID, role, RBAC), UserSchedule, TemporaryAccessPermit, PasswordResetToken
+│   │   ├── serializers.py                                      # UserSerializer (created_by_username, is_active read-only), password serializers
+│   │   ├── views.py                                            # 17 endpoints: JWT, CRUD usuarios, horarios, permisos temporales, change/forgot/reset-password
 │   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
-│   │   ├── services.py                                         # Autenticación JWT, RBAC y verificación de identidad
-│   │   ├── selectors.py                                        # Consultas de lectura sin efectos secundarios
+│   │   ├── services.py                                         # Autenticación JWT, RBAC, gestión de usuarios, change_own_password, forgot/reset-password
+│   │   ├── selectors.py                                        # get_all_users (filtros role/search/inactive), check_user_access, get_user_by_id
 │   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
 │   │   ├── exceptions.py                                       # Excepciones de dominio y validación
 │   │   ├── signals.py                                          # Sincronización de eventos de identidad
@@ -135,9 +136,6 @@ icm_backend/
 │   │   │   ├── test_product_pricing.py                         # Cobertura crítica del módulo
 │   │   │   ├── test_services.py                                # Cobertura crítica del módulo
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
-│   │   ├── management/
-│   │   │   └── commands/                                       # Comandos administrativos del módulo
-│   │   │       └── (sin comandos administrativos propios)
 │   │   ├── models.py                                           # Entidades y constraints de persistencia
 │   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
 │   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
@@ -176,6 +174,7 @@ icm_backend/
 │   │   │   ├── test_combo_dispatch.py                          # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_dispatch_pricing.py                        # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_invoice.py                                 # Cobertura crítica del módulo
+│   │   │   ├── test_location_state_parametrized.py             # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
 │   │   │   ├── test_pricing_optional.py                        # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
@@ -266,6 +265,7 @@ icm_backend/
 │   │   └── admin.py                                            # Registro administrativo y soporte operacional
 │   └── webhooks/                                               # Aplicación Django detectada automáticamente
 │       ├── tests/                                              # Pruebas del subdominio
+│       │   ├── test_commands.py                                # Cobertura crítica del módulo
 │       │   ├── test_endpoint_put.py                            # Reglas de negocio y transacciones del dominio
 │       │   ├── test_services.py                                # Cobertura crítica del módulo
 │       │   └── test_views.py                                   # Cobertura crítica del módulo
@@ -293,8 +293,9 @@ icm_backend/
 ├── docs/                                                       # Documentación técnica viva del proyecto
 │   ├── README_ARQUITECTURA.md                                  # Documento vivo de arquitectura
 │   ├── api/                                                    # Contratos OpenAPI, seguridad y permisos
-│   │   ├── README_API.md                                       # Documento técnico relevante
-│   │   └── README_MATRIZ_PERMISOS.md                           # Documento técnico relevante
+│   │   ├── README_API.md                                       # Especificación de la API: endpoints, contratos y estándares
+│   │   ├── README_MATRIZ_PERMISOS.md                           # Matriz de permisos por rol para todos los endpoints
+│   │   └── REFERENCIA_ENDPOINTS.md                             # Referencia completa de endpoints con ejemplos request/response
 │   ├── requisitos/                                             # Requisitos funcionales y contexto de negocio
 │   │   ├── ERS_ICM_Requisitos.md                               # Documento técnico relevante
 │   │   └── ICM_Informe_Elicitacion_v2_plus.docx.md             # Documento técnico relevante
@@ -314,18 +315,20 @@ icm_backend/
 │   │       └── index.md                                        # Documento técnico relevante
 │   ├── calidad_restricciones/                                  # Atributos de calidad y restricciones
 │   │   ├── README_ATRIBUTOS_CALIDAD.md                         # Documento técnico relevante
-│   │   └── README_RESTRICCIONES.md                             # Documento técnico relevante
+│   │   ├── README_RESTRICCIONES.md                             # Documento técnico relevante
+│   │   └── INFORME_COMPLETITUD_PRINCIPIOS_Y_CALIDAD.md         # Documento técnico relevante
 │   ├── architecture/                                           # Síntesis arquitectónica: drivers, Utility Tree y ADRs
 │   │   ├── architecture_drivers.md                             # Drivers arquitectónicos priorizados
 │   │   ├── utility_tree.md                                     # Utility Tree con escenarios y trade-offs
 │   │   ├── architectural_constraints.md                        # Restricciones arquitectónicas y riesgos
 │   │   └── adr_relationships.md                                # Trazabilidad entre drivers y ADRs
-│   ├── CI/                                                     # Documento arquitectónico relevante
-│   │   └── README_CICD.md                                      # Documento técnico relevante
+│   ├── guias/                                                  # Guías operativas del proyecto
+│   │   ├── ENV_GUIDE.md                                        # Guía completa de variables de entorno
+│   │   └── SEED_DB.md                                          # Guía de carga de datos semilla
+│   ├── CI/                                                     # Runbook operativo de CI/CD
+│   │   └── README_CICD.md                                      # Runbook CI/CD: pipelines, despliegue, backups y rollback
 │   ├── evidence/                                               # Documento arquitectónico relevante
 │   │   └── README.md                                           # Documento técnico relevante
-│   ├── guias/                                                  # Documento arquitectónico relevante
-│   │   └── SEED_DB.md                                           # Documento técnico relevante
 │   ├── system_behavior/                                        # Documento arquitectónico relevante
 │   │   ├── pricing/                                            # Documento arquitectónico relevante
 │   │   │   ├── Plan Arquitectura de Precios y Facturación — Sistema Inventario ICM.md  # Documento técnico relevante
@@ -347,15 +350,14 @@ icm_backend/
 │   ├── generate_docs/                                          # Generadores compartidos de documentación
 │   │   ├── __main__.py                                         # Entry point oficial: python -m scripts.generate_docs
 │   │   └── utils.py                                            # Pipeline compartido: descubrimiento, renderizado y escritura
-│   ├── seed_db/
-│   │   ├── config.py                                           # Datos estáticos del seed unificado
-│   │   ├── seeder.py                                           # Lógica principal del seed
-│   │   ├── run.py                                              # Punto de entrada ejecutable
-│   │   └── clean.py                                            # Limpieza de la base de datos del seed
-│   │   ├── transformer.py
-│   │   └── validator.py
-│   └── perf/
-│       └── locustfile.py
+│   ├── perf/
+│   │   └── locustfile.py
+│   └── seed_db/
+│       ├── clean.py                                            # Limpieza de la base de datos del seed
+│       ├── config.py                                           # Datos estáticos del seed unificado
+│       ├── env.py
+│       ├── run.py                                              # Punto de entrada ejecutable
+│       └── seeder.py                                           # Lógica principal del seed
 ├── shared/                                                     # Código transversal reutilizable
 │   ├── models.py                                               # BaseModel y metadatos comunes
 │   ├── permissions.py                                          # Permisos base y reutilizables
@@ -363,6 +365,7 @@ icm_backend/
 │   ├── mixins.py                                               # Mixins transversales para vistas
 │   ├── pagination.py                                           # Paginación reutilizable
 │   ├── openapi.py                                              # Tags OpenAPI y contratos compartidos
+│   ├── email_service.py                                        # Servicio de email desacoplado (porta-adaptador SMTP)
 │   ├── utils/                                                  # Utilidades transversales
 │   │   └── validators.py                                       # Validadores reutilizables
 │   ├── audit.py
@@ -372,19 +375,24 @@ icm_backend/
 ├── tests/                                                      # Tests de integración cross-módulo
 │   ├── factories.py                                            # Factories de datos de prueba
 │   ├── ers/                                                    # Suite Gherkin dinámica alineada al ERS
-│   │   ├── gherkin_impl.py                                     # Escenarios Gherkin y trazabilidad al ERS
 │   │   └── test_gherkin_dynamic.py                             # Escenarios Gherkin y trazabilidad al ERS
 │   ├── integration/                                            # Pruebas HTTP/API de integración
 │   │   ├── test_api_integration.py                             # Pruebas de integración HTTP/API
+│   │   ├── test_cross_domain.py                                # Pruebas de integración HTTP/API
 │   │   ├── test_movements_integration.py                       # Pruebas de integración HTTP/API
 │   │   └── test_smoke_endpoints.py                             # Pruebas de integración HTTP/API
 │   ├── concurrency/
-│   │   └── test_concurrent_movements.py                        # Cobertura crítica del módulo
-│   └── test_import/
-│       ├── test_importer.py                                    # Cobertura crítica del módulo
-│       ├── test_reader.py                                      # Cobertura crítica del módulo
-│       ├── test_transformer.py                                 # Cobertura crítica del módulo
-│       └── test_validator.py                                   # Cobertura crítica del módulo
+│   │   ├── test_concurrent_movements.py                        # Cobertura crítica del módulo
+│   │   ├── test_concurrent_receptions.py                       # Cobertura crítica del módulo
+│   │   └── test_concurrent_transfers.py                        # Cobertura crítica del módulo
+│   ├── scripts/                                                # Automatizaciones reutilizables del repositorio
+│   │   ├── test_generate_docs.py                               # Cobertura crítica del módulo
+│   │   ├── test_generate_project_structure.py                  # Cobertura crítica del módulo
+│   │   ├── test_parse_ers_gherkin.py                           # Cobertura crítica del módulo
+│   │   ├── test_perf_locustfile.py                             # Cobertura crítica del módulo
+│   │   └── test_seed_db.py                                     # Cobertura crítica del módulo
+│   └── shared/                                                 # Código transversal reutilizable
+│       └── test_location_validators.py                         # Cobertura crítica del módulo
 ├── docker-compose.prod.yml                                     # Orquestación de producción
 ├── docker-compose.yml                                          # Orquestación local del stack
 ├── manage.py                                                   # Punto de entrada de comandos Django
@@ -481,6 +489,31 @@ GET /api/v1/movements/ auxiliar a 10:00 → 200 OK
 ```
 
 **Referencia**: RF-001, RF-002
+
+---
+
+#### Flujo de recuperación de contraseña (RF-001)
+
+El módulo de autenticación implementa un flujo completo de tres pasos:
+
+1. **`POST /api/v1/auth/forgot-password/`** (público) — el usuario introduce su email. El backend crea un `PasswordResetToken` (raw token en email, SHA-256 en BD), invalida tokens previos no usados y envía el link `{FRONTEND_URL}/reset-password?token=<raw>` por SMTP. La respuesta es **siempre 200** (anti-enumeración).
+2. **Frontend** — redirige al usuario al formulario de nueva contraseña con el token de la URL.
+3. **`POST /api/v1/auth/reset-password/`** (público) — valida el token (un solo uso, expira en `PASSWORD_RESET_TOKEN_EXPIRY_MINUTES` minutos), cambia la contraseña y blacklistea todos los tokens JWT activos del usuario.
+
+También existe **`POST /api/v1/auth/change-password/`** (autenticado) para el cambio self-service sin pasar por email.
+
+**Invariantes de seguridad**:
+- El raw token nunca se almacena en la BD (solo el hash SHA-256).
+- Los tokens previos no usados se invalidan al solicitar uno nuevo.
+- `select_for_update()` previene doble-uso concurrente del mismo token.
+- El cambio o reset de contraseña siempre blacklistea todas las sesiones activas del usuario.
+- `shared/email_service.py` actúa como porta-adaptador: en tests usa `locmem.EmailBackend`, en dev/prod usa SMTP.
+
+**Variables de entorno relevantes**:
+- `FRONTEND_URL` — URL base del frontend para construir el link del email.
+- `PASSWORD_RESET_TOKEN_EXPIRY_MINUTES` — minutos de validez del token (default 10).
+- `EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_PORT` — configuración SMTP.
+- Ver `docs/guias/ENV_GUIDE.md` para referencia completa.
 
 ---
 
@@ -2285,7 +2318,7 @@ Documentacion complementaria de este analisis:
 
 | Requisito | Modulo funcional | Componentes tecnicos principales | Reglas de negocio asociadas |
 | --- | --- | --- | --- |
-| RF-001 | Autenticacion | `apps/authentication/views.py`, `apps/authentication/services.py`, `shared/permissions.py` | BR-01, BR-03 |
+| RF-001 | Autenticacion y recuperacion de contrasena | `apps/authentication/views.py`, `apps/authentication/services.py`, `shared/permissions.py`, `shared/email_service.py` | BR-01, BR-03 |
 | RF-002 | Credenciales | `apps/authentication/services.py`, `apps/authentication/views.py`, `apps/audit/services.py` | BR-01, BR-02 |
 | RF-003 | Catalogo | `apps/catalog/models.py`, `apps/catalog/services.py`, `apps/catalog/views.py` | BR-04, BR-12, BR-13, BR-17 |
 | RF-004 | Consulta inventario | `apps/inventory/selectors.py`, `apps/inventory/views.py`, `apps/inventory/models.py` | BR-11, BR-13, BR-14, BR-15 |

@@ -58,7 +58,9 @@ El backend usa `djangorestframework-simplejwt` con autenticacion `JWTAuthenticat
 - El refresh se rota y se blanquea en blacklist tras rotacion.
 - El logout invalida el `refresh` enviado en el cuerpo.
 - La deshabilitacion de usuarios revoca todos sus tokens outstanding.
+- El cambio de contrasena (`change-password`) y el reset por token (`reset-password`) revocan **todos** los tokens outstanding del usuario, forzando re-login.
 - Las contrasenas se almacenan con el hashing nativo de Django (`set_password()` sobre `AbstractUser`).
+- El token de recuperacion de contrasena se almacena como hash SHA-256 — el raw token solo viaja por email y jamas se persiste.
 
 ### 3.2 Autorizacion
 
@@ -148,7 +150,9 @@ flowchart TD
 | `JWT_ACCESS_TOKEN_LIFETIME_MINUTES` | Duracion del access token | 60 minutos por defecto en base |
 | `JWT_REFRESH_TOKEN_LIFETIME_DAYS` | Duracion del refresh token | 7 dias por defecto en base |
 | `CORS_ALLOWED_ORIGINS` | Origenes web permitidos | Lista separada por coma |
-| `FRONTEND_URL` | Origen permitido en produccion | Usado para CORS en `production.py` |
+| `FRONTEND_URL` | URL base del frontend | Usado para construir el enlace de recuperacion de contrasena en emails y para CORS en `production.py` |
+| `DEFAULT_FROM_EMAIL` | Remitente de emails del sistema | Se usa en `forgot-password`; default `noreply@icm.local` |
+| `PASSWORD_RESET_TOKEN_EXPIRY_MINUTES` | Tiempo de validez del token de recuperacion | Default 10 minutos; token SHA-256 de un solo uso |
 
 ## 8. Ciclo de vida de los tokens
 
@@ -190,7 +194,16 @@ Claims estandar de SimpleJWT presentes por defecto:
 
 - `POST /api/v1/auth/logout/` blacklistea el refresh recibido.
 - `disable_user()` blacklistea todos los tokens outstanding del usuario.
+- `change_own_password()` y `reset_password_with_token()` blacklistean **todos** los tokens outstanding del usuario, forzando re-login.
 - Si el refresh ya expiro o fue revocado, el endpoint devuelve error uniforme.
+
+### 8.5 Token de recuperacion de contrasena (`PasswordResetToken`)
+
+- Generado al llamar `POST /api/v1/auth/forgot-password/`.
+- El **raw token** (URL-safe, 32 bytes) se envia solo por email — nunca se almacena en la BD.
+- La BD almacena el **SHA-256** del raw token (`token_hash`), expiración (`expires_at`), flag de uso (`used`) y timestamp de uso (`used_at`).
+- Tokens previos no usados se invalidan al generar uno nuevo.
+- Vigencia configurable via `PASSWORD_RESET_TOKEN_EXPIRY_MINUTES` (default 10 min).
 
 ## 9. Modelo de autorizacion
 
@@ -231,6 +244,8 @@ La configuracion base define `IsWithinOperatingHours` como permiso global por de
 | `/api/v1/auth/health/` | GET | Publica | Health check sin autenticacion |
 | `/api/v1/auth/login/` | POST | Publica condicionada | Requiere credenciales validas y respeta BR-03 para auxiliar |
 | `/api/v1/auth/token/refresh/` | POST | Publica condicionada | Requiere refresh valido y respeta BR-03 para auxiliar |
+| `/api/v1/auth/forgot-password/` | POST | Publica | Solicita recuperacion de contrasena; respuesta identica si el email no existe (anti-enumeracion) |
+| `/api/v1/auth/reset-password/` | POST | Publica | Consume token de recuperacion y restablece la contrasena |
 | `/api/schema/` | GET | Publica | Esquema OpenAPI |
 | `/api/docs/` | GET | Publica | Swagger UI |
 | `/api/redoc/` | GET | Publica | ReDoc |
@@ -268,6 +283,9 @@ Leyenda:
 | Permisos temporales | Listar permisos | `GET /api/v1/auth/users/<uuid:pk>/temporary-permits/` | Permitido | Permitido | Denegado | Denegado | Denegado | Almacenista o administrador |
 | Permisos temporales | Otorgar permiso | `POST /api/v1/auth/users/<uuid:pk>/temporary-permits/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista; lógica de franjas con Unión |
 | Permiso temporal | Revocar permiso | `POST /api/v1/auth/temporary-permits/<uuid:pk>/revoke/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista; operación idempotente |
+| Contraseña | Cambiar contraseña propia | `POST /api/v1/auth/change-password/` | Permitido | Permitido | Permitido | Denegado | Denegado | Cualquier usuario autenticado; invalida todas las sesiones activas; registra auditoría |
+| Contraseña | Solicitar recuperación | `POST /api/v1/auth/forgot-password/` | Permitido | Permitido | Permitido | Permitido | Permitido | Público (sin JWT); anti-enumeración; envía email con enlace de reset |
+| Contraseña | Restablecer con token | `POST /api/v1/auth/reset-password/` | Permitido | Permitido | Permitido | Permitido | Permitido | Público (sin JWT); token de un solo uso; expira según `PASSWORD_RESET_TOKEN_EXPIRY_MINUTES` |
 
 ### 11.2 Catalogo
 

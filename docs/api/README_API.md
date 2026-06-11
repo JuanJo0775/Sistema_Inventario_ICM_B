@@ -270,9 +270,36 @@ Para el catálogo completo con ejemplos request/response, ver [REFERENCIA_ENDPOI
 | `POST` | `/auth/token/refresh/` | Renovar access token |
 | `POST` | `/auth/logout/` | Invalidar refresh token |
 | `GET` | `/auth/me/` | Perfil del usuario autenticado |
-| `GET/POST` | `/auth/users/` | Listar / crear usuarios |
+| `GET/POST` | `/auth/users/` | Listar / crear usuarios (filtros: `?role=`, `?search=`, `?page=`) |
 | `GET/PUT/PATCH` | `/auth/users/<uuid:pk>/` | Detalle / actualizar usuario |
 | `POST` | `/auth/users/<uuid:pk>/disable/` | Deshabilitar cuenta |
+| `POST` | `/auth/change-password/` | Cambiar contraseña propia (requiere auth) |
+| `POST` | `/auth/forgot-password/` | Solicitar recuperación por email (sin auth, anti-enumeración) |
+| `POST` | `/auth/reset-password/` | Restablecer contraseña con token (sin auth) |
+
+#### Flujo de recuperación de contraseña (frontend)
+
+```
+1. POST /auth/forgot-password/   { "email": "..." }
+   → siempre 200, envía email con link al frontend si el email existe
+
+2. Usuario hace clic en el link del email:
+   {FRONTEND_URL}/reset-password?token=<raw_token>
+
+3. POST /auth/reset-password/    { "token": "...", "new_password": "...", "new_password_confirm": "..." }
+   → 200 si el token es válido (no expirado, no usado)
+   → 422 si el token expiró o ya fue utilizado
+
+4. Frontend redirige a /login
+```
+
+El token expira en `PASSWORD_RESET_TOKEN_EXPIRY_MINUTES` minutos (default 10). `FRONTEND_URL` controla el dominio del link enviado en el email. Ambas variables se configuran en `.env`.
+
+**Seguridad implementada:**
+- El token se almacena como SHA-256 (nunca el raw en BD).
+- `forgot-password` devuelve el mismo mensaje 200 exista o no el email (anti-enumeración).
+- Al restablecer la contraseña se invalidan **todos** los tokens JWT activos del usuario (fuerza re-login).
+- El token es de un solo uso; una segunda llamada con el mismo token devuelve 422.
 
 ### 10.2 Catálogo (`/api/v1/catalog/`)
 

@@ -179,6 +179,118 @@ POST /api/v1/auth/users/<uuid>/disable/ → deshabilitar
 
 **Response 201:** objeto usuario completo.
 
+**Filtros disponibles en `GET /auth/users/`:**
+```
+?role=almacenista|auxiliar_despacho|administrador
+?search=<texto>        → busca en username, email, first_name, last_name
+?include_inactive=true → incluye usuarios desactivados
+?page=1&page_size=20   → activa paginación (sin estos params devuelve lista completa)
+```
+
+---
+
+### Cambiar contraseña propia
+
+```
+POST /api/v1/auth/change-password/
+Authorization: Bearer <access>
+```
+
+Disponible para cualquier rol autenticado. Invalida todos los tokens JWT activos del usuario.
+
+**Request:**
+```json
+{
+  "current_password": "ContraseñaActual123!",
+  "new_password": "NuevaClave2026!",
+  "new_password_confirm": "NuevaClave2026!"
+}
+```
+
+**Response 200:**
+```json
+{ "message": "Contraseña actualizada correctamente." }
+```
+
+**Errores:**
+- `400` — `new_password` y `new_password_confirm` no coinciden
+- `401` — no autenticado
+- `422` — contraseña actual incorrecta o nueva contraseña no cumple políticas
+
+---
+
+### Recuperación de contraseña (flujo completo)
+
+#### Paso 1 — Solicitar enlace
+
+```
+POST /api/v1/auth/forgot-password/
+```
+
+Sin autenticación. **Siempre devuelve 200** aunque el email no exista (anti-enumeración).
+
+**Request:**
+```json
+{ "email": "usuario@ejemplo.com" }
+```
+
+**Response 200:**
+```json
+{
+  "message": "Si el correo está registrado recibirás instrucciones para recuperar tu contraseña."
+}
+```
+
+Si el email corresponde a un usuario activo, el sistema:
+1. Invalida tokens de reset anteriores del usuario.
+2. Crea un token nuevo (válido `PASSWORD_RESET_TOKEN_EXPIRY_MINUTES` minutos, default 10).
+3. Envía email al usuario con el enlace: `{FRONTEND_URL}/reset-password?token=<raw_token>`.
+
+**Errores:**
+- `400` — formato de email inválido
+
+---
+
+#### Paso 2 — El frontend recibe el token
+
+El usuario hace clic en el enlace del email y llega a la página del frontend:
+
+```
+http://localhost:3000/reset-password?token=<raw_token>
+```
+
+El frontend extrae `token` del query param y lo pasa al siguiente request.
+
+---
+
+#### Paso 3 — Restablecer contraseña
+
+```
+POST /api/v1/auth/reset-password/
+```
+
+Sin autenticación.
+
+**Request:**
+```json
+{
+  "token": "<raw_token_del_query_param>",
+  "new_password": "NuevaClave2026!",
+  "new_password_confirm": "NuevaClave2026!"
+}
+```
+
+**Response 200:**
+```json
+{ "message": "Contraseña restablecida correctamente." }
+```
+
+**Errores:**
+- `400` — contraseñas no coinciden
+- `422` — token inválido, expirado o ya utilizado → mostrar "El enlace expiró. Solicita uno nuevo."
+
+Tras el 200, el frontend debe redirigir a `/login`.
+
 ---
 
 ## Catálogo

@@ -40,7 +40,16 @@ El proyecto usa variables de entorno para su configuración y conexión a la bas
 copy .env.example .env
 ```
 
-Abre el archivo `.env` recién creado en tu editor. Asegúrate de tener PostgreSQL instalado y ejecutándose en tu máquina local, y ajusta las credenciales (`DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`) para que coincidan con tu base de datos local.
+Abre el archivo `.env` recién creado en tu editor. Ajusta las siguientes variables mínimas:
+
+- **Base de datos** — `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` para tu PostgreSQL local.
+- **Usuario inicial** — `ALMACENISTA_PASSWORD` (contraseña del primer usuario; requerida por `create_almacenista`).
+- **Email (opcional en desarrollo)** — `EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_PORT`, `EMAIL_USE_TLS` para probar el flujo de recuperación de contraseña con [Mailtrap](https://mailtrap.io).
+- **Frontend** — `FRONTEND_URL` (default `http://localhost:3000`) determina la URL base del enlace en el email de recuperación.
+- **Token de recuperación** — `PASSWORD_RESET_TOKEN_EXPIRY_MINUTES` (default `10`) controla el tiempo de expiración del link de reset.
+
+> Para una referencia completa de cada variable con ejemplos para desarrollo, staging y producción, consulta:
+> **[docs/guias/ENV_GUIDE.md](guias/ENV_GUIDE.md)**
 
 ## 5. Ejecutar migraciones
 
