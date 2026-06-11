@@ -80,9 +80,9 @@ def _update_po_status_from_receptions(po: PurchaseOrder) -> None:
 def _resolve_allocation_lot_values(
     *,
     item_lot_code: str | None,
-    item_lot_expiration_date,
+    item_lot_expiration_date: Any = None,
     allocation_lot_code: str | None,
-    allocation_lot_expiration_date,
+    allocation_lot_expiration_date: Any = None,
 ) -> tuple[str | None, Any | None]:
     """Resuelve lote/fecha de una porción avanzando con fallback al ítem."""
     lot_code = (allocation_lot_code or item_lot_code or "").strip() or None
@@ -96,7 +96,7 @@ def _resolve_allocation_lot_values(
 
 
 @transaction.atomic
-def create_supplier(created_by, data: dict[str, Any], *, request=None) -> Supplier:
+def create_supplier(created_by: Any, data: dict[str, Any], *, request: Any = None) -> Supplier:
     """Registra un nuevo proveedor. Solo almacenista."""
     nit = (data.get("nit") or "").strip() or None
     if nit and Supplier.objects.filter(nit=nit).exists():
@@ -127,7 +127,7 @@ def create_supplier(created_by, data: dict[str, Any], *, request=None) -> Suppli
 
 @transaction.atomic
 def update_supplier(
-    executor, supplier_id: uuid.UUID, data: dict[str, Any], *, request=None
+    executor: Any, supplier_id: uuid.UUID, data: dict[str, Any], *, request: Any = None
 ) -> Supplier:
     """Actualiza datos de un proveedor existente. Solo almacenista."""
     supplier = Supplier.objects.select_for_update().get(pk=supplier_id)
@@ -170,7 +170,7 @@ def update_supplier(
 
 
 @transaction.atomic
-def deactivate_supplier(executor, supplier_id: uuid.UUID, *, request=None) -> Supplier:
+def deactivate_supplier(executor: Any, supplier_id: uuid.UUID, *, request: Any = None) -> Supplier:
     """Desactiva un proveedor. No cancela OC existentes."""
     supplier = Supplier.objects.select_for_update().get(pk=supplier_id)
     supplier.is_active = False
@@ -187,7 +187,7 @@ def deactivate_supplier(executor, supplier_id: uuid.UUID, *, request=None) -> Su
 
 
 @transaction.atomic
-def activate_supplier(executor, supplier_id: uuid.UUID, *, request=None) -> Supplier:
+def activate_supplier(executor: Any, supplier_id: uuid.UUID, *, request: Any = None) -> Supplier:
     """Reactiva un proveedor previamente desactivado."""
     supplier = Supplier.objects.select_for_update().get(pk=supplier_id)
     supplier.is_active = True
@@ -210,7 +210,7 @@ def activate_supplier(executor, supplier_id: uuid.UUID, *, request=None) -> Supp
 
 @transaction.atomic
 def create_purchase_order(
-    created_by, data: dict[str, Any], *, request=None
+    created_by: Any, data: dict[str, Any], *, request: Any = None
 ) -> PurchaseOrder:
     """
     Crea una OC en estado BORRADOR con sus ítems de línea.
@@ -262,7 +262,7 @@ def create_purchase_order(
 
 @transaction.atomic
 def update_purchase_order(
-    executor, po_id: uuid.UUID, data: dict[str, Any], *, request=None
+    executor: Any, po_id: uuid.UUID, data: dict[str, Any], *, request: Any = None
 ) -> PurchaseOrder:
     """Actualiza una OC en estado BORRADOR. Solo se puede editar antes de confirmar."""
     po = PurchaseOrder.objects.select_for_update().get(pk=po_id)
@@ -305,7 +305,7 @@ def update_purchase_order(
 
 @transaction.atomic
 def confirm_purchase_order(
-    executor, po_id: uuid.UUID, *, request=None
+    executor: Any, po_id: uuid.UUID, *, request: Any = None
 ) -> PurchaseOrder:
     """BORRADOR → PENDIENTE. La OC queda bloqueada para modificaciones."""
     po = PurchaseOrder.objects.select_for_update().get(pk=po_id)
@@ -332,7 +332,7 @@ def confirm_purchase_order(
 
 @transaction.atomic
 def cancel_purchase_order(
-    executor, po_id: uuid.UUID, reason: str, *, request=None
+    executor: Any, po_id: uuid.UUID, reason: str, *, request: Any = None
 ) -> PurchaseOrder:
     """
     Cancela una OC. Solo posible desde BORRADOR o PENDIENTE.
@@ -389,7 +389,7 @@ def cancel_purchase_order(
 
 @transaction.atomic
 def create_reception(
-    received_by, po_id: uuid.UUID, data: dict[str, Any], *, request=None
+    received_by: Any, po_id: uuid.UUID, data: dict[str, Any], *, request: Any = None
 ) -> Reception:
     """
     RF-005 / BR-11 — Crea una Recepción en estado BORRADOR asociada a una OC.
@@ -496,7 +496,7 @@ def create_reception(
 
 
 @transaction.atomic
-def confirm_reception(executor, reception_id: uuid.UUID, *, request=None) -> Reception:
+def confirm_reception(executor: Any, reception_id: uuid.UUID, *, request: Any = None) -> Reception:
     """
     RF-005 / BR-11 — BORRADOR → CONFIRMADA.
 
@@ -648,7 +648,7 @@ def confirm_reception(executor, reception_id: uuid.UUID, *, request=None) -> Rec
 
 
 @transaction.atomic
-def cancel_reception(executor, reception_id: uuid.UUID, *, request=None) -> Reception:
+def cancel_reception(executor: Any, reception_id: uuid.UUID, *, request: Any = None) -> Reception:
     """Cancela una recepción en estado BORRADOR. No tiene efecto en inventario."""
     reception = Reception.objects.select_for_update().get(pk=reception_id)
 

@@ -1,7 +1,5 @@
 """Alertas operativas (RF-011, BR-04, BR-11)."""
 
-from __future__ import annotations
-
 from django.conf import settings
 from django.db import models
 

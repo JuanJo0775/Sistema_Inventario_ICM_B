@@ -20,14 +20,14 @@ class DashboardAlertSummarySerializer(serializers.Serializer):
 
 
 class DashboardKPIValueSerializer(serializers.Serializer):
-    label = serializers.CharField()
+    label = serializers.CharField()  # type: ignore[assignment]
     value = serializers.FloatField(allow_null=True)
     unit = serializers.CharField()
     precision = serializers.ChoiceField(
         choices=("real", "partial", "approximate", "future")
     )
     threshold = serializers.FloatField(allow_null=True)
-    source = serializers.CharField()
+    source = serializers.CharField()  # type: ignore[assignment]
 
 
 class DashboardKPISummarySerializer(serializers.Serializer):

@@ -1,7 +1,5 @@
 """Catálogo de productos (RF-003, BR-04, BR-05, BR-12, BR-13)."""
 
-from __future__ import annotations
-
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models

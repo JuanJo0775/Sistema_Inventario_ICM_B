@@ -5,8 +5,8 @@ from __future__ import annotations
 import base64
 
 try:
-    from barcode import get_barcode_class  # type: ignore
-    from barcode.writer import SVGWriter  # type: ignore
+    from barcode import get_barcode_class
+    from barcode.writer import SVGWriter
 
     _HAS_BARCODE_LIB = True
 except Exception:  # pragma: no cover - environment fallback for tests

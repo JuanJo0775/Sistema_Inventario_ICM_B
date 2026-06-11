@@ -4,24 +4,16 @@ El ledger en `movements` es la única fuente de verdad; este modelo es caché
 consistente actualizada solo desde `apps.movements.services`.
 """
 
-from __future__ import annotations
-
-# Determinar el nombre de argumento correcto para CheckConstraint
-from inspect import signature as _inspect_signature
-
 from django.db import models
 from django.db.models import Q
 
 from shared.models import BaseModel
 
-_cc_params = _inspect_signature(models.CheckConstraint.__init__).parameters
-if "condition" in _cc_params:
-    _cc_kw = {"condition": Q(current_stock__gte=0)}
-else:
-    _cc_kw = {"check": Q(current_stock__gte=0)}
-
 # Constraint reutilizable para Meta
-_STOCK_NON_NEGATIVE_CC = models.CheckConstraint(name="stock_non_negative", **_cc_kw)
+_STOCK_NON_NEGATIVE_CC = models.CheckConstraint(
+    name="stock_non_negative",
+    check=Q(current_stock__gte=0),
+)
 
 # Palabras clave para detectar automáticamente si una ubicación es de tipo vitrina (minorista)
 _VITRINA_KEYWORDS = {

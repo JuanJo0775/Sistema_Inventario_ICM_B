@@ -94,7 +94,7 @@ class ProductDetailSerializer(ProductSerializer):
     barcode_payload = serializers.SerializerMethodField()
 
     class Meta(ProductSerializer.Meta):
-        fields = ProductSerializer.Meta.fields + (
+        fields = tuple(ProductSerializer.Meta.fields) + (  # type: ignore[assignment]
             "barcode_svg",
             "barcode_svg_data_uri",
             "barcode_payload",

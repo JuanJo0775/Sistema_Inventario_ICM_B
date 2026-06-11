@@ -1,7 +1,5 @@
 """Modelo de usuario ICM (RF-001, RF-002, BR-01, BR-02, BR-03)."""
 
-from __future__ import annotations
-
 import uuid
 
 from django.contrib.auth.models import AbstractUser

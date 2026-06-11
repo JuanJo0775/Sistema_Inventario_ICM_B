@@ -1,8 +1,5 @@
 """Vistas de autenticación (RF-001, RF-002)."""
 
-from __future__ import annotations
-
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
@@ -41,7 +38,7 @@ from apps.authentication.services import (
 )
 from shared.openapi import TAG_AUTH, TAG_SYSTEM, standard_error_responses
 
-User = get_user_model()
+from apps.authentication.models import User
 
 
 @extend_schema(

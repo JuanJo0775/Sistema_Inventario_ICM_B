@@ -1,7 +1,5 @@
 """Auditoría central (RF-012, BR-10)."""
 
-from __future__ import annotations
-
 import uuid
 
 from django.conf import settings

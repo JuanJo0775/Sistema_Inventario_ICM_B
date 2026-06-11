@@ -228,5 +228,5 @@ class ReportDatasetSerializer(serializers.Serializer):
     report = serializers.CharField()
     generated_at = serializers.DateTimeField()
     filters = serializers.JSONField()
-    data = serializers.JSONField()
+    data = serializers.JSONField()  # type: ignore[assignment]
     suggested_filename = serializers.CharField()

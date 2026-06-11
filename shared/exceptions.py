@@ -10,7 +10,7 @@ class ICMBaseException(Exception):
 
     default_message = "Error del sistema ICM"
     default_code = "ICM_ERROR"
-    status_code = status.HTTP_400_BAD_REQUEST
+    status_code: int = status.HTTP_400_BAD_REQUEST
 
     def __init__(
         self, message: str | None = None, *, detail: dict | None = None
@@ -202,4 +202,4 @@ class CorrectionWindowClosedError(ImmutableRecordError):
         "La ventana de autocorrección para este movimiento ya no está activa."
     )
     default_code = "CORRECTION_WINDOW_CLOSED"
-    status_code = status.HTTP_409_CONFLICT
+    status_code = status.HTTP_409_CONFLICT  # type: ignore[assignment]

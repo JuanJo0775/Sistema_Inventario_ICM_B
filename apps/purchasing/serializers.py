@@ -142,7 +142,7 @@ class PurchaseOrderCreateSerializer(serializers.Serializer):
     supplier_id = serializers.UUIDField()
     expected_delivery = serializers.DateField(required=False, allow_null=True)
     notes = serializers.CharField(required=False, allow_blank=True, default="")
-    items = PurchaseOrderItemWriteSerializer(many=True, min_length=1)
+    items = PurchaseOrderItemWriteSerializer(many=True, allow_empty=False)
 
 
 class PurchaseOrderUpdateSerializer(serializers.Serializer):
@@ -299,4 +299,4 @@ class ReceptionCreateSerializer(serializers.Serializer):
     po_id = serializers.UUIDField()
     destination_location_id = serializers.UUIDField()
     notes = serializers.CharField(required=False, allow_blank=True, default="")
-    items = ReceptionItemWriteSerializer(many=True, min_length=1)
+    items = ReceptionItemWriteSerializer(many=True, allow_empty=False)

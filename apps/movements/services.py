@@ -277,13 +277,14 @@ def _resolve_price_snapshot(
     """
     from decimal import ROUND_HALF_UP, Decimal
 
-    type_map = {
+    type_map: dict[str, tuple[str | None, Any]] = {
         MovementType.SALIDA_VENTA_MENOR: ("retail", product.sale_price_retail),
         MovementType.SALIDA_VENTA_MAYOR: ("wholesale", product.sale_price_wholesale),
         MovementType.SALIDA_DANO: ("cost", product.unit_cost),
         MovementType.SALIDA_VENCIMIENTO: ("cost", product.unit_cost),
     }
-    price_type, raw_price = type_map.get(movement_type, (None, None))
+    _default: tuple[str | None, Any] = (None, None)
+    price_type, raw_price = type_map.get(movement_type, _default)
 
     if raw_price is None:
         logger.info(
@@ -373,7 +374,7 @@ def _requires_ack_flags(product: Product) -> tuple[bool, bool]:
 
 def _log_alert_acknowledgement(
     *,
-    user,
+    user: Any,
     movement: Movement,
     cold_chain_acknowledged: bool,
     electrical_safety_acknowledged: bool,
@@ -396,7 +397,7 @@ def _log_alert_acknowledgement(
 
 @transaction.atomic
 def register_entry(
-    user,
+    user: Any,
     product_id: UUID,
     location_id: UUID,
     quantity: int,
@@ -499,7 +500,7 @@ def register_entry(
 
 @transaction.atomic
 def register_dispatch(
-    user,
+    user: Any,
     product_id: UUID,
     location_id: UUID,
     quantity: int,
@@ -836,7 +837,7 @@ def register_dispatch(
 
 @transaction.atomic
 def register_internal_transfer(
-    user,
+    user: Any,
     product_id: UUID,
     origin_id: UUID,
     destination_id: UUID,
@@ -966,7 +967,7 @@ def register_internal_transfer(
 
 @transaction.atomic
 def register_return(
-    user,
+    user: Any,
     product_id: UUID,
     location_id: UUID,
     quantity: int,
@@ -1040,7 +1041,7 @@ def register_return(
 
 @transaction.atomic
 def register_adjustment(
-    almacenista_user,
+    almacenista_user: Any,
     product_id: UUID,
     location_id: UUID,
     new_quantity: int,
@@ -1109,7 +1110,7 @@ _CORRECTABLE_TYPES = (
 )
 
 
-def _reverse_entrada_stock(user, original: Movement) -> Movement:
+def _reverse_entrada_stock(user: Any, original: Movement) -> Movement:
     """Reversa el efecto de stock de una ENTRADA creando una SALIDA_DANO interna."""
     origin = _lock_stock(original.product_id, original.destination_location_id)
     before = origin.current_stock
@@ -1138,7 +1139,7 @@ def _reverse_entrada_stock(user, original: Movement) -> Movement:
     )
 
 
-def _reverse_salida_stock(user, original: Movement) -> Movement:
+def _reverse_salida_stock(user: Any, original: Movement) -> Movement:
     """Reversa el efecto de stock de una SALIDA creando una ENTRADA interna."""
     dest = _lock_stock(original.product_id, original.origin_location_id)
     before = dest.current_stock
@@ -1161,7 +1162,7 @@ def _reverse_salida_stock(user, original: Movement) -> Movement:
 
 @transaction.atomic
 def correct_movement_within_window(
-    user, movement_id: UUID, corrected_data: dict[str, Any]
+    user: Any, movement_id: UUID, corrected_data: dict[str, Any]
 ) -> list[Movement]:
     """
     BR-06 — Autocorrección dentro de 5 minutos para TRASLADO, ENTRADA y SALIDA_VENTA_*.
@@ -1428,11 +1429,11 @@ def available_lots_at_location(
 
 @transaction.atomic
 def dispatch_combo(
-    user,
+    user: Any,
     combo_id: UUID,
     location_id: UUID,
     *,
-    request=None,
+    request: Any = None,
 ) -> list[Movement]:
     """
     RF-003, BR-11 — Despacha un combo (Opción B: plantilla virtual).

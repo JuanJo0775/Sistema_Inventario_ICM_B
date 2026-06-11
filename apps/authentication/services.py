@@ -64,7 +64,7 @@ def authenticate_user(
     if not user.is_active:
         log_event(
             AuditEventType.LOGIN_FAILED,
-            user=user,
+            user=user,  # type: ignore[arg-type]
             request=request,
             detail={"reason": "inactive"},
         )
@@ -73,10 +73,10 @@ def authenticate_user(
         rt = request_time or timezone.now()
         from apps.authentication.selectors import check_user_access
 
-        if not check_user_access(user, rt):
+        if not check_user_access(user, rt):  # type: ignore[arg-type]
             log_event(
                 AuditEventType.LOGIN_FAILED,
-                user=user,
+                user=user,  # type: ignore[arg-type]
                 request=request,
                 detail={"reason": "outside_operating_hours", "fuera_de_horario": True},
             )
@@ -84,11 +84,11 @@ def authenticate_user(
     log_event(
         AuditEventType.LOGIN_SUCCESS,
         description="Login exitoso",
-        user=user,
+        user=user,  # type: ignore[arg-type]
         request=request,
-        detail={"username": user.username},
+        detail={"username": user.get_username()},
     )
-    return user
+    return user  # type: ignore[return-value]
 
 
 @transaction.atomic

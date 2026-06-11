@@ -1,7 +1,5 @@
 """Modelos de webhooks (NEW-03): endpoints y cola de entregas."""
 
-from __future__ import annotations
-
 from django.conf import settings
 from django.db import models
 

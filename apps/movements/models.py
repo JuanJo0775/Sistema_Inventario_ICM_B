@@ -1,7 +1,5 @@
 """Ledger central de movimientos (RF-005–RF-009, BR-10, BR-11, BR-13)."""
 
-from __future__ import annotations
-
 import uuid
 
 from django.conf import settings

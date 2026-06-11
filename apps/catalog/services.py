@@ -80,7 +80,7 @@ def create_product(
 @transaction.atomic
 def update_product(
     user: User,
-    product_id,
+    product_id: Any,
     data: dict[str, Any],
     *,
     request: HttpRequest | None = None,
@@ -116,9 +116,9 @@ def update_product(
         if field in data:
             setattr(product, field, data[field])
     if "category_id" in data:
-        product.category_id = data["category_id"]
+        setattr(product, "category_id", data["category_id"])
     if "subcategory_id" in data:
-        product.subcategory_id = data.get("subcategory_id")
+        setattr(product, "subcategory_id", data.get("subcategory_id"))
     if not product.barcode:
         product.barcode = build_product_barcode(product.sku)
     product.save()
@@ -282,12 +282,14 @@ def create_subcategory(
     _require_almacenista(user)
 
     # Si no se provee category_id, usa la primera categoría activa disponible
+    category: Category | None
     if category_id:
         category = Category.objects.get(pk=category_id)
     else:
-        category = Category.objects.filter(is_active=True).order_by("name").first()
-        if not category:
-            category = Category.objects.order_by("name").first()
+        category = (
+            Category.objects.filter(is_active=True).order_by("name").first()
+            or Category.objects.order_by("name").first()
+        )
         if not category:
             raise ValueError(
                 "No existe ninguna categoría en el sistema. Crea al menos una categoría antes de crear marcas."
@@ -421,7 +423,7 @@ def update_subcategory(
         .get(pk=subcategory_id)
     )
     if "category_id" in data:
-        subcat.category_id = data["category_id"]
+        setattr(subcat, "category_id", data["category_id"])
     if "name" in data:
         new_name = data["name"].strip()
         if new_name != subcat.name:
@@ -429,7 +431,7 @@ def update_subcategory(
             slug = base
             n = 0
             while (
-                Subcategory.objects.filter(category_id=subcat.category_id, slug=slug)
+                Subcategory.objects.filter(category=subcat.category, slug=slug)
                 .exclude(pk=subcat.pk)
                 .exists()
             ):
@@ -545,7 +547,7 @@ def update_combo(
                 from shared.exceptions import DomainValidationError
 
                 raise DomainValidationError(f"Producto {p.sku} no está activo.")
-        combo.combo_items.all().delete()
+        ComboItem.objects.filter(combo=combo).delete()
         for row in items:
             ComboItem.objects.create(
                 combo=combo,

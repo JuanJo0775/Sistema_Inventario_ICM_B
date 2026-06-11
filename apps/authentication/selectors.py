@@ -1,15 +1,12 @@
 """Consultas de solo lectura de usuarios (RF-001, RF-002)."""
 
-from __future__ import annotations
-
 from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 
-User = get_user_model()
+from apps.authentication.models import User
 
 
 def get_user_by_id(user_id: UUID | str) -> User:

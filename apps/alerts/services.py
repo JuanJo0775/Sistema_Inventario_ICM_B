@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from django.db import transaction
@@ -41,7 +41,7 @@ def _severity_and_category(
     return severity, category
 
 
-def sync_stock_alerts_for_product(product_id: UUID, *, user=None) -> None:
+def sync_stock_alerts_for_product(product_id: UUID, *, user: Any = None) -> None:
     """
     RF-011 — Alerta de stock bajo según `Product.reorder_point`.
 
@@ -93,7 +93,7 @@ def sync_stock_alerts_for_product(product_id: UUID, *, user=None) -> None:
         open_alerts.update(is_resolved=True, resolved_at=timezone.now(), resolved_by=rb)
 
 
-def _sync_lot_expiry_alert(lot: Lot, *, user=None) -> None:
+def _sync_lot_expiry_alert(lot: Lot, *, user: Any = None) -> None:
     today = timezone.now().date()
     days_left = (lot.expiration_date - today).days
     resolved_by = (
@@ -138,7 +138,7 @@ def _sync_lot_expiry_alert(lot: Lot, *, user=None) -> None:
         )
 
 
-def sync_expiry_alerts_for_product(product_id: UUID, *, user=None) -> None:
+def sync_expiry_alerts_for_product(product_id: UUID, *, user: Any = None) -> None:
     """RF-011 — Alertas de vencimiento a 60 y 30 días según lotes o `Product.expiration_date`."""
     product = Product.objects.filter(pk=product_id).first()
     if not product:

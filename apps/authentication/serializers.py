@@ -1,8 +1,5 @@
 """Serializers de autenticación (RF-001, RF-002)."""
 
-from __future__ import annotations
-
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 from rest_framework_simplejwt.serializers import (
@@ -14,7 +11,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from apps.authentication.models import UserRole
 from apps.authentication.services import OutsideOperatingHoursError, authenticate_user
 
-User = get_user_model()
+from apps.authentication.models import User
 
 
 def user_login_profile(user: User) -> dict:
