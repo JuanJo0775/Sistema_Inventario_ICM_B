@@ -210,9 +210,7 @@ class ICMUser(HttpUser):
 
     @task(1)
     def get_inventory_summary(self):
-        self.client.get(
-            "/api/v1/reports/inventory/summary/", headers=self._auth()
-        )
+        self.client.get("/api/v1/reports/inventory/summary/", headers=self._auth())
 
     # ── Read: Purchasing ─────────────────────────────────────────────────────
 
@@ -222,9 +220,7 @@ class ICMUser(HttpUser):
 
     @task(1)
     def get_purchase_orders(self):
-        self.client.get(
-            "/api/v1/purchasing/purchase-orders/", headers=self._auth()
-        )
+        self.client.get("/api/v1/purchasing/purchase-orders/", headers=self._auth())
 
     # ── Write: Movements ─────────────────────────────────────────────────────
 
@@ -323,9 +319,7 @@ class ICMUser(HttpUser):
             "/api/v1/purchasing/purchase-orders/",
             json={
                 "supplier_id": self._supplier_id,
-                "items": [
-                    {"product": self._product_id, "quantity_ordered": 5}
-                ],
+                "items": [{"product": self._product_id, "quantity_ordered": 5}],
             },
             headers=self._auth(),
             name="/api/v1/purchasing/purchase-orders/ [write]",
