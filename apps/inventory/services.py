@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.utils.text import slugify
 
 import apps.alerts.services as alert_services
@@ -169,6 +169,157 @@ def create_location(
 
 
 @transaction.atomic
+def create_location(
+    executor: Any,
+    *,
+    name: str,
+    description: str = "",
+    max_capacity: int | None = None,
+    is_retail: bool | None = None,
+    storage_type_id: UUID | None = None,
+    storage_template_id: UUID | None = None,
+    operational_status: str = Location.OperationalStatus.ACTIVE,
+    capacity_mode: str = Location.CapacityMode.NONE,
+    capacity_level: int | None = None,
+    capacity_score: int | None = None,
+    occupancy_estimate_pct: float | None = None,
+) -> Location:
+    """
+    RF-004, BR-14, BR-15 — Alta de ubicación física (solo almacenista).
+
+    El `code` se genera automáticamente desde el nombre usando slugify.
+    `is_retail` se auto-detecta si el nombre contiene palabras clave como
+    'vitrina', 'mostrador', etc. Puede forzarse manualmente.
+    `max_capacity` es opcional; se recomienda para vitrinas.
+    BR-15: el `storage_type_id` debe corresponder a un StorageType activo.
+    """
+    if getattr(executor, "role", None) != "almacenista":
+        raise UnauthorizedDomainActionError(
+            "Solo el almacenista puede crear ubicaciones."
+        )
+    name = (name or "").strip()
+    if not name:
+        raise DomainValidationError("El nombre de la ubicación es obligatorio.")
+    if Location.objects.filter(name__iexact=name).exists():
+        raise DomainValidationError(f"Ya existe una ubicación con el nombre '{name}'.")
+
+    storage_template = None
+    if storage_template_id is not None:
+        storage_template = StorageTemplate.objects.filter(
+            pk=storage_template_id
+        ).first()
+        if storage_template is None:
+            raise DomainValidationError("La plantilla de almacenamiento no existe.")
+        if not storage_template.is_active:
+            raise DomainValidationError("La plantilla de almacenamiento está inactiva.")
+
+    template_defaults = storage_template.defaults if storage_template else {}
+    if (
+        storage_type_id is None
+        and storage_template
+        and storage_template.storage_type_id
+    ):
+        storage_type_id = storage_template.storage_type_id
+    is_retail = _from_template(is_retail, template_defaults, "is_retail", bool)
+    max_capacity = _from_template(max_capacity, template_defaults, "max_capacity")
+    if capacity_mode == Location.CapacityMode.NONE:
+        capacity_mode = str(
+            _from_template(None, template_defaults, "capacity_mode") or capacity_mode
+        )
+    capacity_level = _from_template(capacity_level, template_defaults, "capacity_level")
+    capacity_score = _from_template(capacity_score, template_defaults, "capacity_score")
+    occupancy_estimate_pct = _from_template(
+        occupancy_estimate_pct, template_defaults, "occupancy_estimate_pct"
+    )
+
+    valid_statuses = {choice[0] for choice in Location.OperationalStatus.choices}
+    if operational_status not in valid_statuses:
+        raise DomainValidationError("Estado operativo de ubicación inválido.")
+
+    valid_capacity_modes = {choice[0] for choice in Location.CapacityMode.choices}
+    if capacity_mode not in valid_capacity_modes:
+        raise DomainValidationError("Modo de capacidad inválido.")
+    if (
+        capacity_level is not None
+        and capacity_mode != Location.CapacityMode.RELATIVE_SCALE
+    ):
+        raise DomainValidationError(
+            "capacity_level solo aplica cuando capacity_mode=relative_scale."
+        )
+    if capacity_level is not None and not 1 <= int(capacity_level) <= 5:
+        raise DomainValidationError("capacity_level debe estar entre 1 y 5.")
+    if capacity_score is not None and int(capacity_score) <= 0:
+        raise DomainValidationError("capacity_score debe ser mayor que 0.")
+    if (
+        occupancy_estimate_pct is not None
+        and not 0 <= float(occupancy_estimate_pct) <= 100
+    ):
+        raise DomainValidationError("occupancy_estimate_pct debe estar entre 0 y 100.")
+    if (
+        capacity_mode == Location.CapacityMode.NONE
+        and max_capacity is not None
+        and int(max_capacity) > 0
+    ):
+        capacity_mode = Location.CapacityMode.ABSOLUTE_LEGACY
+    storage_type = None
+    if storage_type_id is not None:
+        storage_type = StorageType.objects.filter(pk=storage_type_id).first()
+        if storage_type is None:
+            raise DomainValidationError("El tipo de almacenamiento no existe.")
+        if not storage_type.is_active:
+            raise DomainValidationError(
+                "No se puede asignar un tipo de almacenamiento inactivo."
+            )
+
+    detected_retail = _is_retail_by_name(name)
+    if is_retail is not None:
+        final_is_retail = is_retail
+    elif storage_type is not None:
+        final_is_retail = bool(storage_type.default_is_retail)
+    else:
+        final_is_retail = detected_retail
+
+    base_code = _generate_unique_code(name)
+    create_kwargs = dict(
+        name=name,
+        description=description or "",
+        is_retail=final_is_retail,
+        max_capacity=max_capacity,
+        storage_type=storage_type,
+        storage_template=storage_template,
+        operational_status=operational_status,
+        capacity_mode=capacity_mode,
+        capacity_level=capacity_level,
+        capacity_score=capacity_score,
+        occupancy_estimate_pct=occupancy_estimate_pct,
+        is_active=operational_status != Location.OperationalStatus.ARCHIVED,
+    )
+    for attempt in range(3):
+        code = base_code if attempt == 0 else f"{base_code}-{attempt}"
+        sid = transaction.savepoint()
+        try:
+            loc = Location.objects.create(code=code, **create_kwargs)
+            transaction.savepoint_commit(sid)
+            log_event(
+                AuditEventType.LOCATION_CREATED,
+                description=f"Ubicación '{loc.name}' creada (código {loc.code}).",
+                user=executor,
+                detail={
+                    "location_id": str(loc.id),
+                    "code": loc.code,
+                    "name": loc.name,
+                },
+            )
+            return loc
+        except IntegrityError:
+            transaction.savepoint_rollback(sid)
+            if attempt == 2:
+                raise DomainValidationError(
+                    "No se pudo generar un código único para la ubicación."
+                )
+
+
+@transaction.atomic
 def update_location(executor: Any, location_id: UUID, data: dict[str, Any]) -> Location:
     """RF-004 — Actualiza nombre, descripción, banderas de ubicación (solo almacenista)."""
     if getattr(executor, "role", None) != "almacenista":
@@ -287,6 +438,25 @@ def update_location(executor: Any, location_id: UUID, data: dict[str, Any]) -> L
         elif not requested_active:
             loc.operational_status = Location.OperationalStatus.ARCHIVED
     loc.save()
+    if data.get("is_active") is False:
+        _action = "deactivated"
+    elif data.get("operational_status") == Location.OperationalStatus.ARCHIVED:
+        _action = "deactivated"
+    elif "operational_status" in data:
+        _action = "state_changed"
+    else:
+        _action = "updated"
+    log_event(
+        AuditEventType.LOCATION_MODIFIED,
+        user=executor,
+        detail={
+            "location_id": str(loc.id),
+            "_entity_type": "Location",
+            "_entity_id": str(loc.id),
+            "_origin": "API",
+            "_action": _action,
+        },
+    )
     return loc
 
 
