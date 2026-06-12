@@ -188,10 +188,14 @@ Revisión del código en `apps/purchasing/services.py`:
 | update_category | CATEGORY_UPDATED | ✅ |
 | deactivate_category | CATEGORY_DEACTIVATED | ✅ |
 | activate_category | CATEGORY_ACTIVATED | ✅ |
-| create_subcategory | SUBCATEGORY_CREATED | ✅ |
-| update_subcategory | SUBCATEGORY_UPDATED | ✅ |
-| deactivate_subcategory | SUBCATEGORY_DEACTIVATED | ✅ |
-| activate_subcategory | SUBCATEGORY_ACTIVATED | ✅ |
+| create_brand | BRAND_CREATED | ✅ |
+| update_brand | BRAND_UPDATED | ✅ |
+| deactivate_brand | BRAND_DEACTIVATED | ✅ |
+| activate_brand | BRAND_ACTIVATED | ✅ |
+| create_subcategory | SUBCATEGORY_CREATED | ✅ (legacy) |
+| update_subcategory | SUBCATEGORY_UPDATED | ✅ (legacy) |
+| deactivate_subcategory | SUBCATEGORY_DEACTIVATED | ✅ (legacy) |
+| activate_subcategory | SUBCATEGORY_ACTIVATED | ✅ (legacy) |
 
 ### Authentication (9/9 ✅ — 100%)
 

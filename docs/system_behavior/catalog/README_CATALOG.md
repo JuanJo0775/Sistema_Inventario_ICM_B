@@ -2,9 +2,9 @@
 
 ## 1. Resumen
 
-El módulo `catalog` gestiona el catálogo de productos, categorías, subcategorías, combos y precios. Es el maestro de productos del sistema.
+El módulo `catalog` gestiona el catálogo de productos, categorías, marcas, combos y precios. Es el maestro de productos del sistema.
 
-**RF-003** — Gestión de catálogo (CRUD categorías, subcategorías, productos, combos).
+**RF-003** — Gestión de catálogo (CRUD categorías, marcas, productos, combos).
 **RF-013** — Precios y facturación (campos financieros en producto, historial de precios).
 
 ---
@@ -24,14 +24,15 @@ El módulo `catalog` gestiona el catálogo de productos, categorías, subcategor
 | `is_active` | BooleanField | Soft delete |
 | `created_at` / `updated_at` | DateTimeField | Automáticos (BaseModel) |
 
-### 2.2 Subcategory
+### 2.2 Brand (Marca)
+
+Marca independiente de categorías. Los productos de una misma marca pueden estar en distintas categorías.
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
 | `id` | UUID (PK) | Identificador único (BaseModel) |
-| `name` | CharField(128) | Nombre |
-| `category` | FK -> Category | Categoría padre |
-| `slug` | SlugField(128) | Único por categoría |
+| `name` | CharField(128, unique) | Nombre de la marca |
+| `slug` | SlugField(128, unique) | Auto-generado único global |
 | `description` | TextField | Opcional |
 | `is_active` | BooleanField | Soft delete |
 | `created_at` / `updated_at` | DateTimeField | Automáticos (BaseModel) |
@@ -45,8 +46,7 @@ El módulo `catalog` gestiona el catálogo de productos, categorías, subcategor
 | `barcode` | CharField(100, unique, nullable) | BR-13: alias de escaneo, auto-generado |
 | `name` | CharField(255) | Nombre del producto |
 | `category` | FK -> Category (PROTECT) | Categoría |
-| `subcategory` | FK -> Subcategory (SET_NULL, nullable) | Subcategoría |
-| `brand` | CharField(100, default="Can") | Marca |
+| `brand` | FK -> Brand (SET_NULL, nullable) | Marca (independiente de categoría) |
 | `expiration_date` | DateField (nullable) | Fecha de vencimiento |
 | `requires_expiration` | BooleanField | Control de vencimiento |
 | `weight_grams` | PositiveIntegerField (nullable) | Peso |
@@ -117,6 +117,10 @@ El módulo `catalog` gestiona el catálogo de productos, categorías, subcategor
 | `update_product_prices(user, product_id, **prices)` | RF-013, BR-17 | Actualiza + historial ProductPriceHistory |
 | `create_category(user, data)` | RF-003 | Crea categoría |
 | `deactivate_category(user, category_id)` | RF-003 | Valida productos activos (409) |
+| `create_brand(user, name, description)` | RF-003 | Crea marca (independiente de categoría) |
+| `update_brand(user, brand_id, data)` | RF-003 | Actualiza marca |
+| `deactivate_brand(user, brand_id)` | RF-003 | Soft delete, valida productos activos (409) |
+| `activate_brand(user, brand_id)` | RF-003 | Reactiva marca |
 | `create_combo(user, data)` | RF-003 | Crea combo con items |
 | `update_combo(user, combo_id, data)` | RF-003 | Reemplaza items completamente |
 | `resolve_identifier(raw)` | BR-13 | Busca por: SKU > barcode > nombre |
@@ -144,9 +148,9 @@ Todas bajo `/api/v1/catalog/`.
 | GET/POST | `categories/` | AlmacenistaOrReadOnly | Listar/crear categorías |
 | GET/PUT/PATCH/DELETE | `categories/<pk>/` | AlmacenistaOrReadOnly | CRUD categoría |
 | POST | `categories/<pk>/restore/` | Almacenista | Restaurar |
-| GET/POST | `subcategories/` | AlmacenistaOrReadOnly | Listar/crear |
-| GET/PUT/PATCH/DELETE | `subcategories/<pk>/` | AlmacenistaOrReadOnly | CRUD subcategoría |
-| POST | `subcategories/<pk>/restore/` | Almacenista | Restaurar |
+| GET/POST | `brands/` | AlmacenistaOrReadOnly | Listar/crear marcas |
+| GET/PUT/PATCH/DELETE | `brands/<pk>/` | AlmacenistaOrReadOnly | CRUD marca |
+| POST | `brands/<pk>/restore/` | Almacenista | Restaurar marca |
 | GET/POST | `products/` | Almacenista | Listar/crear |
 | GET/PUT/PATCH/DELETE | `products/<pk>/` | AlmacenistaOrReadOnly | CRUD producto |
 | GET | `products/<pk>/barcode/` | Autenticado | Barcode SVG |

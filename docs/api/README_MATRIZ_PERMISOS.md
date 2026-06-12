@@ -293,8 +293,8 @@ Leyenda:
 |---|---|---|---|---|---|---|---|---|
 | Catalogo - categorias | Leer | `GET /api/v1/catalog/categories/` | Permitido | Permitido | Permitido | Denegado | Denegado | Solo autenticado |
 | Catalogo - categorias | Crear | `POST /api/v1/catalog/categories/` | Denegado | Permitido | Denegado | Denegado | Denegado | Escritura solo almacenista |
-| Catalogo - subcategorias | Leer | `GET /api/v1/catalog/subcategories/` | Permitido | Permitido | Permitido | Denegado | Denegado | Solo autenticado |
-| Catalogo - subcategorias | Crear | `POST /api/v1/catalog/subcategories/` | Denegado | Permitido | Denegado | Denegado | Denegado | Escritura solo almacenista |
+| Catalogo - marcas | Leer | `GET /api/v1/catalog/brands/` | Permitido | Permitido | Permitido | Denegado | Denegado | Solo autenticado |
+| Catalogo - marcas | Crear | `POST /api/v1/catalog/brands/` | Denegado | Permitido | Denegado | Denegado | Denegado | Escritura solo almacenista |
 | Catalogo - productos | Leer | `GET /api/v1/catalog/products/` | Denegado | Permitido | Denegado | Denegado | Denegado | La vista exige almacenista para toda la operacion |
 | Catalogo - productos | Crear | `POST /api/v1/catalog/products/` | Denegado | Permitido | Denegado | Denegado | Denegado | Reglas de SKU y dominio en services |
 | Catalogo - producto detalle | Leer | `GET /api/v1/catalog/products/<uuid:pk>/` | Permitido | Permitido | Permitido | Denegado | Denegado | Lectura autenticada |
@@ -324,7 +324,7 @@ Leyenda:
 | Stock por producto | Leer | `GET /api/v1/inventory/products/<uuid:product_id>/stock/` | Permitido | Permitido | Permitido | Denegado | Denegado | Alias disponible en `/stock/product/` |
 | Stock por ubicacion | Leer | `GET /api/v1/inventory/stock/location/<uuid:location_id>/` | Permitido | Permitido | Permitido | Denegado | Denegado | Solo autenticado |
 | Umbral de stock por ubicacion | Actualizar | `PATCH /api/v1/inventory/stock/<uuid:pk>/threshold/` | Denegado | Permitido | Denegado | Denegado | Denegado | **[NUEVO]** Override local de reorder_point; solo almacenista |
-| Busqueda de productos | Buscar | `GET /api/v1/inventory/search/` | Permitido | Permitido | Permitido | Denegado | Denegado | Query params `q`, `category`, `subcategory` |
+| Busqueda de productos | Buscar | `GET /api/v1/inventory/search/` | Permitido | Permitido | Permitido | Denegado | Denegado | Query params `q`, `category`, `brand` |
 
 ### 11.4 Movimientos
 

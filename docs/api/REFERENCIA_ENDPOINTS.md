@@ -357,8 +357,7 @@ GET  /api/v1/catalog/products/<uuid>/prices/     → historial de cambios de pre
   "sku": "ELE-0001",
   "name": "Electroestimulador Premium",
   "category_id": "uuid-categoria",
-  "subcategory_id": "uuid-subcat",
-  "brand": "Medco",
+  "brand_id": "uuid-brand",
   "requires_expiration": false,
   "requires_cold_chain": false,
   "reorder_point": 5,
@@ -633,7 +632,7 @@ Para eliminar override:
 ### Búsqueda de productos
 
 ```
-GET /api/v1/inventory/search/?q=electro&category=uuid&subcategory=uuid
+GET /api/v1/inventory/search/?q=electro&category=uuid&brand=uuid
 ```
 
 Todos los autenticados. Busca por nombre o SKU (con índice `pg_trgm` en producción).

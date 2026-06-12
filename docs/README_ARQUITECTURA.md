@@ -75,7 +75,7 @@ Contrato tecnico base de comunicacion:
 Dominios de API esperados:
 
 - `/api/v1/auth/` autenticacion y gestion de usuarios
-- `/api/v1/catalog/` productos, categorias, subcategorias, combos y precios
+- `/api/v1/catalog/` productos, categorias, marcas, combos y precios
 - `/api/v1/inventory/` stock por ubicacion y busqueda
 - `/api/v1/movements/` entradas, salidas, traslados, devoluciones, ajustes y facturas
 - `/api/v1/dashboard/` read model operacional orientado a UI ejecutiva
@@ -333,13 +333,35 @@ icm_backend/
 │   ├── evidence/                                               # Documento arquitectónico relevante
 │   │   └── README.md                                           # Documento técnico relevante
 │   ├── system_behavior/                                        # Documento arquitectónico relevante
+│   │   ├── alerts/                                             # Alertas operativas y monitoreo preventivo
+│   │   │   └── README_ALERTS.md                                # Documento técnico relevante
+│   │   ├── audit/                                              # Trazabilidad e histórico de eventos
+│   │   │   └── README_AUDIT.md                                 # Documento técnico relevante
+│   │   ├── auth/
+│   │   │   └── README_AUTH.md                                  # Documento técnico relevante
+│   │   ├── catalog/                                            # Catálogo, SKUs definidos por usuario y validación de productos
+│   │   │   ├── README_CATALOG.md                               # Documento técnico relevante
+│   │   │   └── README_PRODUCT_SERIAL.md                        # Documento técnico relevante
+│   │   ├── dashboard/                                          # Aplicación Django detectada automáticamente
+│   │   │   └── README_DASHBOARD.md                             # Documento técnico relevante
+│   │   ├── inventory/                                          # Consulta de stock en tiempo real
+│   │   │   └── README_INVENTORY.md                             # Documento técnico relevante
+│   │   ├── movements/                                          # Ledger inmutable y consistencia de inventario
+│   │   │   └── README_MOVEMENTS.md                             # Documento técnico relevante
 │   │   ├── pricing/                                            # Documento arquitectónico relevante
 │   │   │   ├── Plan Arquitectura de Precios y Facturación — Sistema Inventario ICM.md  # Documento técnico relevante
 │   │   │   └── README_PRECIOS_FACTURACION.md                   # Documento técnico relevante
-│   │   └── storage/                                            # Documento arquitectónico relevante
-│   │       ├── README_LOCATION_STATES.md                       # Documento técnico relevante
-│   │       ├── README_STORAGE_DOMAIN.md                        # Documento técnico relevante
-│   │       └── README_STORAGE_TYPES.md                         # Documento técnico relevante
+│   │   ├── purchasing/                                         # Aplicación Django detectada automáticamente
+│   │   │   └── README_PURCHASING.md                            # Documento técnico relevante
+│   │   ├── reports/                                            # Reportes e indicadores operativos
+│   │   │   └── README_REPORTS.md                               # Documento técnico relevante
+│   │   ├── storage/                                            # Documento arquitectónico relevante
+│   │   │   ├── README_LOCATION_STATES.md                       # Documento técnico relevante
+│   │   │   ├── README_STORAGE_DOMAIN.md                        # Documento técnico relevante
+│   │   │   └── README_STORAGE_TYPES.md                         # Documento técnico relevante
+│   │   ├── webhooks/                                           # Aplicación Django detectada automáticamente
+│   │   │   └── README_WEBHOOKS.md                              # Documento técnico relevante
+│   │   └── index.md                                            # Documento técnico relevante
 │   └── GUIA_ONBOARDING.md                                      # Documento técnico relevante
 ├── requirements/                                               # Dependencias por entorno
 │   ├── base.txt

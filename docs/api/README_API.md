@@ -336,7 +336,7 @@ El token expira en `PASSWORD_RESET_TOKEN_EXPIRY_MINUTES` minutos (default 10). `
 | `GET` | `/inventory/stock/product/<uuid:product_id>/` | Stock por producto |
 | `GET` | `/inventory/stock/location/<uuid:location_id>/` | Stock por ubicación |
 | `PATCH` | `/inventory/stock/<uuid:pk>/threshold/` | **[NUEVO]** Actualizar umbral de reorden por ubicación |
-| `GET` | `/inventory/search/` | Búsqueda de productos (`?q=`, `?category=`, `?subcategory=`) |
+| `GET` | `/inventory/search/` | Búsqueda de productos (`?q=`, `?category=`, `?brand=`) |
 
 **Exportación de inventario consolidado:** `GET /inventory/?export=csv` o `?export=xlsx` devuelve el inventario en el formato indicado con filas aplanadas por producto/ubicación.
 

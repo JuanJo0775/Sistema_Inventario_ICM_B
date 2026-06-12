@@ -108,6 +108,31 @@ El módulo `movements` implementa el ledger central del inventario. Todos los ca
 ### BR-04 — Serial obligatorio
 Si `category.requires_serial_number` y no se envía serial → `SerialNumberRequiredError`.
 
+### ProductSerial — Expansión batch de seriales
+Al registrar una entrada con `serial_number` y `quantity > 1`, el sistema **expande** automáticamente el serial en N registros `ProductSerial` individuales usando el formato:
+
+```
+<serial_base>-<batch_prefix>-<NNN>
+```
+
+- `serial_base`: lo que digitó el usuario (ej: `SN-CEL-001`)
+- `batch_prefix`: 2 caracteres hex del UUID del movimiento (ej: `a7`). Agrupa visualmente los ítems de una misma entrada
+- `NNN`: número secuencial de 3 dígitos (001, 002, ..., N)
+
+**Ejemplo:** entrada `quantity=10, serial_number="SN-CEL-001"` crea 10 `ProductSerial`:
+- `SN-CEL-001-a7-001`
+- `SN-CEL-001-a7-002`
+- ...
+- `SN-CEL-001-a7-010`
+
+**Comportamiento:**
+- El `Movement.serial_number` guarda el serial base (lo que digitó el usuario)
+- Los `ProductSerial` guardan los seriales expandidos individuales
+- En **devolución**: el usuario debe digitar el serial completo expandido (impreso en el equipo)
+- El `batch_prefix` se deriva del UUID del movimiento, garantizando unicidad entre distintas entradas
+- La expansión aplica **siempre** que se proporcione `serial_number`, incluso si `quantity=1`
+- Si la categoría no requiere serial pero el usuario lo provee, igual se crean los `ProductSerial`
+
 ### BR-06 — Autocorrección
 Solo el mismo usuario, dentro de 5 minutos, para tipos: TRASLADO, ENTRADA, SALIDA_VENTA_MAYOR, SALIDA_VENTA_MENOR.
 Nunca muta el original: crea reversal + movimiento corregido.
@@ -158,7 +183,7 @@ Todas bajo `/api/v1/movements/`.
 ## 7. Flujo de entrada
 
 ```
-POST /movements/entries/ { product_id, location_id, quantity, ... }
+POST /movements/entries/ { product_id, location_id, quantity, serial_number, ... }
   → register_entry()
     → Lock: Product.select_for_update(), Location.select_for_update()
     → BR-14: validar destino permitido
@@ -167,6 +192,7 @@ POST /movements/entries/ { product_id, location_id, quantity, ... }
     → Crear/recuperar Lot si requires_expiration
     → _lock_stock(): StockByLocation.current_stock += quantity
     → Crear Movement (ENTRADA) con snapshots
+    → Crear ProductSerial × quantity con formato <base>-<batch>-<NNN>
     → log_event(MOVEMENT_CREATED)
     → check_and_create_alerts(product, location)
 ```
