@@ -42,8 +42,10 @@ Ejecuta:
 
 - `black --check .`
 - `isort --check-only .`
+- `flake8 apps/ shared/`
 - `bandit -r apps shared -ll`
 - `pip-audit --progress=off`
+- `mypy apps/ shared/`
 - `python manage.py makemigrations --check --dry-run`
 - `python -m scripts.generate_docs --check`
 

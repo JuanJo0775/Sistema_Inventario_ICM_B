@@ -15,6 +15,7 @@
 - [Reportes y exportación](#reportes-y-exportacion)
 - [Alertas y polling](#alertas-y-polling)
 - [Auditoría](#auditoria)
+- [Compras](#compras)
 - [Webhooks](#webhooks)
 - [Errores](#errores)
 - [Paginación](#paginacion)
@@ -162,6 +163,7 @@ GET  /api/v1/auth/users/<uuid>/    → detalle usuario
 PUT  /api/v1/auth/users/<uuid>/    → actualizar completo
 PATCH /api/v1/auth/users/<uuid>/   → actualizar parcial
 POST /api/v1/auth/users/<uuid>/disable/ → deshabilitar
+POST /api/v1/auth/users/<uuid>/enable/  → reactivar
 ```
 
 **Request POST:**
@@ -1281,6 +1283,89 @@ GET /api/v1/audit/<uuid>/    → detalle log
 
 ---
 
+## Compras
+
+> Solo `almacenista` puede operar el módulo en escritura (`IsPurchasingOperator`).
+> `administrador` tiene solo lectura (`IsPurchasingViewer`).
+
+### Proveedores
+
+```
+GET    /api/v1/purchasing/suppliers/                      → listar (paginado, ?search=, ?is_active=)
+POST   /api/v1/purchasing/suppliers/                      → crear
+GET    /api/v1/purchasing/suppliers/<uuid>/                → detalle
+PATCH  /api/v1/purchasing/suppliers/<uuid>/                → actualizar parcial
+POST   /api/v1/purchasing/suppliers/<uuid>/deactivate/     → desactivar
+POST   /api/v1/purchasing/suppliers/<uuid>/activate/       → reactivar
+```
+
+**Request POST:**
+```json
+{
+  "name": "Proveedor Médico SAS",
+  "nit": "900123456-7",
+  "contact_name": "Carlos Pérez",
+  "contact_email": "carlos@proveedor.com",
+  "contact_phone": "+573001234567",
+  "address": "Cra 45 # 20-30, Bogotá",
+  "payment_terms": "Net 30",
+  "currency": "COP",
+  "notes": "Proveedor principal de insumos de electroterapia"
+}
+```
+
+### Órdenes de compra (OC)
+
+```
+GET    /api/v1/purchasing/purchase-orders/                           → listar (paginado, ?status=, ?supplier_id=)
+POST   /api/v1/purchasing/purchase-orders/                           → crear
+GET    /api/v1/purchasing/purchase-orders/<uuid>/                     → detalle
+PATCH  /api/v1/purchasing/purchase-orders/<uuid>/                     → actualizar parcial
+POST   /api/v1/purchasing/purchase-orders/<uuid>/confirm/             → confirmar OC
+POST   /api/v1/purchasing/purchase-orders/<uuid>/cancel/              → cancelar OC
+```
+
+**Request POST (crear):**
+```json
+{
+  "supplier": "<supplier_uuid>",
+  "expected_date": "2026-06-30",
+  "items": [
+    {
+      "product": "<product_uuid>",
+      "quantity_ordered": 50,
+      "unit_cost": "12500.0000"
+    }
+  ],
+  "notes": "Pedido urgente"
+}
+```
+
+### Recepciones
+
+```
+GET    /api/v1/purchasing/receptions/                    → listar (paginado, ?status=, ?purchase_order_id=)
+POST   /api/v1/purchasing/receptions/                    → crear
+GET    /api/v1/purchasing/receptions/<uuid>/              → detalle
+POST   /api/v1/purchasing/receptions/<uuid>/confirm/      → confirmar (crea Movement, actualiza stock)
+POST   /api/v1/purchasing/receptions/<uuid>/cancel/       → cancelar (solo si no está confirmada)
+```
+
+**Request POST (confirmar):**
+```json
+{
+  "received_items": [
+    {
+      "product": "<product_uuid>",
+      "quantity_received": 48,
+      "unit_cost": "12500.0000"
+    }
+  ]
+}
+```
+
+---
+
 ## Webhooks
 
 Solo `almacenista` (`IsAlmacenista` — rol rector del sistema). Permite notificar a sistemas externos cuando ocurren eventos críticos.
@@ -1554,9 +1639,12 @@ Los listados están paginados. Respuesta estándar:
 | Configurar precios de producto | ✅ | ❌ | ❌ |
 | Ver facturas comerciales | ✅ | ✅ | ❌ |
 | Ver reportes financieros | ✅ | ❌ | ✅ |
+| Gestionar proveedores | ✅ | ❌ | ✅ (solo lectura) |
+| Gestionar órdenes de compra | ✅ | ❌ | ✅ (solo lectura) |
+| Gestionar recepciones | ✅ | ❌ | ❌ |
 
 Para la matriz completa de cada endpoint, ver [README_MATRIZ_PERMISOS.md](README_MATRIZ_PERMISOS.md).
 
 ---
 
-*Actualizado: 2026-05-31. Sincronizado con el estado real del código (508 tests, production-readiness ~95%).*
+*Actualizado: 2026-06-11. Sincronizado con el estado real del código.*

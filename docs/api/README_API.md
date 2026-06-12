@@ -21,6 +21,7 @@ La API cubre los dominios funcionales del backend:
 - alertas (con polling realtime)
 - auditoría
 - webhooks (notificaciones a sistemas externos)
+- compras (proveedores, órdenes de compra, recepciones)
 
 > **Documentos relacionados:**
 > - Referencia completa de endpoints con ejemplos: [REFERENCIA_ENDPOINTS.md](REFERENCIA_ENDPOINTS.md)
@@ -92,9 +93,8 @@ Los tags se definen centralmente en [shared/openapi.py](../../shared/openapi.py)
 | `TAG_REPORTS` | `reports` | Reportes históricos, exportación y datasets |
 | `TAG_ALERTS` | `alerts` | Alertas operativas y polling |
 | `TAG_AUDIT` | `audit` | Logs de auditoría inmutables |
-| `webhooks` | `webhooks` | Gestión de webhooks (definido en `apps/webhooks/views.py`) |
-
-> **Nota:** El tag `webhooks` aún no está en `shared/openapi.py`. Cuando se formalice, debe registrarse allí.
+| `TAG_WEBHOOKS` | `webhooks` | Gestión de webhooks |
+| `TAG_PURCHASING` | `purchasing` | Compras, proveedores y recepciones |
 
 ### 4.3 Frontera de dashboard y reportes
 
@@ -273,6 +273,7 @@ Para el catálogo completo con ejemplos request/response, ver [REFERENCIA_ENDPOI
 | `GET/POST` | `/auth/users/` | Listar / crear usuarios (filtros: `?role=`, `?search=`, `?page=`) |
 | `GET/PUT/PATCH` | `/auth/users/<uuid:pk>/` | Detalle / actualizar usuario |
 | `POST` | `/auth/users/<uuid:pk>/disable/` | Deshabilitar cuenta |
+| `POST` | `/auth/users/<uuid:pk>/enable/` | Reactivar cuenta |
 | `POST` | `/auth/change-password/` | Cambiar contraseña propia (requiere auth) |
 | `POST` | `/auth/forgot-password/` | Solicitar recuperación por email (sin auth, anti-enumeración) |
 | `POST` | `/auth/reset-password/` | Restablecer contraseña con token (sin auth) |
@@ -478,6 +479,27 @@ assert expected == request.headers["X-ICM-Signature"]
 ```
 
 **Política de reintentos:** Backoff exponencial (1 min → 5 min → 30 min). Después de `max_retries` intentos fallidos, el delivery queda en estado `FAILED`. No se desactiva el endpoint automáticamente.
+
+### 10.10 Compras (`/api/v1/purchasing/`)
+
+> Solo `almacenista` puede operar el módulo en escritura (`IsPurchasingOperator`). `administrador` tiene solo lectura (`IsPurchasingViewer`).
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `GET/POST` | `/purchasing/suppliers/` | Listar / crear proveedores |
+| `GET/PATCH` | `/purchasing/suppliers/<uuid:pk>/` | Detalle / actualizar proveedor |
+| `POST` | `/purchasing/suppliers/<uuid:pk>/deactivate/` | Desactivar proveedor |
+| `POST` | `/purchasing/suppliers/<uuid:pk>/activate/` | Reactivar proveedor |
+| `GET/POST` | `/purchasing/purchase-orders/` | Listar / crear órdenes de compra |
+| `GET/PATCH` | `/purchasing/purchase-orders/<uuid:pk>/` | Detalle / actualizar OC |
+| `POST` | `/purchasing/purchase-orders/<uuid:pk>/confirm/` | Confirmar OC (dispara recepción inicial) |
+| `POST` | `/purchasing/purchase-orders/<uuid:pk>/cancel/` | Cancelar OC (solo sin recepciones confirmadas) |
+| `GET/POST` | `/purchasing/receptions/` | Listar / crear recepciones |
+| `GET` | `/purchasing/receptions/<uuid:pk>/` | Detalle de recepción |
+| `POST` | `/purchasing/receptions/<uuid:pk>/confirm/` | Confirmar recepción (crea Movement, actualiza stock) |
+| `POST` | `/purchasing/receptions/<uuid:pk>/cancel/` | Cancelar recepción (solo si no está confirmada) |
+
+Para contratos detallados con ejemplos request/response, ver [REFERENCIA_ENDPOINTS.md](REFERENCIA_ENDPOINTS.md).
 
 ## 11. Trazabilidad con el resto de la arquitectura
 

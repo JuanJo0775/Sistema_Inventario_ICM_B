@@ -19,8 +19,8 @@ El archivo `.env` **nunca** se sube al repositorio (está en `.gitignore`). El a
 | Variable | Default | Descripción |
 |---|---|---|
 | `DJANGO_SECRET_KEY` | *(inseguro)* | Clave criptográfica para firmar sesiones, CSRF y tokens. **Cambiar obligatoriamente en producción.** |
-| `DJANGO_DEBUG` | `True` | `True` en desarrollo muestra trazas de error completas. `False` en producción (obligatorio). |
-| `DJANGO_ALLOWED_HOSTS` | `localhost,127.0.0.1,0.0.0.0` | Hosts que el servidor acepta. En producción: el dominio real, ej. `tuapp.com,www.tuapp.com`. |
+| `DJANGO_DEBUG` | `True` (development) / `False` (base) | `True` en desarrollo muestra trazas de error completas. `False` en producción (obligatorio). El default en `base.py` es `False`; `development.py` lo sobreescribe a `True`. |
+| `DJANGO_ALLOWED_HOSTS` | `localhost,127.0.0.1` | Hosts que el servidor acepta. En producción: el dominio real, ej. `tuapp.com,www.tuapp.com`. El default en `base.py` es `localhost,127.0.0.1`; `development.py` usa `*`. |
 | `DJANGO_SETTINGS_MODULE` | `config.settings.development` | Módulo de settings a cargar. Opciones: `development`, `test`, `production`. |
 
 **Producción:**

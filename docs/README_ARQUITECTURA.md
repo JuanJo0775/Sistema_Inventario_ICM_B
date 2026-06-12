@@ -29,6 +29,8 @@ El proyecto usa un monolito modular con apps Django por dominio:
 - reports
 - alerts
 - audit
+- purchasing
+- webhooks
 
 Beneficios:
 
@@ -80,6 +82,7 @@ Dominios de API esperados:
 - `/api/v1/reports/` indicadores, reportes operativos y reportes financieros
 - `/api/v1/alerts/` alertas operativas activas
 - `/api/v1/audit/` trazabilidad historica (solo lectura autorizada)
+- `/api/v1/purchasing/` proveedores, órdenes de compra y recepciones
 - `/api/v1/webhooks/` suscripcion y entrega de eventos externos
 
 Endpoints de precios y facturacion agregados:
@@ -1267,19 +1270,35 @@ def register_entry(user, product_id, location_id, quantity, serial_number=None,
 
 ### 4.5 Ubicaciones de Almacenamiento
 
-El sistema soporta tres ubicaciones físicas:
+El sistema soporta ubicaciones físicas con estado operativo (BR-14):
 
 ```python
-class Location(Model):
-    code = CharField(unique=True)  # 'VITRINA', 'BODEGA_1', 'BODEGA_2'
-    description = CharField()
-    is_retail = BooleanField(default=False)  # Vitrina = True, Bodegas = False
+class Location(BaseModel):
+    class OperationalStatus(models.TextChoices):
+        ACTIVE = "active", "Activa"
+        MAINTENANCE = "maintenance", "Mantenimiento"
+        RESTRICTED = "restricted", "Restringida"
+        BLOCKED = "blocked", "Bloqueada"
+        ARCHIVED = "archived", "Archivada"
+
+    code = SlugField(max_length=100, unique=True)  # auto-generado desde name
+    name = CharField(max_length=100)
+    description = TextField(blank=True)
+    is_retail = BooleanField(default=False)
+    max_capacity = PositiveIntegerField(null=True, blank=True)
+    operational_status = CharField(
+        max_length=20, choices=OperationalStatus.choices,
+        default=OperationalStatus.ACTIVE, db_index=True
+    )
+    storage_type = ForeignKey(StorageType, null=True, on_delete=PROTECT)
+    storage_template = ForeignKey(StorageTemplate, null=True, on_delete=SET_NULL)
 ```
 
 Las ubicaciones definen:
 - Dónde se ejecutan las operaciones (vitrina vs. mayorista).
 - Cómo se consolida el stock total.
 - Reglas de visibilidad en reportes.
+- BR-14: el `operational_status` determina qué operaciones de stock son elegibles.
 
 ---
 
@@ -2029,12 +2048,18 @@ Estos tests **deben** pasar siempre:
 
 ### 11.3 Herramientas y Configuración
 
-```python
+```ini
 # pytest.ini
 [pytest]
 DJANGO_SETTINGS_MODULE = config.settings.test
 python_files = test_*.py
-addopts = --cov=apps --cov-report=html --tb=short
+python_classes = Test*
+python_functions = test_*
+addopts = -v --tb=short --import-mode=importlib
+norecursedirs = .venv node_modules .git .tox tests/performance
+filterwarnings = ignore::DeprecationWarning
+markers =
+    slow: tests lentos que ejecutan el seeder o el cleaner completos
 
 # Run: pytest
 # Run with coverage: pytest --cov
@@ -2159,7 +2184,7 @@ Todos los `created_at`, `updated_at` se almacenan en UTC:
 ```python
 # settings/base.py
 USE_TZ = True
-TIME_ZONE = 'UTC'
+TIME_ZONE = config("APP_TIMEZONE", default="America/Bogota")
 
 # Conversión a zona local: solo en serialización
 class MovementSerializer(Serializer):
