@@ -865,9 +865,5 @@ def test_confirm_reception_with_serial_in_allocation_propagates(
         ).count()
         == 2
     )
-    assert Movement.objects.filter(
-        product=product, serial_number="SN-ALLOC-1"
-    ).exists()
-    assert Movement.objects.filter(
-        product=product, serial_number="SN-ALLOC-2"
-    ).exists()
+    assert Movement.objects.filter(product=product, serial_number="SN-ALLOC-1").exists()
+    assert Movement.objects.filter(product=product, serial_number="SN-ALLOC-2").exists()

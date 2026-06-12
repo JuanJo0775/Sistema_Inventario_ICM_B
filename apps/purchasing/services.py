@@ -591,9 +591,7 @@ def confirm_reception(
                     allocation_lot_code=allocation.lot_code,
                     allocation_lot_expiration_date=allocation.lot_expiration_date,
                 )
-                serial_number = (
-                    allocation.serial_number or item.serial_number or None
-                )
+                serial_number = allocation.serial_number or item.serial_number or None
                 movement = movements_services.register_entry(
                     executor,
                     product_id=product.id,

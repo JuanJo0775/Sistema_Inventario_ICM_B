@@ -44,13 +44,9 @@ from shared.location_validators import (
 logger = logging.getLogger(__name__)
 
 
-def _validate_serial_required(
-    product: Product, serial_number: str | None
-) -> None:
+def _validate_serial_required(product: Product, serial_number: str | None) -> None:
     """BR-04: Valida serial obligatorio si la categoría lo exige."""
-    if product.category.requires_serial_number and not (
-        serial_number or ""
-    ).strip():
+    if product.category.requires_serial_number and not (serial_number or "").strip():
         raise SerialNumberRequiredError()
 
 

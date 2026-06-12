@@ -30,7 +30,12 @@ from shared.exceptions import (
     ProductNotReturnableError,
     SerialNumberRequiredError,
 )
-from tests.factories import ElectroCategoryFactory, LocationFactory, LotFactory, ProductFactory
+from tests.factories import (
+    ElectroCategoryFactory,
+    LocationFactory,
+    LotFactory,
+    ProductFactory,
+)
 
 
 @pytest.mark.django_db
@@ -932,9 +937,7 @@ def test_internal_transfer_electroterapia_without_serial_fails(
     cat = ElectroCategoryFactory()
     product = ProductFactory(category=cat, sku="TRF-SER-01")
     origin, destination = sample_locations[0], sample_locations[1]
-    StockByLocation.objects.create(
-        product=product, location=origin, current_stock=10
-    )
+    StockByLocation.objects.create(product=product, location=origin, current_stock=10)
     with pytest.raises(SerialNumberRequiredError):
         register_internal_transfer(
             almacenista_user,
@@ -948,15 +951,11 @@ def test_internal_transfer_electroterapia_without_serial_fails(
 
 
 @pytest.mark.django_db
-def test_internal_transfer_with_serial_persists(
-    almacenista_user, sample_locations
-):
+def test_internal_transfer_with_serial_persists(almacenista_user, sample_locations):
     cat = ElectroCategoryFactory()
     product = ProductFactory(category=cat, sku="TRF-SER-02")
     origin, destination = sample_locations[0], sample_locations[1]
-    StockByLocation.objects.create(
-        product=product, location=origin, current_stock=10
-    )
+    StockByLocation.objects.create(product=product, location=origin, current_stock=10)
     movement = register_internal_transfer(
         almacenista_user,
         product.id,
@@ -1013,9 +1012,7 @@ def test_adjustment_electroterapia_without_serial_fails(
 
 
 @pytest.mark.django_db
-def test_adjustment_with_serial_persists(
-    almacenista_user, sample_locations
-):
+def test_adjustment_with_serial_persists(almacenista_user, sample_locations):
     cat = ElectroCategoryFactory()
     product = ProductFactory(category=cat, sku="ADJ-SER-02")
     loc = sample_locations[0]
@@ -1037,7 +1034,9 @@ def test_adjustment_downwards_without_serial_optional_when_not_required(
     almacenista_user, sample_product, sample_locations
 ):
     loc = sample_locations[0]
-    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=10)
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=10
+    )
     movement = register_adjustment(
         almacenista_user,
         sample_product.id,

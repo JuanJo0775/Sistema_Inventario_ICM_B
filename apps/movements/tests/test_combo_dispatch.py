@@ -168,9 +168,7 @@ def test_dispatch_combo_electro_without_serial_fails(almacenista_user):
     location = LocationFactory(code="BODEGA_CMB_ELEC")
     combo = ProductCombo.objects.create(name="Kit Electro", sku="KIT-ELEC")
     ComboItem.objects.create(combo=combo, product=product, quantity=1)
-    StockByLocation.objects.create(
-        product=product, location=location, current_stock=5
-    )
+    StockByLocation.objects.create(product=product, location=location, current_stock=5)
 
     from apps.movements.services import dispatch_combo
 
@@ -193,9 +191,7 @@ def test_dispatch_combo_electro_with_serial_succeeds(almacenista_user):
     location = LocationFactory(code="BODEGA_CMB_ELEC2")
     combo = ProductCombo.objects.create(name="Kit Electro 2", sku="KIT-ELEC2")
     ComboItem.objects.create(combo=combo, product=product, quantity=2)
-    StockByLocation.objects.create(
-        product=product, location=location, current_stock=10
-    )
+    StockByLocation.objects.create(product=product, location=location, current_stock=10)
 
     from apps.movements.services import dispatch_combo
 
