@@ -8,18 +8,24 @@ applyTo: ".*"
 Propósito: proporcionar una guía autorizada, centralizada y fácilmente consultable para asistentes de código (GitHub Copilot, Cursor, etc.) que vayan a modificar lógica de negocio, APIs, tests o documentación en este repositorio.
 
 Documentos de referencia (consultar siempre antes de cambiar comportamiento):
-- `docs/README_ARQUITECTURA.md` — Arquitectura modular, ledger + stock derivado, BR-01…BR-13, SOLID, testing, Docker
+- `docs/README_ARQUITECTURA.md` — Arquitectura modular, ledger + stock derivado, BR-01…BR-15, SOLID, testing, Docker
 - `docs/requisitos/ERS_ICM_Requisitos.md` — Requisitos funcionales y criterios Gherkin
 - `docs/api/README_API.md` — Especificación de la API `/api/v1/`, JWT, tags OpenAPI
+- `docs/api/README_MATRIZ_PERMISOS.md` — Matriz de permisos y seguridad por rol
+- `docs/api/REFERENCIA_ENDPOINTS.md` — Referencia completa de endpoints (guía frontend)
 - `docs/test/README_TEST.md` — Guía oficial de pruebas y regeneración de documentación
 - `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` — Matriz RF ↔ tests
 - `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` — Contexto de negocio y alcance
 - `docs/GUIA_ONBOARDING.md` — Guía de onboarding y checklist para desarrolladores nuevos
+- `docs/guias/ENV_GUIDE.md` — Guía de variables de entorno
+- `docs/guias/SEED_DB.md` — Guía de seed de base de datos
 - `docs/adr/README_ADR.md` — Decisiones arquitectónicas registradas (ADRs). Revisar `docs/adr/` para ADRs individuales
 - `docs/adr/ADR-001.md` — ADR-001 (referencia de ejemplo)
 - `docs/calidad_restricciones/README_ATRIBUTOS_CALIDAD.md` — Atributos de calidad y criterios
 - `docs/calidad_restricciones/README_RESTRICCIONES.md` — Restricciones y reglas no funcionales
 - `docs/CI/README_CICD.md` — Runbook de CI/CD: pipelines, despliegue, promoción por digest, backups, rollback y operación segura
+- `scripts/README_SCRIPTS.md` — Documentación de todos los scripts del proyecto
+- `AUDIT_REMEDIATION_PLAN.md` — Plan de remediación de auditoría
 - `README.md` — Resumen del proyecto y enlaces rápidos
 - `AGENTS.md` — Guía rápida para asistentes de código (archivo en la raíz)
 
@@ -170,7 +176,7 @@ He revisado las reglas que antes residían en `.cursor/rules/` y las he consolid
 ### 1) Contexto y trazabilidad (obligatorio)
 
 - Antes de cambiar comportamiento o contratos, alinear siempre con:
-  - `docs/README_ARQUITECTURA.md`, `docs/requisitos/ERS_ICM_Requisitos.md`, `docs/api/README_API.md`, `docs/ICM_Informe_Elicitacion_v2_plus.docx.md`.
+  - `docs/README_ARQUITECTURA.md`, `docs/requisitos/ERS_ICM_Requisitos.md`, `docs/api/README_API.md`, `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md`.
 - Documentar en docstrings y en la descripción del PR los RF/BR/RNF impactados (ej: "RF-005, BR-10").
 - Roles y horario crítico: `almacenista`, `auxiliar_despacho`, `administrador`. Ventana auxiliar: America/Bogota 07:00–12:00 y 14:00–17:00.
 

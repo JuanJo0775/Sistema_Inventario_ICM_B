@@ -11,17 +11,45 @@ Propósito: proporcionar una guía rápida y completa en la raíz del repositori
 | `docs/README_ARQUITECTURA.md` | Arquitectura modular, ledger + stock derivado, BR-01…BR-15, SOLID, testing, Docker |
 | `docs/requisitos/ERS_ICM_Requisitos.md` | Requisitos funcionales, criterios Gherkin y trazabilidad |
 | `docs/api/README_API.md` | Especificación `/api/v1/`, JWT, tags OpenAPI, checklist de publicación |
+| `docs/api/README_MATRIZ_PERMISOS.md` | Matriz de permisos y seguridad por rol |
+| `docs/api/REFERENCIA_ENDPOINTS.md` | Referencia completa de endpoints (guía frontend) |
 | `docs/test/README_TEST.md` | Guía oficial de pruebas: suite Gherkin, unit/integration y comandos de regeneración |
 | `docs/test/TRAZABILIDAD_ERS_GHERKIN.md` | Matriz viva RF ↔ tests con cobertura y brechas documentadas |
 | `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md` | Contexto de negocio ICM, alcance y supuestos |
 | `docs/GUIA_ONBOARDING.md` | Guía de onboarding para nuevos desarrolladores y configuraciones locales |
-| `docs/adr/README_ADR.md` | Decisiones arquitectónicas registradas (ADRs)
-| `docs/adr/ADR-001.md` | ADR-001 (ejemplo y antecedentes) — revisar carpeta `docs/adr/` para más ADRs
-| `docs/calidad_restricciones/README_ATRIBUTOS_CALIDAD.md` | Atributos de calidad y criterios de aceptación
-| `docs/calidad_restricciones/README_RESTRICCIONES.md` | Restricciones y reglas no funcionales importantes
+| `docs/guias/ENV_GUIDE.md` | Guía de variables de entorno (`.env`) |
+| `docs/guias/SEED_DB.md` | Guía de seed de base de datos |
+| `docs/adr/README_ADR.md` | Decisiones arquitectónicas registradas (ADRs) |
+| `docs/adr/ADR-001.md` | ADR-001 (ejemplo y antecedentes) — revisar `docs/adr/` para más ADRs |
+| `docs/calidad_restricciones/README_ATRIBUTOS_CALIDAD.md` | Atributos de calidad y criterios de aceptación |
+| `docs/calidad_restricciones/README_RESTRICCIONES.md` | Restricciones y reglas no funcionales importantes |
 | `docs/CI/README_CICD.md` | Runbook de CI/CD: pipelines, despliegue, promoción, backups, rollback y operación segura |
-| `README.md` | Resumen del proyecto y enlaces rápidos
-| `AGENTS.md` | Guía rápida para asistentes de código (este archivo)
+| `scripts/README_SCRIPTS.md` | Documentación de todos los scripts del proyecto |
+| `AUDIT_REMEDIATION_PLAN.md` | Plan de remediación de auditoría (cobertura, event types) |
+| `README.md` | Resumen del proyecto y enlaces rápidos |
+| `AGENTS.md` | Guía rápida para asistentes de código (este archivo) |
+
+## Documentación complementaria
+
+Archivos adicionales organizados por carpeta (no obligatorios, pero útiles según la tarea):
+
+| Carpeta / Archivo | Propósito |
+|-------------------|-----------|
+| `docs/architecture/architecture_drivers.md` | Drivers arquitectónicos priorizados |
+| `docs/architecture/utility_tree.md` | Utility Tree con escenarios y trade-offs |
+| `docs/architecture/architectural_constraints.md` | Restricciones arquitectónicas formales |
+| `docs/architecture/adr_relationships.md` | Trazabilidad drivers ↔ ADRs |
+| `docs/calidad_restricciones/INFORME_COMPLETITUD_PRINCIPIOS_Y_CALIDAD.md` | Informe de completitud KISS/DRY/YAGNI y atributos de calidad |
+| `docs/requisitos/KPIS_Proyecto_nuclear.md` | Especificación de KPIs del proyecto |
+| `docs/guias/GRAPHIFY_GUIDE.md` | Guía de actualización del grafo Graphify |
+| `docs/guias/Clasificacion_Productos.xlsx` | Catálogo histórico de productos (fuente del seed) |
+| `docs/test/CHANGELOG_TESTING.md` | Historial de mejoras de testing |
+| `docs/test/TEST_ASSESSMENT_2026-06-10.md` | Informe integral de calidad y cobertura de pruebas |
+| `docs/test/FRONTEND_E2E_PLAN.md` | Plan de pruebas E2E para frontend |
+| `docs/evidence/README.md` | Evidencias generadas por CI (cobertura, audit) |
+| `README_EVALUACION.md` | Resumen de revisión del repositorio |
+| `README_RESTRICCIONES_NO_DOCUMENTADAS.md` | Restricciones no documentadas detectadas |
+| `GEMINI.md` | Instrucciones para Antigravity (Gemini) |
 
 ## Reglas y políticas vinculadas
 
@@ -216,7 +244,7 @@ He revisado las reglas que antes residían en `.cursor/rules/` y las he consolid
 ### 1) Contexto y trazabilidad (obligatorio)
 
 - Antes de cambiar comportamiento o contratos, alinear siempre con:
-  - `docs/README_ARQUITECTURA.md`, `docs/requisitos/ERS_ICM_Requisitos.md`, `docs/api/README_API.md`, `docs/ICM_Informe_Elicitacion_v2_plus.docx.md`.
+  - `docs/README_ARQUITECTURA.md`, `docs/requisitos/ERS_ICM_Requisitos.md`, `docs/api/README_API.md`, `docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md`.
 - Documentar en docstrings y en la descripción del PR los RF/BR/RNF impactados (ej: "RF-005, BR-10").
 - Roles y horario crítico: `almacenista`, `auxiliar_despacho`, `administrador`. Ventana auxiliar: America/Bogota 07:00–12:00 y 14:00–17:00.
 
