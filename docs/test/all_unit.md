@@ -5545,6 +5545,294 @@ Código fuente: [apps/catalog/tests/test_models.py](../../apps/catalog/tests/tes
 <!-- file: UNIT-0155.md -->
 **Código:** UNIT-0155
 
+# test_delete_soft_deletes
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_delete_soft_deletes`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_delete_soft_deletes -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 219)
+
+
+---
+
+<!-- file: UNIT-0156.md -->
+**Código:** UNIT-0156
+
+# test_delete_with_active_products_returns_409
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_delete_with_active_products_returns_409`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_delete_with_active_products_returns_409 -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 229)
+
+
+---
+
+<!-- file: UNIT-0157.md -->
+**Código:** UNIT-0157
+
+# test_get_detail_returns_200
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_get_detail_returns_200`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_get_detail_returns_200 -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 184)
+
+
+---
+
+<!-- file: UNIT-0158.md -->
+**Código:** UNIT-0158
+
+# test_list_excludes_inactive_by_default
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_list_excludes_inactive_by_default`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_list_excludes_inactive_by_default -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 253)
+
+
+---
+
+<!-- file: UNIT-0159.md -->
+**Código:** UNIT-0159
+
+# test_list_includes_inactive_with_param
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_list_includes_inactive_with_param`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_list_includes_inactive_with_param -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 265)
+
+
+---
+
+<!-- file: UNIT-0160.md -->
+**Código:** UNIT-0160
+
+# test_patch_updates_name
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_patch_updates_name`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_patch_updates_name -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 195)
+
+
+---
+
+<!-- file: UNIT-0161.md -->
+**Código:** UNIT-0161
+
+# test_put_updates_brand
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_put_updates_brand`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_put_updates_brand -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 208)
+
+
+---
+
+<!-- file: UNIT-0162.md -->
+**Código:** UNIT-0162
+
+# test_restore_reactivates
+
+## Nombre del test
+
+`apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_restore_reactivates`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest apps/catalog/tests/test_new_endpoints.py::TestBrandDetail::test_restore_reactivates -v
+```
+
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 240)
+
+
+---
+
+<!-- file: UNIT-0163.md -->
+**Código:** UNIT-0163
+
 # test_delete_category_with_active_products_returns_409
 
 ## Nombre del test
@@ -5573,13 +5861,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_delete_category_with_active_products_returns_409 -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 106)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 105)
 
 
 ---
 
-<!-- file: UNIT-0156.md -->
-**Código:** UNIT-0156
+<!-- file: UNIT-0164.md -->
+**Código:** UNIT-0164
 
 # test_delete_category_with_only_inactive_products_succeeds
 
@@ -5609,13 +5897,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_delete_category_with_only_inactive_products_succeeds -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 118)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 117)
 
 
 ---
 
-<!-- file: UNIT-0157.md -->
-**Código:** UNIT-0157
+<!-- file: UNIT-0165.md -->
+**Código:** UNIT-0165
 
 # test_delete_requires_almacenista
 
@@ -5645,13 +5933,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_delete_requires_almacenista -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 170)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 169)
 
 
 ---
 
-<!-- file: UNIT-0158.md -->
-**Código:** UNIT-0158
+<!-- file: UNIT-0166.md -->
+**Código:** UNIT-0166
 
 # test_delete_soft_deletes_category
 
@@ -5681,13 +5969,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_delete_soft_deletes_category -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 96)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 95)
 
 
 ---
 
-<!-- file: UNIT-0159.md -->
-**Código:** UNIT-0159
+<!-- file: UNIT-0167.md -->
+**Código:** UNIT-0167
 
 # test_get_detail_404_on_missing
 
@@ -5717,13 +6005,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_get_detail_404_on_missing -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 49)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 48)
 
 
 ---
 
-<!-- file: UNIT-0160.md -->
-**Código:** UNIT-0160
+<!-- file: UNIT-0168.md -->
+**Código:** UNIT-0168
 
 # test_get_detail_returns_200
 
@@ -5753,13 +6041,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_get_detail_returns_200 -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 38)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 37)
 
 
 ---
 
-<!-- file: UNIT-0161.md -->
-**Código:** UNIT-0161
+<!-- file: UNIT-0169.md -->
+**Código:** UNIT-0169
 
 # test_list_excludes_inactive_by_default
 
@@ -5789,13 +6077,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_list_excludes_inactive_by_default -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 140)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 139)
 
 
 ---
 
-<!-- file: UNIT-0162.md -->
-**Código:** UNIT-0162
+<!-- file: UNIT-0170.md -->
+**Código:** UNIT-0170
 
 # test_list_includes_inactive_with_param
 
@@ -5825,13 +6113,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_list_includes_inactive_with_param -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 150)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 149)
 
 
 ---
 
-<!-- file: UNIT-0163.md -->
-**Código:** UNIT-0163
+<!-- file: UNIT-0171.md -->
+**Código:** UNIT-0171
 
 # test_patch_requires_almacenista
 
@@ -5861,13 +6149,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_patch_requires_almacenista -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 160)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 159)
 
 
 ---
 
-<!-- file: UNIT-0164.md -->
-**Código:** UNIT-0164
+<!-- file: UNIT-0172.md -->
+**Código:** UNIT-0172
 
 # test_patch_updates_flags
 
@@ -5897,13 +6185,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_patch_updates_flags -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 71)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 70)
 
 
 ---
 
-<!-- file: UNIT-0165.md -->
-**Código:** UNIT-0165
+<!-- file: UNIT-0173.md -->
+**Código:** UNIT-0173
 
 # test_patch_updates_name
 
@@ -5933,13 +6221,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_patch_updates_name -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 58)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 57)
 
 
 ---
 
-<!-- file: UNIT-0166.md -->
-**Código:** UNIT-0166
+<!-- file: UNIT-0174.md -->
+**Código:** UNIT-0174
 
 # test_put_replaces_category
 
@@ -5969,13 +6257,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_put_replaces_category -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 84)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 83)
 
 
 ---
 
-<!-- file: UNIT-0167.md -->
-**Código:** UNIT-0167
+<!-- file: UNIT-0175.md -->
+**Código:** UNIT-0175
 
 # test_restore_category_reactivates
 
@@ -6005,13 +6293,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestCategoryDetail::test_restore_category_reactivates -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 129)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 128)
 
 
 ---
 
-<!-- file: UNIT-0168.md -->
-**Código:** UNIT-0168
+<!-- file: UNIT-0176.md -->
+**Código:** UNIT-0176
 
 # test_delete_soft_deletes
 
@@ -6041,13 +6329,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_delete_soft_deletes -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 352)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 343)
 
 
 ---
 
-<!-- file: UNIT-0169.md -->
-**Código:** UNIT-0169
+<!-- file: UNIT-0177.md -->
+**Código:** UNIT-0177
 
 # test_get_detail_returns_200
 
@@ -6077,13 +6365,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_get_detail_returns_200 -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 293)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 284)
 
 
 ---
 
-<!-- file: UNIT-0170.md -->
-**Código:** UNIT-0170
+<!-- file: UNIT-0178.md -->
+**Código:** UNIT-0178
 
 # test_list_excludes_inactive_by_default
 
@@ -6113,13 +6401,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_list_excludes_inactive_by_default -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 379)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 370)
 
 
 ---
 
-<!-- file: UNIT-0171.md -->
-**Código:** UNIT-0171
+<!-- file: UNIT-0179.md -->
+**Código:** UNIT-0179
 
 # test_list_includes_inactive_with_param
 
@@ -6149,13 +6437,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_list_includes_inactive_with_param -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 393)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 384)
 
 
 ---
 
-<!-- file: UNIT-0172.md -->
-**Código:** UNIT-0172
+<!-- file: UNIT-0180.md -->
+**Código:** UNIT-0180
 
 # test_patch_updates_name
 
@@ -6185,13 +6473,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_patch_updates_name -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 306)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 297)
 
 
 ---
 
-<!-- file: UNIT-0173.md -->
-**Código:** UNIT-0173
+<!-- file: UNIT-0181.md -->
+**Código:** UNIT-0181
 
 # test_patch_with_items_replaces_all_items
 
@@ -6221,13 +6509,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_patch_with_items_replaces_all_items -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 319)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 310)
 
 
 ---
 
-<!-- file: UNIT-0174.md -->
-**Código:** UNIT-0174
+<!-- file: UNIT-0182.md -->
+**Código:** UNIT-0182
 
 # test_put_replaces_combo
 
@@ -6257,13 +6545,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_put_replaces_combo -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 337)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 328)
 
 
 ---
 
-<!-- file: UNIT-0175.md -->
-**Código:** UNIT-0175
+<!-- file: UNIT-0183.md -->
+**Código:** UNIT-0183
 
 # test_restore_reactivates
 
@@ -6293,13 +6581,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboDetail::test_restore_reactivates -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 364)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 355)
 
 
 ---
 
-<!-- file: UNIT-0176.md -->
-**Código:** UNIT-0176
+<!-- file: UNIT-0184.md -->
+**Código:** UNIT-0184
 
 # test_deactivate_via_delete_logs_combo_deactivated
 
@@ -6329,13 +6617,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboUpdateIsActiveIgnored::test_deactivate_via_delete_logs_combo_deactivated -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 580)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 571)
 
 
 ---
 
-<!-- file: UNIT-0177.md -->
-**Código:** UNIT-0177
+<!-- file: UNIT-0185.md -->
+**Código:** UNIT-0185
 
 # test_patch_name_still_works_when_is_active_sent
 
@@ -6365,13 +6653,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboUpdateIsActiveIgnored::test_patch_name_still_works_when_is_active_sent -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 595)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 586)
 
 
 ---
 
-<!-- file: UNIT-0178.md -->
-**Código:** UNIT-0178
+<!-- file: UNIT-0186.md -->
+**Código:** UNIT-0186
 
 # test_patch_with_is_active_does_not_deactivate_combo
 
@@ -6401,13 +6689,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboUpdateIsActiveIgnored::test_patch_with_is_active_does_not_deactivate_combo -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 549)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 540)
 
 
 ---
 
-<!-- file: UNIT-0179.md -->
-**Código:** UNIT-0179
+<!-- file: UNIT-0187.md -->
+**Código:** UNIT-0187
 
 # test_patch_with_is_active_does_not_log_combo_deactivated
 
@@ -6437,13 +6725,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestComboUpdateIsActiveIgnored::test_patch_with_is_active_does_not_log_combo_deactivated -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 565)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 556)
 
 
 ---
 
-<!-- file: UNIT-0180.md -->
-**Código:** UNIT-0180
+<!-- file: UNIT-0188.md -->
+**Código:** UNIT-0188
 
 # test_delete_logs_product_deactivated_event
 
@@ -6473,13 +6761,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductDeactivateComboGuard::test_delete_logs_product_deactivated_event -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 528)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 519)
 
 
 ---
 
-<!-- file: UNIT-0181.md -->
-**Código:** UNIT-0181
+<!-- file: UNIT-0189.md -->
+**Código:** UNIT-0189
 
 # test_delete_returns_409_when_in_active_combo
 
@@ -6509,13 +6797,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductDeactivateComboGuard::test_delete_returns_409_when_in_active_combo -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 486)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 477)
 
 
 ---
 
-<!-- file: UNIT-0182.md -->
-**Código:** UNIT-0182
+<!-- file: UNIT-0190.md -->
+**Código:** UNIT-0190
 
 # test_delete_succeeds_when_not_in_any_combo
 
@@ -6545,13 +6833,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductDeactivateComboGuard::test_delete_succeeds_when_not_in_any_combo -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 517)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 508)
 
 
 ---
 
-<!-- file: UNIT-0183.md -->
-**Código:** UNIT-0183
+<!-- file: UNIT-0191.md -->
+**Código:** UNIT-0191
 
 # test_delete_succeeds_when_only_in_inactive_combo
 
@@ -6581,13 +6869,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductDeactivateComboGuard::test_delete_succeeds_when_only_in_inactive_combo -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 502)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 493)
 
 
 ---
 
-<!-- file: UNIT-0184.md -->
-**Código:** UNIT-0184
+<!-- file: UNIT-0192.md -->
+**Código:** UNIT-0192
 
 # test_delete_deactivates_product
 
@@ -6617,13 +6905,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_delete_deactivates_product -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 414)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 405)
 
 
 ---
 
-<!-- file: UNIT-0185.md -->
-**Código:** UNIT-0185
+<!-- file: UNIT-0193.md -->
+**Código:** UNIT-0193
 
 # test_delete_requires_almacenista
 
@@ -6653,13 +6941,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_delete_requires_almacenista -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 459)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 450)
 
 
 ---
 
-<!-- file: UNIT-0186.md -->
-**Código:** UNIT-0186
+<!-- file: UNIT-0194.md -->
+**Código:** UNIT-0194
 
 # test_list_excludes_inactive_by_default
 
@@ -6689,13 +6977,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_list_excludes_inactive_by_default -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 439)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 430)
 
 
 ---
 
-<!-- file: UNIT-0187.md -->
-**Código:** UNIT-0187
+<!-- file: UNIT-0195.md -->
+**Código:** UNIT-0195
 
 # test_list_includes_inactive_with_param
 
@@ -6725,13 +7013,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_list_includes_inactive_with_param -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 449)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 440)
 
 
 ---
 
-<!-- file: UNIT-0188.md -->
-**Código:** UNIT-0188
+<!-- file: UNIT-0196.md -->
+**Código:** UNIT-0196
 
 # test_restore_reactivates_product
 
@@ -6761,13 +7049,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_restore_reactivates_product -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 425)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 416)
 
 
 ---
 
-<!-- file: UNIT-0189.md -->
-**Código:** UNIT-0189
+<!-- file: UNIT-0197.md -->
+**Código:** UNIT-0197
 
 # test_restore_requires_almacenista
 
@@ -6797,295 +7085,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/catalog/tests/test_new_endpoints.py::TestProductSoftDeleteAndRestore::test_restore_requires_almacenista -v
 ```
 
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 468)
-
-
----
-
-<!-- file: UNIT-0190.md -->
-**Código:** UNIT-0190
-
-# test_delete_soft_deletes
-
-## Nombre del test
-
-`apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_delete_soft_deletes`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_delete_soft_deletes -v
-```
-
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 223)
-
-
----
-
-<!-- file: UNIT-0191.md -->
-**Código:** UNIT-0191
-
-# test_delete_with_active_products_returns_409
-
-## Nombre del test
-
-`apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_delete_with_active_products_returns_409`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_delete_with_active_products_returns_409 -v
-```
-
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 234)
-
-
----
-
-<!-- file: UNIT-0192.md -->
-**Código:** UNIT-0192
-
-# test_get_detail_returns_200
-
-## Nombre del test
-
-`apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_get_detail_returns_200`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_get_detail_returns_200 -v
-```
-
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 185)
-
-
----
-
-<!-- file: UNIT-0193.md -->
-**Código:** UNIT-0193
-
-# test_list_excludes_inactive_by_default
-
-## Nombre del test
-
-`apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_list_excludes_inactive_by_default`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_list_excludes_inactive_by_default -v
-```
-
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 260)
-
-
----
-
-<!-- file: UNIT-0194.md -->
-**Código:** UNIT-0194
-
-# test_list_includes_inactive_with_param
-
-## Nombre del test
-
-`apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_list_includes_inactive_with_param`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_list_includes_inactive_with_param -v
-```
-
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 273)
-
-
----
-
-<!-- file: UNIT-0195.md -->
-**Código:** UNIT-0195
-
-# test_patch_updates_name
-
-## Nombre del test
-
-`apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_patch_updates_name`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_patch_updates_name -v
-```
-
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 197)
-
-
----
-
-<!-- file: UNIT-0196.md -->
-**Código:** UNIT-0196
-
-# test_put_updates_subcategory
-
-## Nombre del test
-
-`apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_put_updates_subcategory`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_put_updates_subcategory -v
-```
-
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 211)
-
-
----
-
-<!-- file: UNIT-0197.md -->
-**Código:** UNIT-0197
-
-# test_restore_reactivates
-
-## Nombre del test
-
-`apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_restore_reactivates`
-
-## Propósito
-
-Prueba unitaria del backend ICM.
-
-## Requisito o caso de negocio asociado
-
-Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
-
-## Inputs
-
-Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
-
-## Resultado esperado
-
-Aserciones del test (assert); ver código en la línea indicada abajo.
-
-## Link directo al test
-
-```bash
-pytest apps/catalog/tests/test_new_endpoints.py::TestSubcategoryDetail::test_restore_reactivates -v
-```
-
-Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 246)
+Código fuente: [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) (aprox. línea 459)
 
 
 ---
@@ -10469,7 +10469,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_combo_dispatch.py::test_dispatch_combo_creates_audit_log -v
 ```
 
-Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 96)
+Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 101)
 
 
 ---
@@ -10505,7 +10505,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_combo_dispatch.py::test_dispatch_combo_electro_with_serial_succeeds -v
 ```
 
-Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 185)
+Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 190)
 
 
 ---
@@ -10541,7 +10541,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_combo_dispatch.py::test_dispatch_combo_electro_without_serial_fails -v
 ```
 
-Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 162)
+Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 167)
 
 
 ---
@@ -10577,7 +10577,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_combo_dispatch.py::test_dispatch_combo_inactive_combo_returns_404 -v
 ```
 
-Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 121)
+Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 126)
 
 
 ---
@@ -10613,7 +10613,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_combo_dispatch.py::test_dispatch_combo_insufficient_stock -v
 ```
 
-Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 73)
+Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 78)
 
 
 ---
@@ -10649,7 +10649,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_combo_dispatch.py::test_dispatch_combo_requires_authentication -v
 ```
 
-Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 143)
+Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 148)
 
 
 ---
@@ -10685,7 +10685,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_combo_dispatch.py::test_dispatch_combo_success -v
 ```
 
-Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 43)
+Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 48)
 
 
 ---
@@ -10721,7 +10721,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_combo_dispatch.py::test_dispatch_combo_with_mixed_products_serial_not_required -v
 ```
 
-Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 209)
+Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 221)
 
 
 ---
@@ -11837,7 +11837,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_adjustment_downwards_without_serial_optional_when_not_required -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 1033)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 1049)
 
 
 ---
@@ -11873,7 +11873,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_adjustment_electroterapia_without_serial_fails -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 997)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 1007)
 
 
 ---
@@ -11909,7 +11909,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_adjustment_requires_justification -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 241)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 246)
 
 
 ---
@@ -11945,7 +11945,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_adjustment_with_serial_persists -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 1015)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 1025)
 
 
 ---
@@ -11981,7 +11981,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_correct_entrada_within_window -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 673)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 677)
 
 
 ---
@@ -12017,7 +12017,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_correct_movement_outside_window_raises -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 780)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 784)
 
 
 ---
@@ -12053,7 +12053,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_correct_salida_within_window -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 723)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 727)
 
 
 ---
@@ -12089,7 +12089,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_correction_within_window_creates_reversal_and_fixed -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 275)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 280)
 
 
 ---
@@ -12125,7 +12125,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_chooses_earliest_lot_when_expiring_product -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 86)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 89)
 
 
 ---
@@ -12161,7 +12161,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_consumes_across_multiple_lots -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 301)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 306)
 
 
 ---
@@ -12197,7 +12197,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_cross_validation_fails_wrong_sku -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 179)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 181)
 
 
 ---
@@ -12233,7 +12233,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_fails_when_origin_is_archived -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 516)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 520)
 
 
 ---
@@ -12269,7 +12269,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_fails_when_origin_is_restricted -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 583)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 587)
 
 
 ---
@@ -12305,7 +12305,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_fails_when_origin_location_is_in_maintenance -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 423)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 427)
 
 
 ---
@@ -12341,7 +12341,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_raises_insufficient_stock_when_quantity_exceeds_stock -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 825)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 829)
 
 
 ---
@@ -12377,7 +12377,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_raises_insufficient_stock_when_stock_is_zero -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 805)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 809)
 
 
 ---
@@ -12413,7 +12413,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_single_movement_nonexpiring_product -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 381)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 385)
 
 
 ---
@@ -12449,7 +12449,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_allows_destination_in_restricted -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 607)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 611)
 
 
 ---
@@ -12485,7 +12485,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_allows_destination_location_in_maintenance -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 448)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 452)
 
 
 ---
@@ -12521,7 +12521,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_discrepancy_note_required_when_qty_mismatch -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 162)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 164)
 
 
 ---
@@ -12557,7 +12557,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_electroterapia_without_serial_fails -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 146)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 148)
 
 
 ---
@@ -12593,7 +12593,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_fails_when_destination_is_archived -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 496)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 500)
 
 
 ---
@@ -12629,7 +12629,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_increments_stock_and_creates_ledger_record -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 42)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 45)
 
 
 ---
@@ -12665,7 +12665,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_with_lot_persists_lot_on_movement -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 61)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 64)
 
 
 ---
@@ -12701,7 +12701,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_internal_transfer_does_not_change_global_stock -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 201)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 203)
 
 
 ---
@@ -12737,7 +12737,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_internal_transfer_electroterapia_without_serial_fails -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 934)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 938)
 
 
 ---
@@ -12773,7 +12773,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_internal_transfer_fails_when_destination_is_blocked -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 468)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 472)
 
 
 ---
@@ -12809,7 +12809,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_internal_transfer_serial_optional_when_not_required -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 974)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 984)
 
 
 ---
@@ -12845,7 +12845,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_internal_transfer_with_serial_persists -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 954)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 958)
 
 
 ---
@@ -12881,7 +12881,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_normalize_serial_empty_string -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 874)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 878)
 
 
 ---
@@ -12917,7 +12917,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_normalize_serial_none -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 869)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 873)
 
 
 ---
@@ -12953,7 +12953,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_normalize_serial_preserves_content -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 889)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 893)
 
 
 ---
@@ -12989,7 +12989,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_normalize_serial_strips_whitespace -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 884)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 888)
 
 
 ---
@@ -13025,7 +13025,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_normalize_serial_whitespace_only -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 879)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 883)
 
 
 ---
@@ -13061,7 +13061,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_register_entry_raises_lot_code_required_for_expiring_product -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 627)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 631)
 
 
 ---
@@ -13097,7 +13097,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_register_entry_raises_lot_expiration_date_required -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 648)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 652)
 
 
 ---
@@ -13133,7 +13133,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_register_entry_rolls_back_on_movement_save_failure -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 845)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 849)
 
 
 ---
@@ -13169,7 +13169,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_return_blocked_for_non_returnable_category -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 229)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 231)
 
 
 ---
@@ -13205,7 +13205,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_return_fails_when_destination_is_archived -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 540)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 544)
 
 
 ---
@@ -13241,7 +13241,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_return_fails_when_destination_is_blocked -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 560)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 564)
 
 
 ---
@@ -13277,7 +13277,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_stock_can_be_reconstructed_from_ledger -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 253)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 258)
 
 
 ---
@@ -13313,7 +13313,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_validate_serial_required_passes_when_not_required -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 925)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 929)
 
 
 ---
@@ -13349,7 +13349,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_validate_serial_required_passes_with_serial -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 918)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 922)
 
 
 ---
@@ -13385,7 +13385,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_validate_serial_required_raises_when_empty -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 902)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 906)
 
 
 ---
@@ -13421,7 +13421,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_validate_serial_required_raises_when_missing -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 894)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 898)
 
 
 ---
@@ -13457,7 +13457,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_validate_serial_required_raises_when_whitespace -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 910)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 914)
 
 
 ---
