@@ -19,7 +19,7 @@ def get_product_by_id(product_id: UUID) -> Product:
     Raises:
         Product.DoesNotExist: Si el UUID no existe.
     """
-    return Product.objects.select_related("category", "subcategory").get(pk=product_id)
+    return Product.objects.select_related("category", "brand").get(pk=product_id)
 
 
 def get_all_products(filters: dict[str, Any] | None = None) -> QuerySet[Product]:
@@ -33,7 +33,7 @@ def get_all_products(filters: dict[str, Any] | None = None) -> QuerySet[Product]
         QuerySet ordenado por SKU.
     """
     filters = filters or {}
-    qs = Product.objects.select_related("category", "subcategory").all()
+    qs = Product.objects.select_related("category", "brand").all()
     if filters.get("category_id"):
         qs = qs.filter(category_id=filters["category_id"])
     if filters.get("is_active") is not None:

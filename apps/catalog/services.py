@@ -9,12 +9,12 @@ from django.db import transaction
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
 from apps.catalog.models import (
+    Brand,
     Category,
     ComboItem,
     Product,
     ProductCombo,
     ProductPriceHistory,
-    Subcategory,
 )
 from shared.exceptions import (
     DomainValidationError,
@@ -44,15 +44,13 @@ def create_product(
     _require_almacenista(user)
     sku = (data.get("sku") or "").strip()
     validate_sku_format(sku)
-    brand = (data.get("brand") or "Can").strip() or "Can"
     category = Category.objects.get(pk=data["category_id"])
     product = Product.objects.create(
         sku=sku,
         name=data["name"],
         category=category,
-        subcategory_id=data.get("subcategory_id"),
+        brand_id=data.get("brand_id"),
         barcode=build_product_barcode(sku),
-        brand=brand,
         expiration_date=data.get("expiration_date") or data.get("expiry_date"),
         requires_expiration=bool(data.get("requires_expiration")),
         weight_grams=data.get("weight_grams"),
@@ -117,8 +115,8 @@ def update_product(
             setattr(product, field, data[field])
     if "category_id" in data:
         setattr(product, "category_id", data["category_id"])
-    if "subcategory_id" in data:
-        setattr(product, "subcategory_id", data.get("subcategory_id"))
+    if "brand_id" in data:
+        setattr(product, "brand_id", data.get("brand_id"))
     if not product.barcode:
         product.barcode = build_product_barcode(product.sku)
     product.save()
@@ -268,54 +266,38 @@ def resolve_identifier(value: str) -> Product:
 
 
 @transaction.atomic
-def create_subcategory(
+def create_brand(
     user: User,
     *,
-    category_id: Any = None,
     name: str,
     description: str = "",
     request: HttpRequest | None = None,
-) -> Subcategory:
-    """RF-003 — Crea subcategoría / marca (solo almacenista)."""
+) -> Brand:
+    """RF-003 — Crea marca (solo almacenista)."""
     from django.utils.text import slugify
 
     _require_almacenista(user)
 
-    # Si no se provee category_id, usa la primera categoría activa disponible
-    category: Category | None
-    if category_id:
-        category = Category.objects.get(pk=category_id)
-    else:
-        category = (
-            Category.objects.filter(is_active=True).order_by("name").first()
-            or Category.objects.order_by("name").first()
-        )
-        if not category:
-            raise ValueError(
-                "No existe ninguna categoría en el sistema. Crea al menos una categoría antes de crear marcas."
-            )
-
-    base = slugify(name) or "subcategoria"
+    base = slugify(name) or "marca"
     slug = base
     n = 0
-    while Subcategory.objects.filter(category=category, slug=slug).exists():
+    while Brand.objects.filter(slug=slug).exists():
         n += 1
         slug = f"{base}-{n}"
 
-    subcat = Subcategory.objects.create(
-        category=category,
+    brand = Brand.objects.create(
         name=name.strip(),
         slug=slug,
         description=description or "",
     )
     log_event(
-        AuditEventType.SUBCATEGORY_CREATED,
-        description=f"Subcategoría/Marca creada: {subcat.name} en {category.name}",
+        AuditEventType.BRAND_CREATED,
+        description=f"Marca creada: {brand.name}",
         user=user,
         request=request,
-        detail={"subcategory_id": str(subcat.id), "category_id": str(category.id)},
+        detail={"brand_id": str(brand.id)},
     )
-    return subcat
+    return brand
 
 
 @transaction.atomic
@@ -406,105 +388,91 @@ def activate_category(
 
 
 @transaction.atomic
-def update_subcategory(
+def update_brand(
     user: User,
-    subcategory_id: Any,
+    brand_id: Any,
     data: dict[str, Any],
     *,
     request: HttpRequest | None = None,
-) -> Subcategory:
-    """RF-003 — Actualiza subcategoría / marca (solo almacenista)."""
+) -> Brand:
+    """RF-003 — Actualiza marca (solo almacenista)."""
     from django.utils.text import slugify
 
     _require_almacenista(user)
-    subcat = (
-        Subcategory.objects.select_for_update()
-        .select_related("category")
-        .get(pk=subcategory_id)
-    )
-    if "category_id" in data:
-        setattr(subcat, "category_id", data["category_id"])
+    brand = Brand.objects.select_for_update().get(pk=brand_id)
     if "name" in data:
         new_name = data["name"].strip()
-        if new_name != subcat.name:
-            base = slugify(new_name) or "subcategoria"
+        if new_name != brand.name:
+            base = slugify(new_name) or "marca"
             slug = base
             n = 0
-            while (
-                Subcategory.objects.filter(category=subcat.category, slug=slug)
-                .exclude(pk=subcat.pk)
-                .exists()
-            ):
+            while Brand.objects.filter(slug=slug).exclude(pk=brand.pk).exists():
                 n += 1
                 slug = f"{base}-{n}"
-            subcat.name = new_name
-            subcat.slug = slug
+            brand.name = new_name
+            brand.slug = slug
     if "description" in data:
-        subcat.description = data["description"] or ""
+        brand.description = data["description"] or ""
     if "is_active" in data:
-        subcat.is_active = bool(data["is_active"])
-    subcat.save()
+        brand.is_active = bool(data["is_active"])
+    brand.save()
     log_event(
-        AuditEventType.SUBCATEGORY_UPDATED,
-        description=f"Subcategoría/Marca actualizada: {subcat.name}",
+        AuditEventType.BRAND_UPDATED,
+        description=f"Marca actualizada: {brand.name}",
         user=user,
         request=request,
-        detail={"subcategory_id": str(subcat.id)},
+        detail={"brand_id": str(brand.id)},
     )
-    return subcat
+    return brand
 
 
 @transaction.atomic
-def deactivate_subcategory(
+def deactivate_brand(
     user: User,
-    subcategory_id: Any,
+    brand_id: Any,
     *,
     request: HttpRequest | None = None,
 ) -> None:
-    """Desactiva una subcategoría. Falla con ValueError si tiene productos activos."""
+    """Desactiva una marca. Falla con ValueError si tiene productos activos."""
     _require_almacenista(user)
-    subcat = (
-        Subcategory.objects.select_for_update()
-        .select_related("category")
-        .get(pk=subcategory_id)
-    )
-    active_count = Product.objects.filter(subcategory=subcat, is_active=True).count()
+    brand = Brand.objects.select_for_update().get(pk=brand_id)
+    active_count = Product.objects.filter(brand=brand, is_active=True).count()
     if active_count:
         raise ValueError(
-            f"No se puede desactivar la subcategoría porque tiene {active_count} "
+            f"No se puede desactivar la marca porque tiene {active_count} "
             f"producto(s) activo(s) asociado(s)."
         )
-    subcat.is_active = False
-    subcat.save(update_fields=["is_active"])
+    brand.is_active = False
+    brand.save(update_fields=["is_active"])
     log_event(
-        AuditEventType.SUBCATEGORY_DEACTIVATED,
-        description=f"Subcategoría desactivada: {subcat.name}",
+        AuditEventType.BRAND_DEACTIVATED,
+        description=f"Marca desactivada: {brand.name}",
         user=user,
         request=request,
-        detail={"subcategory_id": str(subcat.id)},
+        detail={"brand_id": str(brand.id)},
     )
 
 
 @transaction.atomic
-def activate_subcategory(
+def activate_brand(
     user: User,
-    subcategory_id: Any,
+    brand_id: Any,
     *,
     request: HttpRequest | None = None,
-) -> Subcategory:
-    """Reactiva una subcategoría previamente desactivada."""
+) -> Brand:
+    """Reactiva una marca previamente desactivada."""
     _require_almacenista(user)
-    subcat = Subcategory.objects.select_for_update().get(pk=subcategory_id)
-    subcat.is_active = True
-    subcat.save(update_fields=["is_active"])
+    brand = Brand.objects.select_for_update().get(pk=brand_id)
+    brand.is_active = True
+    brand.save(update_fields=["is_active"])
     log_event(
-        AuditEventType.SUBCATEGORY_ACTIVATED,
-        description=f"Subcategoría reactivada: {subcat.name}",
+        AuditEventType.BRAND_ACTIVATED,
+        description=f"Marca reactivada: {brand.name}",
         user=user,
         request=request,
-        detail={"subcategory_id": str(subcat.id)},
+        detail={"brand_id": str(brand.id)},
     )
-    return subcat
+    return brand
 
 
 @transaction.atomic
@@ -719,7 +687,7 @@ def activate_product(
     Reactiva un producto previamente desactivado.
     """
     _require_almacenista(user)
-    # Fetch the product with a lock. Avoid select_related on nullable subcategory to prevent
+    # Fetch the product with a lock. Avoid select_related on nullable brand to prevent
     # FOR UPDATE errors on outer joins (PostgreSQL limitation).
     product = (
         Product.objects.select_related("category")

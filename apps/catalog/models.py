@@ -38,32 +38,22 @@ class Category(BaseModel):
         return self.name
 
 
-class Subcategory(BaseModel):
-    """Subcategoría ligada a una macrocategoría (RF-003)."""
+class Brand(BaseModel):
+    """Marca independiente (sin relación con Category). Un producto tiene una marca opcional,
+    pero los productos de una misma marca pueden estar en distintas categorías."""
 
-    name = models.CharField(max_length=128)
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.CASCADE,
-        related_name="subcategories",
-    )
-    slug = models.SlugField(max_length=128)
+    name = models.CharField(max_length=128, unique=True)
+    slug = models.SlugField(max_length=128, unique=True)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        verbose_name = "Subcategoría"
-        verbose_name_plural = "Subcategorías"
-        ordering = ("category_id", "name")
-        constraints = [
-            models.UniqueConstraint(
-                fields=("category", "slug"), name="uniq_subcategory_slug_per_category"
-            ),
-        ]
-        unique_together = ("category", "name")
+        verbose_name = "Marca"
+        verbose_name_plural = "Marcas"
+        ordering = ("name",)
 
     def __str__(self) -> str:
-        return f"{self.category.name} / {self.name}"
+        return self.name
 
 
 class Product(BaseModel):
@@ -89,14 +79,13 @@ class Product(BaseModel):
         on_delete=models.PROTECT,
         related_name="products",
     )
-    subcategory = models.ForeignKey(
-        Subcategory,
+    brand = models.ForeignKey(
+        Brand,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         related_name="products",
     )
-    brand = models.CharField(max_length=100, default="Can")
     expiration_date = models.DateField(null=True, blank=True)
     requires_expiration = models.BooleanField(
         default=False,
@@ -199,6 +188,65 @@ class Lot(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.product.sku} / {self.code}"
+
+
+class ProductSerial(BaseModel):
+    """
+    Unidad serializada individual (BR-04).
+
+    Se crea en la entrada y se referencia por ID en movimientos posteriores,
+    análogo a como Lot se referencia por `lot_id`.
+    """
+
+    class Status(models.TextChoices):
+        AVAILABLE = "available", "Disponible"
+        DISPATCHED = "dispatched", "Despachado"
+        DAMAGED = "damaged", "Dañado"
+        ADJUSTED = "adjusted", "Ajustado"
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.PROTECT,
+        related_name="serials",
+    )
+    serial_number = models.CharField(max_length=100)
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.AVAILABLE,
+    )
+    current_location = models.ForeignKey(
+        "inventory.Location",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="product_serials",
+    )
+    last_movement = models.ForeignKey(
+        "movements.Movement",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="product_serial_records",
+    )
+
+    class Meta:
+        verbose_name = "Serial de producto"
+        verbose_name_plural = "Seriales de producto"
+        constraints = [
+            models.UniqueConstraint(
+                fields=("product", "serial_number"),
+                name="uniq_product_serial_per_product",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=("product", "status")),
+            models.Index(fields=("current_location", "status")),
+        ]
+        ordering = ("created_at",)
+
+    def __str__(self) -> str:
+        return f"{self.product.sku} / {self.serial_number} ({self.status})"
 
 
 class ProductCombo(BaseModel):

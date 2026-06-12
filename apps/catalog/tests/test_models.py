@@ -21,8 +21,7 @@ def test_product_full_clean_rejects_invalid_sku_format():
         sku="ELECTRO001",  # formato inválido (falta guion)
         name="Ejemplo",
         category=cat,
-        subcategory=None,
-        brand="Can",
+        brand=None,
     )
     with pytest.raises(ValidationError, match="Formato SKU inválido"):
         p.full_clean()

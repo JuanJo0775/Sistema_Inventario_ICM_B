@@ -12,9 +12,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.catalog.models import Category, Product, ProductCombo, Subcategory
+from apps.catalog.models import Brand, Category, Product, ProductCombo
 from apps.catalog.permissions import IsAlmacenistaOrReadOnly
 from apps.catalog.serializers import (
+    BrandCreateSerializer,
+    BrandSerializer,
+    BrandUpdateSerializer,
     CategoryCreateSerializer,
     CategorySerializer,
     CategoryUpdateSerializer,
@@ -29,29 +32,26 @@ from apps.catalog.serializers import (
     ProductSerializer,
     ProductUpdateSerializer,
     ResolveIdentifierQuerySerializer,
-    SubcategoryCreateSerializer,
-    SubcategorySerializer,
-    SubcategoryUpdateSerializer,
 )
 from apps.catalog.services import (
+    activate_brand,
     activate_category,
     activate_combo,
     activate_product,
-    activate_subcategory,
+    create_brand,
     create_category,
     create_combo,
     create_product,
-    create_subcategory,
+    deactivate_brand,
     deactivate_category,
     deactivate_combo,
     deactivate_product,
-    deactivate_subcategory,
     resolve_identifier,
+    update_brand,
     update_category,
     update_combo,
     update_product,
     update_product_prices,
-    update_subcategory,
 )
 from shared.openapi import TAG_CATALOG, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
@@ -108,57 +108,51 @@ class CategoryListCreateView(generics.ListCreateAPIView):
 
 @extend_schema_view(
     get=extend_schema(
-        summary="Listar subcategorías",
-        description="Lista las subcategorías registradas en el catálogo.",
+        summary="Listar marcas",
+        description="Lista las marcas registradas en el catálogo.",
         tags=[TAG_CATALOG],
         responses={
-            200: SubcategorySerializer(many=True),
+            200: BrandSerializer(many=True),
             **standard_error_responses(),
         },
     ),
     post=extend_schema(
-        summary="Crear subcategoría",
-        description="Crea una nueva subcategoría asociada a una categoría.",
-        request=SubcategoryCreateSerializer,
+        summary="Crear marca",
+        description="Crea una nueva marca independiente de categorías.",
+        request=BrandCreateSerializer,
         responses={
-            201: SubcategorySerializer,
+            201: BrandSerializer,
             **standard_error_responses(include_403=True),
         },
         tags=[TAG_CATALOG],
     ),
 )
-class SubcategoryListCreateView(generics.ListCreateAPIView):
+class BrandListCreateView(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrReadOnly)
-    serializer_class = SubcategorySerializer
+    serializer_class = BrandSerializer
     pagination_class = ICMPageNumberPagination
 
     def get_queryset(self):
-        qs = Subcategory.objects.select_related("category").all()
+        qs = Brand.objects.all()
         include_inactive = self.request.query_params.get("include_inactive", "").lower()
         if include_inactive not in ("1", "true", "yes"):
             qs = qs.filter(is_active=True)
-        category = self.request.query_params.get("category")
-        if category:
-            qs = qs.filter(category_id=category)
         return qs
 
     def create(self, request, *args, **kwargs):
-        ser = SubcategoryCreateSerializer(data=request.data)
+        ser = BrandCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         d = ser.validated_data
         try:
-            subcat = create_subcategory(
+            brand = create_brand(
                 request.user,
-                category_id=d.get("category_id"),
                 name=d["name"],
                 description=d.get("description", ""),
                 request=request,
             )
         except ValueError as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(
-            SubcategorySerializer(subcat).data, status=status.HTTP_201_CREATED
-        )
+        return Response(BrandSerializer(brand).data, status=status.HTTP_201_CREATED)
 
 
 @extend_schema_view(
@@ -188,7 +182,7 @@ class ProductListCreateView(generics.ListCreateAPIView):
     pagination_class = ICMPageNumberPagination
 
     def get_queryset(self):
-        qs = Product.objects.select_related("category", "subcategory").all()
+        qs = Product.objects.select_related("category", "brand").all()
         include_inactive = self.request.query_params.get("include_inactive", "").lower()
         if include_inactive not in ("1", "true", "yes"):
             qs = qs.filter(is_active=True)
@@ -254,7 +248,7 @@ class ProductListCreateView(generics.ListCreateAPIView):
 )
 class ProductDetailView(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrReadOnly)
-    queryset = Product.objects.select_related("category", "subcategory")
+    queryset = Product.objects.select_related("category", "brand")
     serializer_class = ProductSerializer
     http_method_names = ["get", "put", "patch", "delete", "head", "options"]
 
@@ -292,7 +286,7 @@ class ProductBarcodeView(APIView):
         tags=[TAG_CATALOG],
     )
     def get(self, request, pk):
-        product = Product.objects.select_related("category", "subcategory").get(pk=pk)
+        product = Product.objects.select_related("category", "brand").get(pk=pk)
         return Response(ProductBarcodeSerializer.from_product(product))
 
 
@@ -473,41 +467,41 @@ class CategoryRestoreView(APIView):
 
 @extend_schema_view(
     get=extend_schema(
-        summary="Detalle de subcategoría",
-        description="Obtiene el detalle de una subcategoría.",
+        summary="Detalle de marca",
+        description="Obtiene el detalle de una marca.",
         tags=[TAG_CATALOG],
         responses={
-            200: SubcategorySerializer,
+            200: BrandSerializer,
             **standard_error_responses(include_404=True),
         },
     ),
     put=extend_schema(
-        summary="Actualizar subcategoría",
-        description="Reemplaza los datos editables de una subcategoría.",
-        request=SubcategoryUpdateSerializer,
+        summary="Actualizar marca",
+        description="Reemplaza los datos editables de una marca.",
+        request=BrandUpdateSerializer,
         tags=[TAG_CATALOG],
         responses={
-            200: SubcategorySerializer,
+            200: BrandSerializer,
             **standard_error_responses(include_403=True, include_404=True),
         },
     ),
     patch=extend_schema(
-        summary="Actualizar subcategoría parcialmente",
-        description="Actualiza solo los campos enviados de una subcategoría.",
-        request=SubcategoryUpdateSerializer,
+        summary="Actualizar marca parcialmente",
+        description="Actualiza solo los campos enviados de una marca.",
+        request=BrandUpdateSerializer,
         tags=[TAG_CATALOG],
         responses={
-            200: SubcategorySerializer,
+            200: BrandSerializer,
             **standard_error_responses(include_403=True, include_404=True),
         },
     ),
     delete=extend_schema(
-        summary="Desactivar subcategoría",
+        summary="Desactivar marca",
         description=(
-            "Marca la subcategoría como inactiva. "
+            "Marca la marca como inactiva. "
             "El registro NO se elimina de la base de datos. "
-            "Devuelve HTTP 409 si la subcategoría tiene productos activos asociados. "
-            "Para reactivarla use POST /subcategories/{id}/restore/."
+            "Devuelve HTTP 409 si la marca tiene productos activos asociados. "
+            "Para reactivarla use POST /brands/{id}/restore/."
         ),
         tags=[TAG_CATALOG],
         responses={
@@ -516,40 +510,36 @@ class CategoryRestoreView(APIView):
         },
     ),
 )
-class SubcategoryDetailView(APIView):
+class BrandDetailView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenistaOrReadOnly)
 
-    def _get_subcategory(self, pk):
-        return get_object_or_404(Subcategory.objects.select_related("category"), pk=pk)
+    def _get_brand(self, pk):
+        return get_object_or_404(Brand, pk=pk)
 
     def get(self, request, pk):
-        return Response(SubcategorySerializer(self._get_subcategory(pk)).data)
+        return Response(BrandSerializer(self._get_brand(pk)).data)
 
     def put(self, request, pk):
-        ser = SubcategoryUpdateSerializer(data=request.data)
+        ser = BrandUpdateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         try:
-            subcat = update_subcategory(
-                request.user, pk, ser.validated_data, request=request
-            )
+            brand = update_brand(request.user, pk, ser.validated_data, request=request)
         except ObjectDoesNotExist:
             raise NotFound()
-        return Response(SubcategorySerializer(subcat).data)
+        return Response(BrandSerializer(brand).data)
 
     def patch(self, request, pk):
-        ser = SubcategoryUpdateSerializer(data=request.data, partial=True)
+        ser = BrandUpdateSerializer(data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
         try:
-            subcat = update_subcategory(
-                request.user, pk, ser.validated_data, request=request
-            )
+            brand = update_brand(request.user, pk, ser.validated_data, request=request)
         except ObjectDoesNotExist:
             raise NotFound()
-        return Response(SubcategorySerializer(subcat).data)
+        return Response(BrandSerializer(brand).data)
 
     def delete(self, request, pk):
         try:
-            deactivate_subcategory(request.user, pk, request=request)
+            deactivate_brand(request.user, pk, request=request)
         except ObjectDoesNotExist:
             raise NotFound()
         except ValueError as exc:
@@ -557,22 +547,22 @@ class SubcategoryDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class SubcategoryRestoreView(APIView):
+class BrandRestoreView(APIView):
     permission_classes = (IsAuthenticated, IsAlmacenista)
 
     @extend_schema(
-        summary="Restaurar subcategoría",
-        description="Reactiva una subcategoría previamente desactivada.",
+        summary="Restaurar marca",
+        description="Reactiva una marca previamente desactivada.",
         tags=[TAG_CATALOG],
         responses={
-            200: SubcategorySerializer,
+            200: BrandSerializer,
             **standard_error_responses(include_403=True, include_404=True),
         },
     )
     def post(self, request, pk):
-        get_object_or_404(Subcategory.objects.select_related("category"), pk=pk)
-        subcat = activate_subcategory(request.user, pk, request=request)
-        return Response(SubcategorySerializer(subcat).data)
+        get_object_or_404(Brand, pk=pk)
+        brand = activate_brand(request.user, pk, request=request)
+        return Response(BrandSerializer(brand).data)
 
 
 @extend_schema_view(

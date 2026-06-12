@@ -5,18 +5,17 @@ from __future__ import annotations
 import pytest
 
 from apps.audit.models import AuditEventType, AuditLog
-from apps.catalog.models import Category, ComboItem, Product, ProductCombo, Subcategory
-from apps.catalog.services import create_category, create_combo, create_subcategory
-from tests.factories import CategoryFactory, ProductFactory
+from apps.catalog.models import Brand, Category, ComboItem, Product, ProductCombo
+from apps.catalog.services import create_brand, create_category, create_combo
+from tests.factories import BrandFactory, CategoryFactory, ProductFactory
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
 
-def _make_subcategory(category: Category, name: str = "Sub A") -> Subcategory:
-    return Subcategory.objects.create(
-        category=category,
+def _make_brand(name: str = "Marca A") -> Brand:
+    return Brand.objects.create(
         name=name,
         slug=name.lower().replace(" ", "-"),
     )
@@ -176,43 +175,40 @@ class TestCategoryDetail:
 
 
 # ===========================================================================
-# SUBCATEGORY — GET detail, PUT, PATCH, DELETE, restore, include_inactive
+# BRAND — GET detail, PUT, PATCH, DELETE, restore, include_inactive
 # ===========================================================================
 
 
-class TestSubcategoryDetail:
+class TestBrandDetail:
     @pytest.mark.django_db
     def test_get_detail_returns_200(self, authenticated_almacenista_client):
-        cat = CategoryFactory()
-        sub = _make_subcategory(cat, "Sub Test")
+        brand = _make_brand("Marca Test")
         resp = authenticated_almacenista_client.get(
-            f"/api/v1/catalog/subcategories/{sub.id}/"
+            f"/api/v1/catalog/brands/{brand.id}/"
         )
         assert resp.status_code == 200
-        assert resp.data["id"] == str(sub.id)
-        assert resp.data["name"] == "Sub Test"
+        assert resp.data["id"] == str(brand.id)
+        assert resp.data["name"] == "Marca Test"
         assert "is_active" in resp.data
 
     @pytest.mark.django_db
     def test_patch_updates_name(self, authenticated_almacenista_client):
-        cat = CategoryFactory()
-        sub = _make_subcategory(cat, "Original")
+        brand = _make_brand("Original")
         resp = authenticated_almacenista_client.patch(
-            f"/api/v1/catalog/subcategories/{sub.id}/",
+            f"/api/v1/catalog/brands/{brand.id}/",
             {"name": "Actualizada"},
             format="json",
         )
         assert resp.status_code == 200
         assert resp.data["name"] == "Actualizada"
-        sub.refresh_from_db()
-        assert sub.name == "Actualizada"
+        brand.refresh_from_db()
+        assert brand.name == "Actualizada"
 
     @pytest.mark.django_db
-    def test_put_updates_subcategory(self, authenticated_almacenista_client):
-        cat = CategoryFactory()
-        sub = _make_subcategory(cat, "Vieja")
+    def test_put_updates_brand(self, authenticated_almacenista_client):
+        brand = _make_brand("Vieja")
         resp = authenticated_almacenista_client.put(
-            f"/api/v1/catalog/subcategories/{sub.id}/",
+            f"/api/v1/catalog/brands/{brand.id}/",
             {"name": "Nueva"},
             format="json",
         )
@@ -221,49 +217,45 @@ class TestSubcategoryDetail:
 
     @pytest.mark.django_db
     def test_delete_soft_deletes(self, authenticated_almacenista_client):
-        cat = CategoryFactory()
-        sub = _make_subcategory(cat)
+        brand = _make_brand()
         resp = authenticated_almacenista_client.delete(
-            f"/api/v1/catalog/subcategories/{sub.id}/"
+            f"/api/v1/catalog/brands/{brand.id}/"
         )
         assert resp.status_code == 204
-        sub.refresh_from_db()
-        assert sub.is_active is False
+        brand.refresh_from_db()
+        assert brand.is_active is False
 
     @pytest.mark.django_db
     def test_delete_with_active_products_returns_409(
         self, authenticated_almacenista_client
     ):
-        cat = CategoryFactory()
-        sub = _make_subcategory(cat)
-        ProductFactory(category=cat, subcategory=sub, is_active=True)
+        brand = _make_brand()
+        ProductFactory(brand=brand, is_active=True)
         resp = authenticated_almacenista_client.delete(
-            f"/api/v1/catalog/subcategories/{sub.id}/"
+            f"/api/v1/catalog/brands/{brand.id}/"
         )
         assert resp.status_code == 409
 
     @pytest.mark.django_db
     def test_restore_reactivates(self, authenticated_almacenista_client):
-        cat = CategoryFactory()
-        sub = _make_subcategory(cat)
-        sub.is_active = False
-        sub.save()
+        brand = _make_brand()
+        brand.is_active = False
+        brand.save()
         resp = authenticated_almacenista_client.post(
-            f"/api/v1/catalog/subcategories/{sub.id}/restore/"
+            f"/api/v1/catalog/brands/{brand.id}/restore/"
         )
         assert resp.status_code == 200
         assert resp.data["is_active"] is True
-        sub.refresh_from_db()
-        assert sub.is_active is True
+        brand.refresh_from_db()
+        assert brand.is_active is True
 
     @pytest.mark.django_db
     def test_list_excludes_inactive_by_default(self, authenticated_almacenista_client):
-        cat = CategoryFactory()
-        active = _make_subcategory(cat, "Sub Activa")
-        inactive = _make_subcategory(cat, "Sub Inactiva")
+        active = _make_brand("Marca Activa")
+        inactive = _make_brand("Marca Inactiva")
         inactive.is_active = False
         inactive.save()
-        resp = authenticated_almacenista_client.get("/api/v1/catalog/subcategories/")
+        resp = authenticated_almacenista_client.get("/api/v1/catalog/brands/")
         assert resp.status_code == 200
         ids = [s["id"] for s in resp.data["results"]]
         assert str(active.id) in ids
@@ -271,12 +263,11 @@ class TestSubcategoryDetail:
 
     @pytest.mark.django_db
     def test_list_includes_inactive_with_param(self, authenticated_almacenista_client):
-        cat = CategoryFactory()
-        inactive = _make_subcategory(cat, "Sub Inactiva 2")
+        inactive = _make_brand("Marca Inactiva 2")
         inactive.is_active = False
         inactive.save()
         resp = authenticated_almacenista_client.get(
-            "/api/v1/catalog/subcategories/?include_inactive=true"
+            "/api/v1/catalog/brands/?include_inactive=true"
         )
         assert resp.status_code == 200
         ids = [s["id"] for s in resp.data["results"]]

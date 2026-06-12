@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from rest_framework import serializers
 
-from apps.catalog.models import Category, ComboItem, Product, ProductCombo, Subcategory
+from apps.catalog.models import Brand, Category, ComboItem, Product, ProductCombo
 from shared.utils.barcode import build_product_barcode_payload
 
 
@@ -24,12 +24,11 @@ class CategorySerializer(serializers.ModelSerializer):
         )
 
 
-class SubcategorySerializer(serializers.ModelSerializer):
+class BrandSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Subcategory
+        model = Brand
         fields = (
             "id",
-            "category",
             "name",
             "slug",
             "description",
@@ -51,7 +50,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "name",
             "category",
             "category_slug",
-            "subcategory",
+            "brand",
             "barcode",
             "barcode_type",
             "brand",
@@ -159,8 +158,7 @@ class ProductUpdateSerializer(serializers.Serializer):
     name = serializers.CharField(required=False)
     sku = serializers.CharField(required=False)
     category_id = serializers.UUIDField(required=False)
-    subcategory_id = serializers.UUIDField(required=False, allow_null=True)
-    brand = serializers.CharField(required=False, allow_blank=True)
+    brand_id = serializers.UUIDField(required=False, allow_null=True)
     requires_cold_chain = serializers.BooleanField(required=False)
     requires_expiration = serializers.BooleanField(required=False)
     expiration_date = serializers.DateField(required=False, allow_null=True)
@@ -176,8 +174,7 @@ class ProductCreateSerializer(serializers.Serializer):
     sku = serializers.CharField()
     name = serializers.CharField()
     category_id = serializers.UUIDField()
-    subcategory_id = serializers.UUIDField(required=False, allow_null=True)
-    brand = serializers.CharField(default="Can")
+    brand_id = serializers.UUIDField(required=False, allow_null=True)
     requires_cold_chain = serializers.BooleanField(default=False)
     requires_expiration = serializers.BooleanField(default=False)
     expiration_date = serializers.DateField(required=False, allow_null=True)
@@ -277,15 +274,13 @@ class CategoryUpdateSerializer(serializers.Serializer):
     is_returnable = serializers.BooleanField(required=False)
 
 
-class SubcategoryCreateSerializer(serializers.Serializer):
-    category_id = serializers.UUIDField(required=False, allow_null=True)
+class BrandCreateSerializer(serializers.Serializer):
     name = serializers.CharField()
     description = serializers.CharField(required=False, allow_blank=True, default="")
 
 
-class SubcategoryUpdateSerializer(serializers.Serializer):
+class BrandUpdateSerializer(serializers.Serializer):
     name = serializers.CharField(required=False)
-    category_id = serializers.UUIDField(required=False)
     description = serializers.CharField(required=False, allow_blank=True)
     is_active = serializers.BooleanField(required=False)
 

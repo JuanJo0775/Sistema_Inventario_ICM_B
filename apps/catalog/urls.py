@@ -1,6 +1,9 @@
 from django.urls import path
 
 from apps.catalog.views import (
+    BrandDetailView,
+    BrandListCreateView,
+    BrandRestoreView,
     CategoryDetailView,
     CategoryListCreateView,
     CategoryRestoreView,
@@ -13,9 +16,6 @@ from apps.catalog.views import (
     ProductPricesView,
     ProductRestoreView,
     ResolveIdentifierView,
-    SubcategoryDetailView,
-    SubcategoryListCreateView,
-    SubcategoryRestoreView,
 )
 
 urlpatterns = [
@@ -31,19 +31,19 @@ urlpatterns = [
         name="catalog-category-restore",
     ),
     path(
-        "subcategories/",
-        SubcategoryListCreateView.as_view(),
-        name="catalog-subcategories",
+        "brands/",
+        BrandListCreateView.as_view(),
+        name="catalog-brands",
     ),
     path(
-        "subcategories/<uuid:pk>/",
-        SubcategoryDetailView.as_view(),
-        name="catalog-subcategory-detail",
+        "brands/<uuid:pk>/",
+        BrandDetailView.as_view(),
+        name="catalog-brand-detail",
     ),
     path(
-        "subcategories/<uuid:pk>/restore/",
-        SubcategoryRestoreView.as_view(),
-        name="catalog-subcategory-restore",
+        "brands/<uuid:pk>/restore/",
+        BrandRestoreView.as_view(),
+        name="catalog-brand-restore",
     ),
     path("products/", ProductListCreateView.as_view(), name="catalog-products"),
     path(

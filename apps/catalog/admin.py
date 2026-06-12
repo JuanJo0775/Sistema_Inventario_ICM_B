@@ -1,12 +1,13 @@
 from django.contrib import admin
 
 from apps.catalog.models import (
+    Brand,
     Category,
     ComboItem,
     Lot,
     Product,
     ProductCombo,
-    Subcategory,
+    ProductSerial,
 )
 
 
@@ -16,9 +17,9 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
 
 
-@admin.register(Subcategory)
-class SubcategoryAdmin(admin.ModelAdmin):
-    list_display = ("name", "slug", "category")
+@admin.register(Brand)
+class BrandAdmin(admin.ModelAdmin):
+    list_display = ("name", "slug")
     prepopulated_fields = {"slug": ("name",)}
 
 
@@ -39,6 +40,19 @@ class ProductAdmin(admin.ModelAdmin):
 class LotAdmin(admin.ModelAdmin):
     list_display = ("product", "code", "expiration_date", "created_at")
     search_fields = ("code", "product__sku", "product__name")
+
+
+@admin.register(ProductSerial)
+class ProductSerialAdmin(admin.ModelAdmin):
+    list_display = (
+        "product",
+        "serial_number",
+        "status",
+        "current_location",
+        "created_at",
+    )
+    list_filter = ("status",)
+    search_fields = ("serial_number", "product__sku", "product__name")
 
 
 class ComboItemInline(admin.TabularInline):
