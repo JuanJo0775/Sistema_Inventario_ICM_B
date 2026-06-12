@@ -454,6 +454,7 @@ def create_reception(
             quantity_received=qty,
             lot_code=item_data.get("lot_code", ""),
             lot_expiration_date=item_data.get("lot_expiration_date"),
+            serial_number=item_data.get("serial_number") or None,
             discrepancy_note=item_data.get("discrepancy_note", ""),
         )
 
@@ -484,6 +485,7 @@ def create_reception(
                     quantity_received=int(allocation_data["quantity_received"]),
                     lot_code=(allocation_data.get("lot_code") or "").strip() or None,
                     lot_expiration_date=allocation_data.get("lot_expiration_date"),
+                    serial_number=allocation_data.get("serial_number") or None,
                 )
 
     log_event(
@@ -589,6 +591,9 @@ def confirm_reception(
                     allocation_lot_code=allocation.lot_code,
                     allocation_lot_expiration_date=allocation.lot_expiration_date,
                 )
+                serial_number = (
+                    allocation.serial_number or item.serial_number or None
+                )
                 movement = movements_services.register_entry(
                     executor,
                     product_id=product.id,
@@ -596,6 +601,7 @@ def confirm_reception(
                     location_id=allocation.location_id,
                     lot_code=lot_code,
                     lot_expiration_date=lot_expiration_date,
+                    serial_number=serial_number,
                     qty_invoiced=allocation.quantity_received,
                     discrepancy_note=item.discrepancy_note or None,
                     unit_cost=poi.unit_cost,
@@ -616,6 +622,7 @@ def confirm_reception(
                 location_id=reception.destination_location_id,
                 lot_code=item.lot_code or None,
                 lot_expiration_date=item.lot_expiration_date,
+                serial_number=item.serial_number or None,
                 qty_invoiced=item.quantity_received,
                 discrepancy_note=item.discrepancy_note or None,
                 unit_cost=poi.unit_cost,

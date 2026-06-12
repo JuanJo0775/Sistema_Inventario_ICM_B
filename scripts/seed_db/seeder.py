@@ -566,14 +566,19 @@ class Seeder:
             if not row or row.current_stock < 2:
                 continue
             qty = max(1, int(row.current_stock * pct))
+            kwargs: dict[str, Any] = {
+                "product_id": product.id,
+                "origin_id": bodega.id,
+                "destination_id": dest.id,
+                "quantity": qty,
+            }
+            if product.category.requires_serial_number:
+                kwargs["serial_number"] = f"SN-TRF-{product.sku}-001"
+                kwargs["electrical_safety_acknowledged"] = True
+            if product.requires_cold_chain:
+                kwargs["cold_chain_acknowledged"] = True
             try:
-                register_internal_transfer(
-                    almacenista,
-                    product_id=product.id,
-                    origin_id=bodega.id,
-                    destination_id=dest.id,
-                    quantity=qty,
-                )
+                register_internal_transfer(almacenista, **kwargs)
                 self._ok(f"  <-> {sku} x {qty}: bodega -> {dest.code}")
                 count += 1
             except Exception as exc:

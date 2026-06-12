@@ -283,6 +283,12 @@ class ReceptionItem(BaseModel):
         blank=True,
         help_text="Fecha de vencimiento del lote recibido.",
     )
+    serial_number = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        help_text="BR-04: Número de serie (obligatorio si la categoría lo exige).",
+    )
     discrepancy_note = models.TextField(
         blank=True,
         help_text="Obligatorio cuando la cantidad recibida difiere de la esperada.",
@@ -340,6 +346,12 @@ class ReceptionItemAllocation(BaseModel):
     quantity_received = models.PositiveIntegerField()
     lot_code = models.CharField(max_length=100, blank=True, null=True)
     lot_expiration_date = models.DateField(null=True, blank=True)
+    serial_number = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        help_text="BR-04: Número de serie (obligatorio si la categoría lo exige).",
+    )
     movement = models.OneToOneField(
         "movements.Movement",
         on_delete=models.PROTECT,

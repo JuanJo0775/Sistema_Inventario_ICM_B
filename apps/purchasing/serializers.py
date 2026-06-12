@@ -184,6 +184,7 @@ class ReceptionItemSerializer(serializers.ModelSerializer):
             "quantity_received",
             "lot_code",
             "lot_expiration_date",
+            "serial_number",
             "discrepancy_note",
             "movement_id",
             "allocations",
@@ -214,6 +215,7 @@ class ReceptionItemAllocationSerializer(serializers.ModelSerializer):
             "quantity_received",
             "lot_code",
             "lot_expiration_date",
+            "serial_number",
             "movement_id",
         )
         read_only_fields = ("id", "movement_id")
@@ -224,6 +226,9 @@ class ReceptionItemAllocationWriteSerializer(serializers.Serializer):
     quantity_received = serializers.IntegerField(min_value=1)
     lot_code = serializers.CharField(required=False, allow_blank=True, default="")
     lot_expiration_date = serializers.DateField(required=False, allow_null=True)
+    serial_number = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
 
 
 class ReceptionItemWriteSerializer(serializers.Serializer):
@@ -231,6 +236,9 @@ class ReceptionItemWriteSerializer(serializers.Serializer):
     quantity_received = serializers.IntegerField(min_value=0)
     lot_code = serializers.CharField(required=False, allow_blank=True, default="")
     lot_expiration_date = serializers.DateField(required=False, allow_null=True)
+    serial_number = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
     discrepancy_note = serializers.CharField(
         required=False, allow_blank=True, default=""
     )

@@ -9,6 +9,8 @@ from django.utils import timezone
 from apps.inventory.models import StockByLocation
 from apps.movements.models import Movement, MovementType
 from apps.movements.services import (
+    _normalize_serial,
+    _validate_serial_required,
     correct_movement_within_window,
     ledger_net_quantity_for_location,
     register_adjustment,
@@ -28,7 +30,7 @@ from shared.exceptions import (
     ProductNotReturnableError,
     SerialNumberRequiredError,
 )
-from tests.factories import ElectroCategoryFactory, LotFactory, ProductFactory
+from tests.factories import ElectroCategoryFactory, LocationFactory, LotFactory, ProductFactory
 
 
 @pytest.mark.django_db
@@ -853,3 +855,194 @@ def test_register_entry_rolls_back_on_movement_save_failure(
     ).exists()
     row = StockByLocation.objects.filter(product=sample_product, location=loc).first()
     assert row is None or row.current_stock == 0
+
+
+# ── Serial helpers unit tests ────────────────────────────────────────────────
+
+
+@pytest.mark.django_db
+def test_normalize_serial_none():
+    assert _normalize_serial(None) is None
+
+
+@pytest.mark.django_db
+def test_normalize_serial_empty_string():
+    assert _normalize_serial("") is None
+
+
+@pytest.mark.django_db
+def test_normalize_serial_whitespace_only():
+    assert _normalize_serial("   ") is None
+
+
+@pytest.mark.django_db
+def test_normalize_serial_strips_whitespace():
+    assert _normalize_serial("  SN-123  ") == "SN-123"
+
+
+@pytest.mark.django_db
+def test_normalize_serial_preserves_content():
+    assert _normalize_serial("SN-001") == "SN-001"
+
+
+@pytest.mark.django_db
+def test_validate_serial_required_raises_when_missing(db):
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="VAL-SER")
+    with pytest.raises(SerialNumberRequiredError):
+        _validate_serial_required(product, None)
+
+
+@pytest.mark.django_db
+def test_validate_serial_required_raises_when_empty(db):
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="VAL-SER2")
+    with pytest.raises(SerialNumberRequiredError):
+        _validate_serial_required(product, "")
+
+
+@pytest.mark.django_db
+def test_validate_serial_required_raises_when_whitespace(db):
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="VAL-SER3")
+    with pytest.raises(SerialNumberRequiredError):
+        _validate_serial_required(product, "   ")
+
+
+@pytest.mark.django_db
+def test_validate_serial_required_passes_with_serial(db):
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="VAL-SER4")
+    _validate_serial_required(product, "SN-OK")
+
+
+@pytest.mark.django_db
+def test_validate_serial_required_passes_when_not_required(db):
+    product = ProductFactory(sku="VAL-SER5")
+    _validate_serial_required(product, None)
+
+
+# ── BR-04: Serial en Traslados ────────────────────────────────────────────────
+
+
+@pytest.mark.django_db
+def test_internal_transfer_electroterapia_without_serial_fails(
+    almacenista_user, sample_locations
+):
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="TRF-SER-01")
+    origin, destination = sample_locations[0], sample_locations[1]
+    StockByLocation.objects.create(
+        product=product, location=origin, current_stock=10
+    )
+    with pytest.raises(SerialNumberRequiredError):
+        register_internal_transfer(
+            almacenista_user,
+            product.id,
+            origin.id,
+            destination.id,
+            3,
+            cold_chain_acknowledged=True,
+            electrical_safety_acknowledged=True,
+        )
+
+
+@pytest.mark.django_db
+def test_internal_transfer_with_serial_persists(
+    almacenista_user, sample_locations
+):
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="TRF-SER-02")
+    origin, destination = sample_locations[0], sample_locations[1]
+    StockByLocation.objects.create(
+        product=product, location=origin, current_stock=10
+    )
+    movement = register_internal_transfer(
+        almacenista_user,
+        product.id,
+        origin.id,
+        destination.id,
+        3,
+        serial_number="SN-TRF-01",
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+    assert movement.serial_number == "SN-TRF-01"
+    assert movement.movement_type == MovementType.TRASLADO
+
+
+@pytest.mark.django_db
+def test_internal_transfer_serial_optional_when_not_required(
+    almacenista_user, sample_product, sample_locations
+):
+    origin, destination = sample_locations[0], sample_locations[1]
+    StockByLocation.objects.create(
+        product=sample_product, location=origin, current_stock=10
+    )
+    movement = register_internal_transfer(
+        almacenista_user,
+        sample_product.id,
+        origin.id,
+        destination.id,
+        2,
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+    assert movement.serial_number is None
+
+
+# ── BR-04: Serial en Ajustes ──────────────────────────────────────────────────
+
+
+@pytest.mark.django_db
+def test_adjustment_electroterapia_without_serial_fails(
+    almacenista_user, sample_locations
+):
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="ADJ-SER-01")
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=product, location=loc, current_stock=10)
+    with pytest.raises(SerialNumberRequiredError):
+        register_adjustment(
+            almacenista_user,
+            product.id,
+            loc.id,
+            5,
+            "Ajuste de prueba",
+        )
+
+
+@pytest.mark.django_db
+def test_adjustment_with_serial_persists(
+    almacenista_user, sample_locations
+):
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="ADJ-SER-02")
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=product, location=loc, current_stock=10)
+    movement = register_adjustment(
+        almacenista_user,
+        product.id,
+        loc.id,
+        5,
+        "Ajuste con serial",
+        serial_number="SN-ADJ-01",
+    )
+    assert movement.serial_number == "SN-ADJ-01"
+    assert movement.movement_type == MovementType.AJUSTE
+
+
+@pytest.mark.django_db
+def test_adjustment_downwards_without_serial_optional_when_not_required(
+    almacenista_user, sample_product, sample_locations
+):
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=sample_product, location=loc, current_stock=10)
+    movement = register_adjustment(
+        almacenista_user,
+        sample_product.id,
+        loc.id,
+        3,
+        "Ajuste sin serial",
+    )
+    assert movement.serial_number is None

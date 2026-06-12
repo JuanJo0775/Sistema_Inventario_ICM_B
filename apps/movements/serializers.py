@@ -120,6 +120,9 @@ class TransferCreateSerializer(serializers.Serializer):
     destination_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
     lot_id = serializers.UUIDField(required=False, allow_null=True)
+    serial_number = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
     cold_chain_acknowledged = serializers.BooleanField(default=False)
     electrical_safety_acknowledged = serializers.BooleanField(default=False)
 
@@ -140,12 +143,18 @@ class AdjustmentCreateSerializer(serializers.Serializer):
     location_id = serializers.UUIDField()
     new_quantity = serializers.IntegerField(min_value=0)
     justification = serializers.CharField(allow_blank=True)
+    serial_number = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
 
 
 class CorrectionCreateSerializer(serializers.Serializer):
     origin_id = serializers.UUIDField()
     destination_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
+    serial_number = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
 
 
 class AdjustmentCorrectionSerializer(serializers.Serializer):
@@ -155,6 +164,9 @@ class AdjustmentCorrectionSerializer(serializers.Serializer):
     origin_id = serializers.UUIDField()
     destination_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
+    serial_number = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
 
 
 class ComboDispatchSerializer(serializers.Serializer):
@@ -163,6 +175,9 @@ class ComboDispatchSerializer(serializers.Serializer):
     combo_id = serializers.UUIDField(help_text="UUID del combo a despachar.")
     location_id = serializers.UUIDField(
         help_text="UUID de la ubicación desde donde se descuentan los productos."
+    )
+    serial_number = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
     )
 
 

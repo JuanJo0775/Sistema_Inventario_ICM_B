@@ -42,7 +42,13 @@ from apps.purchasing.services import (
     update_purchase_order,
     update_supplier,
 )
-from tests.factories import AlmacenistaFactory, LocationFactory, ProductFactory
+from shared.exceptions import SerialNumberRequiredError
+from tests.factories import (
+    AlmacenistaFactory,
+    ElectroCategoryFactory,
+    LocationFactory,
+    ProductFactory,
+)
 
 from .factories import (
     PurchaseOrderFactory,
@@ -741,3 +747,127 @@ def test_cancel_confirmed_reception_raises(almacenista_user):
     reception = ReceptionFactory(status=ReceptionStatus.CONFIRMADA)
     with pytest.raises(ReceptionNotInBorradorError):
         cancel_reception(almacenista_user, reception.id)
+
+
+# ── BR-04: Serial en Recepciones (bug fix) ────────────────────────────────────
+
+
+@pytest.mark.django_db
+def test_confirm_reception_electro_product_without_serial_raises(almacenista_user):
+    """Recepción de producto Electroterapia sin serial → SerialNumberRequiredError.
+
+    Este test verifica la corrección del bug donde confirm_reception()
+    no pasaba serial_number a register_entry(), causando que productos
+    con categoría que requiere serial nunca pudieran ser recibidos vía compras.
+    """
+    po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="P-ELEC-REC-01")
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=5
+    )
+    location = LocationFactory(code="bodega-recepcion-electro")
+    reception = ReceptionFactory(
+        purchase_order=po,
+        destination_location=location,
+        received_by=almacenista_user,
+    )
+    ReceptionItemFactory(
+        reception=reception,
+        purchase_order_item=poi,
+        quantity_received=5,
+    )
+
+    with pytest.raises(SerialNumberRequiredError):
+        confirm_reception(almacenista_user, reception.id)
+
+
+@pytest.mark.django_db
+def test_confirm_reception_with_serial_propagates_to_movement(almacenista_user):
+    """Recepción con serial_number → se propaga correctamente a Movement (bug fix)."""
+    po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
+    product = ProductFactory(sku="P-REC-SERIAL")
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=5
+    )
+    location = LocationFactory(code="bodega-recepcion-serial")
+    reception = create_reception(
+        almacenista_user,
+        po.id,
+        {
+            "destination_location_id": location.id,
+            "items": [
+                {
+                    "purchase_order_item_id": poi.id,
+                    "quantity_received": 5,
+                    "serial_number": "SN-REC-PROP",
+                }
+            ],
+        },
+    )
+
+    confirm_reception(almacenista_user, reception.id)
+
+    reception.refresh_from_db()
+    assert reception.status == ReceptionStatus.CONFIRMADA
+    movement = Movement.objects.filter(
+        product=product,
+        movement_type=MovementType.ENTRADA,
+    ).first()
+    assert movement is not None
+    assert movement.serial_number == "SN-REC-PROP"
+
+
+@pytest.mark.django_db
+def test_confirm_reception_with_serial_in_allocation_propagates(
+    almacenista_user,
+):
+    """Recepción con serial en allocation → se propaga al Movement (bug fix)."""
+    po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
+    product = ProductFactory(sku="P-REC-ALLOC-SERIAL")
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=10
+    )
+    b1 = LocationFactory(code="bodega-alloc-serial")
+    b2 = LocationFactory(code="vitrina-alloc-serial")
+
+    reception = create_reception(
+        almacenista_user,
+        po.id,
+        {
+            "destination_location_id": b1.id,
+            "items": [
+                {
+                    "purchase_order_item_id": poi.id,
+                    "quantity_received": 10,
+                    "allocations": [
+                        {
+                            "location_id": b1.id,
+                            "quantity_received": 6,
+                            "serial_number": "SN-ALLOC-1",
+                        },
+                        {
+                            "location_id": b2.id,
+                            "quantity_received": 4,
+                            "serial_number": "SN-ALLOC-2",
+                        },
+                    ],
+                }
+            ],
+        },
+    )
+
+    confirm_reception(almacenista_user, reception.id)
+
+    assert (
+        Movement.objects.filter(
+            product=product, movement_type=MovementType.ENTRADA
+        ).count()
+        == 2
+    )
+    assert Movement.objects.filter(
+        product=product, serial_number="SN-ALLOC-1"
+    ).exists()
+    assert Movement.objects.filter(
+        product=product, serial_number="SN-ALLOC-2"
+    ).exists()

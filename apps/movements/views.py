@@ -329,6 +329,7 @@ class TransferListCreateView(generics.ListCreateAPIView):
             d["destination_id"],
             d["quantity"],
             lot_id=d.get("lot_id"),
+            serial_number=d.get("serial_number"),
             cold_chain_acknowledged=d.get("cold_chain_acknowledged", False),
             electrical_safety_acknowledged=d.get(
                 "electrical_safety_acknowledged", False
@@ -439,6 +440,7 @@ class AdjustmentListCreateView(generics.ListCreateAPIView):
             d["location_id"],
             d["new_quantity"],
             d["justification"],
+            serial_number=d.get("serial_number"),
         )
         return Response(
             MovementSerializer(movement).data, status=status.HTTP_201_CREATED
@@ -553,6 +555,7 @@ class ComboDispatchView(APIView):
                 request.user,
                 d["combo_id"],
                 d["location_id"],
+                serial_number=d.get("serial_number"),
                 request=request,
             )
         except ProductCombo.DoesNotExist:

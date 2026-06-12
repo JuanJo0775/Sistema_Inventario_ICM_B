@@ -44,6 +44,24 @@ from shared.location_validators import (
 logger = logging.getLogger(__name__)
 
 
+def _validate_serial_required(
+    product: Product, serial_number: str | None
+) -> None:
+    """BR-04: Valida serial obligatorio si la categoría lo exige."""
+    if product.category.requires_serial_number and not (
+        serial_number or ""
+    ).strip():
+        raise SerialNumberRequiredError()
+
+
+def _normalize_serial(serial_number: str | None) -> str | None:
+    """Normaliza serial: limpia espacios externos; retorna None si vacío."""
+    if serial_number:
+        normalized = serial_number.strip()
+        return normalized if normalized else None
+    return None
+
+
 def _lock_stock(product_id: UUID, location_id: UUID) -> StockByLocation:
     row, _ = StockByLocation.objects.select_for_update().get_or_create(
         product_id=product_id,
@@ -427,8 +445,7 @@ def register_entry(
     )
     location = Location.objects.select_for_update().get(pk=location_id)
     _ensure_location_allows_destination(location, "entry")
-    if product.category.requires_serial_number and not (serial_number or "").strip():
-        raise SerialNumberRequiredError()
+    _validate_serial_required(product, serial_number)
     if (
         qty_invoiced is not None
         and qty_invoiced != quantity
@@ -475,7 +492,7 @@ def register_entry(
         quantity=quantity,
         stock_previo_destino=before,
         stock_resultante_destino=after,
-        serial_number=serial_number,
+        serial_number=_normalize_serial(serial_number),
         quantity_invoiced=qty_invoiced,
         discrepancy_note=discrepancy_note,
         executed_by=user,
@@ -567,8 +584,7 @@ def register_dispatch(
     else:
         product = Product.objects.select_related("category").get(pk=product_id)
 
-    if product.category.requires_serial_number and not (serial_number or "").strip():
-        raise SerialNumberRequiredError()
+    _validate_serial_required(product, serial_number)
 
     cold, electric = _requires_ack_flags(product)
     if cold and not cold_chain_acknowledged:
@@ -707,7 +723,7 @@ def register_dispatch(
                 stock_resultante_origen=after,
                 scanned_code=sc or None,
                 order_sku=osku or None,
-                serial_number=serial_number,
+                serial_number=_normalize_serial(serial_number),
                 invoice_number=invoice_number,
                 invoice_pdf=pdf_file,
                 executed_by=user,
@@ -746,7 +762,7 @@ def register_dispatch(
             stock_resultante_origen=after,
             scanned_code=sc or None,
             order_sku=osku or None,
-            serial_number=serial_number,
+            serial_number=_normalize_serial(serial_number),
             invoice_number=invoice_number,
             invoice_pdf=pdf_file,
             executed_by=user,
@@ -844,21 +860,24 @@ def register_internal_transfer(
     quantity: int,
     *,
     lot_id: UUID | None = None,
+    serial_number: str | None = None,
     cold_chain_acknowledged: bool = False,
     electrical_safety_acknowledged: bool = False,
     related_movement: Movement | None = None,
 ) -> Movement:
     """
-    RF-007, BR-11, BR-14 — Traslado interno entre ubicaciones.
+    RF-007, BR-04, BR-11, BR-14 — Traslado interno entre ubicaciones.
 
     Raises:
         InsufficientStockError: Stock insuficiente en origen.
+        SerialNumberRequiredError: BR-04.
         StockMismatchError: Si el total consolidado cambia tras el traslado (bug / inconsistencia).
     """
     if origin_id == destination_id:
         raise ValueError("Origen y destino deben ser distintos.")
 
     product = Product.objects.select_related("category").get(pk=product_id)
+    _validate_serial_required(product, serial_number)
     locations = {
         loc.id: loc
         for loc in Location.objects.select_for_update().filter(
@@ -946,6 +965,7 @@ def register_internal_transfer(
         stock_resultante_origen=oao,
         stock_previo_destino=dbd,
         stock_resultante_destino=dad,
+        serial_number=_normalize_serial(serial_number),
         executed_by=user,
         related_movement=related_movement,
     )
@@ -992,8 +1012,7 @@ def register_return(
     _ensure_location_allows_destination(location, "return")
     if not _product_allows_returns(product):
         raise ProductNotReturnableError()
-    if product.category.requires_serial_number and not (serial_number or "").strip():
-        raise SerialNumberRequiredError()
+    _validate_serial_required(product, serial_number)
 
     related: Movement | None = None
     if related_movement_id:
@@ -1024,7 +1043,7 @@ def register_return(
         quantity=quantity,
         stock_previo_destino=before,
         stock_resultante_destino=after,
-        serial_number=serial_number,
+        serial_number=_normalize_serial(serial_number),
         related_movement=related,
         executed_by=user,
     )
@@ -1046,13 +1065,16 @@ def register_adjustment(
     location_id: UUID,
     new_quantity: int,
     justification: str,
+    *,
+    serial_number: str | None = None,
 ) -> Movement:
     """
-    RF-009, BR-07, BR-14 — Ajuste formal con delta explícito.
+    RF-009, BR-04, BR-07, BR-14 — Ajuste formal con delta explícito.
 
     Raises:
         UnauthorizedDomainActionError: Solo almacenista.
         AdjustmentJustificationRequiredError: Justificación vacía.
+        SerialNumberRequiredError: BR-04.
     """
     if getattr(almacenista_user, "role", None) != "almacenista":
         raise UnauthorizedDomainActionError(
@@ -1062,6 +1084,8 @@ def register_adjustment(
         raise AdjustmentJustificationRequiredError()
 
     row = _lock_stock(product_id, location_id)
+    product = Product.objects.select_related("category").get(pk=product_id)
+    _validate_serial_required(product, serial_number)
     location = Location.objects.select_for_update().get(pk=location_id)
     before = row.current_stock
     delta = int(new_quantity) - before
@@ -1087,6 +1111,7 @@ def register_adjustment(
         stock_resultante_origen=int(new_quantity) if delta < 0 else None,
         stock_previo_destino=before if delta > 0 else None,
         stock_resultante_destino=int(new_quantity) if delta > 0 else None,
+        serial_number=_normalize_serial(serial_number),
         justification=justification.strip(),
         executed_by=almacenista_user,
     )
@@ -1097,7 +1122,6 @@ def register_adjustment(
         movement=movement,
         detail={"delta": delta, "justification": justification.strip()},
     )
-    product = Product.objects.get(pk=product_id)
     check_and_create_alerts(product)
     return movement
 
@@ -1197,12 +1221,17 @@ def correct_movement_within_window(
             "La ventana de autocorrección (5 minutos) ya cerró para este movimiento."
         )
 
+    orig_serial = original.serial_number
+
     if original.movement_type == MovementType.TRASLADO:
         new_origin = UUID(str(corrected_data["origin_id"]))
         new_dest = UUID(str(corrected_data["destination_id"]))
         new_qty = int(corrected_data["quantity"])
         if new_origin == new_dest:
             raise DomainValidationError("Origen y destino deben ser distintos.")
+
+        rev_serial = corrected_data.get("serial_number", orig_serial)
+        fixed_serial = corrected_data.get("serial_number", orig_serial)
 
         # Los ACKs se propagan del original: el usuario ya los reconoció (BR-06).
         rev = register_internal_transfer(
@@ -1211,6 +1240,7 @@ def correct_movement_within_window(
             UUID(str(original.destination_location_id)),
             UUID(str(original.origin_location_id)),
             int(original.quantity),
+            serial_number=rev_serial,
             cold_chain_acknowledged=True,
             electrical_safety_acknowledged=True,
         )
@@ -1220,6 +1250,7 @@ def correct_movement_within_window(
             new_origin,
             new_dest,
             new_qty,
+            serial_number=fixed_serial,
             cold_chain_acknowledged=True,
             electrical_safety_acknowledged=True,
             related_movement=original,
@@ -1248,6 +1279,7 @@ def correct_movement_within_window(
             location_id=UUID(str(corrected_data["location_id"])),
             quantity=int(corrected_data["quantity"]),
             movement_type=corrected_data.get("movement_type", original.movement_type),
+            serial_number=corrected_data.get("serial_number", orig_serial),
             cold_chain_acknowledged=True,
             electrical_safety_acknowledged=True,
             privacy_notice_acknowledged=True,
@@ -1433,10 +1465,11 @@ def dispatch_combo(
     combo_id: UUID,
     location_id: UUID,
     *,
+    serial_number: str | None = None,
     request: Any = None,
 ) -> list[Movement]:
     """
-    RF-003, BR-11 — Despacha un combo (Opción B: plantilla virtual).
+    RF-003, BR-04, BR-11 — Despacha un combo (Opción B: plantilla virtual).
 
     Lee la receta del combo y por cada ítem genera un movimiento SALIDA_COMBO
     descontando el stock del producto en la ubicación indicada.
@@ -1445,12 +1478,14 @@ def dispatch_combo(
         user: Ejecutor (almacenista o auxiliar).
         combo_id: UUID del combo a despachar.
         location_id: UUID de la ubicación desde donde se sacan los productos.
+        serial_number: Serial opcional; obligatorio si algún componente lo exige (BR-04).
 
     Returns:
         Lista de Movements creados (uno por ítem del combo).
 
     Raises:
         InsufficientStockError: Si no hay stock suficiente de algún ítem.
+        SerialNumberRequiredError: BR-04 si algún componente requiere serial.
         ProductCombo.DoesNotExist: Si el combo no existe o está inactivo.
     """
     from apps.catalog.models import ProductCombo
@@ -1461,6 +1496,9 @@ def dispatch_combo(
     items = list(combo.combo_items.all())
     if not items:
         raise ValueError(f"El combo {combo.sku} no tiene ítems registrados.")
+
+    for item in items:
+        _validate_serial_required(item.product, serial_number)
 
     location = Location.objects.select_for_update().get(pk=location_id)
     _ensure_location_allows_origin(location, "combo_dispatch")
@@ -1563,6 +1601,7 @@ def dispatch_combo(
             quantity=qty_needed,
             stock_previo_origen=before,
             stock_resultante_origen=after,
+            serial_number=_normalize_serial(serial_number),
             justification=f"Salida por combo: {combo.sku} ({combo.name})",
             executed_by=user,
             # Solo el primer movement lleva invoice_number (restricción UNIQUE del ledger).
