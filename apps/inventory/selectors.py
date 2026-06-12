@@ -83,7 +83,7 @@ def search_products(
     query: str,
     *,
     category_id: UUID | None = None,
-    subcategory_id: UUID | None = None,
+    brand_id: UUID | None = None,
 ) -> QuerySet[Product]:
     """
     RF-004, RNF-004 — Búsqueda por SKU, código de barras o nombre (autocompletado).
@@ -91,13 +91,11 @@ def search_products(
     Usa `select_related` para evitar N+1.
     """
     q = (query or "").strip()
-    qs = Product.objects.filter(is_active=True).select_related(
-        "category", "subcategory"
-    )
+    qs = Product.objects.filter(is_active=True).select_related("category", "brand")
     if category_id:
         qs = qs.filter(category_id=category_id)
-    if subcategory_id:
-        qs = qs.filter(subcategory_id=subcategory_id)
+    if brand_id:
+        qs = qs.filter(brand_id=brand_id)
     if not q:
         return qs.order_by("sku")[:50]
     return qs.filter(
@@ -147,9 +145,7 @@ def get_full_inventory(filters: dict[str, Any] | None = None) -> list[dict[str, 
         Lista de dicts con producto, totales y desglose por ubicación.
     """
     filters = filters or {}
-    qs = Product.objects.filter(is_active=True).select_related(
-        "category", "subcategory"
-    )
+    qs = Product.objects.filter(is_active=True).select_related("category", "brand")
     if filters.get("category_id"):
         qs = qs.filter(category_id=filters["category_id"])
     if filters.get("location_id"):

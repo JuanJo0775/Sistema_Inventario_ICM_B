@@ -668,7 +668,7 @@ class ProductSearchView(APIView):
                 required=False,
             ),
             OpenApiParameter(
-                name="subcategory",
+                name="brand",
                 type=str,
                 location=OpenApiParameter.QUERY,
                 required=False,
@@ -683,11 +683,11 @@ class ProductSearchView(APIView):
     def get(self, request):
         q = request.query_params.get("q", "")
         category = request.query_params.get("category")
-        subcategory = request.query_params.get("subcategory")
+        brand = request.query_params.get("brand")
         qs = search_products(
             q,
             category_id=UUID(category) if category else None,
-            subcategory_id=UUID(subcategory) if subcategory else None,
+            brand_id=UUID(brand) if brand else None,
         )
         paginator = ICMPageNumberPagination()
         page = paginator.paginate_queryset(list(qs), request, view=self)
