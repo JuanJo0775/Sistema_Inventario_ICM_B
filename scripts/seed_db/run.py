@@ -1,7 +1,7 @@
 """
 Seed unificado ICM: catalogo completo + movimientos de prueba.
 
-Incluye: categorias, marcas/subcategorias, productos con precios,
+Incluye: categorias, marcas, productos con precios,
 proveedores, ubicaciones, stock via OC, traslados, ventas, ajustes y combos.
 
 Prerequisito:

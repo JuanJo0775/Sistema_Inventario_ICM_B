@@ -76,11 +76,11 @@ class Seeder:
         self._section("Fase 3 -- Categorias")
         cats = self._ensure_categories(almacenista, result)
 
-        self._section("Fase 4 -- Subcategorias / Marcas")
-        subcats = self._ensure_subcategories(almacenista, cats, result)
+        self._section("Fase 4 -- Marcas")
+        brands = self._ensure_brands(almacenista, cats, result)
 
         self._section("Fase 5 -- Productos")
-        products = self._ensure_products(almacenista, cats, subcats, result)
+        products = self._ensure_products(almacenista, cats, brands, result)
 
         self._section("Fase 6 -- Proveedores")
         suppliers = self._ensure_suppliers(almacenista)
@@ -271,52 +271,44 @@ class Seeder:
         return cats
 
     # =========================================================================
-    # Fase 4: Subcategorias / Marcas
+    # Fase 4: Marcas
     # =========================================================================
 
-    def _ensure_subcategories(
+    def _ensure_brands(
         self, almacenista, cats: dict, result: SeedResult
     ) -> dict[str, Any]:
-        """Retorna dict[(category_slug, brand_name) -> Subcategory]."""
-        from apps.catalog.models import Subcategory
-        from apps.catalog.services import create_subcategory
+        """Retorna dict[brand_name -> Brand]."""
+        from apps.catalog.models import Brand
+        from apps.catalog.services import create_brand
 
-        subcats: dict[tuple, Any] = {}
+        brands: dict[str, Any] = {}
         for cat_slug, brand_name, description in config.SUBCATEGORIES:
-            cat = cats.get(cat_slug)
-            if not cat:
-                self._warn(
-                    f"Categoria '{cat_slug}' no encontrada para marca '{brand_name}'"
-                )
-                continue
-
-            existing = Subcategory.objects.filter(
-                category=cat, name__iexact=brand_name
-            ).first()
+            # cat_slug se ignora, las marcas son independientes de categorías
+            # pero lo mantenemos para compatibilidad con config.SUBCATEGORIES
+            existing = Brand.objects.filter(name__iexact=brand_name).first()
             if existing:
-                subcats[(cat_slug, brand_name)] = existing
+                brands[brand_name] = existing
             else:
-                subcat = create_subcategory(
+                brand = create_brand(
                     almacenista,
-                    category_id=cat.id,
                     name=brand_name,
                     description=description,
                 )
-                subcats[(cat_slug, brand_name)] = subcat
+                brands[brand_name] = brand
                 result.subcategories_created += 1
-                self._ok(f"  + Marca: {brand_name} -> {cat.name}")
+                self._ok(f"  + Marca: {brand_name}")
 
         created = result.subcategories_created
-        total = len(subcats)
+        total = len(brands)
         self._ok(f"  Marcas: {created} creadas, {total - created} existentes")
-        return subcats
+        return brands
 
     # =========================================================================
     # Fase 5: Productos (catalogo de referencia con datos completos)
     # =========================================================================
 
     def _ensure_products(
-        self, almacenista, cats: dict, subcats: dict, result: SeedResult
+        self, almacenista, cats: dict, brands: dict, result: SeedResult
     ) -> dict[str, Any]:
         """Retorna dict[sku -> Product]. Crea solo los que no existen."""
         from apps.catalog.models import Product
@@ -338,8 +330,8 @@ class Seeder:
                 self._warn(f"Categoria '{cat_slug}' no encontrada para {sku} — omitido")
                 continue
 
-            brand = p_data.get("brand", "Can")
-            subcat = subcats.get((cat_slug, brand))
+            brand_name = p_data.get("brand", "Can")
+            brand_obj = brands.get(brand_name)
 
             try:
                 product = create_product(
@@ -348,8 +340,7 @@ class Seeder:
                         "sku": sku,
                         "name": p_data["name"],
                         "category_id": cat.id,
-                        "subcategory_id": subcat.id if subcat else None,
-                        "brand": brand,
+                        "brand_id": brand_obj.id if brand_obj else None,
                         "unit_cost": p_data.get("unit_cost"),
                         "sale_price_retail": p_data.get("sale_price_retail"),
                         "sale_price_wholesale": p_data.get("sale_price_wholesale"),

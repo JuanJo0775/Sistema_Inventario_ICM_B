@@ -103,7 +103,7 @@ CATEGORIES: list[dict[str, Any]] = [
 ]
 
 # ---------------------------------------------------------------------------
-# Subcategorias (marcas) — (category_slug, brand_name, description)
+# Marcas (antes subcategorias) — (category_slug, brand_name, description)
 # ---------------------------------------------------------------------------
 SUBCATEGORIES: list[tuple[str, str, str]] = [
     # Electroterapia

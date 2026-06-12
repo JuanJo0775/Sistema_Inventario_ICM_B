@@ -11,7 +11,7 @@ Elimina (en orden FK-safe):
   - Facturas, movimientos, alertas
   - Ordenes de compra, recepciones
   - Combos, productos, lotes, historial de precios, stock
-  - Subcategorias y categorias
+  - Marcas y categorias
   - Proveedores
   - Ubicaciones adicionales (bodega-norte, vitrina-2, etc.)
   - Usuarios adicionales (auxiliar_despacho, administrador)
@@ -67,11 +67,12 @@ def clean() -> None:
     from apps.catalog.models import (
         Category,
         ComboItem,
+        Brand,
         Lot,
         Product,
         ProductCombo,
         ProductPriceHistory,
-        Subcategory,
+        ProductSerial,
     )
     from apps.inventory.models import (
         Location,
@@ -129,8 +130,9 @@ def clean() -> None:
     _deleted("ProductPriceHistory", ProductPriceHistory.objects.all().delete())
     _deleted("Lot", Lot.objects.all().delete())
     _deleted("StockByLocation", StockByLocation.objects.all().delete())
+    _deleted("ProductSerial", ProductSerial.objects.all().delete())
     _deleted("Product", Product.objects.all().delete())
-    _deleted("Subcategory", Subcategory.objects.all().delete())
+    _deleted("Brand", Brand.objects.all().delete())
     _deleted("Category", Category.objects.all().delete())
     _deleted("Supplier", Supplier.objects.all().delete())
 
