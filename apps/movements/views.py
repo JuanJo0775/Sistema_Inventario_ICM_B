@@ -201,7 +201,7 @@ class DispatchListCreateView(generics.ListCreateAPIView):
             lot_id=d.get("lot_id"),
             scanned_code=d.get("scanned_code"),
             order_sku=d.get("order_sku"),
-            serial_number=d.get("serial_number"),
+            serial_id=d.get("serial_id"),
             customer_data=d.get("customer_data"),
             note=d.get("note"),
             cold_chain_acknowledged=d.get("cold_chain_acknowledged", False),
@@ -329,7 +329,7 @@ class TransferListCreateView(generics.ListCreateAPIView):
             d["destination_id"],
             d["quantity"],
             lot_id=d.get("lot_id"),
-            serial_number=d.get("serial_number"),
+            serial_id=d.get("serial_id"),
             cold_chain_acknowledged=d.get("cold_chain_acknowledged", False),
             electrical_safety_acknowledged=d.get(
                 "electrical_safety_acknowledged", False
@@ -385,7 +385,7 @@ class ReturnListCreateView(generics.ListCreateAPIView):
             d["location_id"],
             d["quantity"],
             lot_id=d.get("lot_id"),
-            serial_number=d.get("serial_number"),
+            serial_id=d.get("serial_id"),
             related_movement_id=d.get("related_movement_id"),
         )
         return Response(
@@ -440,7 +440,7 @@ class AdjustmentListCreateView(generics.ListCreateAPIView):
             d["location_id"],
             d["new_quantity"],
             d["justification"],
-            serial_number=d.get("serial_number"),
+            serial_id=d.get("serial_id"),
         )
         return Response(
             MovementSerializer(movement).data, status=status.HTTP_201_CREATED
@@ -555,7 +555,7 @@ class ComboDispatchView(APIView):
                 request.user,
                 d["combo_id"],
                 d["location_id"],
-                serial_number=d.get("serial_number"),
+                serial_id=d.get("serial_id"),
                 request=request,
             )
         except ProductCombo.DoesNotExist:

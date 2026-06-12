@@ -6,6 +6,7 @@ from unittest.mock import patch
 import pytest
 from django.utils import timezone
 
+from apps.catalog.models import ProductSerial
 from apps.inventory.models import StockByLocation
 from apps.movements.models import Movement, MovementType
 from apps.movements.services import (
@@ -24,6 +25,7 @@ from shared.exceptions import (
     CrossValidationFailedError,
     DiscrepancyNoteRequiredError,
     ImmutableRecordError,
+    InsufficientStockError,
     LocationStateNotAllowedError,
     LotCodeRequiredError,
     LotExpirationDateRequiredError,
@@ -35,6 +37,7 @@ from tests.factories import (
     LocationFactory,
     LotFactory,
     ProductFactory,
+    ProductSerialFactory,
 )
 
 
@@ -133,7 +136,6 @@ def test_dispatch_chooses_earliest_lot_when_expiring_product(
         MovementType.SALIDA_VENTA_MENOR,
         scanned_code=product.barcode,
         order_sku=product.sku,
-        serial_number="SN-DSP",
         cold_chain_acknowledged=True,
         electrical_safety_acknowledged=True,
     )
@@ -233,7 +235,10 @@ def test_return_blocked_for_non_returnable_category(
     loc = sample_locations[0]
     with pytest.raises(ProductNotReturnableError):
         register_return(
-            almacenista_user, sample_product.id, loc.id, 1, serial_number="SN"
+            almacenista_user,
+            sample_product.id,
+            loc.id,
+            1,
         )
 
 
@@ -364,7 +369,6 @@ def test_dispatch_consumes_across_multiple_lots(almacenista_user, sample_locatio
             MovementType.SALIDA_VENTA_MENOR,
             scanned_code=product.barcode,
             order_sku=product.sku,
-            serial_number="SN-DSP-2",
             cold_chain_acknowledged=True,
             electrical_safety_acknowledged=True,
         )
@@ -938,7 +942,7 @@ def test_internal_transfer_electroterapia_without_serial_fails(
     product = ProductFactory(category=cat, sku="TRF-SER-01")
     origin, destination = sample_locations[0], sample_locations[1]
     StockByLocation.objects.create(product=product, location=origin, current_stock=10)
-    with pytest.raises(SerialNumberRequiredError):
+    with pytest.raises(InsufficientStockError):
         register_internal_transfer(
             almacenista_user,
             product.id,
@@ -956,13 +960,19 @@ def test_internal_transfer_with_serial_persists(almacenista_user, sample_locatio
     product = ProductFactory(category=cat, sku="TRF-SER-02")
     origin, destination = sample_locations[0], sample_locations[1]
     StockByLocation.objects.create(product=product, location=origin, current_stock=10)
+    serial = ProductSerialFactory(
+        product=product,
+        serial_number="SN-TRF-01",
+        current_location=origin,
+        status=ProductSerial.Status.AVAILABLE,
+    )
     movement = register_internal_transfer(
         almacenista_user,
         product.id,
         origin.id,
         destination.id,
         3,
-        serial_number="SN-TRF-01",
+        serial_id=serial.id,
         cold_chain_acknowledged=True,
         electrical_safety_acknowledged=True,
     )
@@ -1017,13 +1027,19 @@ def test_adjustment_with_serial_persists(almacenista_user, sample_locations):
     product = ProductFactory(category=cat, sku="ADJ-SER-02")
     loc = sample_locations[0]
     StockByLocation.objects.create(product=product, location=loc, current_stock=10)
+    serial = ProductSerialFactory(
+        product=product,
+        serial_number="SN-ADJ-01",
+        current_location=loc,
+        status=ProductSerial.Status.AVAILABLE,
+    )
     movement = register_adjustment(
         almacenista_user,
         product.id,
         loc.id,
         5,
         "Ajuste con serial",
-        serial_number="SN-ADJ-01",
+        serial_id=serial.id,
     )
     assert movement.serial_number == "SN-ADJ-01"
     assert movement.movement_type == MovementType.AJUSTE

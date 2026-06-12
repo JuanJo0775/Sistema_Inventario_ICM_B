@@ -15,7 +15,7 @@ from django.utils import timezone
 from apps.alerts import services as alert_services
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
-from apps.catalog.models import Lot, Product
+from apps.catalog.models import Lot, Product, ProductSerial
 from apps.catalog.services import resolve_identifier
 from apps.inventory.models import Location, StockByLocation
 from apps.movements.models import Invoice, InvoiceCounter, Movement, MovementType
@@ -56,6 +56,108 @@ def _normalize_serial(serial_number: str | None) -> str | None:
         normalized = serial_number.strip()
         return normalized if normalized else None
     return None
+
+
+def _resolve_serial_for_dispatch(
+    product: Product,
+    location_id: UUID,
+    serial_id: UUID | None = None,
+) -> str | None:
+    """
+    Resuelve el serial_number para un movimiento de salida/traslado.
+
+    - Si `serial_id` se provee: valida que el ProductSerial exista, esté disponible
+      y en la ubicación correcta.
+    - Si no se provee y la categoría requiere serial: auto-asigna uno disponible.
+    - Si la categoría no requiere serial: retorna None.
+
+    Returns:
+        El serial_number en string, o None si no aplica.
+    """
+    from apps.catalog.models import ProductSerial
+
+    if not product.category.requires_serial_number:
+        return None
+
+    if serial_id is not None:
+        try:
+            ps = ProductSerial.objects.select_for_update().get(
+                pk=serial_id,
+                product=product,
+                status=ProductSerial.Status.AVAILABLE,
+                current_location_id=location_id,
+            )
+        except ProductSerial.DoesNotExist:
+            raise ValueError(
+                f"Serial {serial_id} no disponible para producto {product.sku} "
+                f"en ubicación {location_id}."
+            )
+        return ps.serial_number
+
+    # Auto-asignar: tomar el primer serial disponible (FIFO por created_at)
+    ps = (
+        ProductSerial.objects.select_for_update()
+        .filter(
+            product=product,
+            status=ProductSerial.Status.AVAILABLE,
+            current_location_id=location_id,
+        )
+        .order_by("created_at")
+        .first()
+    )
+    if ps is None:
+        raise InsufficientStockError(
+            detail={
+                "product_id": str(product.id),
+                "location_id": str(location_id),
+                "message": "No hay seriales disponibles para este producto en la ubicación.",
+            }
+        )
+    return ps.serial_number
+
+
+def _update_serial_status(
+    serial_number: str,
+    product: Product,
+    new_status: str,
+    location_id: UUID | None = None,
+    movement: Movement | None = None,
+) -> ProductSerial | None:
+    """
+    Actualiza el estado y ubicación de un ProductSerial.
+
+    Retorna la instancia actualizada o None si no se encontró.
+    """
+    from apps.catalog.models import ProductSerial
+
+    try:
+        ps = ProductSerial.objects.select_for_update().get(
+            product=product, serial_number=serial_number
+        )
+        ps.status = new_status
+        if location_id is not None:
+            ps.current_location_id = location_id
+        if movement is not None:
+            ps.last_movement = movement
+        ps.save(
+            update_fields=["status", "current_location", "last_movement", "updated_at"]
+        )
+        return ps
+    except ProductSerial.DoesNotExist:
+        return None
+
+
+def available_serials_at_location(
+    *, product_id: UUID, location_id: UUID
+) -> list[ProductSerial]:
+    """Retorna los seriales disponibles (status=available) de un producto en una ubicación."""
+    return list(
+        ProductSerial.objects.filter(
+            product_id=product_id,
+            status=ProductSerial.Status.AVAILABLE,
+            current_location_id=location_id,
+        ).order_by("created_at")
+    )
 
 
 def _lock_stock(product_id: UUID, location_id: UUID) -> StockByLocation:
@@ -480,6 +582,7 @@ def register_entry(
     dest.last_movement_at = timezone.now()
     dest.save(update_fields=["current_stock", "last_movement_at", "updated_at"])
 
+    normalized_serial = _normalize_serial(serial_number)
     movement = Movement.objects.create(
         movement_type=MovementType.ENTRADA,
         product_id=product_id,
@@ -488,12 +591,30 @@ def register_entry(
         quantity=quantity,
         stock_previo_destino=before,
         stock_resultante_destino=after,
-        serial_number=_normalize_serial(serial_number),
+        serial_number=normalized_serial,
         quantity_invoiced=qty_invoiced,
         discrepancy_note=discrepancy_note,
         executed_by=user,
         unit_cost=unit_cost,
     )
+
+    # Crear ProductSerial × quantity con batch prefix + sufijo auto-incremental
+    # Formato: <serial_base>-<batch_prefix>-<NNN> (ej: SN-CEL-001-a7-001)
+    # batch_prefix = primeros 2 hex chars del UUID del movimiento (agrupa seriales de la misma entrada)
+    if normalized_serial:
+        batch_prefix = movement.pk.hex[:2]
+        serials = [
+            ProductSerial(
+                product=product,
+                serial_number=f"{normalized_serial}-{batch_prefix}-{i:03d}",
+                status=ProductSerial.Status.AVAILABLE,
+                current_location_id=location_id,
+                last_movement=movement,
+            )
+            for i in range(1, quantity + 1)
+        ]
+        ProductSerial.objects.bulk_create(serials, ignore_conflicts=True)
+
     log_event(
         AuditEventType.MOVEMENT_CREATED,
         description="Entrada de mercancía",
@@ -522,7 +643,7 @@ def register_dispatch(
     lot_id: UUID | None = None,
     scanned_code: str | None = None,
     order_sku: str | None = None,
-    serial_number: str | None = None,
+    serial_id: UUID | None = None,
     customer_data: dict[str, Any] | None = None,
     note: str | None = None,
     cold_chain_acknowledged: bool = False,
@@ -580,8 +701,6 @@ def register_dispatch(
     else:
         product = Product.objects.select_related("category").get(pk=product_id)
 
-    _validate_serial_required(product, serial_number)
-
     cold, electric = _requires_ack_flags(product)
     if cold and not cold_chain_acknowledged:
         raise AlertAcknowledgementRequiredError(
@@ -617,6 +736,9 @@ def register_dispatch(
         customer_snapshot = cd
     if note:
         extra_audit["note"] = note
+
+    # Resolver serial desde ProductSerial (BR-04)
+    resolved_serial = _resolve_serial_for_dispatch(product, location_id, serial_id)
 
     # Calcular snapshot de precio al momento del despacho (R-05)
     price_snapshot = _resolve_price_snapshot(
@@ -719,7 +841,7 @@ def register_dispatch(
                 stock_resultante_origen=after,
                 scanned_code=sc or None,
                 order_sku=osku or None,
-                serial_number=_normalize_serial(serial_number),
+                serial_number=resolved_serial,
                 invoice_number=invoice_number,
                 invoice_pdf=pdf_file,
                 executed_by=user,
@@ -758,7 +880,7 @@ def register_dispatch(
             stock_resultante_origen=after,
             scanned_code=sc or None,
             order_sku=osku or None,
-            serial_number=_normalize_serial(serial_number),
+            serial_number=resolved_serial,
             invoice_number=invoice_number,
             invoice_pdf=pdf_file,
             executed_by=user,
@@ -770,6 +892,16 @@ def register_dispatch(
     check_and_create_alerts(product, location)
     for m in movements_created:
         m.refresh_from_db()
+
+    # Marcar ProductSerial como despachado
+    for m in movements_created:
+        if m.serial_number and product.category.requires_serial_number:
+            _update_serial_status(
+                serial_number=m.serial_number,
+                product=product,
+                new_status=ProductSerial.Status.DISPATCHED,
+                movement=m,
+            )
 
     log_event(
         AuditEventType.MOVEMENT_CREATED,
@@ -856,7 +988,7 @@ def register_internal_transfer(
     quantity: int,
     *,
     lot_id: UUID | None = None,
-    serial_number: str | None = None,
+    serial_id: UUID | None = None,
     cold_chain_acknowledged: bool = False,
     electrical_safety_acknowledged: bool = False,
     related_movement: Movement | None = None,
@@ -873,7 +1005,7 @@ def register_internal_transfer(
         raise ValueError("Origen y destino deben ser distintos.")
 
     product = Product.objects.select_related("category").get(pk=product_id)
-    _validate_serial_required(product, serial_number)
+    resolved_serial = _resolve_serial_for_dispatch(product, origin_id, serial_id)
     locations = {
         loc.id: loc
         for loc in Location.objects.select_for_update().filter(
@@ -961,10 +1093,21 @@ def register_internal_transfer(
         stock_resultante_origen=oao,
         stock_previo_destino=dbd,
         stock_resultante_destino=dad,
-        serial_number=_normalize_serial(serial_number),
+        serial_number=resolved_serial,
         executed_by=user,
         related_movement=related_movement,
     )
+
+    # Actualizar ubicación del ProductSerial
+    if resolved_serial and product.category.requires_serial_number:
+        _update_serial_status(
+            serial_number=resolved_serial,
+            product=product,
+            new_status=ProductSerial.Status.AVAILABLE,
+            location_id=destination_id,
+            movement=movement,
+        )
+
     log_event(
         AuditEventType.MOVEMENT_CREATED,
         description="Traslado interno",
@@ -989,7 +1132,7 @@ def register_return(
     quantity: int,
     *,
     lot_id: UUID | None = None,
-    serial_number: str | None = None,
+    serial_id: UUID | None = None,
     related_movement_id: UUID | None = None,
 ) -> Movement:
     """
@@ -1008,7 +1151,20 @@ def register_return(
     _ensure_location_allows_destination(location, "return")
     if not _product_allows_returns(product):
         raise ProductNotReturnableError()
-    _validate_serial_required(product, serial_number)
+
+    resolved_serial: str | None = None
+    if serial_id is not None:
+        try:
+            ps = ProductSerial.objects.select_for_update().get(
+                pk=serial_id, product=product
+            )
+            resolved_serial = ps.serial_number
+        except ProductSerial.DoesNotExist:
+            raise ValueError(
+                f"Serial {serial_id} no existe para producto {product.sku}."
+            )
+    elif product.category.requires_serial_number:
+        raise SerialNumberRequiredError()
 
     related: Movement | None = None
     if related_movement_id:
@@ -1039,10 +1195,21 @@ def register_return(
         quantity=quantity,
         stock_previo_destino=before,
         stock_resultante_destino=after,
-        serial_number=_normalize_serial(serial_number),
+        serial_number=resolved_serial,
         related_movement=related,
         executed_by=user,
     )
+
+    # Reactivar o crear ProductSerial
+    if resolved_serial:
+        _update_serial_status(
+            serial_number=resolved_serial,
+            product=product,
+            new_status=ProductSerial.Status.AVAILABLE,
+            location_id=location_id,
+            movement=movement,
+        )
+
     log_event(
         AuditEventType.RETURN_CREATED,
         description="Devolución registrada",
@@ -1062,7 +1229,7 @@ def register_adjustment(
     new_quantity: int,
     justification: str,
     *,
-    serial_number: str | None = None,
+    serial_id: UUID | None = None,
 ) -> Movement:
     """
     RF-009, BR-04, BR-07, BR-14 — Ajuste formal con delta explícito.
@@ -1081,8 +1248,22 @@ def register_adjustment(
 
     row = _lock_stock(product_id, location_id)
     product = Product.objects.select_related("category").get(pk=product_id)
-    _validate_serial_required(product, serial_number)
     location = Location.objects.select_for_update().get(pk=location_id)
+
+    resolved_serial: str | None = None
+    if serial_id is not None:
+        try:
+            ps = ProductSerial.objects.select_for_update().get(
+                pk=serial_id, product=product
+            )
+            resolved_serial = ps.serial_number
+        except ProductSerial.DoesNotExist:
+            raise ValueError(
+                f"Serial {serial_id} no existe para producto {product.sku}."
+            )
+    elif product.category.requires_serial_number:
+        raise SerialNumberRequiredError()
+
     before = row.current_stock
     delta = int(new_quantity) - before
     if delta == 0:
@@ -1107,10 +1288,20 @@ def register_adjustment(
         stock_resultante_origen=int(new_quantity) if delta < 0 else None,
         stock_previo_destino=before if delta > 0 else None,
         stock_resultante_destino=int(new_quantity) if delta > 0 else None,
-        serial_number=_normalize_serial(serial_number),
+        serial_number=resolved_serial,
         justification=justification.strip(),
         executed_by=almacenista_user,
     )
+
+    # Marcar ProductSerial como ajustado
+    if resolved_serial:
+        _update_serial_status(
+            serial_number=resolved_serial,
+            product=product,
+            new_status=ProductSerial.Status.ADJUSTED,
+            movement=movement,
+        )
+
     log_event(
         AuditEventType.ADJUSTMENT_CREATED,
         description="Ajuste de inventario",
@@ -1219,6 +1410,14 @@ def correct_movement_within_window(
 
     orig_serial = original.serial_number
 
+    def _serial_id_from_corrected(corrected_data, orig_serial):
+        """Helper: retorna serial_id si se envió, o None para auto-asignar, o el original."""
+        if "serial_id" in corrected_data:
+            return corrected_data["serial_id"]
+        if orig_serial and "serial_id" not in corrected_data:
+            return None  # auto-asignar
+        return None
+
     if original.movement_type == MovementType.TRASLADO:
         new_origin = UUID(str(corrected_data["origin_id"]))
         new_dest = UUID(str(corrected_data["destination_id"]))
@@ -1226,8 +1425,8 @@ def correct_movement_within_window(
         if new_origin == new_dest:
             raise DomainValidationError("Origen y destino deben ser distintos.")
 
-        rev_serial = corrected_data.get("serial_number", orig_serial)
-        fixed_serial = corrected_data.get("serial_number", orig_serial)
+        rev_serial_id = _serial_id_from_corrected(corrected_data, orig_serial)
+        fixed_serial_id = _serial_id_from_corrected(corrected_data, orig_serial)
 
         # Los ACKs se propagan del original: el usuario ya los reconoció (BR-06).
         rev = register_internal_transfer(
@@ -1236,7 +1435,7 @@ def correct_movement_within_window(
             UUID(str(original.destination_location_id)),
             UUID(str(original.origin_location_id)),
             int(original.quantity),
-            serial_number=rev_serial,
+            serial_id=rev_serial_id,
             cold_chain_acknowledged=True,
             electrical_safety_acknowledged=True,
         )
@@ -1246,7 +1445,7 @@ def correct_movement_within_window(
             new_origin,
             new_dest,
             new_qty,
-            serial_number=fixed_serial,
+            serial_id=fixed_serial_id,
             cold_chain_acknowledged=True,
             electrical_safety_acknowledged=True,
             related_movement=original,
@@ -1261,7 +1460,7 @@ def correct_movement_within_window(
             quantity=int(corrected_data["quantity"]),
             lot_code=corrected_data.get("lot_code"),
             lot_expiration_date=corrected_data.get("lot_expiration_date"),
-            serial_number=corrected_data.get("serial_number"),
+            serial_number=corrected_data.get("serial_number", orig_serial),
             cold_chain_acknowledged=True,
             electrical_safety_acknowledged=True,
         )
@@ -1275,7 +1474,7 @@ def correct_movement_within_window(
             location_id=UUID(str(corrected_data["location_id"])),
             quantity=int(corrected_data["quantity"]),
             movement_type=corrected_data.get("movement_type", original.movement_type),
-            serial_number=corrected_data.get("serial_number", orig_serial),
+            serial_id=_serial_id_from_corrected(corrected_data, orig_serial),
             cold_chain_acknowledged=True,
             electrical_safety_acknowledged=True,
             privacy_notice_acknowledged=True,
@@ -1461,7 +1660,7 @@ def dispatch_combo(
     combo_id: UUID,
     location_id: UUID,
     *,
-    serial_number: str | None = None,
+    serial_id: UUID | None = None,
     request: Any = None,
 ) -> list[Movement]:
     """
@@ -1474,7 +1673,7 @@ def dispatch_combo(
         user: Ejecutor (almacenista o auxiliar).
         combo_id: UUID del combo a despachar.
         location_id: UUID de la ubicación desde donde se sacan los productos.
-        serial_number: Serial opcional; obligatorio si algún componente lo exige (BR-04).
+        serial_id: UUID del serial (obligatorio si algún componente lo exige).
 
     Returns:
         Lista de Movements creados (uno por ítem del combo).
@@ -1493,8 +1692,14 @@ def dispatch_combo(
     if not items:
         raise ValueError(f"El combo {combo.sku} no tiene ítems registrados.")
 
+    # Validar serial contra todos los ítems del combo
+    resolved_serial: str | None = None
     for item in items:
-        _validate_serial_required(item.product, serial_number)
+        if item.product.category.requires_serial_number:
+            resolved_serial = _resolve_serial_for_dispatch(
+                item.product, location_id, serial_id
+            )
+            break
 
     location = Location.objects.select_for_update().get(pk=location_id)
     _ensure_location_allows_origin(location, "combo_dispatch")
@@ -1597,7 +1802,7 @@ def dispatch_combo(
             quantity=qty_needed,
             stock_previo_origen=before,
             stock_resultante_origen=after,
-            serial_number=_normalize_serial(serial_number),
+            serial_number=resolved_serial,
             justification=f"Salida por combo: {combo.sku} ({combo.name})",
             executed_by=user,
             # Solo el primer movement lleva invoice_number (restricción UNIQUE del ledger).

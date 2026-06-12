@@ -6,11 +6,16 @@ import pytest
 from django.urls import reverse
 
 from apps.audit.models import AuditEventType, AuditLog
-from apps.catalog.models import ComboItem, ProductCombo
+from apps.catalog.models import ComboItem, ProductCombo, ProductSerial
 from apps.inventory.models import StockByLocation
 from apps.movements.models import Movement, MovementType
-from shared.exceptions import InsufficientStockError, SerialNumberRequiredError
-from tests.factories import ElectroCategoryFactory, LocationFactory, ProductFactory
+from shared.exceptions import InsufficientStockError
+from tests.factories import (
+    ElectroCategoryFactory,
+    LocationFactory,
+    ProductFactory,
+    ProductSerialFactory,
+)
 
 
 @pytest.fixture
@@ -160,7 +165,7 @@ def test_dispatch_combo_requires_authentication(api_client, combo_setup):
 
 @pytest.mark.django_db
 def test_dispatch_combo_electro_without_serial_fails(almacenista_user):
-    """Combo con producto Electroterapia sin serial → SerialNumberRequiredError."""
+    """Combo con producto Electroterapia sin serial → InsufficientStockError."""
     from apps.catalog.models import ComboItem, ProductCombo
 
     cat = ElectroCategoryFactory()
@@ -172,12 +177,12 @@ def test_dispatch_combo_electro_without_serial_fails(almacenista_user):
 
     from apps.movements.services import dispatch_combo
 
-    with pytest.raises(SerialNumberRequiredError):
+    with pytest.raises(InsufficientStockError):
         dispatch_combo(
             almacenista_user,
             combo.id,
             location.id,
-            serial_number=None,
+            serial_id=None,
         )
 
 
@@ -193,13 +198,20 @@ def test_dispatch_combo_electro_with_serial_succeeds(almacenista_user):
     ComboItem.objects.create(combo=combo, product=product, quantity=2)
     StockByLocation.objects.create(product=product, location=location, current_stock=10)
 
+    serial = ProductSerialFactory(
+        product=product,
+        serial_number="SN-COMBO-01",
+        current_location=location,
+        status=ProductSerial.Status.AVAILABLE,
+    )
+
     from apps.movements.services import dispatch_combo
 
     movements = dispatch_combo(
         almacenista_user,
         combo.id,
         location.id,
-        serial_number="SN-COMBO-01",
+        serial_id=serial.id,
     )
     assert len(movements) == 1
     assert movements[0].serial_number == "SN-COMBO-01"
@@ -231,7 +243,7 @@ def test_dispatch_combo_with_mixed_products_serial_not_required(
         almacenista_user,
         combo.id,
         location.id,
-        serial_number=None,
+        serial_id=None,
     )
     assert len(movements) == 2
     assert all(m.serial_number is None for m in movements)

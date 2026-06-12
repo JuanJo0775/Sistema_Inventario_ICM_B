@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from uuid import UUID
+
 from rest_framework import serializers
 
 from apps.movements.models import Movement
@@ -82,6 +84,20 @@ class EntryCreateSerializer(serializers.Serializer):
     electrical_safety_acknowledged = serializers.BooleanField(default=False)
 
 
+def _resolve_serial_number(serial_number: str, product_id) -> UUID | None:
+    """Resuelve un serial_number string al UUID del ProductSerial, o None si no existe."""
+    from apps.catalog.models import ProductSerial
+
+    if not serial_number or not str(serial_number).strip():
+        return None
+    try:
+        return ProductSerial.objects.get(
+            serial_number=str(serial_number).strip(), product_id=product_id
+        ).id
+    except ProductSerial.DoesNotExist:
+        return None
+
+
 class DispatchCreateSerializer(serializers.Serializer):
     product_id = serializers.UUIDField()
     location_id = serializers.UUIDField()
@@ -93,7 +109,10 @@ class DispatchCreateSerializer(serializers.Serializer):
     )
     order_sku = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     serial_number = serializers.CharField(
-        required=False, allow_blank=True, allow_null=True
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        help_text="Número de serie a despachar. Si se omite, se auto-asigna uno disponible.",
     )
     customer_data = serializers.JSONField(required=False)
     note = serializers.CharField(required=False, allow_blank=True)
@@ -113,6 +132,15 @@ class DispatchCreateSerializer(serializers.Serializer):
         ),
     )
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        serial_number = attrs.pop("serial_number", None)
+        if serial_number:
+            attrs["serial_id"] = _resolve_serial_number(
+                serial_number, attrs["product_id"]
+            )
+        return attrs
+
 
 class TransferCreateSerializer(serializers.Serializer):
     product_id = serializers.UUIDField()
@@ -121,10 +149,22 @@ class TransferCreateSerializer(serializers.Serializer):
     quantity = serializers.IntegerField(min_value=1)
     lot_id = serializers.UUIDField(required=False, allow_null=True)
     serial_number = serializers.CharField(
-        required=False, allow_blank=True, allow_null=True
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        help_text="Número de serie a transferir. Se auto-asigna si se omite.",
     )
     cold_chain_acknowledged = serializers.BooleanField(default=False)
     electrical_safety_acknowledged = serializers.BooleanField(default=False)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        serial_number = attrs.pop("serial_number", None)
+        if serial_number:
+            attrs["serial_id"] = _resolve_serial_number(
+                serial_number, attrs["product_id"]
+            )
+        return attrs
 
 
 class ReturnCreateSerializer(serializers.Serializer):
@@ -133,9 +173,21 @@ class ReturnCreateSerializer(serializers.Serializer):
     quantity = serializers.IntegerField(min_value=1)
     lot_id = serializers.UUIDField(required=False, allow_null=True)
     serial_number = serializers.CharField(
-        required=False, allow_blank=True, allow_null=True
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        help_text="Número de serie del equipo a devolver.",
     )
     related_movement_id = serializers.UUIDField(required=False, allow_null=True)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        serial_number = attrs.pop("serial_number", None)
+        if serial_number:
+            attrs["serial_id"] = _resolve_serial_number(
+                serial_number, attrs["product_id"]
+            )
+        return attrs
 
 
 class AdjustmentCreateSerializer(serializers.Serializer):
@@ -144,16 +196,30 @@ class AdjustmentCreateSerializer(serializers.Serializer):
     new_quantity = serializers.IntegerField(min_value=0)
     justification = serializers.CharField(allow_blank=True)
     serial_number = serializers.CharField(
-        required=False, allow_blank=True, allow_null=True
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        help_text="Número de serie del equipo a ajustar.",
     )
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        serial_number = attrs.pop("serial_number", None)
+        if serial_number:
+            attrs["serial_id"] = _resolve_serial_number(
+                serial_number, attrs["product_id"]
+            )
+        return attrs
 
 
 class CorrectionCreateSerializer(serializers.Serializer):
     origin_id = serializers.UUIDField()
     destination_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
-    serial_number = serializers.CharField(
-        required=False, allow_blank=True, allow_null=True
+    serial_id = serializers.UUIDField(
+        required=False,
+        allow_null=True,
+        help_text="UUID del ProductSerial.",
     )
 
 
@@ -164,8 +230,10 @@ class AdjustmentCorrectionSerializer(serializers.Serializer):
     origin_id = serializers.UUIDField()
     destination_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
-    serial_number = serializers.CharField(
-        required=False, allow_blank=True, allow_null=True
+    serial_id = serializers.UUIDField(
+        required=False,
+        allow_null=True,
+        help_text="UUID del ProductSerial.",
     )
 
 
@@ -176,8 +244,10 @@ class ComboDispatchSerializer(serializers.Serializer):
     location_id = serializers.UUIDField(
         help_text="UUID de la ubicación desde donde se descuentan los productos."
     )
-    serial_number = serializers.CharField(
-        required=False, allow_blank=True, allow_null=True
+    serial_id = serializers.UUIDField(
+        required=False,
+        allow_null=True,
+        help_text="UUID del ProductSerial. Obligatorio si algún componente requiere serial.",
     )
 
 
