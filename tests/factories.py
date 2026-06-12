@@ -10,7 +10,7 @@ from django.utils import timezone
 from factory.django import DjangoModelFactory
 
 from apps.authentication.models import UserRole
-from apps.catalog.models import Category, Lot, Product
+from apps.catalog.models import Brand, Category, Lot, Product, ProductSerial
 from apps.inventory.models import Location
 
 User = get_user_model()
@@ -78,6 +78,17 @@ class ManoCategoryFactory(DjangoModelFactory):
     is_returnable = False
 
 
+class BrandFactory(DjangoModelFactory):
+    class Meta:
+        model = Brand
+        django_get_or_create = ("slug",)
+
+    name = factory.Sequence(lambda n: f"Marca {n}")
+    slug = factory.Sequence(lambda n: f"marca-{n}")
+    description = ""
+    is_active = True
+
+
 class ProductFactory(DjangoModelFactory):
     class Meta:
         model = Product
@@ -86,8 +97,8 @@ class ProductFactory(DjangoModelFactory):
     sku = factory.Sequence(lambda n: f"PRD-{n%9999+1:04d}")
     name = factory.Faker("word")
     category = factory.SubFactory(ManoCategoryFactory)
+    brand = factory.SubFactory(BrandFactory)
     barcode = factory.SelfAttribute("sku")
-    brand = "Can"
     reorder_point = 5
     requires_expiration = False
 
@@ -111,3 +122,12 @@ class LocationFactory(DjangoModelFactory):
     code = factory.Sequence(lambda n: f"LOC-{n:04d}")
     description = ""
     is_retail = False
+
+
+class ProductSerialFactory(DjangoModelFactory):
+    class Meta:
+        model = ProductSerial
+
+    product = factory.SubFactory(ProductFactory)
+    serial_number = factory.Sequence(lambda n: f"SN-{n:05d}")
+    status = ProductSerial.Status.AVAILABLE
