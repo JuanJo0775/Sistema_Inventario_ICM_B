@@ -137,7 +137,7 @@ def impl_rnf004_s02(
     StockByLocation.objects.create(
         product=sample_product, location=loc, current_stock=5
     )
-    with django_assert_num_queries(20):
+    with django_assert_num_queries(21):
         r = authenticated_almacenista_client.post(
             reverse("movements-entries"),
             {

@@ -475,7 +475,8 @@ def impl_rf007_s05(
 
 
 def impl_rf008_s01(authenticated_almacenista_client: APIClient, sample_locations, db):
-    from tests.factories import ElectroCategoryFactory, ProductFactory
+    from tests.factories import ElectroCategoryFactory, ProductFactory, ProductSerialFactory
+    from apps.catalog.models import ProductSerial
 
     cat = ElectroCategoryFactory()
     p = ProductFactory(category=cat, sku="P-0001")
@@ -483,6 +484,13 @@ def impl_rf008_s01(authenticated_almacenista_client: APIClient, sample_locations
     from apps.inventory.models import StockByLocation
 
     StockByLocation.objects.create(product=p, location=loc, current_stock=0)
+    # Crear ProductSerial para que la devolución pueda identificarlo
+    ProductSerialFactory(
+        product=p,
+        serial_number="SN-DEVOL",
+        current_location=loc,
+        status=ProductSerial.Status.DISPATCHED,
+    )
     url = reverse("movements-returns")
     r = authenticated_almacenista_client.post(
         url,
@@ -521,14 +529,22 @@ def impl_rf008_s02(
 
 
 def impl_rf008_s03(authenticated_almacenista_client: APIClient, sample_locations, db):
+    from apps.catalog.models import ProductSerial
     from apps.inventory.models import StockByLocation
     from apps.movements.models import Movement
-    from tests.factories import ElectroCategoryFactory, ProductFactory
+    from tests.factories import ElectroCategoryFactory, ProductFactory, ProductSerialFactory
 
     cat = ElectroCategoryFactory()
     p = ProductFactory(category=cat, sku="P-0803")
     loc = sample_locations[0]
     StockByLocation.objects.create(product=p, location=loc, current_stock=1)
+    # Crear serial disponible para el despacho
+    ProductSerialFactory(
+        product=p,
+        serial_number="SN-RET-ORIG",
+        current_location=loc,
+        status=ProductSerial.Status.AVAILABLE,
+    )
     sale = authenticated_almacenista_client.post(
         reverse("movements-dispatches"),
         {
@@ -544,6 +560,13 @@ def impl_rf008_s03(authenticated_almacenista_client: APIClient, sample_locations
     )
     assert sale.status_code == status.HTTP_201_CREATED
     original = Movement.objects.get(pk=sale.data["id"])
+    # Crear serial para la devolución (simula equipo que retorna)
+    ProductSerialFactory(
+        product=p,
+        serial_number="SN-RET-APPROVED",
+        current_location=loc,
+        status=ProductSerial.Status.DISPATCHED,
+    )
     r = authenticated_almacenista_client.post(
         reverse("movements-returns"),
         {
@@ -586,13 +609,21 @@ def impl_rf008_s04(
 
 
 def impl_rf008_s05(authenticated_almacenista_client: APIClient, sample_locations, db):
+    from apps.catalog.models import ProductSerial
     from apps.inventory.models import StockByLocation
-    from tests.factories import ElectroCategoryFactory, ProductFactory
+    from tests.factories import ElectroCategoryFactory, ProductFactory, ProductSerialFactory
 
     cat = ElectroCategoryFactory()
     p = ProductFactory(category=cat, sku="P-0805")
     loc = sample_locations[0]
     StockByLocation.objects.create(product=p, location=loc, current_stock=1)
+    # Crear serial disponible para el despacho
+    ProductSerialFactory(
+        product=p,
+        serial_number="SN-RET-HIST",
+        current_location=loc,
+        status=ProductSerial.Status.AVAILABLE,
+    )
     sale = authenticated_almacenista_client.post(
         reverse("movements-dispatches"),
         {
@@ -608,6 +639,13 @@ def impl_rf008_s05(authenticated_almacenista_client: APIClient, sample_locations
     )
     assert sale.status_code == status.HTTP_201_CREATED
     original = sale.data["id"]
+    # Crear serial para la devolución
+    ProductSerialFactory(
+        product=p,
+        serial_number="SN-RET-HIST-01",
+        current_location=loc,
+        status=ProductSerial.Status.DISPATCHED,
+    )
     return_movement = authenticated_almacenista_client.post(
         reverse("movements-returns"),
         {

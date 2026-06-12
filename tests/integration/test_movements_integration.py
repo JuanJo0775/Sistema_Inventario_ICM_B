@@ -70,7 +70,6 @@ def test_integration_fefo_multi_lot(almacenista_user, sample_locations):
             MovementType.SALIDA_VENTA_MENOR,
             scanned_code=product.barcode,
             order_sku=product.sku,
-            serial_number="INT-SN-DSP",
             cold_chain_acknowledged=True,
             electrical_safety_acknowledged=True,
         )

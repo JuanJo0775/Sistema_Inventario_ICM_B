@@ -589,6 +589,95 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/change-password/:
+    post:
+      operationId: auth_change_password_create
+      description: RF-001 — El usuario autenticado cambia su propia contraseña proporcionando
+        la contraseña actual y la nueva. Invalida todos los tokens JWT activos (fuerza
+        re-login) y registra evento de auditoría.
+      summary: Cambiar contraseña (self-service)
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/forgot-password/:
+    post:
+      operationId: auth_forgot_password_create
+      description: RF-001 — Envía un email con enlace de recuperación válido por 1
+        hora. La respuesta es siempre genérica para no revelar si el email existe
+        (anti-enumeración).
+      summary: Solicitar recuperación de contraseña
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/auth/health/:
     get:
       operationId: auth_health_retrieve
@@ -738,6 +827,103 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/reset-password/:
+    post:
+      operationId: auth_reset_password_create
+      description: RF-001 — Valida el token de recuperación (1 h de vigencia, un solo
+        uso), cambia la contraseña e invalida todas las sesiones JWT activas.
+      summary: Restablecer contraseña con token
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/temporary-permits/{id}/revoke/:
+    post:
+      operationId: auth_temporary_permits_revoke_create
+      description: Revoca (marca como inactivo) una autorización extraordinaria temporal
+        (solo almacenista).
+      summary: Revocar permiso temporal
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemporaryAccessPermit'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/auth/token/refresh/:
     post:
       operationId: auth_token_refresh_create
@@ -789,8 +975,9 @@ paths:
   /api/v1/auth/users/:
     get:
       operationId: auth_users_list
-      description: Almacenista o administrador. Vista de lectura protegida (RF-002,
-        BR-02).
+      description: 'Almacenista o administrador. Vista de lectura protegida (RF-002,
+        BR-02). Parámetros opcionales: `include_inactive` (1/true), `role` (almacenista|auxiliar_despacho|administrador),
+        `search` (username/email/nombre), `page` y `page_size` para paginación.'
       summary: Listar usuarios
       tags:
       - auth
@@ -1138,6 +1325,641 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/users/{id}/schedule/:
+    get:
+      operationId: auth_users_schedule_retrieve
+      description: Obtiene el horario personalizado estable del auxiliar de despacho.
+      summary: Ver horario personalizado del usuario
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSchedule'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: auth_users_schedule_create
+      description: Establece o actualiza el horario personalizado estable del auxiliar
+        de despacho (solo almacenista).
+      summary: Configurar horario personalizado del usuario
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserScheduleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserScheduleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserScheduleRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSchedule'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/auth/users/{id}/temporary-permits/:
+    get:
+      operationId: auth_users_temporary_permits_list
+      description: Obtiene la lista de autorizaciones extraordinarias temporales de
+        un auxiliar.
+      summary: Listar permisos temporales de un usuario
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TemporaryAccessPermit'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: auth_users_temporary_permits_create
+      description: Crea una autorización extraordinaria temporal para el auxiliar
+        de despacho (solo almacenista).
+      summary: Otorgar permiso temporal
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemporaryAccessPermitRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TemporaryAccessPermitRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TemporaryAccessPermitRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemporaryAccessPermit'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/brands/:
+    get:
+      operationId: catalog_brands_list
+      description: Lista las marcas registradas en el catálogo.
+      summary: Listar marcas
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBrandList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: catalog_brands_create
+      description: Crea una nueva marca independiente de categorías.
+      summary: Crear marca
+      tags:
+      - catalog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BrandCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BrandCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BrandCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/brands/{id}/:
+    get:
+      operationId: catalog_brands_retrieve
+      description: Obtiene el detalle de una marca.
+      summary: Detalle de marca
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: catalog_brands_update
+      description: Reemplaza los datos editables de una marca.
+      summary: Actualizar marca
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BrandUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BrandUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BrandUpdateRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: catalog_brands_partial_update
+      description: Actualiza solo los campos enviados de una marca.
+      summary: Actualizar marca parcialmente
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBrandUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBrandUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBrandUpdateRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: catalog_brands_destroy
+      description: Marca la marca como inactiva. El registro NO se elimina de la base
+        de datos. Devuelve HTTP 409 si la marca tiene productos activos asociados.
+        Para reactivarla use POST /brands/{id}/restore/.
+      summary: Desactivar marca
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/brands/{id}/restore/:
+    post:
+      operationId: catalog_brands_restore_create
+      description: Reactiva una marca previamente desactivada.
+      summary: Restaurar marca
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
           description: ''
         '400':
           description: Solicitud inválida o con errores de validación.
@@ -1724,8 +2546,9 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     put:
       operationId: catalog_combos_update
-      description: Reemplaza los datos de un combo. Si se envían `items`, reemplaza
-        toda la lista de componentes.
+      description: Reemplaza los datos de un combo. Si se envían `items`, los ComboItems
+        anteriores son **eliminados permanentemente** de la base de datos (hard delete)
+        y reemplazados por los nuevos.
       summary: Actualizar combo
       parameters:
       - in: path
@@ -1789,8 +2612,9 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     patch:
       operationId: catalog_combos_partial_update
-      description: Actualiza solo los campos enviados. Si se envían `items`, reemplaza
-        toda la lista.
+      description: Actualiza solo los campos enviados. Si se envían `items`, los ComboItems
+        anteriores son **eliminados permanentemente** de la base de datos (hard delete)
+        y reemplazados por los nuevos.
       summary: Actualizar combo parcialmente
       parameters:
       - in: path
@@ -2633,399 +3457,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /api/v1/catalog/subcategories/:
-    get:
-      operationId: catalog_subcategories_list
-      description: Lista las subcategorías registradas en el catálogo.
-      summary: Listar subcategorías
-      parameters:
-      - name: ordering
-        required: false
-        in: query
-        description: Qué campo usar para ordenar los resultados.
-        schema:
-          type: string
-      - name: page
-        required: false
-        in: query
-        description: Un número de página dentro del conjunto de resultados paginado.
-        schema:
-          type: integer
-      - name: page_size
-        required: false
-        in: query
-        description: Número de resultados a devolver por página.
-        schema:
-          type: integer
-      - name: search
-        required: false
-        in: query
-        description: Un término de búsqueda.
-        schema:
-          type: string
-      tags:
-      - catalog
-      security:
-      - jwtAuth: []
-      - BearerAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedSubcategoryList'
-          description: ''
-        '400':
-          description: Solicitud inválida o con errores de validación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: No autenticado o token inválido/expirado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '422':
-          description: Entidad no procesable (errores lógicos o de dominio ICM).
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    post:
-      operationId: catalog_subcategories_create
-      description: Crea una nueva subcategoría asociada a una categoría.
-      summary: Crear subcategoría
-      tags:
-      - catalog
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SubcategoryCreateRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/SubcategoryCreateRequest'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/SubcategoryCreateRequest'
-        required: true
-      security:
-      - jwtAuth: []
-      - BearerAuth: []
-      responses:
-        '201':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Subcategory'
-          description: ''
-        '400':
-          description: Solicitud inválida o con errores de validación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: No autenticado o token inválido/expirado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Permiso denegado para ejecutar la acción.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '422':
-          description: Entidad no procesable (errores lógicos o de dominio ICM).
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/v1/catalog/subcategories/{id}/:
-    get:
-      operationId: catalog_subcategories_retrieve
-      description: Obtiene el detalle de una subcategoría.
-      summary: Detalle de subcategoría
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        required: true
-      tags:
-      - catalog
-      security:
-      - jwtAuth: []
-      - BearerAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Subcategory'
-          description: ''
-        '400':
-          description: Solicitud inválida o con errores de validación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: No autenticado o token inválido/expirado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Recurso no encontrado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '422':
-          description: Entidad no procesable (errores lógicos o de dominio ICM).
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    put:
-      operationId: catalog_subcategories_update
-      description: Reemplaza los datos editables de una subcategoría.
-      summary: Actualizar subcategoría
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        required: true
-      tags:
-      - catalog
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SubcategoryUpdateRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/SubcategoryUpdateRequest'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/SubcategoryUpdateRequest'
-      security:
-      - jwtAuth: []
-      - BearerAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Subcategory'
-          description: ''
-        '400':
-          description: Solicitud inválida o con errores de validación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: No autenticado o token inválido/expirado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Permiso denegado para ejecutar la acción.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Recurso no encontrado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '422':
-          description: Entidad no procesable (errores lógicos o de dominio ICM).
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    patch:
-      operationId: catalog_subcategories_partial_update
-      description: Actualiza solo los campos enviados de una subcategoría.
-      summary: Actualizar subcategoría parcialmente
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        required: true
-      tags:
-      - catalog
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchedSubcategoryUpdateRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedSubcategoryUpdateRequest'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedSubcategoryUpdateRequest'
-      security:
-      - jwtAuth: []
-      - BearerAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Subcategory'
-          description: ''
-        '400':
-          description: Solicitud inválida o con errores de validación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: No autenticado o token inválido/expirado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Permiso denegado para ejecutar la acción.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Recurso no encontrado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '422':
-          description: Entidad no procesable (errores lógicos o de dominio ICM).
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    delete:
-      operationId: catalog_subcategories_destroy
-      description: Marca la subcategoría como inactiva. El registro NO se elimina
-        de la base de datos. Devuelve HTTP 409 si la subcategoría tiene productos
-        activos asociados. Para reactivarla use POST /subcategories/{id}/restore/.
-      summary: Desactivar subcategoría
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        required: true
-      tags:
-      - catalog
-      security:
-      - jwtAuth: []
-      - BearerAuth: []
-      responses:
-        '204':
-          description: No response body
-        '400':
-          description: Solicitud inválida o con errores de validación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: No autenticado o token inválido/expirado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Permiso denegado para ejecutar la acción.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Recurso no encontrado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '422':
-          description: Entidad no procesable (errores lógicos o de dominio ICM).
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /api/v1/catalog/subcategories/{id}/restore/:
-    post:
-      operationId: catalog_subcategories_restore_create
-      description: Reactiva una subcategoría previamente desactivada.
-      summary: Restaurar subcategoría
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        required: true
-      tags:
-      - catalog
-      security:
-      - jwtAuth: []
-      - BearerAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Subcategory'
-          description: ''
-        '400':
-          description: Solicitud inválida o con errores de validación.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: No autenticado o token inválido/expirado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Permiso denegado para ejecutar la acción.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Recurso no encontrado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '422':
-          description: Entidad no procesable (errores lógicos o de dominio ICM).
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/dashboard/alerts/:
     get:
       operationId: dashboard_alerts_retrieve
@@ -3821,6 +4252,10 @@ paths:
       summary: Buscar productos
       parameters:
       - in: query
+        name: brand
+        schema:
+          type: string
+      - in: query
         name: category
         schema:
           type: string
@@ -3829,10 +4264,6 @@ paths:
         schema:
           type: string
         description: Texto para SKU, código de barras o nombre.
-      - in: query
-        name: subcategory
-        schema:
-          type: string
       tags:
       - inventory
       security:
@@ -5816,6 +6247,813 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/purchasing/purchase-orders/:
+    get:
+      operationId: purchasing_purchase_orders_list
+      summary: Listar órdenes de compra
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      tags:
+      - purchasing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPurchaseOrderList'
+          description: ''
+    post:
+      operationId: purchasing_purchase_orders_create
+      summary: Crear orden de compra
+      tags:
+      - purchasing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrderCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrderCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrderCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/purchasing/purchase-orders/{id}/:
+    get:
+      operationId: purchasing_purchase_orders_retrieve
+      summary: Detalle de OC
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+          description: ''
+    put:
+      operationId: purchasing_purchase_orders_update
+      summary: Actualizar OC (completo, solo BORRADOR)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrderUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrderUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrderUpdateRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '405':
+          description: Método no permitido o registro inmutable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: purchasing_purchase_orders_partial_update
+      summary: Actualizar OC (parcial, solo BORRADOR)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPurchaseOrderUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPurchaseOrderUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPurchaseOrderUpdateRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '405':
+          description: Método no permitido o registro inmutable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/purchasing/purchase-orders/{id}/cancel/:
+    post:
+      operationId: purchasing_purchase_orders_cancel_create
+      summary: Cancelar OC
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/POCancelRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/POCancelRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/POCancelRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/purchasing/purchase-orders/{id}/confirm/:
+    post:
+      operationId: purchasing_purchase_orders_confirm_create
+      summary: Confirmar OC (BORRADOR → PENDIENTE)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/purchasing/receptions/:
+    get:
+      operationId: purchasing_receptions_list
+      summary: Listar recepciones
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      tags:
+      - purchasing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReceptionList'
+          description: ''
+    post:
+      operationId: purchasing_receptions_create
+      summary: Crear recepción en BORRADOR
+      tags:
+      - purchasing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReceptionCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReceptionCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReceptionCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reception'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/purchasing/receptions/{id}/:
+    get:
+      operationId: purchasing_receptions_retrieve
+      summary: Detalle de recepción
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reception'
+          description: ''
+  /api/v1/purchasing/receptions/{id}/cancel/:
+    post:
+      operationId: purchasing_receptions_cancel_create
+      summary: Cancelar recepción (solo BORRADOR)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reception'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '405':
+          description: Método no permitido o registro inmutable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/purchasing/receptions/{id}/confirm/:
+    post:
+      operationId: purchasing_receptions_confirm_create
+      summary: Confirmar recepción (genera Movements de ENTRADA)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reception'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '405':
+          description: Método no permitido o registro inmutable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/purchasing/suppliers/:
+    get:
+      operationId: purchasing_suppliers_list
+      summary: Listar proveedores
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      tags:
+      - purchasing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSupplierList'
+          description: ''
+    post:
+      operationId: purchasing_suppliers_create
+      summary: Crear proveedor
+      tags:
+      - purchasing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupplierWriteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SupplierWriteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SupplierWriteRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/purchasing/suppliers/{id}/:
+    get:
+      operationId: purchasing_suppliers_retrieve
+      summary: Detalle de proveedor
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+          description: ''
+    put:
+      operationId: purchasing_suppliers_update
+      summary: Actualizar proveedor (completo)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupplierWriteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SupplierWriteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SupplierWriteRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: purchasing_suppliers_partial_update
+      summary: Actualizar proveedor (parcial)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSupplierWriteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSupplierWriteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSupplierWriteRequest'
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: purchasing_suppliers_destroy
+      description: Marca el proveedor como inactivo (is_active=False). El registro
+        NO se elimina de la base de datos. Para reactivar, use POST /suppliers/{id}/activate/.
+      summary: Desactivar proveedor (soft delete)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/purchasing/suppliers/{id}/activate/:
+    post:
+      operationId: purchasing_suppliers_activate_create
+      summary: Reactivar proveedor
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+          description: ''
+  /api/v1/purchasing/suppliers/{id}/deactivate/:
+    post:
+      operationId: purchasing_suppliers_deactivate_create
+      summary: Desactivar proveedor
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+          description: ''
   /api/v1/reports/data/:
     get:
       operationId: reports_data_retrieve
@@ -7250,6 +8488,11 @@ components:
         quantity:
           type: integer
           minimum: 1
+        serial_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: UUID del ProductSerial.
       required:
       - destination_id
       - movement_id
@@ -7269,6 +8512,10 @@ components:
           minimum: 0
         justification:
           type: string
+        serial_number:
+          type: string
+          nullable: true
+          description: Número de serie del equipo a ajustar.
       required:
       - justification
       - location_id
@@ -7415,6 +8662,61 @@ components:
       - metadata
       - movement
       - user
+    Brand:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        slug:
+          type: string
+          maxLength: 128
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de creación (UTC).
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de última modificación (UTC).
+      required:
+      - created_at
+      - id
+      - name
+      - slug
+      - updated_at
+    BrandCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          default: ''
+      required:
+      - name
+    BrandUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        is_active:
+          type: boolean
     CapacityModeEnum:
       enum:
       - none
@@ -7508,6 +8810,26 @@ components:
           type: boolean
         is_returnable:
           type: boolean
+    ChangePasswordRequest:
+      type: object
+      description: Cambio de contraseña self-service (RF-001).
+      properties:
+        current_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        new_password_confirm:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - current_password
+      - new_password
+      - new_password_confirm
     Combo:
       type: object
       properties:
@@ -7632,6 +8954,12 @@ components:
           type: string
           format: uuid
           description: UUID de la ubicación desde donde se descuentan los productos.
+        serial_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: UUID del ProductSerial. Obligatorio si algún componente requiere
+            serial.
       required:
       - combo_id
       - location_id
@@ -7710,6 +9038,11 @@ components:
         quantity:
           type: integer
           minimum: 1
+        serial_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: UUID del ProductSerial.
       required:
       - destination_id
       - origin_id
@@ -7904,6 +9237,8 @@ components:
         serial_number:
           type: string
           nullable: true
+          description: Número de serie a despachar. Si se omite, se auto-asigna uno
+            disponible.
         customer_data: {}
         note:
           type: string
@@ -8063,6 +9398,10 @@ components:
       - CATEGORY_UPDATED
       - CATEGORY_DEACTIVATED
       - CATEGORY_ACTIVATED
+      - BRAND_CREATED
+      - BRAND_UPDATED
+      - BRAND_DEACTIVATED
+      - BRAND_ACTIVATED
       - SUBCATEGORY_CREATED
       - SUBCATEGORY_UPDATED
       - SUBCATEGORY_DEACTIVATED
@@ -8075,6 +9414,26 @@ components:
       - MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD
       - INVOICE_GENERATED
       - DISPATCH_WITH_PRICE_COMPLETED
+      - SUPPLIER_CREATED
+      - SUPPLIER_UPDATED
+      - SUPPLIER_DEACTIVATED
+      - SUPPLIER_ACTIVATED
+      - PURCHASE_ORDER_CREATED
+      - PURCHASE_ORDER_CONFIRMED
+      - PURCHASE_ORDER_CANCELLED
+      - RECEPTION_CREATED
+      - RECEPTION_CONFIRMED
+      - RECEPTION_CANCELLED
+      - LOCATION_CREATED
+      - LOCATION_MODIFIED
+      - WEBHOOK_ENDPOINT_CHANGED
+      - STOCK_THRESHOLD_UPDATED
+      - ALERT_RESOLVED
+      - PURCHASE_ORDER_UPDATED
+      - BATCH_JOB_EXECUTED
+      - PASSWORD_CHANGED
+      - PASSWORD_RESET_REQUESTED
+      - PASSWORD_RESET_COMPLETED
       type: string
       description: |-
         * `LOGIN_SUCCESS` - Login exitoso
@@ -8103,6 +9462,10 @@ components:
         * `CATEGORY_UPDATED` - Categoría de catálogo actualizada
         * `CATEGORY_DEACTIVATED` - Categoría de catálogo desactivada
         * `CATEGORY_ACTIVATED` - Categoría de catálogo reactivada
+        * `BRAND_CREATED` - Marca de catálogo creada
+        * `BRAND_UPDATED` - Marca de catálogo actualizada
+        * `BRAND_DEACTIVATED` - Marca de catálogo desactivada
+        * `BRAND_ACTIVATED` - Marca de catálogo reactivada
         * `SUBCATEGORY_CREATED` - Subcategoría de catálogo creada
         * `SUBCATEGORY_UPDATED` - Subcategoría de catálogo actualizada
         * `SUBCATEGORY_DEACTIVATED` - Subcategoría de catálogo desactivada
@@ -8115,6 +9478,26 @@ components:
         * `MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD` - Intento de modificación sobre registro inmutable
         * `INVOICE_GENERATED` - Factura generada
         * `DISPATCH_WITH_PRICE_COMPLETED` - Despacho con precio completado
+        * `SUPPLIER_CREATED` - Proveedor creado
+        * `SUPPLIER_UPDATED` - Proveedor actualizado
+        * `SUPPLIER_DEACTIVATED` - Proveedor desactivado
+        * `SUPPLIER_ACTIVATED` - Proveedor reactivado
+        * `PURCHASE_ORDER_CREATED` - Orden de compra creada
+        * `PURCHASE_ORDER_CONFIRMED` - Orden de compra confirmada
+        * `PURCHASE_ORDER_CANCELLED` - Orden de compra cancelada
+        * `RECEPTION_CREATED` - Recepción de mercancía creada
+        * `RECEPTION_CONFIRMED` - Recepción de mercancía confirmada
+        * `RECEPTION_CANCELLED` - Recepción de mercancía cancelada
+        * `LOCATION_CREATED` - Ubicación creada
+        * `LOCATION_MODIFIED` - Ubicación modificada
+        * `WEBHOOK_ENDPOINT_CHANGED` - Endpoint webhook modificado
+        * `STOCK_THRESHOLD_UPDATED` - Umbral de stock actualizado
+        * `ALERT_RESOLVED` - Alerta resuelta
+        * `PURCHASE_ORDER_UPDATED` - Orden de compra actualizada
+        * `BATCH_JOB_EXECUTED` - Job batch ejecutado
+        * `PASSWORD_CHANGED` - Contraseña cambiada por el usuario
+        * `PASSWORD_RESET_REQUESTED` - Recuperación de contraseña solicitada
+        * `PASSWORD_RESET_COMPLETED` - Contraseña restablecida exitosamente
     ExpiringLotReportItem:
       type: object
       properties:
@@ -8156,6 +9539,16 @@ components:
       - name
       - product_id
       - sku
+    ForgotPasswordRequest:
+      type: object
+      description: Solicitud de recuperación de contraseña por email (RF-001).
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+      - email
     ICMTokenRefreshRequest:
       type: object
       description: |-
@@ -8899,6 +10292,14 @@ components:
         * `restricted` - Restringida
         * `blocked` - Bloqueada
         * `archived` - Archivada
+    POCancelRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          minLength: 5
+      required:
+      - reason
     PaginatedAlertList:
       type: object
       required:
@@ -8945,6 +10346,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AuditLog'
+    PaginatedBrandList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Brand'
     PaginatedCategoryList:
       type: object
       required:
@@ -9037,7 +10461,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Product'
-    PaginatedSubcategoryList:
+    PaginatedPurchaseOrderList:
       type: object
       required:
       - count
@@ -9059,7 +10483,63 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/Subcategory'
+            $ref: '#/components/schemas/PurchaseOrder'
+    PaginatedReceptionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reception'
+    PaginatedSupplierList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Supplier'
+    PatchedBrandUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        is_active:
+          type: boolean
     PatchedCategoryUpdateRequest:
       type: object
       properties:
@@ -9211,17 +10691,13 @@ components:
         category:
           type: string
           format: uuid
-        subcategory:
+        brand:
           type: string
           format: uuid
           nullable: true
         barcode:
           type: string
           nullable: true
-          maxLength: 100
-        brand:
-          type: string
-          minLength: 1
           maxLength: 100
         expiration_date:
           type: string
@@ -9245,6 +10721,19 @@ components:
           type: integer
           maximum: 2147483647
           minimum: 0
+    PatchedPurchaseOrderUpdateRequest:
+      type: object
+      properties:
+        expected_delivery:
+          type: string
+          format: date
+          nullable: true
+        notes:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseOrderItemWriteRequest'
     PatchedStockThresholdRequest:
       type: object
       description: Actualización de umbral de stock por ubicación (NEW-02).
@@ -9307,15 +10796,38 @@ components:
           type: integer
           minimum: 0
           default: 0
-    PatchedSubcategoryUpdateRequest:
+    PatchedSupplierWriteRequest:
       type: object
       properties:
-        name:
+        nombre_comercial:
           type: string
           minLength: 1
-        category_id:
+          maxLength: 200
+        razon_social:
           type: string
-          format: uuid
+          maxLength: 200
+        nit:
+          type: string
+          nullable: true
+          maxLength: 20
+        pais:
+          type: string
+          minLength: 1
+          maxLength: 100
+        correo:
+          type: string
+          format: email
+        telefono:
+          type: string
+          maxLength: 20
+        ciudad:
+          type: string
+          maxLength: 100
+        direccion:
+          type: string
+          maxLength: 300
+        observaciones:
+          type: string
     PatchedUserRequest:
       type: object
       description: Perfil de usuario (RF-002) — lectura y actualización parcial por
@@ -9348,11 +10860,6 @@ components:
           maxLength: 20
         role:
           $ref: '#/components/schemas/RoleEnum'
-        is_active:
-          type: boolean
-          title: Activo
-          description: Indica si el usuario debe ser tratado como activo. Desmarque
-            esta opción en lugar de borrar la cuenta.
     PatchedWebhookEndpointCreateRequest:
       type: object
       properties:
@@ -9481,7 +10988,7 @@ components:
         category_slug:
           type: string
           readOnly: true
-        subcategory:
+        brand:
           type: string
           format: uuid
           nullable: true
@@ -9493,9 +11000,6 @@ components:
           type: string
           nullable: true
           readOnly: true
-        brand:
-          type: string
-          maxLength: 100
         expiration_date:
           type: string
           format: date
@@ -9615,17 +11119,10 @@ components:
         category_id:
           type: string
           format: uuid
-        subcategory_id:
+        brand_id:
           type: string
           format: uuid
           nullable: true
-        barcode:
-          type: string
-          nullable: true
-        brand:
-          type: string
-          minLength: 1
-          default: Can
         requires_cold_chain:
           type: boolean
           default: false
@@ -9677,7 +11174,7 @@ components:
         category_slug:
           type: string
           readOnly: true
-        subcategory:
+        brand:
           type: string
           format: uuid
           nullable: true
@@ -9689,9 +11186,6 @@ components:
           type: string
           nullable: true
           readOnly: true
-        brand:
-          type: string
-          maxLength: 100
         expiration_date:
           type: string
           format: date
@@ -9835,17 +11329,13 @@ components:
         category:
           type: string
           format: uuid
-        subcategory:
+        brand:
           type: string
           format: uuid
           nullable: true
         barcode:
           type: string
           nullable: true
-          maxLength: 100
-        brand:
-          type: string
-          minLength: 1
           maxLength: 100
         expiration_date:
           type: string
@@ -9873,6 +11363,206 @@ components:
       - category
       - name
       - sku
+    PurchaseOrder:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        number:
+          type: string
+          readOnly: true
+          description: Número secuencial OC-XXXX, generado automáticamente.
+        supplier:
+          type: string
+          format: uuid
+        supplier_nombre:
+          type: string
+          readOnly: true
+        supplier_nit:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PurchaseOrderStatusEnum'
+          readOnly: true
+        expected_delivery:
+          type: string
+          format: date
+          nullable: true
+          description: Fecha estimada de llegada de la mercancía.
+        notes:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseOrderItem'
+          readOnly: true
+        created_by:
+          type: string
+          format: uuid
+        confirmed_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        confirmed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        cancelled_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        cancelled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        cancellation_reason:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de creación (UTC).
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de última modificación (UTC).
+      required:
+      - cancellation_reason
+      - cancelled_at
+      - cancelled_by
+      - confirmed_at
+      - confirmed_by
+      - created_at
+      - created_by
+      - id
+      - items
+      - number
+      - status
+      - supplier
+      - supplier_nit
+      - supplier_nombre
+      - updated_at
+    PurchaseOrderCreateRequest:
+      type: object
+      properties:
+        supplier_id:
+          type: string
+          format: uuid
+        expected_delivery:
+          type: string
+          format: date
+          nullable: true
+        notes:
+          type: string
+          default: ''
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseOrderItemWriteRequest'
+      required:
+      - items
+      - supplier_id
+    PurchaseOrderItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        product:
+          type: string
+          format: uuid
+        product_name:
+          type: string
+          readOnly: true
+        product_sku:
+          type: string
+          readOnly: true
+        quantity_ordered:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          description: Cantidad solicitada al proveedor.
+        quantity_received:
+          type: integer
+          readOnly: true
+          description: Acumulado de unidades recibidas en recepciones confirmadas.
+        quantity_pending:
+          type: integer
+          readOnly: true
+        unit_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          description: Costo unitario acordado con el proveedor.
+        notes:
+          type: string
+          maxLength: 300
+      required:
+      - id
+      - product
+      - product_name
+      - product_sku
+      - quantity_ordered
+      - quantity_pending
+      - quantity_received
+      - unit_cost
+    PurchaseOrderItemWriteRequest:
+      type: object
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        quantity_ordered:
+          type: integer
+          minimum: 1
+        unit_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+        notes:
+          type: string
+          default: ''
+      required:
+      - product_id
+      - quantity_ordered
+      - unit_cost
+    PurchaseOrderStatusEnum:
+      enum:
+      - borrador
+      - pendiente
+      - parcialmente_recibida
+      - completada
+      - cancelada
+      type: string
+      description: |-
+        * `borrador` - Borrador
+        * `pendiente` - Pendiente
+        * `parcialmente_recibida` - Parcialmente recibida
+        * `completada` - Completada
+        * `cancelada` - Cancelada
+    PurchaseOrderUpdateRequest:
+      type: object
+      properties:
+        expected_delivery:
+          type: string
+          format: date
+          nullable: true
+        notes:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseOrderItemWriteRequest'
     QualityOperationalBreakdown:
       type: object
       properties:
@@ -9978,6 +11668,214 @@ components:
       - movement_type
       - movements
       - units
+    Reception:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        purchase_order:
+          type: string
+          format: uuid
+        po_number:
+          type: string
+          readOnly: true
+        supplier_nombre:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ReceptionStatusEnum'
+          readOnly: true
+        destination_location:
+          type: string
+          format: uuid
+        location_name:
+          type: string
+          readOnly: true
+        received_by:
+          type: string
+          format: uuid
+          readOnly: true
+        confirmed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        notes:
+          type: string
+        has_allocations:
+          type: boolean
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReceptionItem'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de creación (UTC).
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de última modificación (UTC).
+      required:
+      - confirmed_at
+      - created_at
+      - destination_location
+      - has_allocations
+      - id
+      - items
+      - location_name
+      - po_number
+      - purchase_order
+      - received_by
+      - status
+      - supplier_nombre
+      - updated_at
+    ReceptionCreateRequest:
+      type: object
+      properties:
+        po_id:
+          type: string
+          format: uuid
+        destination_location_id:
+          type: string
+          format: uuid
+        notes:
+          type: string
+          default: ''
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReceptionItemWriteRequest'
+      required:
+      - destination_location_id
+      - items
+      - po_id
+    ReceptionItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        purchase_order_item:
+          type: string
+          format: uuid
+        product_name:
+          type: string
+          readOnly: true
+        product_sku:
+          type: string
+          readOnly: true
+        quantity_expected:
+          type: integer
+          readOnly: true
+        quantity_received:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        lot_code:
+          type: string
+          maxLength: 100
+        lot_expiration_date:
+          type: string
+          format: date
+          nullable: true
+          description: Fecha de vencimiento del lote recibido.
+        serial_number:
+          type: string
+          nullable: true
+          description: 'BR-04: Número de serie (obligatorio si la categoría lo exige).'
+          maxLength: 100
+        discrepancy_note:
+          type: string
+          description: Obligatorio cuando la cantidad recibida difiere de la esperada.
+        movement_id:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        allocations:
+          type: string
+          readOnly: true
+      required:
+      - allocations
+      - id
+      - movement_id
+      - product_name
+      - product_sku
+      - purchase_order_item
+      - quantity_expected
+      - quantity_received
+    ReceptionItemAllocationWriteRequest:
+      type: object
+      properties:
+        location_id:
+          type: string
+          format: uuid
+        quantity_received:
+          type: integer
+          minimum: 1
+        lot_code:
+          type: string
+          default: ''
+        lot_expiration_date:
+          type: string
+          format: date
+          nullable: true
+        serial_number:
+          type: string
+          nullable: true
+      required:
+      - location_id
+      - quantity_received
+    ReceptionItemWriteRequest:
+      type: object
+      properties:
+        purchase_order_item_id:
+          type: string
+          format: uuid
+        quantity_received:
+          type: integer
+          minimum: 0
+        lot_code:
+          type: string
+          default: ''
+        lot_expiration_date:
+          type: string
+          format: date
+          nullable: true
+        serial_number:
+          type: string
+          nullable: true
+        discrepancy_note:
+          type: string
+          default: ''
+        allocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReceptionItemAllocationWriteRequest'
+          description: Distribución avanzada opcional. Cada fila puede indicar ubicación,
+            lote y cantidad.
+      required:
+      - purchase_order_item_id
+      - quantity_received
+    ReceptionStatusEnum:
+      enum:
+      - borrador
+      - confirmada
+      - cancelada
+      type: string
+      description: |-
+        * `borrador` - Borrador
+        * `confirmada` - Confirmada
+        * `cancelada` - Cancelada
     ReportDataset:
       type: object
       properties:
@@ -9996,6 +11894,25 @@ components:
       - generated_at
       - report
       - suggested_filename
+    ResetPasswordRequest:
+      type: object
+      description: Restablecimiento de contraseña con token de recuperación (RF-001).
+      properties:
+        token:
+          type: string
+          minLength: 1
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        new_password_confirm:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - new_password
+      - new_password_confirm
+      - token
     ReturnCreateRequest:
       type: object
       properties:
@@ -10015,6 +11932,7 @@ components:
         serial_number:
           type: string
           nullable: true
+          description: Número de serie del equipo a devolver.
         related_movement_id:
           type: string
           format: uuid
@@ -10064,16 +11982,6 @@ components:
         * `MEDIUM` - Medio
         * `LOW` - Bajo
         * `INFO` - Informativo
-    StatusEnum:
-      enum:
-      - PENDING
-      - DELIVERED
-      - FAILED
-      type: string
-      description: |-
-        * `PENDING` - Pendiente
-        * `DELIVERED` - Entregado
-        * `FAILED` - Fallido
     StockByLocation:
       type: object
       properties:
@@ -10337,25 +12245,44 @@ components:
       required:
       - code
       - name
-    Subcategory:
+    Supplier:
       type: object
       properties:
         id:
           type: string
           format: uuid
           readOnly: true
-        category:
+        nombre_comercial:
           type: string
-          format: uuid
-        name:
+          maxLength: 200
+        razon_social:
           type: string
-          maxLength: 128
-        slug:
+          maxLength: 200
+        nit:
           type: string
-          maxLength: 128
-          pattern: ^[-a-zA-Z0-9_]+$
+          nullable: true
+          description: NIT del proveedor incluyendo dígito de verificación.
+          maxLength: 20
+        pais:
+          type: string
+          maxLength: 100
+        correo:
+          type: string
+          format: email
+          maxLength: 254
+        telefono:
+          type: string
+          maxLength: 20
+        ciudad:
+          type: string
+          maxLength: 100
+        direccion:
+          type: string
+          maxLength: 300
         is_active:
           type: boolean
+        observaciones:
+          type: string
         created_at:
           type: string
           format: date-time
@@ -10367,33 +12294,152 @@ components:
           readOnly: true
           description: Fecha y hora de última modificación (UTC).
       required:
-      - category
       - created_at
       - id
-      - name
-      - slug
+      - nombre_comercial
+      - pais
+      - razon_social
       - updated_at
-    SubcategoryCreateRequest:
+    SupplierWriteRequest:
       type: object
       properties:
-        category_id:
-          type: string
-          format: uuid
-        name:
+        nombre_comercial:
           type: string
           minLength: 1
+          maxLength: 200
+        razon_social:
+          type: string
+          maxLength: 200
+        nit:
+          type: string
+          nullable: true
+          maxLength: 20
+        pais:
+          type: string
+          minLength: 1
+          maxLength: 100
+        correo:
+          type: string
+          format: email
+        telefono:
+          type: string
+          maxLength: 20
+        ciudad:
+          type: string
+          maxLength: 100
+        direccion:
+          type: string
+          maxLength: 300
+        observaciones:
+          type: string
       required:
-      - category_id
-      - name
-    SubcategoryUpdateRequest:
+      - nombre_comercial
+      - pais
+    TemporaryAccessPermit:
       type: object
       properties:
-        name:
-          type: string
-          minLength: 1
-        category_id:
+        id:
           type: string
           format: uuid
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+          readOnly: true
+        user_username:
+          type: string
+          readOnly: true
+        start_datetime:
+          type: string
+          format: date-time
+        end_datetime:
+          type: string
+          format: date-time
+        allow_24_7:
+          type: boolean
+        custom_morning_start:
+          type: string
+          format: time
+          nullable: true
+        custom_morning_end:
+          type: string
+          format: time
+          nullable: true
+        custom_afternoon_start:
+          type: string
+          format: time
+          nullable: true
+        custom_afternoon_end:
+          type: string
+          format: time
+          nullable: true
+        reason:
+          type: string
+        granted_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        granted_by_username:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - end_datetime
+      - granted_by
+      - granted_by_username
+      - id
+      - reason
+      - start_datetime
+      - updated_at
+      - user
+      - user_username
+    TemporaryAccessPermitRequest:
+      type: object
+      properties:
+        start_datetime:
+          type: string
+          format: date-time
+        end_datetime:
+          type: string
+          format: date-time
+        allow_24_7:
+          type: boolean
+        custom_morning_start:
+          type: string
+          format: time
+          nullable: true
+        custom_morning_end:
+          type: string
+          format: time
+          nullable: true
+        custom_afternoon_start:
+          type: string
+          format: time
+          nullable: true
+        custom_afternoon_end:
+          type: string
+          format: time
+          nullable: true
+        reason:
+          type: string
+          minLength: 1
+        is_active:
+          type: boolean
+      required:
+      - end_datetime
+      - reason
+      - start_datetime
     TopDispatchedProduct:
       type: object
       properties:
@@ -10430,6 +12476,10 @@ components:
           type: string
           format: uuid
           nullable: true
+        serial_number:
+          type: string
+          nullable: true
+          description: Número de serie a transferir. Se auto-asigna si se omite.
         cold_chain_acknowledged:
           type: boolean
           default: false
@@ -10477,6 +12527,7 @@ components:
           $ref: '#/components/schemas/RoleEnum'
         is_active:
           type: boolean
+          readOnly: true
           title: Activo
           description: Indica si el usuario debe ser tratado como activo. Desmarque
             esta opción en lugar de borrar la cuenta.
@@ -10488,6 +12539,10 @@ components:
         created_by:
           type: string
           format: uuid
+          readOnly: true
+          nullable: true
+        created_by_username:
+          type: string
           readOnly: true
           nullable: true
         created_at:
@@ -10507,8 +12562,10 @@ components:
       required:
       - created_at
       - created_by
+      - created_by_username
       - email
       - id
+      - is_active
       - is_staff
       - last_login
       - role
@@ -10578,15 +12635,73 @@ components:
           maxLength: 20
         role:
           $ref: '#/components/schemas/RoleEnum'
-        is_active:
-          type: boolean
-          title: Activo
-          description: Indica si el usuario debe ser tratado como activo. Desmarque
-            esta opción en lugar de borrar la cuenta.
       required:
       - email
       - role
       - username
+    UserSchedule:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+          readOnly: true
+        morning_start:
+          type: string
+          format: time
+          nullable: true
+        morning_end:
+          type: string
+          format: time
+          nullable: true
+        afternoon_start:
+          type: string
+          format: time
+          nullable: true
+        afternoon_end:
+          type: string
+          format: time
+          nullable: true
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - updated_at
+      - user
+    UserScheduleRequest:
+      type: object
+      properties:
+        morning_start:
+          type: string
+          format: time
+          nullable: true
+        morning_end:
+          type: string
+          format: time
+          nullable: true
+        afternoon_start:
+          type: string
+          format: time
+          nullable: true
+        afternoon_end:
+          type: string
+          format: time
+          nullable: true
+        is_active:
+          type: boolean
     WarehouseUtilizationLocation:
       type: object
       properties:
@@ -10740,7 +12855,7 @@ components:
           readOnly: true
         status:
           allOf:
-          - $ref: '#/components/schemas/StatusEnum'
+          - $ref: '#/components/schemas/WebhookDeliveryStatusEnum'
           readOnly: true
         attempts:
           type: integer
@@ -10775,6 +12890,16 @@ components:
       - next_retry_at
       - response_code
       - status
+    WebhookDeliveryStatusEnum:
+      enum:
+      - PENDING
+      - DELIVERED
+      - FAILED
+      type: string
+      description: |-
+        * `PENDING` - Pendiente
+        * `DELIVERED` - Entregado
+        * `FAILED` - Fallido
     WebhookEndpoint:
       type: object
       properties:
