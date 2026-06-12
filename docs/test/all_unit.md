@@ -10505,7 +10505,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_combo_dispatch.py::test_dispatch_combo_electro_with_serial_succeeds -v
 ```
 
-Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 187)
+Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 185)
 
 
 ---
@@ -10721,7 +10721,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_combo_dispatch.py::test_dispatch_combo_with_mixed_products_serial_not_required -v
 ```
 
-Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 213)
+Código fuente: [apps/movements/tests/test_combo_dispatch.py](../../apps/movements/tests/test_combo_dispatch.py) (aprox. línea 209)
 
 
 ---
@@ -11837,7 +11837,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_adjustment_downwards_without_serial_optional_when_not_required -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 1036)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 1033)
 
 
 ---
@@ -11873,7 +11873,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_adjustment_electroterapia_without_serial_fails -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 998)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 997)
 
 
 ---
@@ -11909,7 +11909,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_adjustment_requires_justification -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 236)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 241)
 
 
 ---
@@ -11945,7 +11945,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_adjustment_with_serial_persists -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 1016)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 1015)
 
 
 ---
@@ -11981,7 +11981,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_correct_entrada_within_window -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 668)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 673)
 
 
 ---
@@ -12017,7 +12017,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_correct_movement_outside_window_raises -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 775)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 780)
 
 
 ---
@@ -12053,7 +12053,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_correct_salida_within_window -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 718)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 723)
 
 
 ---
@@ -12089,7 +12089,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_correction_within_window_creates_reversal_and_fixed -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 270)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 275)
 
 
 ---
@@ -12125,7 +12125,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_chooses_earliest_lot_when_expiring_product -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 81)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 86)
 
 
 ---
@@ -12161,7 +12161,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_consumes_across_multiple_lots -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 296)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 301)
 
 
 ---
@@ -12197,7 +12197,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_cross_validation_fails_wrong_sku -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 174)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 179)
 
 
 ---
@@ -12233,7 +12233,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_fails_when_origin_is_archived -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 511)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 516)
 
 
 ---
@@ -12269,7 +12269,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_fails_when_origin_is_restricted -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 578)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 583)
 
 
 ---
@@ -12305,7 +12305,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_fails_when_origin_location_is_in_maintenance -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 418)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 423)
 
 
 ---
@@ -12341,7 +12341,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_raises_insufficient_stock_when_quantity_exceeds_stock -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 820)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 825)
 
 
 ---
@@ -12377,7 +12377,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_raises_insufficient_stock_when_stock_is_zero -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 800)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 805)
 
 
 ---
@@ -12413,7 +12413,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_single_movement_nonexpiring_product -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 376)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 381)
 
 
 ---
@@ -12449,7 +12449,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_allows_destination_in_restricted -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 602)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 607)
 
 
 ---
@@ -12485,7 +12485,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_allows_destination_location_in_maintenance -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 443)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 448)
 
 
 ---
@@ -12521,7 +12521,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_discrepancy_note_required_when_qty_mismatch -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 157)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 162)
 
 
 ---
@@ -12557,7 +12557,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_electroterapia_without_serial_fails -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 141)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 146)
 
 
 ---
@@ -12593,7 +12593,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_fails_when_destination_is_archived -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 491)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 496)
 
 
 ---
@@ -12629,7 +12629,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_increments_stock_and_creates_ledger_record -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 37)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 42)
 
 
 ---
@@ -12665,7 +12665,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_entry_with_lot_persists_lot_on_movement -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 56)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 61)
 
 
 ---
@@ -12701,7 +12701,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_internal_transfer_does_not_change_global_stock -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 196)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 201)
 
 
 ---
@@ -12737,7 +12737,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_internal_transfer_electroterapia_without_serial_fails -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 929)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 934)
 
 
 ---
@@ -12773,7 +12773,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_internal_transfer_fails_when_destination_is_blocked -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 463)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 468)
 
 
 ---
@@ -12809,7 +12809,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_internal_transfer_serial_optional_when_not_required -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 975)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 974)
 
 
 ---
@@ -12845,7 +12845,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_internal_transfer_with_serial_persists -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 951)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 954)
 
 
 ---
@@ -12881,7 +12881,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_normalize_serial_empty_string -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 869)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 874)
 
 
 ---
@@ -12917,7 +12917,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_normalize_serial_none -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 864)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 869)
 
 
 ---
@@ -12953,7 +12953,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_normalize_serial_preserves_content -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 884)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 889)
 
 
 ---
@@ -12989,7 +12989,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_normalize_serial_strips_whitespace -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 879)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 884)
 
 
 ---
@@ -13025,7 +13025,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_normalize_serial_whitespace_only -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 874)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 879)
 
 
 ---
@@ -13061,7 +13061,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_register_entry_raises_lot_code_required_for_expiring_product -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 622)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 627)
 
 
 ---
@@ -13097,7 +13097,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_register_entry_raises_lot_expiration_date_required -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 643)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 648)
 
 
 ---
@@ -13133,7 +13133,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_register_entry_rolls_back_on_movement_save_failure -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 840)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 845)
 
 
 ---
@@ -13169,7 +13169,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_return_blocked_for_non_returnable_category -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 224)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 229)
 
 
 ---
@@ -13205,7 +13205,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_return_fails_when_destination_is_archived -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 535)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 540)
 
 
 ---
@@ -13241,7 +13241,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_return_fails_when_destination_is_blocked -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 555)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 560)
 
 
 ---
@@ -13277,7 +13277,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_stock_can_be_reconstructed_from_ledger -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 248)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 253)
 
 
 ---
@@ -13313,7 +13313,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_validate_serial_required_passes_when_not_required -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 920)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 925)
 
 
 ---
@@ -13349,7 +13349,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_validate_serial_required_passes_with_serial -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 913)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 918)
 
 
 ---
@@ -13385,7 +13385,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_validate_serial_required_raises_when_empty -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 897)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 902)
 
 
 ---
@@ -13421,7 +13421,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_validate_serial_required_raises_when_missing -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 889)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 894)
 
 
 ---
@@ -13457,7 +13457,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_validate_serial_required_raises_when_whitespace -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 905)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 910)
 
 
 ---
