@@ -36,6 +36,10 @@ class AuditEventType(models.TextChoices):
     CATEGORY_UPDATED = "CATEGORY_UPDATED", "Categoría de catálogo actualizada"
     CATEGORY_DEACTIVATED = "CATEGORY_DEACTIVATED", "Categoría de catálogo desactivada"
     CATEGORY_ACTIVATED = "CATEGORY_ACTIVATED", "Categoría de catálogo reactivada"
+    BRAND_CREATED = "BRAND_CREATED", "Marca de catálogo creada"
+    BRAND_UPDATED = "BRAND_UPDATED", "Marca de catálogo actualizada"
+    BRAND_DEACTIVATED = "BRAND_DEACTIVATED", "Marca de catálogo desactivada"
+    BRAND_ACTIVATED = "BRAND_ACTIVATED", "Marca de catálogo reactivada"
     SUBCATEGORY_CREATED = "SUBCATEGORY_CREATED", "Subcategoría de catálogo creada"
     SUBCATEGORY_UPDATED = "SUBCATEGORY_UPDATED", "Subcategoría de catálogo actualizada"
     SUBCATEGORY_DEACTIVATED = (
