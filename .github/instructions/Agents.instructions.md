@@ -152,7 +152,7 @@ Regla: cada vez que cambia la estructura del proyecto (añadir/quitar carpetas t
 - Comando recomendado (genera/actualiza `docs/README_ARQUITECTURA.md`):
 
 ```bash
-python scripts/generate_project_structure.py
+python scripts/project_structure/generate_project_structure.py
 ```
 
 - Incluir los cambios generados por este script en el mismo commit que modifica la estructura del proyecto.
@@ -160,7 +160,7 @@ python scripts/generate_project_structure.py
 Checklist rápido antes de `git push` cuando tocas tests o estructura:
 
 - Ejecutaste `python -m scripts.generate_docs` (o `python scripts/parse_ers_gherkin.py`) si cambiaste tests/gherkin
-- Ejecutaste `python scripts/generate_project_structure.py` si cambiaste la estructura del repo
+- Ejecutaste `python scripts/project_structure/generate_project_structure.py` si cambiaste la estructura del repo
 - Añadiste los archivos generados al `git add` y están incluidos en el mismo commit
 - En la descripción del PR listaste explícitamente los comandos usados para regenerar la documentación
 

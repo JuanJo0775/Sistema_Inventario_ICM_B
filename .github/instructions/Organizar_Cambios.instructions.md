@@ -103,7 +103,7 @@ python scripts/parse_ers_gherkin.py
 - Si modificas la estructura del proyecto (mover/renombrar apps, añadir/quitar carpetas top-level) ejecuta:
 
 ```bash
-python scripts/generate_project_structure.py
+python scripts/project_structure/generate_project_structure.py
 ```
 
     Esto actualiza `docs/README_ARQUITECTURA.md` y otros artefactos relacionados. Incluir los archivos generados en el mismo commit.

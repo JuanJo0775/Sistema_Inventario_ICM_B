@@ -2,6 +2,23 @@
 
 Instrucciones para asistentes de código (GitHub Copilot, Cursor, Antigravity, Windsurf, etc.).
 
+## graphify — REGLA OBLIGATORIA
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+**OBLIGATORIO: Antes de leer cualquier archivo fuente manualmente, SIEMPRE consultar el grafo primero. Leer archivos directamente solo cuando el grafo no devuelva suficiente contexto. Esto aplica sin excepción para ahorrar tokens.**
+
+Rules:
+- **PASO 1 SIEMPRE**: Para cualquier pregunta sobre el código, ejecutar `graphify query "<pregunta>"` si graphify-out/graph.json existe. NUNCA abrir archivos fuente antes de hacer esta consulta.
+- Usar `graphify path "<A>" "<B>"` para entender relaciones entre módulos/clases. No hacer grep ni leer archivos para esto.
+- Usar `graphify explain "<concepto>"` para entender un módulo o concepto concreto antes de leer su código.
+- Si graphify-out/wiki/index.md existe, navegar por él para orientación general en vez de explorar directorios manualmente.
+- Leer graphify-out/GRAPH_REPORT.md solo para revisión de arquitectura amplia o cuando query/path/explain no den suficiente contexto.
+- Leer archivos fuente directamente SOLO cuando: (a) el grafo no resuelve la duda, o (b) se necesita ver código exacto para una edición puntual.
+- Después de modificar código, ejecutar `graphify update .` para mantener el grafo actualizado (solo AST, sin costo de API).
+
+Propósito: proporcionar una guía rápida y completa en la raíz del repositorio para asistentes de código. Esta versión es un espejo legible de la instrucción canonical en `.github/instructions/Agents.instructions.md`.
+
 Propósito: proporcionar una guía rápida y completa en la raíz del repositorio para asistentes de código. Esta versión es un espejo legible de la instrucción canonical en `.github/instructions/Agents.instructions.md`.
 
 ## Documentación fuente (obligatoria como referencia)
@@ -90,6 +107,12 @@ pytest --cov=apps
 # Formateo y linting
 ruff format apps/ shared/ config/
 ruff check --fix apps/ shared/ config/
+
+# Calidad y seguridad (local)
+python scripts/security/run_security_scan.py                    # todo
+python scripts/security/run_security_scan.py --skip pip-audit   # más rápido
+python scripts/security/run_security_scan.py --only semgrep     # solo semgrep
+python scripts/security/run_security_scan.py --list             # listar herramientas
 ```
 
 ## Configuración de entorno (.env)
@@ -213,7 +236,7 @@ Regla: cada vez que cambia la estructura del proyecto (añadir/quitar carpetas t
 - Comando recomendado (genera/actualiza `docs/README_ARQUITECTURA.md`):
 
 ```bash
-python scripts/generate_project_structure.py
+python scripts/project_structure/generate_project_structure.py
 ```
 
 - Incluir los cambios generados por este script en el mismo commit que modifica la estructura del proyecto.
@@ -221,7 +244,7 @@ python scripts/generate_project_structure.py
 Checklist rápido antes de `git push` cuando tocas tests o estructura:
 
 - Ejecutaste `python -m scripts.generate_docs` (o `python scripts/parse_ers_gherkin.py`) si cambiaste tests/gherkin
-- Ejecutaste `python scripts/generate_project_structure.py` si cambiaste la estructura del repo
+- Ejecutaste `python scripts/project_structure/generate_project_structure.py` si cambiaste la estructura del repo
 - Añadiste los archivos generados al `git add` y están incluidos en el mismo commit
 - En la descripción del PR listaste explícitamente los comandos usados para regenerar la documentación
 
