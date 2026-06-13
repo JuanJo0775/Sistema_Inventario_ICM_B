@@ -42,7 +42,10 @@ from apps.purchasing.services import (
     update_purchase_order,
     update_supplier,
 )
-from shared.exceptions import SerialNumberRequiredError
+from shared.exceptions import (
+    AlertAcknowledgementRequiredError,
+    SerialNumberRequiredError,
+)
 from tests.factories import (
     AlmacenistaFactory,
     ElectroCategoryFactory,
@@ -867,3 +870,180 @@ def test_confirm_reception_with_serial_in_allocation_propagates(
     )
     assert Movement.objects.filter(product=product, serial_number="SN-ALLOC-1").exists()
     assert Movement.objects.filter(product=product, serial_number="SN-ALLOC-2").exists()
+
+
+# ── RF-011: Alert acknowledgement on confirm_reception ──────────────────────
+
+
+@pytest.mark.django_db
+def test_confirm_reception_electro_requires_acknowledgement(almacenista_user):
+    """Electro product WITH serial but WITHOUT ack flags → AlertAcknowledgementRequiredError."""
+    po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="P-ELEC-ACK-01")
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=5
+    )
+    location = LocationFactory(code="bodega-ack-electro")
+    reception = ReceptionFactory(
+        purchase_order=po,
+        destination_location=location,
+        received_by=almacenista_user,
+    )
+    ReceptionItemFactory(
+        reception=reception,
+        purchase_order_item=poi,
+        quantity_received=5,
+        serial_number="SN-REQ-ACK",
+    )
+
+    with pytest.raises(AlertAcknowledgementRequiredError):
+        confirm_reception(almacenista_user, reception.id)
+
+
+@pytest.mark.django_db
+def test_confirm_reception_electro_with_acknowledgement_succeeds(almacenista_user):
+    """Electro product WITH serial AND ack flags → reception confirms OK."""
+    po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="P-ELEC-ACK-02")
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=5
+    )
+    location = LocationFactory(code="bodega-ack-electro-ok")
+    reception = ReceptionFactory(
+        purchase_order=po,
+        destination_location=location,
+        received_by=almacenista_user,
+    )
+    ReceptionItemFactory(
+        reception=reception,
+        purchase_order_item=poi,
+        quantity_received=5,
+        serial_number="SN-ACK-OK",
+    )
+
+    confirm_reception(
+        almacenista_user,
+        reception.id,
+        cold_chain_acknowledged=False,
+        electrical_safety_acknowledged=True,
+    )
+
+    reception.refresh_from_db()
+    assert reception.status == ReceptionStatus.CONFIRMADA
+    movement = Movement.objects.filter(
+        product=product,
+        movement_type=MovementType.ENTRADA,
+    ).first()
+    assert movement is not None
+    assert movement.serial_number == "SN-ACK-OK"
+
+
+@pytest.mark.django_db
+def test_confirm_reception_cold_chain_without_acknowledgement_raises(almacenista_user):
+    """Product with requires_cold_chain=True but no ack → AlertAcknowledgementRequiredError."""
+    po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
+    product = ProductFactory(sku="P-COLD-ACK-01", requires_cold_chain=True)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=5
+    )
+    location = LocationFactory(code="bodega-cold-ack")
+    reception = ReceptionFactory(
+        purchase_order=po,
+        destination_location=location,
+        received_by=almacenista_user,
+    )
+    ReceptionItemFactory(
+        reception=reception,
+        purchase_order_item=poi,
+        quantity_received=5,
+    )
+
+    with pytest.raises(AlertAcknowledgementRequiredError):
+        confirm_reception(almacenista_user, reception.id)
+
+
+@pytest.mark.django_db
+def test_confirm_reception_cold_chain_with_acknowledgement_succeeds(almacenista_user):
+    """Product with requires_cold_chain=True WITH ack → reception confirms OK."""
+    po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
+    product = ProductFactory(sku="P-COLD-ACK-02", requires_cold_chain=True)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=5
+    )
+    location = LocationFactory(code="bodega-cold-ack-ok")
+    reception = ReceptionFactory(
+        purchase_order=po,
+        destination_location=location,
+        received_by=almacenista_user,
+    )
+    ReceptionItemFactory(
+        reception=reception,
+        purchase_order_item=poi,
+        quantity_received=5,
+    )
+
+    confirm_reception(
+        almacenista_user,
+        reception.id,
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=False,
+    )
+
+    reception.refresh_from_db()
+    assert reception.status == ReceptionStatus.CONFIRMADA
+
+
+@pytest.mark.django_db
+def test_confirm_reception_allocations_with_acknowledgement_succeeds(almacenista_user):
+    """Allocation path + Electro product WITH ack flags → allocs confirm OK."""
+    po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="P-ELEC-ALLOC-ACK")
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=10
+    )
+    b1 = LocationFactory(code="bodega-alloc-ack-1")
+    b2 = LocationFactory(code="bodega-alloc-ack-2")
+
+    reception = create_reception(
+        almacenista_user,
+        po.id,
+        {
+            "destination_location_id": b1.id,
+            "items": [
+                {
+                    "purchase_order_item_id": poi.id,
+                    "quantity_received": 10,
+                    "serial_number": "SN-ALLOC-ACK",
+                    "allocations": [
+                        {
+                            "location_id": b1.id,
+                            "quantity_received": 6,
+                        },
+                        {
+                            "location_id": b2.id,
+                            "quantity_received": 4,
+                        },
+                    ],
+                }
+            ],
+        },
+    )
+
+    confirm_reception(
+        almacenista_user,
+        reception.id,
+        cold_chain_acknowledged=False,
+        electrical_safety_acknowledged=True,
+    )
+
+    reception.refresh_from_db()
+    assert reception.status == ReceptionStatus.CONFIRMADA
+    assert (
+        Movement.objects.filter(
+            product=product, movement_type=MovementType.ENTRADA
+        ).count()
+        == 2
+    )

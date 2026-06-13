@@ -303,6 +303,11 @@ class ReceptionSerializer(serializers.ModelSerializer):
         )
 
 
+class ReceptionConfirmSerializer(serializers.Serializer):
+    cold_chain_acknowledged = serializers.BooleanField(default=False)
+    electrical_safety_acknowledged = serializers.BooleanField(default=False)
+
+
 class ReceptionCreateSerializer(serializers.Serializer):
     po_id = serializers.UUIDField()
     destination_location_id = serializers.UUIDField()

@@ -505,7 +505,12 @@ def create_reception(
 
 @transaction.atomic
 def confirm_reception(
-    executor: Any, reception_id: uuid.UUID, *, request: Any = None
+    executor: Any,
+    reception_id: uuid.UUID,
+    *,
+    request: Any = None,
+    cold_chain_acknowledged: bool = False,
+    electrical_safety_acknowledged: bool = False,
 ) -> Reception:
     """
     RF-005 / BR-11 — BORRADOR → CONFIRMADA.
@@ -603,6 +608,8 @@ def confirm_reception(
                     qty_invoiced=allocation.quantity_received,
                     discrepancy_note=item.discrepancy_note or None,
                     unit_cost=poi.unit_cost,
+                    cold_chain_acknowledged=cold_chain_acknowledged,
+                    electrical_safety_acknowledged=electrical_safety_acknowledged,
                 )
                 allocation.movement = movement
                 allocation.save(update_fields=["movement", "updated_at"])
@@ -624,6 +631,8 @@ def confirm_reception(
                 qty_invoiced=item.quantity_received,
                 discrepancy_note=item.discrepancy_note or None,
                 unit_cost=poi.unit_cost,
+                cold_chain_acknowledged=cold_chain_acknowledged,
+                electrical_safety_acknowledged=electrical_safety_acknowledged,
             )
 
             item.movement = movement

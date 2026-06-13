@@ -21,6 +21,7 @@ from .serializers import (
     PurchaseOrderCreateSerializer,
     PurchaseOrderSerializer,
     PurchaseOrderUpdateSerializer,
+    ReceptionConfirmSerializer,
     ReceptionCreateSerializer,
     ReceptionSerializer,
     SupplierSerializer,
@@ -396,6 +397,7 @@ class ReceptionConfirmView(APIView):
 
     @extend_schema(
         summary="Confirmar recepción (genera Movements de ENTRADA)",
+        request=ReceptionConfirmSerializer,
         responses={
             200: ReceptionSerializer,
             **standard_error_responses(
@@ -404,7 +406,16 @@ class ReceptionConfirmView(APIView):
         },
     )
     def post(self, request, pk: UUID):
-        reception = services.confirm_reception(request.user, pk, request=request)
+        ser = ReceptionConfirmSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        reception = services.confirm_reception(
+            request.user,
+            pk,
+            request=request,
+            cold_chain_acknowledged=d.get("cold_chain_acknowledged", False),
+            electrical_safety_acknowledged=d.get("electrical_safety_acknowledged", False),
+        )
         return Response(ReceptionSerializer(selectors.get_reception(reception.id)).data)
 
 

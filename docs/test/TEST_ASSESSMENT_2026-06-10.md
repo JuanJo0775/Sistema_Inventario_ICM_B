@@ -18,6 +18,7 @@
 | 2026-06-11 | 1.3 | Scripts / Herramientas elevado de 8 a 9: nuevos tests para `scripts/parse_ers_gherkin.py` (2 tests, alias y propagación) y `scripts/perf/locustfile.py` (3 tests, importación y estructura). `import_catalog` reemplazado por `seed_db` (ya testeado). |
 | 2026-06-11 | 1.3b | Calidad estática elevado de 8 a 9: bandit y mypy ahora bloqueantes en CI (removidos `continue-on-error: true` y `|| true`). `mypy.ini` extendido de 4 a 9 módulos con `disallow_untyped_defs = True`. |
 | 2026-06-12 | 1.4 | **Validación de ejecución real** (2026-06-12): 758 tests pasan (559 app-level + 19 integración + 131 Gherkin + 35 scripts/aux + 10 shared + 4 concurrencia skippeados en SQLite). 7 escenarios Gherkin skippeados (fuera de alcance frontend RNF001/RNF002). 3 tests de integración seed con timeout/DB thread-sharing (solo en ejecución combinada). Corregido test RF003-S02 (brand_id UUID vs string). Pipeline CI verificado: quality → unit → integration → scenarios → concurrency → load_test. Cobertura app-level: alerts 57, audit 15, auth 84, catalog 84, dashboard 17, inventory 44, movements 99, purchasing 88, reports 46, webhooks 25 = 559 tests. |
+| 2026-06-12 | 1.5 | **Bug fix: acknowledgment flags en confirm_reception** (2026-06-12): `ReceptionConfirmView` ahora acepta `cold_chain_acknowledged` / `electrical_safety_acknowledged` en el body y los reenvía a `register_entry()`. 5 nuevos tests unitarios (purchasing services): electro sin ack → error, electro con ack → OK, cold chain sin ack → error, cold chain con ack → OK, allocs con ack → OK. Cobertura app-level actualizada: purchasing 93, total 564. |
 
 ---
 
@@ -27,7 +28,7 @@
 
 El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas alto** para un sistema backend Django de dominio médico-logístico. La suite de pruebas cubre los contratos funcionales del ERS mediante escenarios Gherkin trazables 1:1, con cobertura técnica adicional de servicios, vistas, concurrencia y carga.
 
-**Ejecución validada 2026-06-12:** 758 tests pasan en ejecución aislada por categoría (559 app-level + 19 integración + 131 Gherkin + 35 scripts/aux + 10 shared + 4 concurrencia skippeados en SQLite). 7 escenarios Gherkin correctamente skippeados (fuera de alcance frontend). 3 tests de seed integration fallan por thread-sharing DB solo en ejecución combinada (conocido, no bloquea CI).
+**Ejecución validada 2026-06-12 (v1.5):** 763 tests pasan en ejecución aislada por categoría (564 app-level + 19 integración + 131 Gherkin + 35 scripts/aux + 10 shared + 4 concurrencia skippeados en SQLite). 7 escenarios Gherkin correctamente skippeados (fuera de alcance frontend). 3 tests de seed integration fallan por thread-sharing DB solo en ejecución combinada (conocido, no bloquea CI).
 
 ### Principales fortalezas
 
@@ -91,7 +92,7 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | Categoría | Ruta | Cantidad | Observaciones |
 |-----------|------|----------|---------------|
 | Fichas de escenarios Gherkin | `docs/test/scenarios/*.md` | 139 fichas | Una por escenario ERS |
-| Fichas de tests unitarios | `docs/test/unit/*.md` + `index.md` | 525 fichas + índice | Auto-generadas por `generate_docs` |
+| Fichas de tests unitarios | `docs/test/unit/*.md` + `index.md` | 547 fichas + índice | Auto-generadas por `generate_docs` |
 | Fichas de tests de integración | `docs/test/integration/*.md` | 24 fichas | Auto-generadas |
 | Metadata JSON de escenarios | `docs/test/gherkin_scenarios.json` | 1 archivo | 138 escenarios parseados |
 | Escenarios fuera de alcance | `docs/test/gherkin_out_of_scope.json` | 1 archivo | 6 escenarios (RNF001, RNF002) |
@@ -137,7 +138,7 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | `reports` | 46 | 7 (RF010) | — | 2 | Alta |
 | `alerts` | 57 | 7 (RF011) | — | 1 | Alta |
 | `audit` | 15 | 8 (RF012) | — | — | Alta |
-| `purchasing` | 88 | 23 (RF019-RF025) | 1 | — | Alta |
+| `purchasing` | 93 | 23 (RF019-RF025) | 1 | — | Alta |
 | `webhooks` | 25 | — | — | — | Media |
 | `dashboard` | 17 | — | — | — | Media-Alta |
 | `shared` (excepciones) | — (indirectos) | 13 (RNF003-RNF006) | — | — | Media |
@@ -204,10 +205,10 @@ apps/webhooks/tests/
 | dashboard | 1 archivo | 17 |
 | inventory | 10 archivos | 44 |
 | movements | 8 archivos | 99 |
-| purchasing | 4 archivos | 88 |
+| purchasing | 4 archivos | 93 |
 | reports | 6 archivos | 46 |
 | webhooks | 4 archivos | 25 |
-| **Total** | **55 archivos** | **559** |
+| **Total** | **55 archivos** | **564** |
 
 #### Cobertura funcional
 
@@ -217,7 +218,7 @@ apps/webhooks/tests/
 - **Selectores:** `test_selectors.py` en inventory, reports y purchasing valida consultas complejas.
 - **Precios y facturación:** `test_product_pricing.py`, `test_combo_pricing.py`, `test_dispatch_pricing.py`, `test_pricing_optional.py`, `test_invoice.py` — 5 archivos especializados.
 - **Alertas especializadas:** `test_new_alert_types.py` (14 tests) cubre los 8 tipos de alerta.
-- **Compras:** `test_services.py` de purchasing tiene 35 tests, el segundo mayor archivo (incluye 4 tests nuevos para `update_purchase_order` con verificación de auditoría).
+- **Compras:** `test_services.py` de purchasing tiene 40 tests, el segundo mayor archivo (incluye 4 tests para `update_purchase_order` con verificación de auditoría + 5 tests para acknowledgment flags en `confirm_reception`).
 
 #### Cobertura técnica
 
@@ -242,7 +243,7 @@ apps/webhooks/tests/
 
 - [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) — 855 líneas
 - [apps/catalog/tests/test_new_endpoints.py](../../apps/catalog/tests/test_new_endpoints.py) — 43 tests, 608 líneas
-- [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) — 31 tests, 658 líneas
+- [apps/purchasing/tests/test_services.py](../../apps/purchasing/tests/test_services.py) — 36 tests, 1050 líneas
 - [apps/dashboard/tests/test_views.py](../../apps/dashboard/tests/test_views.py) — 20 tests, servicio y API
 - [apps/movements/tests/test_location_state_parametrized.py](../../apps/movements/tests/test_location_state_parametrized.py) — 10 tests parametrizados (BR-14)
 - [apps/webhooks/tests/test_commands.py](../../apps/webhooks/tests/test_commands.py) — 3 tests del management command
