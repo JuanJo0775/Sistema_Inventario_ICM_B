@@ -677,7 +677,7 @@ def should_include_file(path: Path, root: Path, config: TreeConfig) -> bool:
     if is_excluded(path, root, config):
         return False
     rel = rel_key(path, root)
-    if rel == "scripts/generate_project_structure.py":
+    if rel == "scripts/project_structure/generate_project_structure.py":
         return False
     if rel == DERIVED_REPORT_REL:
         return False

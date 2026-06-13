@@ -5,9 +5,14 @@ Base previa: icm_backend
 Actual: icm_backend
 
 ## Resumen
-- Nuevos nodos relevantes: 0
-- Eliminados: 0
+- Nuevos nodos relevantes: 2
+- Eliminados: 2
 - Reorganizaciones: 0
 
-## Estado
-- Sin cambios estructurales relevantes detectados respecto al README actual.
+## Altas relevantes
+- scripts/security/
+- scripts/security/run_security_scan.py
+
+## Bajas relevantes
+- scripts/project_structure/
+- scripts/project_structure/generate_project_structure.py

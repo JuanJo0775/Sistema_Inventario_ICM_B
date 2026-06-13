@@ -9,6 +9,7 @@ Agrupar y explicar las automatizaciones reutilizables que facilitan:
 - Sincronizar la documentación arquitectónica con la estructura real del proyecto.
 - Regenerar la documentación de tests y mantener trazabilidad ERS ↔ Gherkin.
 - Generar reportes compactos sobre la estructura del proyecto.
+- Ejecutar escaneos integrales de calidad y seguridad (ruff, semgrep, bandit, pip-audit, mypy).
 - Proporcionar helpers y pipelines idempotentes para generación de artefactos.
 
 ## Requisitos previos
@@ -103,7 +104,24 @@ python scripts/seed_db/run.py --force
 
 - Salida: resumen con conteo de categorías, marcas, productos, OC, movimientos por tipo, stock por ubicación y escenarios disponibles.
 
-5) create_almacenista (management command)
+5) run_security_scan.py (calidad y seguridad integral)
+
+- Propósito: ejecuta de forma secuencial las herramientas de calidad del proyecto: **ruff** (lint + format), **semgrep** (SAST), **bandit** (SAST), **pip-audit** (supply-chain) y **mypy** (tipado estático). Genera un reporte consolidado en `scripts/security/reports/`.
+- Requisito: tener instaladas las herramientas (`pip install -r requirements/base.txt`).
+- Soporta selección granular con `--only`, `--skip`, `--ci`, `--list` y `--dry-run`.
+- Uso:
+
+```bash
+python scripts/security/run_security_scan.py                  # todas las herramientas
+python scripts/security/run_security_scan.py --only ruff      # solo ruff (lint + format)
+python scripts/security/run_security_scan.py --only semgrep   # solo semgrep
+python scripts/security/run_security_scan.py --skip mypy      # todas menos mypy
+python scripts/security/run_security_scan.py --list           # listar herramientas disponibles
+python scripts/security/run_security_scan.py --ci             # modo CI (compacto)
+python scripts/security/run_security_scan.py --dry-run        # modo simulación
+```
+
+6) create_almacenista (management command)
 
 - Propósito: crea el usuario almacenista inicial del sistema con las credenciales definidas en las variables de entorno `ALMACENISTA_USERNAME`, `ALMACENISTA_EMAIL`, `ALMACENISTA_PASSWORD` del archivo `.env`. Es idempotente: si el usuario ya existe, no hace nada.
 - Dependencia: requiere que `ALMACENISTA_PASSWORD` esté configurada en `.env` (no puede estar vacía).
@@ -135,7 +153,7 @@ python manage.py create_almacenista
 python scripts/project_structure/generate_project_structure.py --dry-run
 python scripts/project_structure/generate_project_structure.py
 git add docs/README_ARQUITECTURA.md scripts/project_structure/project_structure_report.md
-git commit -m "docs: actualizar arquitectura desde scripts/generate_project_structure"
+git commit -m "docs: actualizar arquitectura desde scripts/project_structure/generate_project_structure"
 ```
 
 - Extraer escenarios Gherkin y revisar artefactos:
