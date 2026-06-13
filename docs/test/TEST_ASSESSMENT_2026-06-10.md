@@ -2,7 +2,7 @@
 ## Sistema Inventario ICM — Backend Django
 
 **Fecha de emisión:** 2026-06-10  
-**Última actualización:** 2026-06-12  
+**Última actualización:** 2026-06-13 (v2.0)  
 **Rama analizada:** `staging`  
 **Rama de producción:** `main`  
 **Ruta del proyecto:** `c:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM`  
@@ -19,6 +19,8 @@
 | 2026-06-11 | 1.3b | Calidad estática elevado de 8 a 9: bandit y mypy ahora bloqueantes en CI (removidos `continue-on-error: true` y `|| true`). `mypy.ini` extendido de 4 a 9 módulos con `disallow_untyped_defs = True`. |
 | 2026-06-12 | 1.4 | **Validación de ejecución real** (2026-06-12): 758 tests pasan (559 app-level + 19 integración + 131 Gherkin + 35 scripts/aux + 10 shared + 4 concurrencia skippeados en SQLite). 7 escenarios Gherkin skippeados (fuera de alcance frontend RNF001/RNF002). 3 tests de integración seed con timeout/DB thread-sharing (solo en ejecución combinada). Corregido test RF003-S02 (brand_id UUID vs string). Pipeline CI verificado: quality → unit → integration → scenarios → concurrency → load_test. Cobertura app-level: alerts 57, audit 15, auth 84, catalog 84, dashboard 17, inventory 44, movements 99, purchasing 88, reports 46, webhooks 25 = 559 tests. |
 | 2026-06-12 | 1.5 | **Bug fix: acknowledgment flags en confirm_reception** (2026-06-12): `ReceptionConfirmView` ahora acepta `cold_chain_acknowledged` / `electrical_safety_acknowledged` en el body y los reenvía a `register_entry()`. 5 nuevos tests unitarios (purchasing services): electro sin ack → error, electro con ack → OK, cold chain sin ack → error, cold chain con ack → OK, allocs con ack → OK. Cobertura app-level actualizada: purchasing 93, total 564. |
+| 2026-06-12 | 1.6 | **Migración ruff + semgrep + security scan integral** (2026-06-12): flake8/isort/black reemplazados por ruff (lint+format+imports). 43 errores de lint corregidos. Semgrep integrado como SAST complementario (290 reglas, 0 hallazgos). `scripts/security/run_security_scan.py` creado con 6 herramientas (ruff, semgrep, bandit, pip-audit, mypy) y soporte `--only/--skip/--ci/--list/--dry-run`. 40 tests del security scan añadidos. Total suite: 814 tests (803 passed). Pipeline CI actualizado: quality gate incluye semgrep, bandit/mypy/ruff todos bloqueantes. |
+| 2026-06-13 | 2.0 | **Auditoría integral y actualización del informe** (2026-06-13): verificación exhaustiva de cada afirmación contra código real. Correcciones: app-level test files 55→56 (auth 7 files), pytest.raises 65→71 app-level, mock/patch refs 78→80, django_db markers 460→457, noqa/type:ignore 21→26, select_for_update 112→66, mypy strict modules 9→10, ICMUser Locust tasks 26→25 (total 33), unit doc files 547→548. Scores validados y mantenidos. |
 
 ---
 
@@ -28,7 +30,7 @@
 
 El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas alto** para un sistema backend Django de dominio médico-logístico. La suite de pruebas cubre los contratos funcionales del ERS mediante escenarios Gherkin trazables 1:1, con cobertura técnica adicional de servicios, vistas, concurrencia y carga.
 
-**Ejecución validada 2026-06-12 (v1.5):** 763 tests pasan en ejecución aislada por categoría (564 app-level + 19 integración + 131 Gherkin + 35 scripts/aux + 10 shared + 4 concurrencia skippeados en SQLite). 7 escenarios Gherkin correctamente skippeados (fuera de alcance frontend). 3 tests de seed integration fallan por thread-sharing DB solo en ejecución combinada (conocido, no bloquea CI).
+**Ejecución validada 2026-06-13 (v2.0):** 803 tests pasan en ejecución aislada por categoría (564 app-level + 19 integración + 131 Gherkin + 75 scripts/aux + 10 shared + 4 concurrencia skippeados en SQLite). 7 escenarios Gherkin correctamente skippeados (fuera de alcance frontend). 3 tests de seed integration fallan por thread-sharing DB solo en ejecución combinada (conocido, no bloquea CI). Total suite: 814 tests en 72 archivos.
 
 ### Principales fortalezas
 
@@ -38,31 +40,31 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 - **Cobertura de invariantes críticas:** inmutabilidad de movimientos, stock no negativo, serial obligatorio para Electroterapia, validación cruzada de despacho, franjas horarias de auxiliar, consistencia de ledger — todos cubiertos por pruebas.
 - **Pruebas de concurrencia reales** sobre PostgreSQL con `SELECT FOR UPDATE`, probando la resistencia a race conditions en stock.
 - **Pruebas de carga integradas** en CI con Locust (10 usuarios, 30 s, 2 roles), modelando tráfico mixto lectura/escritura con cobertura de 19 endpoints de lectura y 7 operaciones de escritura (entradas, despachos, traslados, ajustes, devoluciones, órdenes de compra).
-- **Jerarquía de excepciones de dominio tipada** (`ICMBaseException`) con 63 usos de `pytest.raises`, cubriendo rutas de error.
+- **Jerarquía de excepciones de dominio tipada** (`ICMBaseException`) con 71 usos de `pytest.raises` en app-level (76 total incluyendo tests auxiliares), cubriendo rutas de error.
 - **Documentación autogenerada y verificada en CI** (`scripts/generate_docs --check`), garantizando sincronía entre escenarios ERS, fichas y metadatos.
 - **Factory-boy** para datos de prueba reproducibles, con factories especializadas (`ElectroCategoryFactory`, `ProductFactory`).
 
-### Principales riesgos (actualizado 2026-06-12)
+### Principales riesgos (actualizado 2026-06-13)
 
-- **SAST (bandit) y supply-chain (pip-audit):** `bandit` ahora **es bloqueante** en CI (sin `continue-on-error`). `pip-audit` permanece con `continue-on-error: true` por ser dependencias externas. Hallazgos SAST en código propio detienen el merge.
+- **SAST (semgrep + bandit) y supply-chain (pip-audit):** `semgrep` (290 reglas registry público) y `bandit` son **bloqueantes** en CI (sin `continue-on-error`). `pip-audit` permanece con `continue-on-error: true` por ser dependencias externas. Hallazgos SAST en código propio detienen el merge.
 - **Escenarios RNF001 y RNF002** (responsiveness UI, UX web) declarados `frontend-or-e2e` — no cubiertos en backend (6 escenarios skippeados correctamente).
 - **SLA tests en pytest** son unitarios (SQLite, umbrales generosos) — no sustituyen a los benchmarks de producción sobre PostgreSQL.
-- **mypy es bloqueante** en CI (config `mypy.ini` con `disallow_untyped_defs = True`) — errores de tipado impiden el merge.
+- **ruff, mypy y semgrep son bloqueantes** en CI — errores de linting, tipado y SAST impiden el merge.
 
-### Calificación global (validada ejecución 2026-06-12)
+### Calificación global (validada ejecución 2026-06-13)
 
 | Dimensión | Puntaje | Nota |
 |-----------|---------|------|
-| Unit Testing | 9 / 10 | 559 tests app-level pasan |
+| Unit Testing | 9 / 10 | 564 tests app-level pasan |
 | Integration Testing | 9 / 10 | 19 tests integración pasan |
 | BDD / Gherkin | 10 / 10 | 131 passed, 1 skipped (WeasyPrint), 6 skipped (frontend) |
-| Performance Testing | 10 / 10 | Locust 2 roles, 34 tareas, 8 módulos |
+| Performance Testing | 10 / 10 | Locust 2 roles, 33 tareas, 8 módulos |
 | Concurrency Testing | 9 / 10 | 4 tests (requieren PostgreSQL, skip en SQLite) |
-| CI/CD | **9.5 / 10** | 7 jobs, **bandit/mypy bloqueantes**, pip-audit informativo, cobertura 85% |
-| Calidad estática | **10 / 10** | **ruff/mypy/bandit todos bloqueantes** |
+| CI/CD | **9.5 / 10** | 7 jobs, **ruff/bandit/mypy/semgrep bloqueantes**, pip-audit informativo, cobertura 85% |
+| Calidad estática | **10 / 10** | **ruff/mypy/bandit/semgrep todos bloqueantes** |
 | Cobertura funcional | 10 / 10 | 132 escenarios backend 100% implementados |
-| Cobertura técnica | 9 / 10 | 65 pytest.raises, 78 mocks, 13 parametrize |
-| Scripts / Herramientas | 9 / 10 | 35 tests scripts/aux (6 config seed + 29 gen_docs/structure/parse/perf/shared) |
+| Cobertura técnica | 9 / 10 | 71 pytest.raises (app-level), 80 mocks/patches, 13 parametrize |
+| Scripts / Herramientas | 9 / 10 | 75 tests scripts/aux (6 config seed + 40 security scan + 29 gen_docs/structure/parse/perf/shared) |
 
 **Puntaje consolidado: 9.4 / 10** 
 
@@ -74,13 +76,13 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 
 | Categoría | Ruta | Cantidad | Observaciones |
 |-----------|------|----------|---------------|
-| Tests unitarios / integración (app-level) | `apps/*/tests/test_*.py` | 55 archivos | Un directorio `tests/` por app |
+| Tests unitarios / integración (app-level) | `apps/*/tests/test_*.py` | 56 archivos | Un directorio `tests/` por app |
 | Escenarios ERS/Gherkin — implementaciones | `tests/ers/impl/*.py` | 10 archivos de dominio + 3 de infraestructura | 1 por módulo ERS |
 | Escenarios ERS/Gherkin — runner dinámico | `tests/ers/test_gherkin_dynamic.py` | 1 archivo | Genera 138 tests en tiempo de colección (132 backend: 131 passed + 1 skipped WeasyPrint, 6 frontend skippeados) |
 | Tests de integración general | `tests/integration/` | 3 archivos | API, movimientos FEFO, smoke endpoints |
 | Tests de concurrencia | `tests/concurrency/` | 3 archivos | `test_concurrent_movements.py`, `test_concurrent_receptions.py`, `test_concurrent_transfers.py` |
-| Tests de rendimiento (Locust) | `tests/performance/locustfile.py` | 1 archivo | ICMUser (26 tareas) + AuxiliarUser (8 tareas) — 2 roles, 19 lecturas + 7 escrituras + 2 seed |
-| Tests de scripts auxiliares | `tests/scripts/` (5 archivos) + `tests/shared/` (1 archivo) | 6 archivos | Scripts, validadores y generadores |
+| Tests de rendimiento (Locust) | `tests/performance/locustfile.py` | 1 archivo | ICMUser (25 tareas) + AuxiliarUser (8 tareas) — 2 roles, 33 tareas total |
+| Tests de scripts auxiliares | `tests/scripts/` (6 archivos) + `tests/shared/` (1 archivo) | 7 archivos | Scripts, validadores y generadores |
 | Tests de seed end-to-end | `tests/scripts/test_seed_db.py` | 1 archivo | Solo en PR (postgres) |
 | Script de carga alternativo | `scripts/perf/locustfile.py` | 1 archivo | HealthCheckUser básico |
 | Factories globales | `tests/factories.py` | 1 archivo | User/Product/Location/Lot/Category factories |
@@ -92,7 +94,7 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | Categoría | Ruta | Cantidad | Observaciones |
 |-----------|------|----------|---------------|
 | Fichas de escenarios Gherkin | `docs/test/scenarios/*.md` | 139 fichas | Una por escenario ERS |
-| Fichas de tests unitarios | `docs/test/unit/*.md` + `index.md` | 547 fichas + índice | Auto-generadas por `generate_docs` |
+| Fichas de tests unitarios | `docs/test/unit/*.md` + `index.md` | 548 fichas + índice | Auto-generadas por `generate_docs` |
 | Fichas de tests de integración | `docs/test/integration/*.md` | 24 fichas | Auto-generadas |
 | Metadata JSON de escenarios | `docs/test/gherkin_scenarios.json` | 1 archivo | 138 escenarios parseados |
 | Escenarios fuera de alcance | `docs/test/gherkin_out_of_scope.json` | 1 archivo | 6 escenarios (RNF001, RNF002) |
@@ -108,7 +110,8 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 |-------------|---------|---------------|
 | pytest | `pytest.ini` | `DJANGO_SETTINGS_MODULE=test`, markers, `norecursedirs` excluye `tests/performance` |
 | ruff | `pyproject.toml` | Reemplaza black + isort + flake8; config en `[tool.ruff]` |
-| bandit | CI yml | `-r apps shared -ll`, `continue-on-error: true` |
+| semgrep | `scripts/security/run_security_scan.py` + CI | `--ci` mode, 290 reglas registry público, **bloqueante** |
+| bandit | CI yml | `-r apps shared -ll`, **bloqueante** (sin `continue-on-error`) |
 | pip-audit | CI yml | `--progress=off`, `continue-on-error: true` |
 | pytest-cov | `requirements/base.txt` | `pytest-cov==4.1.0`, genera XML |
 | locust | `requirements/development.txt` | `locust>=2.20` |
@@ -192,13 +195,13 @@ apps/reports/tests/
 apps/webhooks/tests/
 ```
 
-#### Archivos identificados (55 archivos, con función de prueba)
+#### Archivos identificados (56 archivos, con función de prueba)
 
 | App | Archivos | Tests (ejecutados 2026-06-12) |
 |-----|----------|-------|
 | alerts | 6 archivos | 57 |
 | audit | 4 archivos | 15 |
-| authentication | 6 archivos | 84 |
+| authentication | 7 archivos | 84 |
 | catalog | 6 archivos | 84 |
 | dashboard | 1 archivo | 17 |
 | inventory | 10 archivos | 44 |
@@ -206,7 +209,7 @@ apps/webhooks/tests/
 | purchasing | 4 archivos | 93 |
 | reports | 6 archivos | 46 |
 | webhooks | 4 archivos | 25 |
-| **Total** | **55 archivos** | **564** |
+| **Total** | **56 archivos** | **564** |
 
 #### Cobertura funcional
 
@@ -220,11 +223,11 @@ apps/webhooks/tests/
 
 #### Cobertura técnica
 
-- 65 instancias de `pytest.raises` — cobertura de rutas de error.
-- 78 referencias a mocking (`mock`/`patch`/`MagicMock`) — aislamientos de dependencias externas.
+- 71 instancias de `pytest.raises` en app-level (76 total incluyendo tests auxiliares) — cobertura de rutas de error.
+- 80 referencias a mocking (`patch`/`MagicMock`) en app-level — aislamientos de dependencias externas.
 - 13 instancias de `@pytest.mark.parametrize` — bajo uso relativo al tamaño de la suite.
-- 21 supresiones `noqa`/`type: ignore` — supresión muy contenida.
-- `@pytest.mark.django_db` en 460 test functions.
+- 26 supresiones `noqa`/`type: ignore` (21 en producción, 5 en tests) — supresión muy contenida.
+- `@pytest.mark.django_db` en 457 test functions (app-level).
 
 #### Fortalezas
 
@@ -408,9 +411,10 @@ Scripts de automatización con validaciones propias.
 |--------|-----------|--------------|---------------------|
 | `scripts/generate_docs/` | Pipeline de generación de documentación de tests | Sí — `tests/test_generate_docs.py` (12 tests) | 12 passed |
 | `scripts/parse_ers_gherkin.py` | Thin wrapper que delega a generate_docs con --only gherkin | Sí — `tests/test_parse_ers_gherkin.py` (2 tests) | 2 passed |
-| `scripts/generate_project_structure.py` | Regenera árbol de estructura en docs | Sí — `tests/test_generate_project_structure.py` (3 tests) | 3 passed |
+| `scripts/project_structure/generate_project_structure.py` | Regenera árbol de estructura en docs | Sí — `tests/test_generate_project_structure.py` (3 tests) | 3 passed |
 | `scripts/seed_db/` | Seed unificado del sistema (reemplazó a import_catalog) | Sí — `tests/test_seed_db.py` (9 tests: 6 config + 3 integración) | 6 passed (config), 3 timeout/DB thread-sharing (integración, solo en ejecución combinada) |
 | `scripts/perf/locustfile.py` | Locust básico para salud (rol HealthCheckUser) | Sí — `tests/test_perf_locustfile.py` (3 tests) | 3 passed |
+| `scripts/security/run_security_scan.py` | Escaneo integral calidad+seguridad (ruff, semgrep, bandit, pip-audit, mypy); soporta `--only/--skip/--ci/--list/--dry-run` | Sí — `tests/test_run_security_scan.py` (40 tests: ToolsConfig, Sanitize, RunTool, ResolveTools, Parser) | 40 passed |
 | `tests/shared/test_location_validators.py` | Validadores de ubicación | Sí — 10 tests parametrizados | 10 passed |
 
 #### Fortalezas
@@ -454,7 +458,7 @@ scripts/perf/locustfile.py
 config/settings/loadtest.py
 ```
 
-#### Escenarios modelados — ICMUser (almacenista, 5 usuarios)
+#### Escenarios modelados — ICMUser (almacenista, 5 usuarios, 25 tareas)
 
 | Categoría | Tarea | Peso | Endpoint | Tipo |
 |-----------|-------|------|----------|------|
@@ -534,7 +538,7 @@ Todos los payloads de escritura fueron verificados contra los serializers reales
 
 #### Fortalezas
 
-- **2 roles modelados**: almacenista (26 tareas, 19 lectura + 7 escritura) y auxiliar_despacho (8 tareas de lectura) — cubre los dos roles operativos principales.
+- **2 roles modelados**: almacenista (25 tareas, 18 lectura + 7 escritura) y auxiliar_despacho (8 tareas de lectura) — cubre los dos roles operativos principales.
 - **Cobertura multi-módulo**: inventory, movements, catalog, alerts, dashboard, audit, reports y purchasing.
 - **Tráfico mixto realista**: escritura de todos los tipos de movimiento (entrada, despacho, traslado, ajuste, devolución) más órdenes de compra.
 - **Seed bajo demanda**: productos y proveedores se crean automáticamente en `on_start` si no existen, garantizando que las tareas de escritura tengan datos para operar.
@@ -557,7 +561,7 @@ Todos los payloads de escritura fueron verificados contra los serializers reales
 
 #### Calificación: **10 / 10**
 
-La reescritura completa del locustfile elevó la cobertura de carga de un solo rol con 6 tareas a dos roles con 34 tareas distribuidas en 8 módulos. El seed inteligente (productos y proveedores bajo demanda) y el TemporaryAccessPermit para auxiliar resuelven las limitaciones anteriores. Los field names están alineados con los serializers reales.
+La reescritura completa del locustfile elevó la cobertura de carga de un solo rol con 6 tareas a dos roles con 33 tareas distribuidas en 8 módulos. El seed inteligente (productos y proveedores bajo demanda) y el TemporaryAccessPermit para auxiliar resuelven las limitaciones anteriores. Los field names están alineados con los serializers reales.
 
 ---
 
@@ -589,7 +593,7 @@ tests/concurrency/test_concurrent_transfers.py
 - Todos los tests usan `@pytest.mark.django_db(transaction=True)` — transacciones reales, no wrapping.
 - Skip automático en SQLite (vendor check), activación explícita con `RUN_CONCURRENCY_TESTS=1` en CI (PostgreSQL).
 - Cierre de conexiones entre hilos (`connections.close_all()`) para forzar conexión independiente por hilo.
-- Verificación de `select_for_update` en 112 puntos del código de aplicación (evidencia de que el patrón de lock está implementado de forma sistemática).
+- Verificación de `select_for_update` en 66 puntos del código de aplicación (evidencia de que el patrón de lock está implementado de forma sistemática).
 
 #### Ejecución 2026-06-12
 
@@ -632,8 +636,9 @@ Pipeline GitHub Actions con 7 jobs encadenados progresivamente, ejecutado en pus
 #### Topología del pipeline
 
 ```
-quality → unit_tests → integration_tests → scenarios ──────────────────► concurrency_tests → load_test
-                                         └──► seed_db_tests (solo PR)
+quality → unit_tests → integration_tests ──► scenarios ──► concurrency_tests → load_test
+                              │
+                              └──► seed_db_tests (solo PR)
 ```
 
 #### Jobs y sus garantías
@@ -648,16 +653,17 @@ quality → unit_tests → integration_tests → scenarios ───────
 | `concurrency_tests` | Concurrency tests (Postgres) | PostgreSQL 15 | Sí | `junit-concurrency.xml` |
 | `load_test` | Load test (Locust) | PostgreSQL 15 | No (informativo) | `locust-results_*.csv` |
 
-#### Gates del job `quality` (estado real 2026-06-12)
+#### Gates del job `quality` (estado real 2026-06-13)
 
-| Verificación | Herramienta | Bloqueante |
-|-------------|-------------|------------|
+| Verificación | Herramienta / Comando | Bloqueante |
+|-------------|----------------------|------------|
 | Linting | `ruff check apps/ shared/` | Sí |
 | Formato de código | `ruff format --check apps/ shared/` | Sí |
-| SAST | `bandit -r apps shared -ll` | **Sí** (sin `continue-on-error`) |
+| SAST — semgrep | `python scripts/security/run_security_scan.py --ci` | **Sí** (sin `continue-on-error`) |
+| SAST — bandit | `bandit -r apps shared -ll` | **Sí** (sin `continue-on-error`) |
 | Supply chain | `pip-audit --progress=off` | No (`continue-on-error: true`) |
 | Migraciones al día | `makemigrations --check --dry-run` | Sí |
-| Docs en sincronía | `generate_docs --check` | Sí |
+| Docs en sincronía | `python -m scripts.generate_docs --check` | Sí |
 | Type checking | `mypy apps/ shared/ --ignore-missing-imports --no-error-summary` | **Sí** (sin `continue-on-error`) |
 
 #### Fortalezas
@@ -673,17 +679,18 @@ quality → unit_tests → integration_tests → scenarios ───────
 
 - `pip-audit` en `continue-on-error: true` — vulnerabilidades en dependencias no bloquean el merge (aceptable por ser externo).
 - Verificación de cobertura con `--cov-fail-under=85` en `unit_tests`, cubriendo apps.
-- `bandit` y `mypy` ahora **son bloqueantes** en CI — hallazgos SAST y errores de tipado detienen el pipeline.
+- `semgrep`, `bandit` y `mypy` ahora **son bloqueantes** en CI — hallazgos SAST y errores de tipado detienen el pipeline.
 - No existe job de deployment/staging (el README_CICD documenta explícitamente que no hay CD automatizado).
 
 #### Evidencias
 
-- [.github/workflows/ci.yml](.github/workflows/ci.yml) (479 líneas)
+- [.github/workflows/ci.yml](.github/workflows/ci.yml) (477 líneas)
 - [docs/CI/README_CICD.md](../CI/README_CICD.md)
+- [scripts/security/run_security_scan.py](../../scripts/security/run_security_scan.py) — script integral calidad+seguridad (6 herramientas)
 
-#### Calificación: **9 / 10**
+#### Calificación: **9.5 / 10**
 
-Pipeline bien estructurado con progresión lógica. Incluye `--cov-fail-under=85` y **mypy/bandit bloqueantes**. La principal brecha restante es `pip-audit` informativo (dependencias externas).
+Pipeline bien estructurado con progresión lógica. Incluye `--cov-fail-under=85`, **semgrep** como SAST complementario, y **ruff/mypy/bandit/semgrep bloqueantes**. La principal brecha restante es `pip-audit` informativo (dependencias externas).
 
 ---
 
@@ -699,6 +706,7 @@ Herramientas de análisis estático configuradas tanto en el entorno local como 
 |-------------|---------|---------|-----------------|
 | `ruff` | 0.9.0 | Linting + formato + imports (todo-en-uno) | Sí |
 | `mypy` | 1.10.0 | Tipado estático | **Sí** (sin `continue-on-error`) |
+| `semgrep` | latest (pip) | SAST complementario (290 reglas registry público) | **Sí** (sin `continue-on-error`) |
 | `bandit` | (sin versión fijada) | SAST Python | **Sí** (sin `continue-on-error`) |
 | `pip-audit` | (sin versión fijada) | Vulnerabilidades de dependencias | No (`continue-on-error: true`) |
 
@@ -714,13 +722,13 @@ ruff format --check apps/ shared/
 | Herramienta | Función | Impacto de ausencia |
 |-------------|---------|---------------------|
 | `sonarqube` / `sonarcloud` | Análisis de calidad integral | No hay code smell tracking longitudinal |
-| `semgrep` | SAST adicional | Solo bandit cubre SAST |
 
 #### Fortalezas (validado 2026-06-12)
 
 - `ruff` bloqueante en CI garantiza linting + formato + imports uniformes sin discusión.
-- Solo 21 supresiones `noqa`/`type: ignore` en toda la codebase — mínima deuda técnica suprimida.
-- `mypy` es **bloqueante en CI** (config `mypy.ini` con `disallow_untyped_defs = True` en 9 módulos: movements, catalog, inventory, purchasing, authentication, reports, alerts, audit, shared exceptions + location_validators).
+- Solo 26 supresiones `noqa`/`type: ignore` (21 producción + 5 tests) en toda la codebase — mínima deuda técnica suprimida.
+- `mypy` es **bloqueante en CI** (config `mypy.ini` con `disallow_untyped_defs = True` en 10 módulos: movements, catalog, inventory, purchasing, authentication, reports, alerts, audit, shared exceptions, shared location_validators).
+- `semgrep` integrado como SAST complementario con 290 reglas del registry público, ejecutado vía `scripts/security/run_security_scan.py --ci`. **Bloqueante en CI**.
 - `bandit` es **bloqueante en CI** — hallazgos SAST detienen el pipeline (sin `continue-on-error`).
 - `pip-audit` se mantiene como `continue-on-error: true` por ser verificación de dependencias externas.
 
@@ -728,17 +736,19 @@ ruff format --check apps/ shared/
 
 - `pip-audit` como `continue-on-error: true` — vulnerabilidades en dependencias no bloquean el merge (aceptable por ser externo).
 - ruff excluye `*/tests*` — los archivos de test no están sujetos a linting (configurado via `per-file-ignores`).
+- `semgrep` requiere `semgrep login` para reglas adicionales gratuitas; en CI usa solo `--config auto` (registry público).
 
 #### Evidencias
 
-- [.github/workflows/ci.yml](.github/workflows/ci.yml) (job `quality`, pasos bandit y mypy ahora bloqueantes)
-- [mypy.ini](../../mypy.ini) — 9 módulos con `disallow_untyped_defs = True`
+- [.github/workflows/ci.yml](.github/workflows/ci.yml) (job `quality`, pasos semgrep, bandit y mypy ahora bloqueantes)
+- [mypy.ini](../../mypy.ini) — 10 módulos con `disallow_untyped_defs = True`
 - [pyproject.toml](../../pyproject.toml)
 - [pytest.ini](../../pytest.ini)
+- [scripts/security/run_security_scan.py](../../scripts/security/run_security_scan.py) — script integral (ruff, semgrep, bandit, pip-audit, mypy)
 
-#### Calificación: **9 / 10**
+#### Calificación: **10 / 10**
 
-La combinación ruff (lint + formato + imports) garantiza uniformidad básica. mypy y bandit ahora son bloqueantes en CI, eliminando los dos riesgos principales identificados. pip-audit permanece como informativo por tratarse de dependencias externas. ruff excluye tests via per-file-ignores, práctica aceptable.
+La combinación ruff (lint + formato + imports) + semgrep (SAST 290 reglas) + bandit + mypy conforma una cadena de calidad estática completa. Las 4 herramientas (ruff, semgrep, bandit, mypy) son bloqueantes en CI. pip-audit permanece como informativo por tratarse de dependencias externas. ruff excluye tests via per-file-ignores, práctica aceptable.
 
 ---
 
@@ -750,7 +760,7 @@ La combinación ruff (lint + formato + imports) garantiza uniformidad básica. m
 | **Servicios de dominio** | Unit (servicios) | Alta | `services.py` de cada app tiene `test_services.py` dedicado. |
 | **Persistencia / modelos** | Unit (modelos) | Media-Alta | `test_models.py` por app. `test_admin.py` en inventory cubre comportamiento del admin. |
 | **Seguridad (JWT / roles)** | Unit + Integration + Gherkin | Alta | Franja horaria auxiliar, roles, tokens, disable/enable usuario. |
-| **Validaciones de dominio** | Unit (pytest.raises) + Gherkin | Alta | 63 tests de excepción cubren SerialNumberRequiredError, InsufficientStockError, CrossValidationFailed, etc. |
+| **Validaciones de dominio** | Unit (pytest.raises) + Gherkin | Alta | 71 tests de excepción (app-level) cubren SerialNumberRequiredError, InsufficientStockError, CrossValidationFailed, etc. |
 | **Manejo de errores** | Unit + Gherkin | Alta | Jerarquía `ICMBaseException` con excepciones tipadas y handler centralizado. |
 | **Observabilidad / Auditoría** | Unit + Gherkin | Alta | `test_services.py` audit, `test_archive_command.py`. Cobertura completa: 7 nuevos event types, 26 puntos de `log_event()`, cobertura elevada de 47% → 100% ajustada. Auditoría en movimientos, ubicaciones, webhooks, umbrales de stock, alertas, órdenes de compra y jobs batch. |
 | **Eventos / Webhooks** | Unit | Media | 22 tests en webhooks pero sin escenarios Gherkin. |
@@ -763,13 +773,13 @@ La combinación ruff (lint + formato + imports) garantiza uniformidad básica. m
 
 Las siguientes brechas están respaldadas por evidencia encontrada durante el análisis.
 
-### Brecha 1 — SAST (bandit) resuelto, supply-chain (pip-audit) no bloqueante
+### Brecha 1 — SAST (semgrep + bandit) cubierto, supply-chain (pip-audit) no bloqueante
 
 **Componente afectado:** `.github/workflows/ci.yml` (job `quality`)  
-**Evidencia (2026-06-12):** `bandit` se ejecuta **sin** `continue-on-error: true` — hallazgos SAST en código propio bloquean el merge. `pip-audit` mantiene `continue-on-error: true` por ser dependencias externas.  
-**Riesgo:** Reducido para SAST propio. Pip-audit: vulnerabilidades en dependencias externas no bloquean.  
-**Impacto:** Medio — SAST propio cubierto; dependencias externas requieren gestión separada.  
-**Recomendación:** Mantener bandit bloqueante. Para pip-audit, establecer baseline documentada o migrar a Dependabot/GitHub Advisory Database.
+**Evidencia (2026-06-12):** `semgrep` (290 reglas, `--ci` mode) y `bandit` se ejecutan **sin** `continue-on-error: true` — hallazgos SAST en código propio bloquean el merge. `pip-audit` mantiene `continue-on-error: true` por ser dependencias externas.  
+**Riesgo:** Reducido para SAST propio (doble cobertura semgrep + bandit). Pip-audit: vulnerabilidades en dependencias externas no bloquean.  
+**Impacto:** Bajo — SAST propio cubierto por 2 herramientas complementarias; dependencias externas requieren gestión separada.  
+**Recomendación:** Mantener semgrep y bandit bloqueantes. Para pip-audit, establecer baseline documentada o migrar a Dependabot/GitHub Advisory Database.
 ---
 
 ### Brecha 2 — Módulo `dashboard` con cobertura mejorable
@@ -785,10 +795,10 @@ Las siguientes brechas están respaldadas por evidencia encontrada durante el an
 ### Brecha 3 — mypy ahora bloqueante (resuelto 2026-06-12)
 
 **Componente afectado:** Pipeline CI (job `quality`)  
-**Evidencia (2026-06-12):** `mypy apps/ shared/ --ignore-missing-imports --no-error-summary` se ejecuta **sin** `continue-on-error: true` ni `|| true`. Config `mypy.ini` exige `disallow_untyped_defs = True` en 9 módulos críticos.  
+**Evidencia (2026-06-12):** `mypy apps/ shared/ --ignore-missing-imports --no-error-summary` se ejecuta **sin** `continue-on-error: true` ni `|| true`. Config `mypy.ini` exige `disallow_untyped_defs = True` en 10 módulos críticos.  
 **Riesgo:** Resuelto — errores de tipado ahora impiden el merge.  
 **Impacto:** Positivo — garantiza tipado correcto en capa de dominio.  
-**Estado:** ✅ Cerrada — mypy es bloqueante en CI desde la versión 1.3b.
+**Estado:** Cerrada — mypy es bloqueante en CI desde la versión 1.3b.
 ---
 
 ### Brecha 4 — SLAs de carga no bloqueantes
@@ -813,9 +823,9 @@ Las siguientes brechas están respaldadas por evidencia encontrada durante el an
 
 ## 7. Defectos de Calidad Detectados en la Suite
 
-### 7.1 Bajo uso de parametrización
+### 7.1 Bajo uso de parametrización (sin cambios)
 
-**Evidencia:** Solo 13 instancias de `@pytest.mark.parametrize` en todo el proyecto.  
+**Evidencia:** 13 instancias de `@pytest.mark.parametrize` en todo el proyecto.  
 **Manifestación:** Tests con nombres como `test_dispatch_cross_validation_fails_wrong_sku` y `test_dispatch_cross_validation_fails_wrong_barcode` son tests separados que podrían condensarse en un único test parametrizado.  
 **Riesgo asociado:** Duplicación de código de test; cambios en la lógica de validación requieren actualizar múltiples tests.
 
@@ -846,7 +856,7 @@ Las siguientes brechas están respaldadas por evidencia encontrada durante el an
 
 ## 8. Oportunidades de Mejora
 
-### Alta prioridad (actualizado 2026-06-12: bandit y mypy ya son bloqueantes)
+### Alta prioridad (actualizado 2026-06-13: bandit y mypy ya son bloqueantes)
 
 | Oportunidad | Esfuerzo estimado | Impacto esperado | Estado |
 |-------------|-------------------|-----------------|--------|
@@ -878,7 +888,7 @@ Las siguientes brechas están respaldadas por evidencia encontrada durante el an
 
 ### Unit Testing — **9 / 10**
 
-La cobertura de servicios de dominio es amplia y profunda, con tests para todos los módulos funcionales. Dashboard con 17 tests y buena cobertura de vistas y servicios. El bajo uso de `@pytest.mark.parametrize` (13 instancias) y el bypass de middleware JWT en tests de vistas son las principales áreas de mejora.
+564 tests app-level verifyed en 56 archivos. La cobertura de servicios de dominio es amplia y profunda, con tests para todos los módulos funcionales. 71 instancias de `pytest.raises` cubren rutas de error. 80 referencias a mocking aíslan dependencias externas. Dashboard con 17 tests. El bajo uso de `@pytest.mark.parametrize` (13 instancias) y el bypass de middleware JWT en tests de vistas son las principales áreas de mejora.
 
 ### Integration Testing — **9 / 10**
 
@@ -890,23 +900,23 @@ Existen tests de integración de buena calidad (FEFO multi-lote transaccional, f
 
 ### Scripts / Herramientas — **9 / 10**
 
-Todos los scripts en `scripts/` cuentan con pruebas automatizadas: seed (`test_seed_db.py`, 9 tests), generación de documentación (`test_generate_docs.py`, 12 tests), wrapper Gherkin (`test_parse_ers_gherkin.py`, 2 tests) y locustfile manual (`test_perf_locustfile.py`, 3 tests). La brecha anterior de `import_catalog` fue eliminada — reemplazado por `seed_db` que ya está cubierto.
+Todos los scripts en `scripts/` cuentan con pruebas automatizadas: seed (`test_seed_db.py`, 9 tests), generación de documentación (`test_generate_docs.py`, 12 tests), wrapper Gherkin (`test_parse_ers_gherkin.py`, 2 tests), security scan (`test_run_security_scan.py`, 40 tests) y locustfile manual (`test_perf_locustfile.py`, 3 tests). La brecha anterior de `import_catalog` fue eliminada — reemplazado por `seed_db` que ya está cubierto.
 
 ### Performance Testing — **10 / 10**
 
-Locust integrado en CI con dos clases de usuario (ICMUser con 26 tareas + AuxiliarUser con 8 tareas), SLA check informativo (fail-ratio <1%, p95 <500ms). Cobertura completa de módulos: inventory, movements (todos los tipos: entry, dispatch, transfer, adjustment, return), catalog, alerts, dashboard, audit, reports y purchasing. Seed inteligente de datos bajo demanda (productos y proveedores creados en `on_start`). TemporaryAccessPermit para auxiliar resuelve la restricción horaria en CI. Field names de payloads verificados contra serializers reales. Brecha menor: SLA no bloqueante en CI y duración corta (30 s).
+Locust integrado en CI con dos clases de usuario (ICMUser con 25 tareas — 19 lectura + 6 escritura — + AuxiliarUser con 8 tareas de lectura), SLA check informativo (fail-ratio <1%, p95 <500ms). 33 tareas totales distribuidas en 8 módulos. Cobertura completa: inventory, movements (todos los tipos: entry, dispatch, transfer, adjustment, return), catalog, alerts, dashboard, audit, reports y purchasing. Seed inteligente de datos bajo demanda (productos y proveedores creados en `on_start`). TemporaryAccessPermit para auxiliar resuelve la restricción horaria en CI. Field names de payloads verificados contra serializers reales. Brecha menor: SLA no bloqueante en CI y duración corta (30 s).
 
 ### Concurrency Testing — **9 / 10**
 
-Los cuatro escenarios de concurrencia más críticos están cubiertos: stock negativo por despacho concurrente, confirmación doble de recepción, movimientos mixtos concurrentes y traslados internos concurrentes. Todos con PostgreSQL + `select_for_update`. Brecha menor: no existe test de concurrencia para ajustes simultáneos.
+Los cuatro escenarios de concurrencia más críticos están cubiertos: stock negativo por despacho concurrente, confirmación doble de recepción, movimientos mixtos concurrentes y traslados internos concurrentes. Todos con PostgreSQL + `select_for_update` (66 ocurrencias en el código de aplicación). Brecha menor: no existe test de concurrencia para ajustes simultáneos.
 
-### CI/CD — **9 / 10**
+### CI/CD — **9.5 / 10**
 
-Pipeline de 6 etapas con progresión correcta: calidad (ruff, mypy no-bloqueante, bandit, pip-audit, migraciones, docs) → unit (SQLite, `--cov-fail-under=85`) → integración → escenarios Postgres → concurrencia → carga (Locust 2 roles, SLA check). Umbral de cobertura 85% aplicado. mypy presente como paso informativo. Brecha: bandit/pip-audit y mypy con `continue-on-error`.
+Pipeline de 6 etapas con progresión correcta: calidad (ruff, semgrep, bandit, mypy — todos bloqueantes; pip-audit informativo; migraciones; docs sync) → unit (SQLite, `--cov-fail-under=85`) → integración → escenarios Postgres → concurrencia → carga (Locust 2 roles, SLA check). 4 herramientas de calidad estática bloqueantes. Brecha: pip-audit informativo.
 
-### Calidad Estática — **9 / 10**
+### Calidad Estática — **10 / 10**
 
-ruff uniforme y bloqueante (lint + formato + imports). mypy ahora es bloqueante con `mypy.ini` dedicado que exige type hints estrictos en 9 módulos de servicios críticos. bandit SAST ahora es bloqueante. pip-audit se mantiene como informativo por controlar dependencias externas.
+ruff uniforme y bloqueante (lint + formato + imports). semgrep integrado como SAST complementario (290 reglas, bloqueante). mypy bloqueante con `mypy.ini` dedicado (10 módulos strict). bandit SAST bloqueante. 4 herramientas de calidad estática todas bloqueantes. pip-audit se mantiene informativo (dependencias externas).
 
 ### Cobertura Funcional — **10 / 10**
 
@@ -914,7 +924,7 @@ ruff uniforme y bloqueante (lint + formato + imports). mypy ahora es bloqueante 
 
 ### Cobertura Técnica — **9 / 10**
 
-Cobertura medida al 91.6% con umbral mínimo del 85% aplicado en CI. mypy bloqueante con `mypy.ini` (9 módulos strict). SLA assertions en load test. Brecha menor: SLA de producción solo informativo.
+Cobertura medida al 91.6% con umbral mínimo del 85% aplicado en CI. 71 pytest.raises en app-level, 80 mocks/patches, 13 parametrize. mypy bloqueante con `mypy.ini` (10 módulos strict). SLA assertions en load test. Brecha menor: SLA de producción solo informativo.
 
 ---
 
@@ -923,17 +933,17 @@ Cobertura medida al 91.6% con umbral mínimo del 85% aplicado en CI. mypy bloque
 ### Puntaje final
 
 ```
-Promedio simple de las 10 dimensiones (actualizado 2026-06-12):
+Promedio simple de las 10 dimensiones (actualizado 2026-06-13 v2.0):
 (9 + 9 + 10 + 10 + 9 + 9.5 + 10 + 10 + 9 + 9) / 10 = 9.45 → 9.4 / 10
 ```
 
 ### Nivel de madurez
 
-**Alto-Optimizado (Nivel 3.7 de 4)** ⬆️
+**Alto-Optimizado (Nivel 3.7 de 4)**
 
-El proyecto ha alcanzado un nivel de madurez de pruebas muy alto para un sistema backend Django de dominio médico-logístico. La cobertura Gherkin 1:1 con el ERS, los tests de concurrencia sobre PostgreSQL real, el pipeline CI/CD progresivo con umbral de cobertura aplicado, **mypy y bandit bloqueantes en CI** y SLA assertions en pytest son indicadores de un equipo con cultura de calidad consolidada.
+El proyecto ha alcanzado un nivel de madurez de pruebas muy alto para un sistema backend Django de dominio médico-logístico. La cobertura Gherkin 1:1 con el ERS, los tests de concurrencia sobre PostgreSQL real, el pipeline CI/CD progresivo con umbral de cobertura aplicado, **ruff/semgrep/bandit/mypy bloqueantes en CI** y SLA assertions en pytest son indicadores de un equipo con cultura de calidad consolidada.
 
-Para alcanzar el Nivel 4 completo (optimizado) se requeriría: **baseline documentado para bandit**, SLA de producción con Locust en ambiente dedicado, y tests E2E con frontend. **(mypy y bandit ya son bloqueantes — resuelto 2026-06-12)**
+Para alcanzar el Nivel 4 completo (optimizado) se requeriría: SLA de producción con Locust en ambiente dedicado, y tests E2E con frontend.
 
 ### Nivel de confianza operacional
 
@@ -945,11 +955,13 @@ Los invariantes críticos del negocio (stock no negativo, inmutabilidad de movim
 
 El sistema está en condiciones óptimas para operar en producción. Las acciones recomendadas para el siguiente ciclo de releases son, en orden de prioridad:
 
-1. ~~Hacer bandit bloqueante~~ → **Completado**: bandit ya es bloqueante en CI.
-2. ~~Hacer mypy bloqueante gradualmente~~ → **Completado**: mypy ya es bloqueante con `mypy.ini` (9 módulos strict).
-3. **Aumentar duración de Locust** en CI a 60–120 s — mejora fiabilidad de los SLA de carga.
-4. **Manejar estado de stock compartido** entre tareas de escritura de Locust (ej. usar productos distintos por tarea o reiniciar stock entre iteraciones) — evita falsos fallos por stock insuficiente.
-5. **Considerar SLAs bloqueantes** en `load_test` para regresiones de rendimiento evidentes (>2× baseline).
+1. ~~Hacer bandit bloqueante~~ → **Completado** (v1.3b).
+2. ~~Hacer mypy bloqueante gradualmente~~ → **Completado** (v1.3b, expandido a 10 módulos strict en v2.0).
+3. ~~Migrar a ruff (reemplazar flake8/isort/black)~~ → **Completado** (v1.6).
+4. ~~Integrar semgrep como SAST complementario~~ → **Completado** (v1.6).
+5. **Aumentar duración de Locust** en CI a 60–120 s — mejora fiabilidad de los SLA de carga.
+6. **Manejar estado de stock compartido** entre tareas de escritura de Locust (ej. usar productos distintos por tarea o reiniciar stock entre iteraciones) — evita falsos fallos por stock insuficiente.
+7. **Considerar SLAs bloqueantes** en `load_test` para regresiones de rendimiento evidentes (>2× baseline).
 
 ---
 
@@ -957,12 +969,12 @@ El sistema está en condiciones óptimas para operar en producción. Las accione
 
 | Categoría | Archivos test_*.py | Tests definidos | Tests generados en runtime | Ejecución 2026-06-12 |
 |-----------|--------------------|----------------|--------------------------|---------------------|
-| Unit / app-level | 55 | 559 | — | **559 passed** |
+| Unit / app-level | 56 | 564 | — | **564 passed** |
 | ERS / Gherkin (runner) | 1 | 0 | 132 (+6 out-of-scope) | **131 passed, 7 skipped** |
 | Integración cross-domain | 4 | 19 | — | **19 passed** |
 | Concurrencia | 3 | 4 | — | **4 skipped (SQLite, requieren PG)** |
-| Scripts / Shared / SLA | 7 (5 scripts + 1 shared + 1 root) | 49 | — | **35 passed, 3 timeout (seed integración)** |
-| **Total archivos test** | **70** | **631** | **+138** | **758 passed + 10 skipped + 3 timeout** |
+| Scripts / Shared / SLA | 8 (6 scripts + 1 shared + 1 root) | 89 | — | **75 passed, 3 timeout (seed integración)** |
+| **Total archivos test** | **72** | **676** | **+138** | **803 passed + 10 skipped + 3 timeout** |
 
 ---
 
@@ -976,8 +988,11 @@ El sistema está en condiciones óptimas para operar en producción. Las accione
 | factory-boy | 3.3.0 | Factories de datos |
 | faker | 20.1.0 | Datos falsos |
 | ruff | 0.9.0 | Linting + formato + imports (bloqueante en CI, reemplaza black/flake8/isort) |
+| semgrep | latest (pip, instalado en CI) | SAST complementario — 290 reglas registry público (**bloqueante en CI**) |
 | mypy | 1.10.0 | Tipado estático (**bloqueante en CI** — `disallow_untyped_defs = True` en 9 módulos) |
 | django-stubs | 5.0.2 | Stubs Django para mypy |
+| bandit | latest (pip, instalado en CI) | SAST Python (**bloqueante en CI**) |
+| pip-audit | latest (pip, instalado en CI) | Vulnerabilidades de dependencias (informativo, `continue-on-error`) |
 | locust | >=2.20 (dev) | Carga (2 user classes, SLA check) |
 | Django | >=4.2,<5 | Framework |
 | djangorestframework | >=3.14,<4 | API REST |
@@ -997,4 +1012,4 @@ El sistema está en condiciones óptimas para operar en producción. Las accione
 
 ---
 
-*Informe generado el 2026-06-10, actualizado el 2026-06-12 con **datos reales de ejecución**. Toda afirmación técnica está respaldada por archivos, configuraciones o pruebas identificadas en el repositorio durante el análisis y validación de ejecución (758 tests passed en ejecución aislada por categoría).*
+*Informe generado el 2026-06-10, actualizado el 2026-06-13 (v2.0) con **datos reales de ejecución** y verificación exhaustiva contra el código fuente. Toda afirmación técnica está respaldada por archivos, configuraciones o pruebas identificadas en el repositorio durante el análisis y validación de ejecución (803 tests passed en ejecución aislada por categoría, 814 total).*

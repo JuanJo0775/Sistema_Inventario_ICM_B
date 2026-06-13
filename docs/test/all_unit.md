@@ -4025,7 +4025,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_permissions_reorganization.py::TestPermissionsReorganization::test_almacenista_delegation_limits -v
 ```
 
-Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 155)
+Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 154)
 
 
 ---
@@ -4061,7 +4061,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_permissions_reorganization.py::TestPermissionsReorganization::test_default_operating_hours -v
 ```
 
-Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 23)
+Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 22)
 
 
 ---
@@ -4097,7 +4097,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_permissions_reorganization.py::TestPermissionsReorganization::test_empty_user_schedule_blocks_all -v
 ```
 
-Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 64)
+Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 63)
 
 
 ---
@@ -4133,7 +4133,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_permissions_reorganization.py::TestPermissionsReorganization::test_enriched_audit_logs -v
 ```
 
-Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 175)
+Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 174)
 
 
 ---
@@ -4169,7 +4169,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_permissions_reorganization.py::TestPermissionsReorganization::test_model_validations -v
 ```
 
-Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 138)
+Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 137)
 
 
 ---
@@ -4205,7 +4205,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_permissions_reorganization.py::TestPermissionsReorganization::test_overlapping_permits_union -v
 ```
 
-Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 93)
+Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 92)
 
 
 ---
@@ -4241,7 +4241,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_permissions_reorganization.py::TestPermissionsReorganization::test_request_level_cache -v
 ```
 
-Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 214)
+Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 213)
 
 
 ---
@@ -4277,7 +4277,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_permissions_reorganization.py::TestPermissionsReorganization::test_temporary_permit_allow_24_7 -v
 ```
 
-Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 73)
+Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 72)
 
 
 ---
@@ -4313,7 +4313,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_permissions_reorganization.py::TestPermissionsReorganization::test_user_schedule_overrides_default -v
 ```
 
-Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 44)
+Código fuente: [apps/authentication/tests/test_permissions_reorganization.py](../../apps/authentication/tests/test_permissions_reorganization.py) (aprox. línea 43)
 
 
 ---
@@ -4385,7 +4385,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_services.py::test_disabled_user_cannot_login -v
 ```
 
-Código fuente: [apps/authentication/tests/test_services.py](../../apps/authentication/tests/test_services.py) (aprox. línea 70)
+Código fuente: [apps/authentication/tests/test_services.py](../../apps/authentication/tests/test_services.py) (aprox. línea 72)
 
 
 ---
@@ -4421,7 +4421,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_services.py::test_only_almacenista_creates_users -v
 ```
 
-Código fuente: [apps/authentication/tests/test_services.py](../../apps/authentication/tests/test_services.py) (aprox. línea 33)
+Código fuente: [apps/authentication/tests/test_services.py](../../apps/authentication/tests/test_services.py) (aprox. línea 35)
 
 
 ---
@@ -4457,7 +4457,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_services.py::test_only_almacenista_disables_users -v
 ```
 
-Código fuente: [apps/authentication/tests/test_services.py](../../apps/authentication/tests/test_services.py) (aprox. línea 62)
+Código fuente: [apps/authentication/tests/test_services.py](../../apps/authentication/tests/test_services.py) (aprox. línea 64)
 
 
 ---
@@ -4493,7 +4493,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_services.py::test_only_almacenista_updates_users -v
 ```
 
-Código fuente: [apps/authentication/tests/test_services.py](../../apps/authentication/tests/test_services.py) (aprox. línea 49)
+Código fuente: [apps/authentication/tests/test_services.py](../../apps/authentication/tests/test_services.py) (aprox. línea 51)
 
 
 ---
@@ -4529,7 +4529,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_services.py::test_operating_hours_enforced_per_request -v
 ```
 
-Código fuente: [apps/authentication/tests/test_services.py](../../apps/authentication/tests/test_services.py) (aprox. línea 77)
+Código fuente: [apps/authentication/tests/test_services.py](../../apps/authentication/tests/test_services.py) (aprox. línea 79)
 
 
 ---
@@ -11837,7 +11837,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_adjustment_downwards_without_serial_optional_when_not_required -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 1049)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 1053)
 
 
 ---
@@ -11873,7 +11873,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_adjustment_electroterapia_without_serial_fails -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 1007)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 1011)
 
 
 ---
@@ -11945,7 +11945,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_adjustment_with_serial_persists -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 1025)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 1029)
 
 
 ---
@@ -12341,7 +12341,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_raises_insufficient_stock_when_quantity_exceeds_stock -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 829)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 831)
 
 
 ---
@@ -12377,7 +12377,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_dispatch_raises_insufficient_stock_when_stock_is_zero -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 809)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 811)
 
 
 ---
@@ -12737,7 +12737,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_internal_transfer_electroterapia_without_serial_fails -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 938)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 942)
 
 
 ---
@@ -12809,7 +12809,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_internal_transfer_serial_optional_when_not_required -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 984)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 988)
 
 
 ---
@@ -12845,7 +12845,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_internal_transfer_with_serial_persists -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 958)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 962)
 
 
 ---
@@ -12881,7 +12881,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_normalize_serial_empty_string -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 878)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 882)
 
 
 ---
@@ -12917,7 +12917,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_normalize_serial_none -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 873)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 877)
 
 
 ---
@@ -12953,7 +12953,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_normalize_serial_preserves_content -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 893)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 897)
 
 
 ---
@@ -12989,7 +12989,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_normalize_serial_strips_whitespace -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 888)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 892)
 
 
 ---
@@ -13025,7 +13025,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_normalize_serial_whitespace_only -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 883)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 887)
 
 
 ---
@@ -13133,7 +13133,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_register_entry_rolls_back_on_movement_save_failure -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 849)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 851)
 
 
 ---
@@ -13313,7 +13313,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_validate_serial_required_passes_when_not_required -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 929)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 933)
 
 
 ---
@@ -13349,7 +13349,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_validate_serial_required_passes_with_serial -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 922)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 926)
 
 
 ---
@@ -13385,7 +13385,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_validate_serial_required_raises_when_empty -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 906)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 910)
 
 
 ---
@@ -13421,7 +13421,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_validate_serial_required_raises_when_missing -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 898)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 902)
 
 
 ---
@@ -13457,7 +13457,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_services.py::test_validate_serial_required_raises_when_whitespace -v
 ```
 
-Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 914)
+Código fuente: [apps/movements/tests/test_services.py](../../apps/movements/tests/test_services.py) (aprox. línea 918)
 
 
 ---
