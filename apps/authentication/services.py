@@ -113,6 +113,14 @@ def create_user(
         role=data["role"],
         created_by=almacenista_user,
     )
+    from django.contrib.auth.password_validation import validate_password
+    from django.core.exceptions import ValidationError as DjangoValidationError
+
+    try:
+        validate_password(data["password"], user)
+    except DjangoValidationError as exc:
+        raise DomainValidationError("; ".join(exc.messages)) from exc
+
     user.set_password(data["password"])
     user.save()
     log_event(
@@ -246,6 +254,15 @@ def update_user_password(
 
     _require_almacenista(almacenista_user)
     target = User.objects.select_for_update().get(pk=target_user_id)
+
+    from django.contrib.auth.password_validation import validate_password
+    from django.core.exceptions import ValidationError as DjangoValidationError
+
+    try:
+        validate_password(new_password, target)
+    except DjangoValidationError as exc:
+        raise DomainValidationError("; ".join(exc.messages)) from exc
+
     target.set_password(new_password)
     target.save(update_fields=["password", "updated_at"])
     log_event(
