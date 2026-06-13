@@ -377,7 +377,7 @@ queue_webhook_event("dispatch.completed", {
 ```
 pytest --tb=short -q
 ```
-Target: mantener los 646 tests actuales verdes + agregar las pruebas nuevas de precio/facturación sin romper los 9 skips legítimos.
+Target: mantener los 814 tests actuales verdes + agregar las pruebas nuevas de precio/facturación sin romper los 12 skips legítimos.
 
 ### Smoke test manual:
 1. Crear producto con precio retail/wholesale
@@ -422,7 +422,7 @@ Cada fase es independiente; revertir la migration de esa fase es suficiente (cam
 - `DispatchCreateSerializer` mantiene todos los campos actuales; los nuevos (discount_pct, price_override) son opcionales.
 - `MovementSerializer` agrega campos nuevos en respuesta → clientes que ignorar campos extra no se afectan.
 - `GET /api/v1/movements/dispatches/<id>/invoice/` sigue retornando FileResponse sin cambio de ruta.
-- Los 646 tests actuales deben pasar sin modificación.
+- Los 814 tests actuales deben pasar sin modificación.
 
 ---
 

@@ -243,43 +243,43 @@ icm_backend/
 │   │   ├── selectors.py                                        # Consultas de auditoría
 │   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
 │   │   └── admin.py                                            # Registro administrativo y soporte operacional
-│   ├── dashboard/                                              # Read model operacional para UI ejecutiva (solo almacenista)
+│   ├── dashboard/                                              # Aplicación Django detectada automáticamente
 │   │   ├── tests/                                              # Pruebas del subdominio
-│   │   │   └── test_views.py                                   # Cobertura de endpoints del dashboard
+│   │   │   └── test_views.py                                   # Reglas de negocio y transacciones del dominio
 │   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
-│   │   ├── views.py                                            # Endpoints HTTP del módulo (overview, metrics, alerts, kpis, movements)
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
 │   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
-│   │   └── services.py                                         # Lógica de agregación y composición para read model
-│   ├── purchasing/                                             # Proveedores, órdenes de compra y recepciones (solo almacenista)
+│   │   └── services.py                                         # Reglas de negocio y transacciones del dominio
+│   ├── purchasing/                                             # Aplicación Django detectada automáticamente
 │   │   ├── tests/                                              # Pruebas del subdominio
 │   │   │   ├── factories.py                                    # Factories de datos de prueba
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
 │   │   │   ├── test_selectors.py                               # Consultas de lectura sin efectos secundarios
 │   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
-│   │   ├── models.py                                           # Entidades y constraints de persistencia (Supplier, PurchaseOrder, Reception)
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
 │   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
 │   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
 │   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
-│   │   ├── services.py                                         # Reglas de negocio: creación OC, confirmación, recepciones, costos congelados
+│   │   ├── services.py                                         # Reglas de negocio del ledger y actualización transaccional del stock
 │   │   ├── selectors.py                                        # Consultas de lectura y agregaciones del módulo
-│   │   ├── permissions.py                                      # Política de acceso (IsPurchasingOperator / IsPurchasingViewer)
-│   │   ├── exceptions.py                                       # Excepciones de dominio (NIT duplicado, OC inmutable, etc.)
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   ├── exceptions.py                                       # Excepciones de dominio y validación
 │   │   └── admin.py                                            # Registro administrativo y soporte operacional
-│   └── webhooks/                                               # Suscripción y entrega de eventos externos (solo almacenista)
+│   └── webhooks/                                               # Aplicación Django detectada automáticamente
 │       ├── tests/                                              # Pruebas del subdominio
-│       │   ├── test_commands.py                                # Cobertura del comando deliver_webhooks
-│       │   ├── test_endpoint_put.py                            # Actualización y prueba de endpoints
-│       │   ├── test_services.py                                # Cobertura de lógica de encolado y firma
-│       │   └── test_views.py                                   # Cobertura de endpoints CRUD y stats
+│       │   ├── test_commands.py                                # Cobertura crítica del módulo
+│       │   ├── test_endpoint_put.py                            # Reglas de negocio y transacciones del dominio
+│       │   ├── test_services.py                                # Cobertura crítica del módulo
+│       │   └── test_views.py                                   # Cobertura crítica del módulo
 │       ├── management/
 │       │   └── commands/                                       # Comandos administrativos del módulo
-│       │       └── deliver_webhooks.py                         # Comando Django para entrega programada de webhooks
-│       ├── models.py                                           # Entidades y constraints (WebhookEndpoint, WebhookDelivery)
+│       │       └── deliver_webhooks.py                         # Comando Django para automatización operativa
+│       ├── models.py                                           # Entidades y constraints de persistencia
 │       ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
 │       ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
 │       ├── urls.py                                             # Ruteo HTTP y composición de endpoints
-│       ├── services.py                                         # Encolado de entregas, firma HMAC-SHA256, política de reintentos
+│       ├── services.py                                         # Reglas de negocio y transacciones del dominio
 │       └── admin.py                                            # Registro administrativo y soporte operacional
 ├── config/                                                     # Configuración central del proyecto Django
 │   ├── settings/                                               # Configuración compartida y sobreescrituras por entorno
@@ -342,7 +342,7 @@ icm_backend/
 │   │   ├── catalog/                                            # Catálogo, SKUs definidos por usuario y validación de productos
 │   │   │   ├── README_CATALOG.md                               # Documento técnico relevante
 │   │   │   └── README_PRODUCT_SERIAL.md                        # Documento técnico relevante
-│   │   ├── dashboard/                                          # Aplicación Django detectada automáticamente
+│   │   ├── dashboard/                                          # Read model operacional para UI ejecutiva (solo almacenista)
 │   │   │   └── README_DASHBOARD.md                             # Documento técnico relevante
 │   │   ├── inventory/                                          # Consulta de stock en tiempo real
 │   │   │   └── README_INVENTORY.md                             # Documento técnico relevante
@@ -351,7 +351,7 @@ icm_backend/
 │   │   ├── pricing/                                            # Documento arquitectónico relevante
 │   │   │   ├── Plan Arquitectura de Precios y Facturación — Sistema Inventario ICM.md  # Documento técnico relevante
 │   │   │   └── README_PRECIOS_FACTURACION.md                   # Documento técnico relevante
-│   │   ├── purchasing/                                         # Aplicación Django detectada automáticamente
+│   │   ├── purchasing/                                         # Proveedores, órdenes de compra y recepciones (solo almacenista)
 │   │   │   └── README_PURCHASING.md                            # Documento técnico relevante
 │   │   ├── reports/                                            # Reportes e indicadores operativos
 │   │   │   └── README_REPORTS.md                               # Documento técnico relevante
@@ -359,7 +359,7 @@ icm_backend/
 │   │   │   ├── README_LOCATION_STATES.md                       # Documento técnico relevante
 │   │   │   ├── README_STORAGE_DOMAIN.md                        # Documento técnico relevante
 │   │   │   └── README_STORAGE_TYPES.md                         # Documento técnico relevante
-│   │   ├── webhooks/                                           # Aplicación Django detectada automáticamente
+│   │   ├── webhooks/                                           # Suscripción y entrega de eventos externos (solo almacenista)
 │   │   │   └── README_WEBHOOKS.md                              # Documento técnico relevante
 │   │   └── index.md                                            # Documento técnico relevante
 │   └── GUIA_ONBOARDING.md                                      # Documento técnico relevante
@@ -369,14 +369,14 @@ icm_backend/
 │   └── production.txt
 ├── scripts/                                                    # Automatizaciones reutilizables del repositorio
 │   ├── README_SCRIPTS.md                                       # Índice y contexto de las automatizaciones
-│   ├── project_structure/                                      # Generador semántico de la estructura arquitectónica
-│   │   └── generate_project_structure.py                       # Generador semántico de la estructura arquitectónica
 │   ├── parse_ers_gherkin.py                                    # Generador de escenarios ERS/Gherkin
 │   ├── generate_docs/                                          # Generadores compartidos de documentación
 │   │   ├── __main__.py                                         # Entry point oficial: python -m scripts.generate_docs
 │   │   └── utils.py                                            # Pipeline compartido: descubrimiento, renderizado y escritura
 │   ├── perf/
 │   │   └── locustfile.py
+│   ├── security/
+│   │   └── run_security_scan.py
 │   └── seed_db/
 │       ├── clean.py                                            # Limpieza de la base de datos del seed
 │       ├── config.py                                           # Datos estáticos del seed unificado
@@ -415,6 +415,7 @@ icm_backend/
 │   │   ├── test_generate_project_structure.py                  # Cobertura crítica del módulo
 │   │   ├── test_parse_ers_gherkin.py                           # Cobertura crítica del módulo
 │   │   ├── test_perf_locustfile.py                             # Cobertura crítica del módulo
+│   │   ├── test_run_security_scan.py                           # Cobertura crítica del módulo
 │   │   └── test_seed_db.py                                     # Cobertura crítica del módulo
 │   └── shared/                                                 # Código transversal reutilizable
 │       └── test_location_validators.py                         # Cobertura crítica del módulo
