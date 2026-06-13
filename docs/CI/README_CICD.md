@@ -42,6 +42,7 @@ Ejecuta:
 
 - `ruff check apps/ shared/`
 - `ruff format --check apps/ shared/`
+- `python scripts/security/run_security_scan.py --ci` (semgrep)
 - `bandit -r apps shared -ll`
 - `pip-audit --progress=off`
 - `mypy apps/ shared/`
@@ -114,17 +115,15 @@ Genera:
 Para reproducir los gates principales:
 
 ```bash
-python -m pip install -U pip
 pip install -r requirements/base.txt
-pip install ruff pip-audit pytest pytest-django pytest-cov bandit
 
 ruff check apps/ shared/
 ruff format --check apps/ shared/
-bandit -r apps shared -ll
-pip-audit --progress=off
+python scripts/security/run_security_scan.py        # todas las herramientas (ruff, semgrep, bandit, pip-audit, mypy)
+python scripts/security/run_security_scan.py --ci   # modo compacto para semgrep
 python manage.py makemigrations --check --dry-run
 python -m scripts.generate_docs --check
-pytest apps/ -q --ignore=tests
+pytest apps/ -q
 pytest tests/integration tests/scripts tests/shared -q
 pytest tests/ers -q
 pytest tests/scripts/test_seed_db.py -q
@@ -143,9 +142,9 @@ pytest -q
 
 Último estado verificado localmente:
 
-- `646 tests recolectados`
-- `637 pasan`
-- `9 skips legítimos`
+- `814 tests recolectados`
+- `803 pasan`
+- `11 skips legítimos`
 - `0 fallos`
 
 Referencia viva:
