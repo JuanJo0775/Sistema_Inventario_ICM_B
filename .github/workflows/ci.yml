@@ -54,6 +54,9 @@ jobs:
       - name: Format check — ruff format
         run: ruff format --check apps/ shared/
 
+      - name: SAST — semgrep
+        run: python scripts/security/run_security_scan.py --ci
+
       - name: SAST — bandit
         run: bandit -r apps shared -ll
 

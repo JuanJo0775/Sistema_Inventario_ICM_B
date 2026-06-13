@@ -54,5 +54,8 @@ graphify-out/
 # Personal guides (local use only)
 docs/guias/GRAPHIFY_GUIDE.md
 
+# Security scan reports
+scripts/security/reports/
+
 # Windows artifacts
 nul
