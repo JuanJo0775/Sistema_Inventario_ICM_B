@@ -475,8 +475,12 @@ def impl_rf007_s05(
 
 
 def impl_rf008_s01(authenticated_almacenista_client: APIClient, sample_locations, db):
-    from tests.factories import ElectroCategoryFactory, ProductFactory, ProductSerialFactory
     from apps.catalog.models import ProductSerial
+    from tests.factories import (
+        ElectroCategoryFactory,
+        ProductFactory,
+        ProductSerialFactory,
+    )
 
     cat = ElectroCategoryFactory()
     p = ProductFactory(category=cat, sku="P-0001")
@@ -532,7 +536,11 @@ def impl_rf008_s03(authenticated_almacenista_client: APIClient, sample_locations
     from apps.catalog.models import ProductSerial
     from apps.inventory.models import StockByLocation
     from apps.movements.models import Movement
-    from tests.factories import ElectroCategoryFactory, ProductFactory, ProductSerialFactory
+    from tests.factories import (
+        ElectroCategoryFactory,
+        ProductFactory,
+        ProductSerialFactory,
+    )
 
     cat = ElectroCategoryFactory()
     p = ProductFactory(category=cat, sku="P-0803")
@@ -611,7 +619,11 @@ def impl_rf008_s04(
 def impl_rf008_s05(authenticated_almacenista_client: APIClient, sample_locations, db):
     from apps.catalog.models import ProductSerial
     from apps.inventory.models import StockByLocation
-    from tests.factories import ElectroCategoryFactory, ProductFactory, ProductSerialFactory
+    from tests.factories import (
+        ElectroCategoryFactory,
+        ProductFactory,
+        ProductSerialFactory,
+    )
 
     cat = ElectroCategoryFactory()
     p = ProductFactory(category=cat, sku="P-0805")

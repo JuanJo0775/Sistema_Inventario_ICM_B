@@ -65,9 +65,9 @@ def clean() -> None:
     from apps.alerts.models import Alert
     from apps.audit.models import AuditLog, AuditLogArchive
     from apps.catalog.models import (
+        Brand,
         Category,
         ComboItem,
-        Brand,
         Lot,
         Product,
         ProductCombo,

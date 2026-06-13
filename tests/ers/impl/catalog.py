@@ -26,15 +26,22 @@ def impl_rf003_s01(almacenista_user, db):
 
 
 def impl_rf003_s02(almacenista_user, db):
+    from apps.catalog.models import Brand
     from apps.catalog.services import create_product
     from tests.factories import CategoryFactory
 
     cat = CategoryFactory(name="Cat RF003 S2", slug="cat-rf003-s2")
+    brand = Brand.objects.create(name="Can", slug="can")
     p = create_product(
         almacenista_user,
-        {"sku": "RFS-0002", "name": "Marca Can", "category_id": cat.id, "brand": "Can"},
+        {
+            "sku": "RFS-0002",
+            "name": "Marca Can",
+            "category_id": cat.id,
+            "brand_id": str(brand.id),
+        },
     )
-    assert p.brand.lower() == "can"
+    assert p.brand.name.lower() == "can"
 
 
 def impl_rf003_s03(almacenista_user, db):
