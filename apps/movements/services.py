@@ -95,7 +95,7 @@ def _resolve_serial_for_dispatch(
         return ps.serial_number
 
     # Auto-asignar: tomar el primer serial disponible (FIFO por created_at)
-    ps = (
+    ps_auto: ProductSerial | None = (
         ProductSerial.objects.select_for_update()
         .filter(
             product=product,
@@ -105,7 +105,7 @@ def _resolve_serial_for_dispatch(
         .order_by("created_at")
         .first()
     )
-    if ps is None:
+    if ps_auto is None:
         raise InsufficientStockError(
             detail={
                 "product_id": str(product.id),
@@ -113,7 +113,7 @@ def _resolve_serial_for_dispatch(
                 "message": "No hay seriales disponibles para este producto en la ubicación.",
             }
         )
-    return ps.serial_number
+    return ps_auto.serial_number
 
 
 def _update_serial_status(
@@ -1410,7 +1410,9 @@ def correct_movement_within_window(
 
     orig_serial = original.serial_number
 
-    def _serial_id_from_corrected(corrected_data, orig_serial):
+    def _serial_id_from_corrected(
+        corrected_data: dict, orig_serial: str | None
+    ) -> UUID | None:
         """Helper: retorna serial_id si se envió, o None para auto-asignar, o el original."""
         if "serial_id" in corrected_data:
             return corrected_data["serial_id"]
