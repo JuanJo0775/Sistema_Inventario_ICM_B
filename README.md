@@ -64,7 +64,7 @@ Documentación funcional y arquitectónica disponible en el repositorio:
 - PostgreSQL 15
 - JWT con djangorestframework-simplejwt (rotación + blacklist)
 - OpenAPI 3 con **drf-spectacular** (Swagger UI y ReDoc)
-- pytest + pytest-django (736+ tests — suite completa con recuperación de contraseña)
+- pytest + pytest-django (769+ tests — suite completa con recuperación de contraseña)
 - Docker + Docker Compose
 - openpyxl (exportación XLSX)
 - WeasyPrint (facturas PDF)
@@ -197,4 +197,4 @@ Para mantener el historial limpio y fácil de revisar, el trabajo debe organizar
 - Configuración por variables de entorno — guía completa en [ENV_GUIDE.md](docs/guias/ENV_GUIDE.md).
 - API bajo `/api/v1/` con documentación **OpenAPI 3** y **Swagger UI**; el contrato detallado vive en [README_API.md](docs/api/README_API.md).
 - Autenticación JWT con cambio y recuperación de contraseña por email (Mailtrap Sandbox en dev).
-- Setup de Docker y dependencias; 736+ tests automatizados con pytest.
+- Setup de Docker y dependencias; 769+ tests automatizados con pytest.

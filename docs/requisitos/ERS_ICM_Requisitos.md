@@ -57,10 +57,10 @@ Las siguientes reglas de negocio fueron identificadas durante las sesiones de el
 * BR-15 (Tipo de almacenamiento activo como requisito de asignación): Un tipo de almacenamiento (`StorageType`) con estado inactivo no puede asignarse a nuevas ubicaciones ni reasignarse a ubicaciones existentes. La desactivación de un tipo no afecta las ubicaciones que ya lo tenían asignado, las cuales conservan su tipo sin restricción adicional. Solo el Almacenista puede crear, modificar o desactivar tipos de almacenamiento y plantillas de configuración.
 * BR-16 (Precio congelado en despacho): Al confirmar un despacho, el sistema captura el precio unitario de venta, el costo unitario, el IVA aplicable y el total calculado en el registro de movimiento de forma permanente e inmutable. Ninguna modificación posterior al precio de un producto en el catálogo puede alterar el precio registrado en movimientos o facturas ya emitidas. Esta regla garantiza la integridad contable del historial de transacciones.
 * BR-17 (Historial auditado de cambios de precio): Toda actualización de precio de un producto (precio minorista, precio mayorista, costo o tasa de IVA) debe registrarse de forma inmutable en un historial de precios que identifique el campo modificado, el valor anterior, el nuevo valor, el usuario que realizó el cambio y la fecha y hora exacta. El historial de precios es de solo lectura y no puede ser eliminado ni modificado.
-* BR-018 (NIT único por proveedor): El NIT de un proveedor es un identificador fiscal único en el sistema. No pueden existir dos proveedores con el mismo NIT, independientemente de su estado activo o inactivo. El sistema rechaza el registro de un proveedor si su NIT ya existe.
-* BR-019 (Estado de OC controla operaciones permitidas): Las Órdenes de Compra siguen un ciclo de vida estricto. Solo pueden editarse en estado BORRADOR. Solo pueden recibir mercancía en estado PENDIENTE o PARCIALMENTE_RECIBIDA. Una OC en estado COMPLETADA o CANCELADA es completamente inmutable.
-* BR-020 (Cancelación de OC requiere ausencia de recepciones confirmadas): Una Orden de Compra no puede cancelarse si tiene al menos una recepción en estado CONFIRMADA. El sistema bloquea la operación e informa al operario del conflicto.
-* BR-021 (Costo de compra congelado en el movimiento de entrada): Al confirmar una recepción, el costo unitario acordado con el proveedor en la Orden de Compra queda registrado de forma permanente en el campo de costo del movimiento de entrada generado. Ninguna modificación posterior al costo del producto en el catálogo puede alterar ese valor histórico.
+* BR-18 (NIT único por proveedor): El NIT de un proveedor es un identificador fiscal único en el sistema. No pueden existir dos proveedores con el mismo NIT, independientemente de su estado activo o inactivo. El sistema rechaza el registro de un proveedor si su NIT ya existe.
+* BR-19 (Estado de OC controla operaciones permitidas): Las Órdenes de Compra siguen un ciclo de vida estricto. Solo pueden editarse en estado BORRADOR. Solo pueden recibir mercancía en estado PENDIENTE o PARCIALMENTE_RECIBIDA. Una OC en estado COMPLETADA o CANCELADA es completamente inmutable.
+* BR-20 (Cancelación de OC requiere ausencia de recepciones confirmadas): Una Orden de Compra no puede cancelarse si tiene al menos una recepción en estado CONFIRMADA. El sistema bloquea la operación e informa al operario del conflicto.
+* BR-21 (Costo de compra congelado en el movimiento de entrada): Al confirmar una recepción, el costo unitario acordado con el proveedor en la Orden de Compra queda registrado de forma permanente en el campo de costo del movimiento de entrada generado. Ninguna modificación posterior al costo del producto en el catálogo puede alterar ese valor histórico.
 
 # **5. Requisitos Funcionales**
 
@@ -2200,7 +2200,7 @@ El sistema debe permitir al Almacenista registrar, consultar, actualizar y activ
 **Reglas de Negocio Aplicables**
 
 * BR-01: Toda operación de creación o modificación de proveedor queda vinculada al UserID del Almacenista ejecutor.
-* BR-018 (nueva): El NIT de un proveedor es único en el sistema. No pueden existir dos proveedores con el mismo NIT.
+* BR-18 (nueva): El NIT de un proveedor es único en el sistema. No pueden existir dos proveedores con el mismo NIT.
 * Un proveedor desactivado no puede asociarse a nuevas Órdenes de Compra, pero sus OC existentes no se afectan.
 
 **Criterios de Aceptación (Formato Gherkin)**
@@ -2277,8 +2277,8 @@ El sistema debe permitir al Almacenista crear Órdenes de Compra (OC) que especi
 **Reglas de Negocio Aplicables**
 
 * BR-01: Toda OC registra el UserID del Almacenista creador.
-* BR-019 (nueva): Una OC en estado BORRADOR puede editarse o cancelarse sin restricciones. A partir de PENDIENTE, es inmutable en su contenido.
-* BR-020 (nueva): Cada OC tiene al menos un ítem con `quantity_ordered > 0` para poder ser confirmada.
+* BR-19 (nueva): Una OC en estado BORRADOR puede editarse o cancelarse sin restricciones. A partir de PENDIENTE, es inmutable en su contenido.
+* BR-20 (nueva): Cada OC tiene al menos un ítem con `quantity_ordered > 0` para poder ser confirmada.
 
 **Criterios de Aceptación (Formato Gherkin)**
 
@@ -2369,7 +2369,7 @@ El sistema debe permitir al Almacenista registrar la recepción física de merca
 **Reglas de Negocio Aplicables**
 
 * BR-014: La ubicación de destino de la recepción debe estar en estado operativo activo o restringido.
-* BR-019: Solo se pueden crear recepciones para OC en estado PENDIENTE o PARCIALMENTE_RECIBIDA.
+* BR-19: Solo se pueden crear recepciones para OC en estado PENDIENTE o PARCIALMENTE_RECIBIDA.
 * La cantidad a recibir por ítem no puede superar la cantidad pendiente de recibir en la OC.
 
 **Criterios de Aceptación (Formato Gherkin)**
@@ -2466,7 +2466,7 @@ Al confirmar una recepción, el sistema debe generar automáticamente un Movimie
 * BR-010: El ledger de movimientos es inmutable. Una recepción confirmada genera Movements permanentes que no pueden eliminarse.
 * BR-011: El stock se actualiza exclusivamente mediante `register_entry()`. La recepción no modifica StockByLocation directamente.
 * BR-014: La ubicación de destino debe estar en estado operativo válido al momento de la confirmación.
-* BR-021 (nueva): El costo de compra (`unit_cost` del ítem de OC) queda congelado en el campo `Movement.unit_cost` en el momento de la confirmación.
+* BR-21 (nueva): El costo de compra (`unit_cost` del ítem de OC) queda congelado en el campo `Movement.unit_cost` en el momento de la confirmación.
 
 **Criterios de Aceptación (Formato Gherkin)**
 
@@ -2595,7 +2595,7 @@ El sistema debe permitir cancelar una recepción que esté en estado BORRADOR. U
 **Reglas de Negocio Aplicables**
 
 * BR-010: Las recepciones CONFIRMADAS son inmutables, igual que los Movements.
-* BR-019 (nueva): Solo las recepciones en BORRADOR pueden cancelarse.
+* BR-19 (nueva): Solo las recepciones en BORRADOR pueden cancelarse.
 
 **Criterios de Aceptación (Formato Gherkin)**
 
@@ -2744,10 +2744,10 @@ Los siguientes requisitos se incorporan a la tabla de trazabilidad del documento
 
 | **ID** | **Nombre** | **Módulo** | **Reglas de Negocio** |
 | --- | --- | --- | --- |
-| RF-019 | Gestión de Proveedores | Compras y Abastecimiento | BR-01, BR-018 |
-| RF-020 | Creación y Gestión de Órdenes de Compra | Compras y Abastecimiento | BR-01, BR-019, BR-020 |
-| RF-021 | Creación de Recepciones de Mercancía | Compras y Abastecimiento | BR-014, BR-019 |
-| RF-022 | Confirmación de Recepción y Generación de Movimientos | Compras y Abastecimiento | BR-010, BR-011, BR-014, BR-021 |
-| RF-023 | Cancelación de Recepciones | Compras y Abastecimiento | BR-010, BR-019 |
+| RF-019 | Gestión de Proveedores | Compras y Abastecimiento | BR-01, BR-18 |
+| RF-020 | Creación y Gestión de Órdenes de Compra | Compras y Abastecimiento | BR-01, BR-19, BR-20 |
+| RF-021 | Creación de Recepciones de Mercancía | Compras y Abastecimiento | BR-014, BR-19 |
+| RF-022 | Confirmación de Recepción y Generación de Movimientos | Compras y Abastecimiento | BR-010, BR-011, BR-014, BR-21 |
+| RF-023 | Cancelación de Recepciones | Compras y Abastecimiento | BR-010, BR-19 |
 | RF-024 | Trazabilidad del Ciclo de Compras | Compras y Abastecimiento | BR-001, BR-010 |
 | RF-025 | Control de Acceso al Módulo de Compras | Compras y Abastecimiento | BR-001, BR-003 |

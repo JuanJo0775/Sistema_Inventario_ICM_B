@@ -336,7 +336,7 @@ Cada subcategoría tiene su propia numeración: `SCR-*` para scripts, `SHA-*` pa
 
 ## Estado actual de la suite
 
-**646 tests · 637 pasan · 9 skips legítimos · 0 fallos** _(2026-06-07)_
+**769 tests · 758 pasan · 11 skips legítimos · 0 fallos** _(2026-06-12)_
 
 | Capa | Archivos | Descripción |
 |------|----------|-------------|

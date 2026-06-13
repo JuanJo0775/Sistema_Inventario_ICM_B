@@ -243,43 +243,43 @@ icm_backend/
 │   │   ├── selectors.py                                        # Consultas de auditoría
 │   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
 │   │   └── admin.py                                            # Registro administrativo y soporte operacional
-│   ├── dashboard/                                              # Aplicación Django detectada automáticamente
+│   ├── dashboard/                                              # Read model operacional para UI ejecutiva (solo almacenista)
 │   │   ├── tests/                                              # Pruebas del subdominio
-│   │   │   └── test_views.py                                   # Reglas de negocio y transacciones del dominio
+│   │   │   └── test_views.py                                   # Cobertura de endpoints del dashboard
 │   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
-│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── views.py                                            # Endpoints HTTP del módulo (overview, metrics, alerts, kpis, movements)
 │   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
-│   │   └── services.py                                         # Reglas de negocio y transacciones del dominio
-│   ├── purchasing/                                             # Aplicación Django detectada automáticamente
+│   │   └── services.py                                         # Lógica de agregación y composición para read model
+│   ├── purchasing/                                             # Proveedores, órdenes de compra y recepciones (solo almacenista)
 │   │   ├── tests/                                              # Pruebas del subdominio
 │   │   │   ├── factories.py                                    # Factories de datos de prueba
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
 │   │   │   ├── test_selectors.py                               # Consultas de lectura sin efectos secundarios
 │   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
 │   │   │   └── test_views.py                                   # Cobertura crítica del módulo
-│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── models.py                                           # Entidades y constraints de persistencia (Supplier, PurchaseOrder, Reception)
 │   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
 │   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
 │   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
-│   │   ├── services.py                                         # Reglas de negocio del ledger y actualización transaccional del stock
+│   │   ├── services.py                                         # Reglas de negocio: creación OC, confirmación, recepciones, costos congelados
 │   │   ├── selectors.py                                        # Consultas de lectura y agregaciones del módulo
-│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
-│   │   ├── exceptions.py                                       # Excepciones de dominio y validación
+│   │   ├── permissions.py                                      # Política de acceso (IsPurchasingOperator / IsPurchasingViewer)
+│   │   ├── exceptions.py                                       # Excepciones de dominio (NIT duplicado, OC inmutable, etc.)
 │   │   └── admin.py                                            # Registro administrativo y soporte operacional
-│   └── webhooks/                                               # Aplicación Django detectada automáticamente
+│   └── webhooks/                                               # Suscripción y entrega de eventos externos (solo almacenista)
 │       ├── tests/                                              # Pruebas del subdominio
-│       │   ├── test_commands.py                                # Cobertura crítica del módulo
-│       │   ├── test_endpoint_put.py                            # Reglas de negocio y transacciones del dominio
-│       │   ├── test_services.py                                # Cobertura crítica del módulo
-│       │   └── test_views.py                                   # Cobertura crítica del módulo
+│       │   ├── test_commands.py                                # Cobertura del comando deliver_webhooks
+│       │   ├── test_endpoint_put.py                            # Actualización y prueba de endpoints
+│       │   ├── test_services.py                                # Cobertura de lógica de encolado y firma
+│       │   └── test_views.py                                   # Cobertura de endpoints CRUD y stats
 │       ├── management/
 │       │   └── commands/                                       # Comandos administrativos del módulo
-│       │       └── deliver_webhooks.py                         # Comando Django para automatización operativa
-│       ├── models.py                                           # Entidades y constraints de persistencia
+│       │       └── deliver_webhooks.py                         # Comando Django para entrega programada de webhooks
+│       ├── models.py                                           # Entidades y constraints (WebhookEndpoint, WebhookDelivery)
 │       ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
 │       ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
 │       ├── urls.py                                             # Ruteo HTTP y composición de endpoints
-│       ├── services.py                                         # Reglas de negocio y transacciones del dominio
+│       ├── services.py                                         # Encolado de entregas, firma HMAC-SHA256, política de reintentos
 │       └── admin.py                                            # Registro administrativo y soporte operacional
 ├── config/                                                     # Configuración central del proyecto Django
 │   ├── settings/                                               # Configuración compartida y sobreescrituras por entorno
@@ -996,7 +996,7 @@ with pytest.raises(UnauthorizedCredentialManagementError):
 
 ---
 
-#### BR-018: NIT Único por Proveedor
+#### BR-18: NIT Único por Proveedor
 
 **Descripción**: El NIT (Número de Identificación Tributaria) de un proveedor es único en todo el sistema. No pueden existir dos proveedores con el mismo NIT, independientemente de si están activos o inactivos.
 
@@ -1015,7 +1015,7 @@ with pytest.raises(SupplierNITDuplicateError):
 
 ---
 
-#### BR-019: Estado de OC controla operaciones permitidas
+#### BR-19: Estado de OC controla operaciones permitidas
 
 **Descripción**: Las Órdenes de Compra siguen un ciclo de vida estricto. El estado determina qué operaciones son posibles:
 - `BORRADOR`: editable, cancelable, no acepta recepciones.
@@ -1041,7 +1041,7 @@ with pytest.raises(PurchaseOrderImmutableError):
 
 ---
 
-#### BR-020: Cancelación de OC requiere ausencia de recepciones confirmadas
+#### BR-20: Cancelación de OC requiere ausencia de recepciones confirmadas
 
 **Descripción**: Una Orden de Compra no puede cancelarse si tiene al menos una recepción en estado `CONFIRMADA`. La cancelación solo es posible si todas las recepciones asociadas están en `BORRADOR` o `CANCELADA`.
 
@@ -1061,7 +1061,7 @@ with pytest.raises(POHasConfirmedReceptionsError):
 
 ---
 
-#### BR-021: Costo de Compra Congelado en Movement al Confirmar Recepción
+#### BR-21: Costo de Compra Congelado en Movement al Confirmar Recepción
 
 **Descripción**: Al confirmar una recepción, el `unit_cost` acordado con el proveedor en el ítem de la Orden de Compra (`PurchaseOrderItem.unit_cost`) queda registrado de forma inmutable en el campo `Movement.unit_cost` del movimiento de entrada generado. Este valor no cambia aunque el precio de catálogo del producto se actualice posteriormente.
 
@@ -1124,10 +1124,10 @@ assert movement.unit_cost == Decimal("12500.5000")
 | BR-15 | StorageType Activo como Requisito | Inventory | Validación en `create_location`/`update_location`; `StorageType.is_active` | Tests: tipo inactivo rechazado en asignación |
 | BR-16 | Precio Congelado en Despacho | Movements/Pricing | `_resolve_price_snapshot()` en `movements/services.py`; campos `unit_price`, `subtotal`, `total_amount` en `Movement` (nullable, inmutables post-creación) | Tests: `test_price_snapshot_immutable_after_product_price_change`; cambio de precio no altera Movement histórico |
 | BR-17 | Historial Auditado de Precios | Catalog/Pricing | `update_product_prices()` en `catalog/services.py` crea fila en `ProductPriceHistory` por cada campo modificado | Tests: `test_update_price_creates_history_record`; valor idéntico no genera registro |
-| BR-018 | NIT Único por Proveedor | Purchasing | `Supplier.nit = CharField(unique=True)` + `SupplierNITDuplicateError` en `purchasing/services.py` | Tests: `test_create_supplier_duplicate_nit_raises` |
-| BR-019 | Estado de OC Controla Operaciones | Purchasing | `PurchaseOrder.is_editable`, `is_receivable` (properties) + guardas en `purchasing/services.py` | Tests: `test_confirm_already_pendiente_raises`, `test_create_reception_po_not_receivable_raises` |
-| BR-020 | Cancelación de OC Requiere Sin Recepciones Confirmadas | Purchasing | `cancel_purchase_order()` verifica `ReceptionStatus.CONFIRMADA` → `POHasConfirmedReceptionsError` (HTTP 409) | Tests: `test_cancel_po_with_confirmed_reception_raises` |
-| BR-021 | Costo de Compra Congelado en Movement | Purchasing/Movements | `register_entry(unit_cost=poi.unit_cost)` en `purchasing/services.confirm_reception()` | Tests: `test_confirm_reception_unit_cost_flows_to_movement` |
+| BR-18 | NIT Único por Proveedor | Purchasing | `Supplier.nit = CharField(unique=True)` + `SupplierNITDuplicateError` en `purchasing/services.py` | Tests: `test_create_supplier_duplicate_nit_raises` |
+| BR-19 | Estado de OC Controla Operaciones | Purchasing | `PurchaseOrder.is_editable`, `is_receivable` (properties) + guardas en `purchasing/services.py` | Tests: `test_confirm_already_pendiente_raises`, `test_create_reception_po_not_receivable_raises` |
+| BR-20 | Cancelación de OC Requiere Sin Recepciones Confirmadas | Purchasing | `cancel_purchase_order()` verifica `ReceptionStatus.CONFIRMADA` → `POHasConfirmedReceptionsError` (HTTP 409) | Tests: `test_cancel_po_with_confirmed_reception_raises` |
+| BR-21 | Costo de Compra Congelado en Movement | Purchasing/Movements | `register_entry(unit_cost=poi.unit_cost)` en `purchasing/services.confirm_reception()` | Tests: `test_confirm_reception_unit_cost_flows_to_movement` |
 
 ---
 
