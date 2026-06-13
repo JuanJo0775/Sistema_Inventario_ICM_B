@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import csv
 import io
-from typing import Iterable
+from collections.abc import Iterable
 
 from django.http import HttpResponse, StreamingHttpResponse
 
@@ -73,14 +73,13 @@ def export_to_xlsx(
 
     truncated = False
     count = 0
-    for row in rows:
-        if count >= XLSX_ROW_LIMIT:
+    for count, row in enumerate(rows, start=1):
+        if count > XLSX_ROW_LIMIT:
             truncated = True
             break
         ws.append(
             [str(row.get(h, "")) if row.get(h, "") is not None else "" for h in headers]
         )
-        count += 1
 
     if truncated:
         ws.append(

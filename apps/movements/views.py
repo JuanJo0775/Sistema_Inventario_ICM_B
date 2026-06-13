@@ -212,7 +212,7 @@ class DispatchListCreateView(generics.ListCreateAPIView):
             discount_pct=d.get("discount_pct"),
         )
         # register_dispatch may return one Movement or a list of Movements
-        if isinstance(movement, (list, tuple)):
+        if isinstance(movement, list | tuple):
             # backward-compat: if it's a single-item list, return an object
             if len(movement) == 1:
                 data = MovementSerializer(movement[0]).data

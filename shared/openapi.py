@@ -31,8 +31,8 @@ def standardize_errors_hook(
     Hook de post-procesamiento para estandarizar las respuestas de error en Swagger UI.
     Reemplaza los esquemas generados por defecto por DRF con el componente `ErrorResponse`.
     """
-    for path, path_data in result.get("paths", {}).items():
-        for method, method_data in path_data.items():
+    for _path, path_data in result.get("paths", {}).items():
+        for _method, method_data in path_data.items():
             if "responses" not in method_data:
                 continue
             responses = method_data["responses"]

@@ -222,12 +222,12 @@ def test_severity_and_category_canonical(
 ):
     """Verifica que _severity_and_category devuelve los valores canónicos del mapa."""
     severity, category = _severity_and_category(alert_type, per_location=per_location)
-    assert (
-        severity == expected_severity
-    ), f"{alert_type}(per_location={per_location}): esperaba severity={expected_severity}, obtuvo={severity}"
-    assert (
-        category == expected_category
-    ), f"{alert_type}(per_location={per_location}): esperaba category={expected_category}, obtuvo={category}"
+    assert severity == expected_severity, (
+        f"{alert_type}(per_location={per_location}): esperaba severity={expected_severity}, obtuvo={severity}"
+    )
+    assert category == expected_category, (
+        f"{alert_type}(per_location={per_location}): esperaba category={expected_category}, obtuvo={category}"
+    )
 
 
 def test_severity_unknown_type_returns_defaults():

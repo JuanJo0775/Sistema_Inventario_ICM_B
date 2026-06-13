@@ -38,7 +38,6 @@ def reverse_migrate(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("catalog", "0013_migrate_brand_data"),
     ]

@@ -12,9 +12,9 @@ def test_alert_type_low_stock():
 
 def test_all_alert_types_have_defaults():
     for alert_type in AlertType.values:
-        assert (
-            alert_type in ALERT_TYPE_DEFAULTS
-        ), f"{alert_type} no tiene entrada en ALERT_TYPE_DEFAULTS"
+        assert alert_type in ALERT_TYPE_DEFAULTS, (
+            f"{alert_type} no tiene entrada en ALERT_TYPE_DEFAULTS"
+        )
 
 
 def test_expiration_30_is_critical():

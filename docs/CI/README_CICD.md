@@ -40,9 +40,8 @@ Jobs reales:
 
 Ejecuta:
 
-- `black --check .`
-- `isort --check-only .`
-- `flake8 apps/ shared/`
+- `ruff check apps/ shared/`
+- `ruff format --check apps/ shared/`
 - `bandit -r apps shared -ll`
 - `pip-audit --progress=off`
 - `mypy apps/ shared/`
@@ -117,10 +116,10 @@ Para reproducir los gates principales:
 ```bash
 python -m pip install -U pip
 pip install -r requirements/base.txt
-pip install black==23.12.1 isort==5.13.2 pip-audit pytest pytest-django pytest-cov bandit
+pip install ruff pip-audit pytest pytest-django pytest-cov bandit
 
-black --check .
-isort --check-only .
+ruff check apps/ shared/
+ruff format --check apps/ shared/
 bandit -r apps shared -ll
 pip-audit --progress=off
 python manage.py makemigrations --check --dry-run

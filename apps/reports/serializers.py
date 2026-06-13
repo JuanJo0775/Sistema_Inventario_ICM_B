@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """Serializadores para los endpoints de `reports`.
 
 Nota: el serializer `KpiDashboardSerializer` representa el payload del panel

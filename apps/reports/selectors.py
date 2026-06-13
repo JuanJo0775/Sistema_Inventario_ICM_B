@@ -691,7 +691,9 @@ def get_invoice_history(
     Returns:
         QuerySet de `Movement` con relaciones cargadas.
     """
-    del include_customer_metadata  # API estable; enlace a auditoría en capa de vista si aplica.
+    del (
+        include_customer_metadata
+    )  # API estable; enlace a auditoría en capa de vista si aplica.
     filters = filters or {}
     qs = get_dispatches_with_invoices().select_related(
         "product", "lot", "executed_by", "origin_location"

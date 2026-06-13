@@ -2138,7 +2138,7 @@ jobs:
 
 ### 12.1 Estilo de Código
 
-- **PEP 8**: `black` (formateador), `isort` (imports), `flake8` (linter).
+- **PEP 8**: `ruff` (formateador + linter + imports, reemplaza a black, isort y flake8).
 - **Type hints**: Obligatorios en `services.py` y `selectors.py`.
 
 ```python

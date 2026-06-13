@@ -59,7 +59,7 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | Performance Testing | 10 / 10 | Locust 2 roles, 34 tareas, 8 módulos |
 | Concurrency Testing | 9 / 10 | 4 tests (requieren PostgreSQL, skip en SQLite) |
 | CI/CD | **9.5 / 10** | 7 jobs, **bandit/mypy bloqueantes**, pip-audit informativo, cobertura 85% |
-| Calidad estática | **10 / 10** | **black/isort/flake8/mypy/bandit todos bloqueantes** |
+| Calidad estática | **10 / 10** | **ruff/mypy/bandit todos bloqueantes** |
 | Cobertura funcional | 10 / 10 | 132 escenarios backend 100% implementados |
 | Cobertura técnica | 9 / 10 | 65 pytest.raises, 78 mocks, 13 parametrize |
 | Scripts / Herramientas | 9 / 10 | 35 tests scripts/aux (6 config seed + 29 gen_docs/structure/parse/perf/shared) |
@@ -107,9 +107,7 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | Herramienta | Archivo | Observaciones |
 |-------------|---------|---------------|
 | pytest | `pytest.ini` | `DJANGO_SETTINGS_MODULE=test`, markers, `norecursedirs` excluye `tests/performance` |
-| isort | `pyproject.toml` | Profile `black`, longitud 88 |
-| black | `requirements/base.txt` + CI | `black==26.3.1` |
-| flake8 | CI yml | `--max-line-length=88`, excluye `*/tests*` y `*/migrations*` |
+| ruff | `pyproject.toml` | Reemplaza black + isort + flake8; config en `[tool.ruff]` |
 | bandit | CI yml | `-r apps shared -ll`, `continue-on-error: true` |
 | pip-audit | CI yml | `--progress=off`, `continue-on-error: true` |
 | pytest-cov | `requirements/base.txt` | `pytest-cov==4.1.0`, genera XML |
@@ -654,9 +652,8 @@ quality → unit_tests → integration_tests → scenarios ───────
 
 | Verificación | Herramienta | Bloqueante |
 |-------------|-------------|------------|
-| Formato de código | `black --check .` | Sí |
-| Orden de imports | `isort --check-only .` | Sí |
-| Linting | `flake8 apps/ shared/` | Sí |
+| Linting | `ruff check apps/ shared/` | Sí |
+| Formato de código | `ruff format --check apps/ shared/` | Sí |
 | SAST | `bandit -r apps shared -ll` | **Sí** (sin `continue-on-error`) |
 | Supply chain | `pip-audit --progress=off` | No (`continue-on-error: true`) |
 | Migraciones al día | `makemigrations --check --dry-run` | Sí |
@@ -700,20 +697,17 @@ Herramientas de análisis estático configuradas tanto en el entorno local como 
 
 | Herramienta | Versión | Función | Bloqueante en CI |
 |-------------|---------|---------|-----------------|
-| `black` | 26.3.1 | Formato de código | Sí |
-| `isort` | 5.13.2 | Orden de imports | Sí |
-| `flake8` | 6.1.0 | Linting PEP8 | Sí |
+| `ruff` | 0.9.0 | Linting + formato + imports (todo-en-uno) | Sí |
 | `mypy` | 1.10.0 | Tipado estático | **Sí** (sin `continue-on-error`) |
 | `bandit` | (sin versión fijada) | SAST Python | **Sí** (sin `continue-on-error`) |
 | `pip-audit` | (sin versión fijada) | Vulnerabilidades de dependencias | No (`continue-on-error: true`) |
 
-#### Configuración de flake8 en CI
+#### Configuración de ruff en CI
 
 ```
-flake8 apps/ shared/ --max-line-length=88 --extend-ignore=E203,W503,E501 --exclude=*/tests*,*/migrations*
+ruff check apps/ shared/
+ruff format --check apps/ shared/
 ```
-
-Nota: flake8 excluye los directorios de tests — los tests no están sujetos a linting.
 
 #### Herramientas ausentes
 
@@ -724,9 +718,8 @@ Nota: flake8 excluye los directorios de tests — los tests no están sujetos a 
 
 #### Fortalezas (validado 2026-06-12)
 
-- `black` + `isort` bloqueantes en CI garantizan estilo uniforme sin discusión.
+- `ruff` bloqueante en CI garantiza linting + formato + imports uniformes sin discusión.
 - Solo 21 supresiones `noqa`/`type: ignore` en toda la codebase — mínima deuda técnica suprimida.
-- Profile `black` en isort evita conflictos entre herramientas de formato.
 - `mypy` es **bloqueante en CI** (config `mypy.ini` con `disallow_untyped_defs = True` en 9 módulos: movements, catalog, inventory, purchasing, authentication, reports, alerts, audit, shared exceptions + location_validators).
 - `bandit` es **bloqueante en CI** — hallazgos SAST detienen el pipeline (sin `continue-on-error`).
 - `pip-audit` se mantiene como `continue-on-error: true` por ser verificación de dependencias externas.
@@ -734,7 +727,7 @@ Nota: flake8 excluye los directorios de tests — los tests no están sujetos a 
 #### Limitaciones
 
 - `pip-audit` como `continue-on-error: true` — vulnerabilidades en dependencias no bloquean el merge (aceptable por ser externo).
-- flake8 excluye `*/tests*` — los archivos de test no están sujetos a linting.
+- ruff excluye `*/tests*` — los archivos de test no están sujetos a linting (configurado via `per-file-ignores`).
 
 #### Evidencias
 
@@ -745,7 +738,7 @@ Nota: flake8 excluye los directorios de tests — los tests no están sujetos a 
 
 #### Calificación: **9 / 10**
 
-La combinación black+isort+flake8 garantiza uniformidad básica. mypy y bandit ahora son bloqueantes en CI, eliminando los dos riesgos principales identificados. pip-audit permanece como informativo por tratarse de dependencias externas. La flake8 excluye tests, práctica aceptable.
+La combinación ruff (lint + formato + imports) garantiza uniformidad básica. mypy y bandit ahora son bloqueantes en CI, eliminando los dos riesgos principales identificados. pip-audit permanece como informativo por tratarse de dependencias externas. ruff excluye tests via per-file-ignores, práctica aceptable.
 
 ---
 
@@ -909,11 +902,11 @@ Los cuatro escenarios de concurrencia más críticos están cubiertos: stock neg
 
 ### CI/CD — **9 / 10**
 
-Pipeline de 6 etapas con progresión correcta: calidad (black, isort, flake8, mypy no-bloqueante, bandit, pip-audit, migraciones, docs) → unit (SQLite, `--cov-fail-under=85`) → integración → escenarios Postgres → concurrencia → carga (Locust 2 roles, SLA check). Umbral de cobertura 85% aplicado. mypy presente como paso informativo. Brecha: bandit/pip-audit y mypy con `continue-on-error`.
+Pipeline de 6 etapas con progresión correcta: calidad (ruff, mypy no-bloqueante, bandit, pip-audit, migraciones, docs) → unit (SQLite, `--cov-fail-under=85`) → integración → escenarios Postgres → concurrencia → carga (Locust 2 roles, SLA check). Umbral de cobertura 85% aplicado. mypy presente como paso informativo. Brecha: bandit/pip-audit y mypy con `continue-on-error`.
 
 ### Calidad Estática — **9 / 10**
 
-black + isort + flake8 uniformes y bloqueantes. mypy ahora es bloqueante con `mypy.ini` dedicado que exige type hints estrictos en 9 módulos de servicios críticos. bandit SAST ahora es bloqueante. pip-audit se mantiene como informativo por controlar dependencias externas.
+ruff uniforme y bloqueante (lint + formato + imports). mypy ahora es bloqueante con `mypy.ini` dedicado que exige type hints estrictos en 9 módulos de servicios críticos. bandit SAST ahora es bloqueante. pip-audit se mantiene como informativo por controlar dependencias externas.
 
 ### Cobertura Funcional — **10 / 10**
 
@@ -982,9 +975,7 @@ El sistema está en condiciones óptimas para operar en producción. Las accione
 | pytest-cov | 4.1.0 | Cobertura (umbral 85% en CI) |
 | factory-boy | 3.3.0 | Factories de datos |
 | faker | 20.1.0 | Datos falsos |
-| black | 26.3.1 | Formato (bloqueante en CI) |
-| flake8 | 6.1.0 | Linting (bloqueante en CI) |
-| isort | 5.13.2 | Orden imports (bloqueante en CI) |
+| ruff | 0.9.0 | Linting + formato + imports (bloqueante en CI, reemplaza black/flake8/isort) |
 | mypy | 1.10.0 | Tipado estático (**bloqueante en CI** — `disallow_untyped_defs = True` en 9 módulos) |
 | django-stubs | 5.0.2 | Stubs Django para mypy |
 | locust | >=2.20 (dev) | Carga (2 user classes, SLA check) |

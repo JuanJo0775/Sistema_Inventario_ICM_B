@@ -87,9 +87,9 @@ pytest apps/movements/tests/
 pytest -v -k "test_serial"
 pytest --cov=apps
 
-# Formateo
-black apps/ shared/ config/
-isort apps/ shared/ config/
+# Formateo y linting
+ruff format apps/ shared/ config/
+ruff check --fix apps/ shared/ config/
 ```
 
 ## Configuración de entorno (.env)

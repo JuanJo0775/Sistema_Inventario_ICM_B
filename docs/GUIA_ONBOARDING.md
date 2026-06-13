@@ -106,9 +106,9 @@ pytest apps/movements/tests/
 # Ejecutar tests con reporte de cobertura
 pytest --cov=apps
 
-# Formatear el código (Black y isort)
-black apps/ shared/ config/
-isort apps/ shared/ config/
+# Formatear y verificar el código (ruff — reemplaza black, isort y flake8)
+ruff format apps/ shared/ config/
+ruff check apps/ shared/ config/
 ```
 
 ## 10. Management Commands del sistema

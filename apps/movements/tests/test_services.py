@@ -396,10 +396,10 @@ def test_dispatch_single_movement_nonexpiring_product(
         product=sample_product, location=loc, current_stock=15
     )
     # Ensure InvoiceCounter safe state
-    from apps.movements.models import InvoiceCounter as IC2
+    from apps.movements.models import InvoiceCounter as InvoiceCounterAlias
 
-    IC2.objects.all().delete()
-    IC2.objects.create(last_number=2000000)
+    InvoiceCounterAlias.objects.all().delete()
+    InvoiceCounterAlias.objects.create(last_number=2000000)
 
     from unittest.mock import patch as _patch2
 
@@ -796,13 +796,15 @@ def test_correct_movement_outside_window_raises(
     )
 
     expired_time = original.created_at + timedelta(minutes=6)
-    with patch("django.utils.timezone.now", return_value=expired_time):
-        with pytest.raises(ImmutableRecordError):
-            correct_movement_within_window(
-                almacenista_user,
-                original.id,
-                {"location_id": loc.id, "quantity": 3},
-            )
+    with (
+        patch("django.utils.timezone.now", return_value=expired_time),
+        pytest.raises(ImmutableRecordError),
+    ):
+        correct_movement_within_window(
+            almacenista_user,
+            original.id,
+            {"location_id": loc.id, "quantity": 3},
+        )
 
 
 @pytest.mark.django_db
@@ -854,11 +856,13 @@ def test_register_entry_rolls_back_on_movement_save_failure(
     from apps.movements.models import Movement
 
     loc = sample_locations[0]
-    with patch.object(
-        Movement.objects, "create", side_effect=RuntimeError("DB error simulated")
+    with (
+        patch.object(
+            Movement.objects, "create", side_effect=RuntimeError("DB error simulated")
+        ),
+        pytest.raises(RuntimeError),
     ):
-        with pytest.raises(RuntimeError):
-            register_entry(almacenista_user, sample_product.id, loc.id, 5)
+        register_entry(almacenista_user, sample_product.id, loc.id, 5)
     assert not Movement.objects.filter(
         product=sample_product, destination_location=loc
     ).exists()

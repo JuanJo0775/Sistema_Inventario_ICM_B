@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("purchasing", "0003_remove_supplier_contacto_supplier_pais_and_more"),
     ]

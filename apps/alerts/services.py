@@ -157,24 +157,26 @@ def sync_expiry_alerts_for_product(product_id: UUID, *, user: Any = None) -> Non
     days_left = (product.expiration_date - today).days
     if days_left > 60:
         return
-    if 30 < days_left <= 60:
-        if not Alert.objects.filter(
+    if (
+        30 < days_left <= 60
+        and not Alert.objects.filter(
             product_id=product_id,
             lot__isnull=True,
             alert_type=AlertType.EXPIRATION_60,
             location__isnull=True,
             is_resolved=False,
-        ).exists():
-            severity, category = _severity_and_category(AlertType.EXPIRATION_60)
-            Alert.objects.create(
-                product_id=product_id,
-                lot=None,
-                alert_type=AlertType.EXPIRATION_60,
-                severity=severity,
-                category=category,
-                location=None,
-                message=f"El producto vence en {days_left} días (ventana 60).",
-            )
+        ).exists()
+    ):
+        severity, category = _severity_and_category(AlertType.EXPIRATION_60)
+        Alert.objects.create(
+            product_id=product_id,
+            lot=None,
+            alert_type=AlertType.EXPIRATION_60,
+            severity=severity,
+            category=category,
+            location=None,
+            message=f"El producto vence en {days_left} días (ventana 60).",
+        )
     if days_left <= 30:
         # Cerrar EXPIRATION_60 si quedó abierta al cruzar la ventana de 30 días
         Alert.objects.filter(

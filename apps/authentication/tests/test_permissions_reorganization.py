@@ -19,7 +19,6 @@ from tests.factories import UserFactory
 
 @pytest.mark.django_db
 class TestPermissionsReorganization:
-
     def test_default_operating_hours(self, auxiliar_user):
         # We test default operating hours (07:00-12:00, 14:00-17:00)
         # Using check_user_access directly

@@ -246,7 +246,7 @@ def _try_build_invoice_pdf(
     return ContentFile(pdf_bytes, name=f"{invoice_number}.pdf")
 
 
-def _build_invoice_pdf_rich(invoice: "Invoice") -> ContentFile | None:
+def _build_invoice_pdf_rich(invoice: Invoice) -> ContentFile | None:
     """Genera PDF enriquecido con datos de precio para un Invoice. Falla silenciosamente."""
     try:
         from weasyprint import HTML
@@ -312,12 +312,12 @@ def _build_invoice_pdf_rich(invoice: "Invoice") -> ContentFile | None:
 
 
 def create_invoice_from_movements(
-    movements: list["Movement"],
+    movements: list[Movement],
     *,
     user: Any,
     invoice_number: str,
     customer_data: dict[str, Any] | None = None,
-) -> "Invoice":
+) -> Invoice:
     """
     Crea o actualiza el modelo Invoice que agrupa los movements del despacho.
 
@@ -378,7 +378,7 @@ def _resolve_price_snapshot(
     quantity: int,
     movement_type: str,
     *,
-    discount_pct: "Any | None" = None,
+    discount_pct: Any | None = None,
 ) -> dict:
     """
     Calcula el snapshot de precio para un Movement de salida.
@@ -525,7 +525,7 @@ def register_entry(
     discrepancy_note: str | None = None,
     cold_chain_acknowledged: bool = False,
     electrical_safety_acknowledged: bool = False,
-    unit_cost: "Any | None" = None,
+    unit_cost: Any | None = None,
 ) -> Movement:
     """
     RF-005 — Entrada de mercancía.
@@ -746,24 +746,23 @@ def register_dispatch(
     )
 
     selected_lot: Lot | None = None
-    if getattr(product, "requires_expiration", False):
-        if lot_id is not None:
-            selected_lot = Lot.objects.select_for_update().get(
-                pk=lot_id, product_id=product_id
+    if getattr(product, "requires_expiration", False) and lot_id is not None:
+        selected_lot = Lot.objects.select_for_update().get(
+            pk=lot_id, product_id=product_id
+        )
+        available = ledger_net_quantity_for_lot_location(
+            product_id=product_id, lot_id=selected_lot.id, location_id=location_id
+        )
+        if available < quantity:
+            raise InsufficientStockError(
+                detail={
+                    "product_id": str(product_id),
+                    "lot_id": str(selected_lot.id),
+                    "location_id": str(location_id),
+                    "available": available,
+                    "requested": quantity,
+                }
             )
-            available = ledger_net_quantity_for_lot_location(
-                product_id=product_id, lot_id=selected_lot.id, location_id=location_id
-            )
-            if available < quantity:
-                raise InsufficientStockError(
-                    detail={
-                        "product_id": str(product_id),
-                        "lot_id": str(selected_lot.id),
-                        "location_id": str(location_id),
-                        "available": available,
-                        "requested": quantity,
-                    }
-                )
 
     origin = _lock_stock(product_id, location_id)
     if origin.current_stock < quantity:

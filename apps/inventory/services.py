@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
@@ -384,9 +385,10 @@ def update_location(executor: Any, location_id: UUID, data: dict[str, Any]) -> L
         elif not requested_active:
             loc.operational_status = Location.OperationalStatus.ARCHIVED
     loc.save()
-    if data.get("is_active") is False:
-        _action = "deactivated"
-    elif data.get("operational_status") == Location.OperationalStatus.ARCHIVED:
+    if (
+        data.get("is_active") is False
+        or data.get("operational_status") == Location.OperationalStatus.ARCHIVED
+    ):
         _action = "deactivated"
     elif "operational_status" in data:
         _action = "state_changed"
@@ -426,10 +428,8 @@ def transition_location_state(
     location = update_location(
         executor, location_id, {"operational_status": new_status}
     )
-    try:
+    with contextlib.suppress(Exception):
         alert_services.sync_location_blocked_alerts_for_location(location)
-    except Exception:
-        pass
     return location
 
 

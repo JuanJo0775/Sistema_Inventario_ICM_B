@@ -48,14 +48,11 @@ jobs:
           pip install -r requirements/base.txt
           pip install bandit pip-audit
 
-      - name: Formatting — black
-        run: black --check .
+      - name: Linting + Formatting — ruff
+        run: ruff check apps/ shared/
 
-      - name: Formatting — isort
-        run: isort --check-only .
-
-      - name: Linting — flake8
-        run: flake8 apps/ shared/ --max-line-length=88 --extend-ignore=E203,W503,E501 --exclude=*/tests*,*/migrations*
+      - name: Format check — ruff format
+        run: ruff format --check apps/ shared/
 
       - name: SAST — bandit
         run: bandit -r apps shared -ll

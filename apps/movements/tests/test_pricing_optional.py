@@ -170,9 +170,9 @@ def test_product_get_exposes_prices_as_nullable_info(authenticated_almacenista_c
         "tax_rate_pct",
     ):
         assert field in data, f"Campo {field} debería estar en la respuesta"
-        assert (
-            data[field] is None
-        ), f"Campo {field} debería ser null para productos sin precio"
+        assert data[field] is None, (
+            f"Campo {field} debería ser null para productos sin precio"
+        )
     assert data["currency"] == "COP"
 
 

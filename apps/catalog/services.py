@@ -114,9 +114,9 @@ def update_product(
         if field in data:
             setattr(product, field, data[field])
     if "category_id" in data:
-        setattr(product, "category_id", data["category_id"])
+        product.category_id = data["category_id"]
     if "brand_id" in data:
-        setattr(product, "brand_id", data.get("brand_id"))
+        product.brand_id = data.get("brand_id")
     if not product.barcode:
         product.barcode = build_product_barcode(product.sku)
     product.save()
@@ -578,7 +578,7 @@ def activate_combo(
 
 @transaction.atomic
 def update_product_prices(
-    user: "User",
+    user: User,
     product_id: Any,
     *,
     unit_cost: Any = None,
@@ -586,7 +586,7 @@ def update_product_prices(
     sale_price_wholesale: Any = None,
     tax_rate_pct: Any = None,
     currency: str | None = None,
-    request: "HttpRequest | None" = None,
+    request: HttpRequest | None = None,
 ) -> Product:
     """
     Actualiza los campos de precio de un producto y registra cada cambio en ProductPriceHistory.

@@ -113,7 +113,6 @@ def unseed_storage_types_and_backfill_locations(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("inventory", "0004_update_checkconstraint"),
     ]

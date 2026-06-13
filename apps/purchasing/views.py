@@ -414,7 +414,9 @@ class ReceptionConfirmView(APIView):
             pk,
             request=request,
             cold_chain_acknowledged=d.get("cold_chain_acknowledged", False),
-            electrical_safety_acknowledged=d.get("electrical_safety_acknowledged", False),
+            electrical_safety_acknowledged=d.get(
+                "electrical_safety_acknowledged", False
+            ),
         )
         return Response(ReceptionSerializer(selectors.get_reception(reception.id)).data)
 

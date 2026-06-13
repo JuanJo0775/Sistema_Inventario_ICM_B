@@ -20,7 +20,6 @@ def reverse_backfill_capacity_mode(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("inventory", "0006_location_operational_status"),
     ]

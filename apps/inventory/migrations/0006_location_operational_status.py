@@ -14,7 +14,6 @@ def reverse_operational_status_backfill(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("inventory", "0005_storage_type_model_and_location_fk"),
     ]

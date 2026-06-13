@@ -161,7 +161,7 @@ def test_poi_unique_together_product_per_po():
 def test_poi_quantity_ordered_check_constraint():
     po = PurchaseOrderFactory()
     product = ProductFactory()
-    with pytest.raises(Exception):
+    with pytest.raises(IntegrityError):
         PurchaseOrderItem.objects.create(
             purchase_order=po,
             product=product,
