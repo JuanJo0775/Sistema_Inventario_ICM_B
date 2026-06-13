@@ -43,14 +43,14 @@ EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 
-SIMPLE_JWT.update(
+SIMPLE_JWT.update(  # noqa: F405
     {
         "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
         "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     }
 )
 
-LOGGING["root"]["level"] = "INFO"
+LOGGING["root"]["level"] = "INFO"  # noqa: F405
 
 # M-06: Restringir acceso a documentación OpenAPI solo a staff en producción.
 RESTRICT_API_SCHEMA = True

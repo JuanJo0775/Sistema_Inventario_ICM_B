@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 
 from apps.purchasing.models import PurchaseOrderStatus, ReceptionStatus
-from tests.factories import LocationFactory, ProductFactory
+from tests.factories import ElectroCategoryFactory, LocationFactory, ProductFactory
 
 from .factories import (
     PurchaseOrderFactory,
@@ -289,3 +289,183 @@ def test_confirm_reception_forbidden_administrador(
         f"/api/v1/purchasing/receptions/{reception.id}/confirm/"
     )
     assert response.status_code == 403
+
+
+# ---------------------------------------------------------------------------
+# Reception + serial_number (BR-04) — view-layer integration
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_create_reception_with_serial_number(
+    authenticated_almacenista_client, almacenista_user
+):
+    """Crea recepción vía endpoint con serial_number y verifica que se persista."""
+    po = PurchaseOrderFactory(
+        created_by=almacenista_user, status=PurchaseOrderStatus.PENDIENTE
+    )
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=10
+    )
+    location = LocationFactory(name="Bodega Test", code="bodega-test")
+
+    response = authenticated_almacenista_client.post(
+        "/api/v1/purchasing/receptions/",
+        {
+            "po_id": str(po.id),
+            "destination_location_id": str(location.id),
+            "items": [
+                {
+                    "purchase_order_item_id": str(poi.id),
+                    "quantity_received": 5,
+                    "serial_number": "SN-TEST-001",
+                }
+            ],
+        },
+        format="json",
+    )
+    assert response.status_code == 201
+    item = response.data["items"][0]
+    assert item["serial_number"] == "SN-TEST-001"
+    assert item["quantity_received"] == 5
+
+
+@pytest.mark.django_db
+def test_create_reception_with_allocations_and_serial(
+    authenticated_almacenista_client, almacenista_user
+):
+    """Crea recepción con allocations y serial_number en item y allocation."""
+    po = PurchaseOrderFactory(
+        created_by=almacenista_user, status=PurchaseOrderStatus.PENDIENTE
+    )
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=10
+    )
+    b1 = LocationFactory(name="Bodega 1", code="bodega-1-test")
+    v1 = LocationFactory(name="Vitrina", code="vitrina-test")
+
+    response = authenticated_almacenista_client.post(
+        "/api/v1/purchasing/receptions/",
+        {
+            "po_id": str(po.id),
+            "destination_location_id": str(b1.id),
+            "items": [
+                {
+                    "purchase_order_item_id": str(poi.id),
+                    "quantity_received": 6,
+                    "serial_number": "SN-TEST-ALLOC-001",
+                    "allocations": [
+                        {
+                            "location_id": str(b1.id),
+                            "quantity_received": 2,
+                            "serial_number": "SN-ALLOC-001",
+                        },
+                        {
+                            "location_id": str(v1.id),
+                            "quantity_received": 4,
+                            "serial_number": "SN-ALLOC-002",
+                        },
+                    ],
+                }
+            ],
+        },
+        format="json",
+    )
+    assert response.status_code == 201
+    assert response.data["has_allocations"] is True
+    # Item-level serial
+    assert response.data["items"][0]["serial_number"] == "SN-TEST-ALLOC-001"
+    # Allocation-level serials
+    allocs = response.data["items"][0]["allocations"]
+    assert len(allocs) == 2
+    serials = {a["serial_number"] for a in allocs}
+    assert serials == {"SN-ALLOC-001", "SN-ALLOC-002"}
+
+
+@pytest.mark.django_db
+def test_create_and_confirm_reception_with_serial(
+    authenticated_almacenista_client, almacenista_user
+):
+    """
+    Flujo completo: crea recepción con serial vía endpoint,
+    luego la confirma — debe crear el movimiento de entrada sin error.
+    """
+    po = PurchaseOrderFactory(
+        created_by=almacenista_user, status=PurchaseOrderStatus.PENDIENTE
+    )
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat)
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=5
+    )
+    location = LocationFactory(
+        name="Bodega Confirm", code="bodega-confirm", operational_status="active"
+    )
+
+    # Crear recepción
+    create_resp = authenticated_almacenista_client.post(
+        "/api/v1/purchasing/receptions/",
+        {
+            "po_id": str(po.id),
+            "destination_location_id": str(location.id),
+            "items": [
+                {
+                    "purchase_order_item_id": str(poi.id),
+                    "quantity_received": 5,
+                    "serial_number": "SN-CONFIRM-001",
+                }
+            ],
+        },
+        format="json",
+    )
+    assert create_resp.status_code == 201
+    reception_id = create_resp.data["id"]
+
+    # Confirmar recepción
+    confirm_resp = authenticated_almacenista_client.post(
+        f"/api/v1/purchasing/receptions/{reception_id}/confirm/",
+        {
+            "cold_chain_acknowledged": True,
+            "electrical_safety_acknowledged": True,
+        },
+        format="json",
+    )
+    assert confirm_resp.status_code == 200
+    assert confirm_resp.data["status"] == "confirmada"
+
+
+@pytest.mark.django_db
+def test_create_reception_with_serial_ignored_when_not_required(
+    authenticated_almacenista_client, almacenista_user
+):
+    """Serial opcional se ignora si la categoría no lo exige."""
+    po = PurchaseOrderFactory(
+        created_by=almacenista_user, status=PurchaseOrderStatus.PENDIENTE
+    )
+    product = ProductFactory()  # ManoCategoryFactory — requires_serial_number=False
+    poi = PurchaseOrderItemFactory(
+        purchase_order=po, product=product, quantity_ordered=10
+    )
+    location = LocationFactory(name="Bodega Normal", code="bodega-normal")
+
+    response = authenticated_almacenista_client.post(
+        "/api/v1/purchasing/receptions/",
+        {
+            "po_id": str(po.id),
+            "destination_location_id": str(location.id),
+            "items": [
+                {
+                    "purchase_order_item_id": str(poi.id),
+                    "quantity_received": 3,
+                    "serial_number": "SN-OPTIONAL-001",
+                }
+            ],
+        },
+        format="json",
+    )
+    assert response.status_code == 201
+    assert response.data["items"][0]["serial_number"] == "SN-OPTIONAL-001"

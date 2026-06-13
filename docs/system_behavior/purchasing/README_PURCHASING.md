@@ -137,7 +137,11 @@ confirm_reception()
   → Valida discrepancy_note si aplica
   → Valida Location.operational_status in (active, restricted)
   → Por cada item/allocation:
-      → movements.services.register_entry()  (crea Movement ENTRADA + actualiza StockByLocation)
+      → movements.services.register_entry(
+           serial_number=item.serial_number or allocation.serial_number,
+           ...)
+       (BR-04: si la categoría exige serial y es None,
+        register_entry() lanza SerialNumberRequiredError)
       → Enlaza movement a ReceptionItem / ReceptionItemAllocation
   → Actualiza PurchaseOrderItem.quantity_received
   → Reception.status = CONFIRMADA

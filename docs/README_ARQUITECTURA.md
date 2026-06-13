@@ -554,6 +554,7 @@ También existe **`POST /api/v1/auth/change-password/`** (autenticado) para el c
 - Para categoría Electroterapia: `requires_serial_number = True`.
 - `movements.services.register_entry()`: si `product.category.requires_serial_number == True` y `serial_number is None`, lanza `SerialNumberRequiredError`.
 - `movements.services.register_dispatch()`: idem validación.
+- `purchasing.services.confirm_reception()` propaga `serial_number` desde `ReceptionItem.serial_number` (o `ReceptionItemAllocation.serial_number` si hay allocaciones) a `movements.services.register_entry()`.
 - El campo `serial_number` en `Movement` es obligatorio en estos casos.
 
 **Verificación en tests**:

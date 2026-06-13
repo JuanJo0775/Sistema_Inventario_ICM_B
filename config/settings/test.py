@@ -19,7 +19,7 @@ CORS_ALLOWED_ORIGINS = []
 
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
-REST_FRAMEWORK = {
-    **REST_FRAMEWORK,
+REST_FRAMEWORK = {  # noqa: F405
+    **REST_FRAMEWORK,  # noqa: F405
     "DEFAULT_THROTTLE_CLASSES": (),
 }

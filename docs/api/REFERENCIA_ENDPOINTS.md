@@ -1350,16 +1350,49 @@ POST   /api/v1/purchasing/receptions/<uuid>/confirm/      → confirmar (crea Mo
 POST   /api/v1/purchasing/receptions/<uuid>/cancel/       → cancelar (solo si no está confirmada)
 ```
 
+**Request POST (crear):**
+```json
+{
+  "po_id": "<purchase_order_uuid>",
+  "destination_location_id": "<location_uuid>",
+  "notes": "Recepción de pedido urgente",
+  "items": [
+    {
+      "purchase_order_item_id": "<po_item_uuid>",
+      "quantity_received": 48,
+      "lot_code": "LOT-2026-001",
+      "lot_expiration_date": "2027-06-30",
+      "serial_number": "SN-XXXX-001",
+      "discrepancy_note": null,
+      "allocations": [
+        {
+          "location_id": "<location_uuid>",
+          "quantity_received": 24,
+          "lot_code": "LOT-2026-001",
+          "lot_expiration_date": "2027-06-30",
+          "serial_number": "SN-XXXX-001-A"
+        },
+        {
+          "location_id": "<otra_location_uuid>",
+          "quantity_received": 24,
+          "serial_number": "SN-XXXX-001-B"
+        }
+      ]
+    }
+  ]
+}
+```
+
+El campo `serial_number` es opcional a nivel de ítem y de allocation.  
+Es **obligatorio** cuando la categoría del producto tiene `requires_serial_number=True` (BR-04 — Electroterapia).  
+Si se usa el modo simple (sin `allocations`), basta con `serial_number` a nivel de ítem.  
+Si se usa el modo avanzado (con `allocations`), se puede especificar un serial por cada allocation.
+
 **Request POST (confirmar):**
 ```json
 {
-  "received_items": [
-    {
-      "product": "<product_uuid>",
-      "quantity_received": 48,
-      "unit_cost": "12500.0000"
-    }
-  ]
+  "cold_chain_acknowledged": true,
+  "electrical_safety_acknowledged": false
 }
 ```
 

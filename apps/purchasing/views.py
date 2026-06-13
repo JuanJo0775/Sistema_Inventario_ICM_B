@@ -358,6 +358,7 @@ class ReceptionListCreateView(APIView):
                         "lot_code": item.get("lot_code", ""),
                         "lot_expiration_date": item.get("lot_expiration_date"),
                         "discrepancy_note": item.get("discrepancy_note", ""),
+                        "serial_number": item.get("serial_number"),
                         "allocations": [
                             {
                                 "location_id": allocation["location_id"],
@@ -366,6 +367,7 @@ class ReceptionListCreateView(APIView):
                                 "lot_expiration_date": allocation.get(
                                     "lot_expiration_date"
                                 ),
+                                "serial_number": allocation.get("serial_number"),
                             }
                             for allocation in item.get("allocations", [])
                         ],

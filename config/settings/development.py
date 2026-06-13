@@ -36,11 +36,11 @@ EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="5171af463f59b9")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="b43eec639a12e6")
 
-SIMPLE_JWT.update(
+SIMPLE_JWT.update(  # noqa: F405
     {
         "ACCESS_TOKEN_LIFETIME": timedelta(hours=24),
         "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     }
 )
 
-LOGGING["root"]["level"] = "DEBUG"
+LOGGING["root"]["level"] = "DEBUG"  # noqa: F405
