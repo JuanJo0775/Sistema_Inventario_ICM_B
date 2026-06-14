@@ -68,15 +68,15 @@ def test_list_endpoints(almacenista_client, endpoint):
 
 
 @pytest.mark.django_db
-def test_delete_endpoint_deactivates_it(almacenista_client, endpoint):
+def test_delete_endpoint_soft_deletes_it(almacenista_client, endpoint):
     url = reverse("webhooks-endpoint-detail", kwargs={"pk": str(endpoint.id)})
     response = almacenista_client.delete(url)
     assert response.status_code == 204
     endpoint.refresh_from_db()
-    assert not endpoint.is_active
+    assert endpoint.deleted_at is not None
+    assert endpoint.is_active is False
     assert AuditLog.objects.filter(
-        event_type=AuditEventType.WEBHOOK_ENDPOINT_CHANGED,
-        metadata___action="deactivated",
+        event_type=AuditEventType.WEBHOOK_ENDPOINT_SOFT_DELETED,
     ).exists()
 
 
