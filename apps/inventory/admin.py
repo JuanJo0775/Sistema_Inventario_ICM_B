@@ -23,8 +23,9 @@ class LocationAdmin(admin.ModelAdmin):
         "operational_status",
         "is_retail",
         "is_active",
+        "deleted_at",
     )
-    list_filter = ("operational_status", "is_retail", "is_active")
+    list_filter = ("operational_status", "is_retail", "is_active", "deleted_at")
 
 
 @admin.register(StorageTemplate)

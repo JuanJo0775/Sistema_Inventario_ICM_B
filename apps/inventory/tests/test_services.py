@@ -99,23 +99,20 @@ def test_deactivate_location_blocks_if_has_stock(db, almacenista_user):
 
     with pytest.raises(DomainValidationError) as excinfo:
         deactivate_location(almacenista_user, location.id)
-    assert (
-        "No es posible desactivar la ubicación porque aún contiene inventario."
-        in str(excinfo.value)
+    assert "No se puede archivar la ubicación porque aún contiene inventario." in str(
+        excinfo.value
     )
 
     with pytest.raises(DomainValidationError) as excinfo:
         update_location(almacenista_user, location.id, {"is_active": False})
-    assert (
-        "No es posible desactivar la ubicación porque aún contiene inventario."
-        in str(excinfo.value)
+    assert "No se puede archivar la ubicación porque aún contiene inventario." in str(
+        excinfo.value
     )
 
     with pytest.raises(DomainValidationError) as excinfo:
         update_location(
             almacenista_user, location.id, {"operational_status": "archived"}
         )
-    assert (
-        "No es posible desactivar la ubicación porque aún contiene inventario."
-        in str(excinfo.value)
+    assert "No se puede archivar la ubicación porque aún contiene inventario." in str(
+        excinfo.value
     )

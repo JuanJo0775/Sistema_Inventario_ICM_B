@@ -4,6 +4,7 @@ from apps.inventory.views import (
     InventoryFullListView,
     LocationDetailView,
     LocationListCreateView,
+    LocationRestoreView,
     LocationStateTransitionView,
     ProductSearchView,
     ReconstructStockView,
@@ -11,9 +12,15 @@ from apps.inventory.views import (
     StockByProductView,
     StockThresholdView,
     StorageTemplateDetailView,
+    StorageTemplateDisableView,
+    StorageTemplateEnableView,
     StorageTemplateListCreateView,
+    StorageTemplateRestoreView,
     StorageTypeDetailView,
+    StorageTypeDisableView,
+    StorageTypeEnableView,
     StorageTypeListCreateView,
+    StorageTypeRestoreView,
 )
 
 urlpatterns = [
@@ -29,6 +36,21 @@ urlpatterns = [
         name="inventory-storage-type-detail",
     ),
     path(
+        "storage-types/<uuid:pk>/restore/",
+        StorageTypeRestoreView.as_view(),
+        name="inventory-storage-type-restore",
+    ),
+    path(
+        "storage-types/<uuid:pk>/disable/",
+        StorageTypeDisableView.as_view(),
+        name="inventory-storage-type-disable",
+    ),
+    path(
+        "storage-types/<uuid:pk>/enable/",
+        StorageTypeEnableView.as_view(),
+        name="inventory-storage-type-enable",
+    ),
+    path(
         "storage-templates/",
         StorageTemplateListCreateView.as_view(),
         name="inventory-storage-templates",
@@ -38,11 +60,31 @@ urlpatterns = [
         StorageTemplateDetailView.as_view(),
         name="inventory-storage-template-detail",
     ),
+    path(
+        "storage-templates/<uuid:pk>/restore/",
+        StorageTemplateRestoreView.as_view(),
+        name="inventory-storage-template-restore",
+    ),
+    path(
+        "storage-templates/<uuid:pk>/disable/",
+        StorageTemplateDisableView.as_view(),
+        name="inventory-storage-template-disable",
+    ),
+    path(
+        "storage-templates/<uuid:pk>/enable/",
+        StorageTemplateEnableView.as_view(),
+        name="inventory-storage-template-enable",
+    ),
     path("locations/", LocationListCreateView.as_view(), name="inventory-locations"),
     path(
         "locations/<uuid:pk>/",
         LocationDetailView.as_view(),
         name="inventory-location-detail",
+    ),
+    path(
+        "locations/<uuid:pk>/restore/",
+        LocationRestoreView.as_view(),
+        name="inventory-location-restore",
     ),
     path(
         "locations/<uuid:pk>/state-transitions/",
