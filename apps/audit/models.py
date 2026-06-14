@@ -28,18 +28,45 @@ class AuditEventType(models.TextChoices):
     PRODUCT_DEACTIVATED = "PRODUCT_DEACTIVATED", "Producto desactivado"
     PRODUCT_ACTIVATED = "PRODUCT_ACTIVATED", "Producto reactivado"
     PRODUCT_PRICE_UPDATED = "PRODUCT_PRICE_UPDATED", "Precios de producto actualizados"
+    # Soft delete — existencia lógica
+    PRODUCT_SOFT_DELETED = "PRODUCT_SOFT_DELETED", "Producto eliminado lógicamente"
+    PRODUCT_RESTORED = "PRODUCT_RESTORED", "Producto restaurado"
+    # Disponibilidad para asignación
+    PRODUCT_DISABLED = "PRODUCT_DISABLED", "Producto desactivado para asignación"
+    PRODUCT_ENABLED = "PRODUCT_ENABLED", "Producto reactivado para asignación"
     COMBO_CREATED = "COMBO_CREATED", "Combo de productos creado"
     COMBO_UPDATED = "COMBO_UPDATED", "Combo de productos actualizado"
     COMBO_DEACTIVATED = "COMBO_DEACTIVATED", "Combo de productos desactivado"
     COMBO_ACTIVATED = "COMBO_ACTIVATED", "Combo de productos reactivado"
+    # Soft delete — existencia lógica
+    COMBO_SOFT_DELETED = "COMBO_SOFT_DELETED", "Combo eliminado lógicamente"
+    COMBO_RESTORED = "COMBO_RESTORED", "Combo restaurado"
     CATEGORY_CREATED = "CATEGORY_CREATED", "Categoría de catálogo creada"
     CATEGORY_UPDATED = "CATEGORY_UPDATED", "Categoría de catálogo actualizada"
     CATEGORY_DEACTIVATED = "CATEGORY_DEACTIVATED", "Categoría de catálogo desactivada"
     CATEGORY_ACTIVATED = "CATEGORY_ACTIVATED", "Categoría de catálogo reactivada"
+    # Soft delete — existencia lógica
+    CATEGORY_SOFT_DELETED = "CATEGORY_SOFT_DELETED", "Categoría eliminada lógicamente"
+    CATEGORY_RESTORED = "CATEGORY_RESTORED", "Categoría restaurada"
+    # Disponibilidad para asignación
+    CATEGORY_DISABLED = (
+        "CATEGORY_DISABLED",
+        "Categoría desactivada para nuevas asignaciones",
+    )
+    CATEGORY_ENABLED = (
+        "CATEGORY_ENABLED",
+        "Categoría reactivada para nuevas asignaciones",
+    )
     BRAND_CREATED = "BRAND_CREATED", "Marca de catálogo creada"
     BRAND_UPDATED = "BRAND_UPDATED", "Marca de catálogo actualizada"
     BRAND_DEACTIVATED = "BRAND_DEACTIVATED", "Marca de catálogo desactivada"
     BRAND_ACTIVATED = "BRAND_ACTIVATED", "Marca de catálogo reactivada"
+    # Soft delete — existencia lógica
+    BRAND_SOFT_DELETED = "BRAND_SOFT_DELETED", "Marca eliminada lógicamente"
+    BRAND_RESTORED = "BRAND_RESTORED", "Marca restaurada"
+    # Disponibilidad para asignación
+    BRAND_DISABLED = "BRAND_DISABLED", "Marca desactivada para nuevas asignaciones"
+    BRAND_ENABLED = "BRAND_ENABLED", "Marca reactivada para nuevas asignaciones"
     SUBCATEGORY_CREATED = "SUBCATEGORY_CREATED", "Subcategoría de catálogo creada"
     SUBCATEGORY_UPDATED = "SUBCATEGORY_UPDATED", "Subcategoría de catálogo actualizada"
     SUBCATEGORY_DEACTIVATED = (
@@ -72,6 +99,61 @@ class AuditEventType(models.TextChoices):
     SUPPLIER_UPDATED = "SUPPLIER_UPDATED", "Proveedor actualizado"
     SUPPLIER_DEACTIVATED = "SUPPLIER_DEACTIVATED", "Proveedor desactivado"
     SUPPLIER_ACTIVATED = "SUPPLIER_ACTIVATED", "Proveedor reactivado"
+    # Supplier — Soft delete
+    SUPPLIER_SOFT_DELETED = "SUPPLIER_SOFT_DELETED", "Proveedor eliminado lógicamente"
+    SUPPLIER_RESTORED = "SUPPLIER_RESTORED", "Proveedor restaurado"
+    # Supplier — Disponibilidad
+    SUPPLIER_DISABLED = "SUPPLIER_DISABLED", "Proveedor desactivado para nuevas OC"
+    SUPPLIER_ENABLED = "SUPPLIER_ENABLED", "Proveedor reactivado para nuevas OC"
+    # Webhooks — Soft delete
+    WEBHOOK_ENDPOINT_SOFT_DELETED = (
+        "WEBHOOK_ENDPOINT_SOFT_DELETED",
+        "Endpoint webhook eliminado lógicamente",
+    )
+    WEBHOOK_ENDPOINT_RESTORED = (
+        "WEBHOOK_ENDPOINT_RESTORED",
+        "Endpoint webhook restaurado",
+    )
+    # Webhooks — Disponibilidad
+    WEBHOOK_ENDPOINT_DISABLED = (
+        "WEBHOOK_ENDPOINT_DISABLED",
+        "Endpoint webhook desactivado para recepción",
+    )
+    WEBHOOK_ENDPOINT_ENABLED = (
+        "WEBHOOK_ENDPOINT_ENABLED",
+        "Endpoint webhook reactivado para recepción",
+    )
+    # Storage — Soft delete
+    STORAGE_TYPE_SOFT_DELETED = (
+        "STORAGE_TYPE_SOFT_DELETED",
+        "Tipo de almacenamiento eliminado lógicamente",
+    )
+    STORAGE_TYPE_RESTORED = "STORAGE_TYPE_RESTORED", "Tipo de almacenamiento restaurado"
+    STORAGE_TEMPLATE_SOFT_DELETED = (
+        "STORAGE_TEMPLATE_SOFT_DELETED",
+        "Plantilla de almacenamiento eliminada lógicamente",
+    )
+    STORAGE_TEMPLATE_RESTORED = (
+        "STORAGE_TEMPLATE_RESTORED",
+        "Plantilla de almacenamiento restaurada",
+    )
+    # Storage — Disponibilidad
+    STORAGE_TYPE_DISABLED = (
+        "STORAGE_TYPE_DISABLED",
+        "Tipo de almacenamiento desactivado para asignación",
+    )
+    STORAGE_TYPE_ENABLED = (
+        "STORAGE_TYPE_ENABLED",
+        "Tipo de almacenamiento reactivado para asignación",
+    )
+    STORAGE_TEMPLATE_DISABLED = (
+        "STORAGE_TEMPLATE_DISABLED",
+        "Plantilla de almacenamiento desactivada para asignación",
+    )
+    STORAGE_TEMPLATE_ENABLED = (
+        "STORAGE_TEMPLATE_ENABLED",
+        "Plantilla de almacenamiento reactivada para asignación",
+    )
     PURCHASE_ORDER_CREATED = "PURCHASE_ORDER_CREATED", "Orden de compra creada"
     PURCHASE_ORDER_CONFIRMED = "PURCHASE_ORDER_CONFIRMED", "Orden de compra confirmada"
     PURCHASE_ORDER_CANCELLED = "PURCHASE_ORDER_CANCELLED", "Orden de compra cancelada"
@@ -81,6 +163,9 @@ class AuditEventType(models.TextChoices):
     # Ubicaciones — entidad de negocio con operaciones protegidas
     LOCATION_CREATED = "LOCATION_CREATED", "Ubicación creada"
     LOCATION_MODIFIED = "LOCATION_MODIFIED", "Ubicación modificada"
+    # Soft delete — existencia lógica
+    LOCATION_SOFT_DELETED = "LOCATION_SOFT_DELETED", "Ubicación eliminada lógicamente"
+    LOCATION_RESTORED = "LOCATION_RESTORED", "Ubicación restaurada"
     # Webhook endpoints — seguridad: vector de exfiltración
     WEBHOOK_ENDPOINT_CHANGED = "WEBHOOK_ENDPOINT_CHANGED", "Endpoint webhook modificado"
     # Umbrales de reorden — afecta comportamiento operativo
