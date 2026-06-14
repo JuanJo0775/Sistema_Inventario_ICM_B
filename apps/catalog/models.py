@@ -4,11 +4,11 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from shared.models import BaseModel
+from shared.models import BaseModel, SoftDeleteModel
 from shared.utils.validators import normalize_sku, validate_sku_format
 
 
-class Category(BaseModel):
+class Category(BaseModel, SoftDeleteModel):
     """
     Macrocategoría del catálogo ICM (RF-003).
 
@@ -38,7 +38,7 @@ class Category(BaseModel):
         return self.name
 
 
-class Brand(BaseModel):
+class Brand(BaseModel, SoftDeleteModel):
     """Marca independiente (sin relación con Category). Un producto tiene una marca opcional,
     pero los productos de una misma marca pueden estar en distintas categorías."""
 
@@ -56,7 +56,7 @@ class Brand(BaseModel):
         return self.name
 
 
-class Product(BaseModel):
+class Product(BaseModel, SoftDeleteModel):
     """
     Producto/SKU central del dominio (RF-003, BR-12, BR-13).
 
@@ -249,7 +249,7 @@ class ProductSerial(BaseModel):
         return f"{self.product.sku} / {self.serial_number} ({self.status})"
 
 
-class ProductCombo(BaseModel):
+class ProductCombo(BaseModel, SoftDeleteModel):
     """Kit o combo: varios SKUs bajo un identificador (RF-003)."""
 
     class PriceStrategy(models.TextChoices):
@@ -258,7 +258,6 @@ class ProductCombo(BaseModel):
 
     name = models.CharField(max_length=255)
     sku = models.CharField(max_length=100, unique=True)
-    is_active = models.BooleanField(default=True)
     products = models.ManyToManyField(
         Product, through="ComboItem", related_name="product_combos"
     )

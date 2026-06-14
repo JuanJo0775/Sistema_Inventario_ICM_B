@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING, Any
 
-from django.db import transaction
+from django.db import IntegrityError, transaction
+from django.utils import timezone
 
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
@@ -16,11 +18,19 @@ from apps.catalog.models import (
     ProductCombo,
     ProductPriceHistory,
 )
+from apps.inventory.models import StockByLocation
+from apps.purchasing.models import (
+    PurchaseOrderItem,
+    PurchaseOrderStatus,
+    ReceptionItem,
+    ReceptionStatus,
+)
 from shared.exceptions import (
     DomainValidationError,
     UnauthorizedCredentialManagementError,
 )
 from shared.utils.barcode import build_product_barcode
+from shared.utils.db import get_for_update_or_404
 from shared.utils.validators import validate_sku_format
 
 if TYPE_CHECKING:
@@ -45,26 +55,39 @@ def create_product(
     sku = (data.get("sku") or "").strip()
     validate_sku_format(sku)
     category = Category.objects.get(pk=data["category_id"])
-    product = Product.objects.create(
-        sku=sku,
-        name=data["name"],
-        category=category,
-        brand_id=data.get("brand_id"),
-        barcode=build_product_barcode(sku),
-        expiration_date=data.get("expiration_date") or data.get("expiry_date"),
-        requires_expiration=bool(data.get("requires_expiration")),
-        weight_grams=data.get("weight_grams"),
-        requires_cold_chain=bool(data.get("requires_cold_chain")),
-        is_active=bool(data.get("is_active", True)),
-        notes=data.get("notes") or "",
-        reorder_point=int(data.get("reorder_point", 0)),
-        # Campos de precio opcionales
-        unit_cost=data.get("unit_cost"),
-        sale_price_retail=data.get("sale_price_retail"),
-        sale_price_wholesale=data.get("sale_price_wholesale"),
-        tax_rate_pct=data.get("tax_rate_pct"),
-        currency=data.get("currency") or "COP",
-    )
+    if not category.is_active:
+        raise DomainValidationError(
+            f"La categoría '{category.name}' está inactiva y no puede recibir nuevos productos."
+        )
+    if data.get("brand_id"):
+        brand = Brand.objects.get(pk=data["brand_id"])
+        if not brand.is_active:
+            raise DomainValidationError(
+                f"La marca '{brand.name}' está inactiva y no puede asignarse a nuevos productos."
+            )
+    try:
+        product = Product.objects.create(
+            sku=sku,
+            name=data["name"],
+            category=category,
+            brand_id=data.get("brand_id"),
+            barcode=build_product_barcode(sku),
+            expiration_date=data.get("expiration_date") or data.get("expiry_date"),
+            requires_expiration=bool(data.get("requires_expiration")),
+            weight_grams=data.get("weight_grams"),
+            requires_cold_chain=bool(data.get("requires_cold_chain")),
+            is_active=bool(data.get("is_active", True)),
+            notes=data.get("notes") or "",
+            reorder_point=int(data.get("reorder_point", 0)),
+            # Campos de precio opcionales
+            unit_cost=data.get("unit_cost"),
+            sale_price_retail=data.get("sale_price_retail"),
+            sale_price_wholesale=data.get("sale_price_wholesale"),
+            tax_rate_pct=data.get("tax_rate_pct"),
+            currency=data.get("currency") or "COP",
+        )
+    except IntegrityError:
+        raise DomainValidationError(f"El SKU '{sku}' ya existe.")
     log_event(
         AuditEventType.PRODUCT_CREATED,
         description=f"Producto creado: {product.sku}",
@@ -91,10 +114,8 @@ def update_product(
         InvalidSKUFormatError: BR-12.
     """
     _require_almacenista(user)
-    product = (
-        Product.objects.select_for_update()
-        .select_related("category")
-        .get(pk=product_id)
+    product = get_for_update_or_404(
+        Product.objects.select_related("category"), pk=product_id
     )
     new_sku = (data.get("sku") or product.sku or "").strip()
     if new_sku != product.sku:
@@ -113,10 +134,23 @@ def update_product(
     ):
         if field in data:
             setattr(product, field, data[field])
-    if "category_id" in data:
-        product.category_id = data["category_id"]
+    if "category_id" in data and data["category_id"] != product.category_id:
+        new_cat = Category.objects.get(pk=data["category_id"])
+        if not new_cat.is_active:
+            raise DomainValidationError(
+                f"La categoría '{new_cat.name}' está inactiva y no puede asignarse."
+            )
+        product.category = new_cat
     if "brand_id" in data:
-        product.brand_id = data.get("brand_id")
+        if data["brand_id"] is None:
+            product.brand = None
+        elif data["brand_id"] != (product.brand_id if product.brand_id else None):
+            new_brand = Brand.objects.get(pk=data["brand_id"])
+            if not new_brand.is_active:
+                raise DomainValidationError(
+                    f"La marca '{new_brand.name}' está inactiva y no puede asignarse."
+                )
+            product.brand_id = data["brand_id"]
     if not product.barcode:
         product.barcode = build_product_barcode(product.sku)
     product.save()
@@ -163,23 +197,27 @@ def create_combo(
         p = products[pid]
 
         if not p.is_active:
-            from shared.exceptions import DomainValidationError
-
             raise DomainValidationError(f"Producto {p.sku} no está activo.")
-    combo = ProductCombo.objects.create(
-        name=name,
-        sku=sku,
-        is_active=bool(data.get("is_active", True)),
-        price_strategy=data.get("price_strategy", "derived"),
-        fixed_price_retail=data.get("fixed_price_retail"),
-        fixed_price_wholesale=data.get("fixed_price_wholesale"),
-    )
-    for row in items:
-        ComboItem.objects.create(
-            combo=combo,
-            product_id=row["product_id"],
-            quantity=int(row.get("quantity", 1)),
+    try:
+        combo = ProductCombo.objects.create(
+            name=name,
+            sku=sku,
+            price_strategy=data.get("price_strategy", "derived"),
+            fixed_price_retail=data.get("fixed_price_retail"),
+            fixed_price_wholesale=data.get("fixed_price_wholesale"),
         )
+    except IntegrityError:
+        raise DomainValidationError(f"El SKU '{sku}' ya existe en otro combo.")
+    try:
+        for row in items:
+            ComboItem.objects.create(
+                combo=combo,
+                product_id=row["product_id"],
+                quantity=int(row.get("quantity", 1)),
+            )
+    except IntegrityError:
+        combo.delete()
+        raise DomainValidationError("Uno o más productos ya están en el combo.")
     log_event(
         AuditEventType.COMBO_CREATED,
         description=f"Combo creado: {combo.sku}",
@@ -210,13 +248,18 @@ def create_category(
     while Category.objects.filter(slug=slug).exists():
         n += 1
         slug = f"{base}-{n}"
-    cat = Category.objects.create(
-        name=name.strip(),
-        slug=slug,
-        description=description or "",
-        requires_serial_number=requires_serial_number,
-        is_returnable=is_returnable,
-    )
+    try:
+        cat = Category.objects.create(
+            name=name.strip(),
+            slug=slug,
+            description=description or "",
+            requires_serial_number=requires_serial_number,
+            is_returnable=is_returnable,
+        )
+    except IntegrityError:
+        raise DomainValidationError(
+            f"Ya existe una categoría con el nombre '{name.strip()}'."
+        )
     log_event(
         AuditEventType.CATEGORY_CREATED,
         description=f"Categoría creada: {cat.name}",
@@ -285,11 +328,16 @@ def create_brand(
         n += 1
         slug = f"{base}-{n}"
 
-    brand = Brand.objects.create(
-        name=name.strip(),
-        slug=slug,
-        description=description or "",
-    )
+    try:
+        brand = Brand.objects.create(
+            name=name.strip(),
+            slug=slug,
+            description=description or "",
+        )
+    except IntegrityError:
+        raise DomainValidationError(
+            f"Ya existe una marca con el nombre '{name.strip()}'."
+        )
     log_event(
         AuditEventType.BRAND_CREATED,
         description=f"Marca creada: {brand.name}",
@@ -312,7 +360,7 @@ def update_category(
     from django.utils.text import slugify
 
     _require_almacenista(user)
-    cat = Category.objects.select_for_update().get(pk=category_id)
+    cat = get_for_update_or_404(Category.objects, pk=category_id)
     if "name" in data:
         new_name = data["name"].strip()
         if new_name != cat.name:
@@ -338,27 +386,36 @@ def update_category(
     return cat
 
 
+# ── Soft Delete ──────────────────────────────────────────────────────────────
+# Responsabilidad: existencia lógica del registro.
+# Bloquea si hay productos activos asociados.
+
+
 @transaction.atomic
-def deactivate_category(
+def soft_delete_category(
     user: User,
     category_id: Any,
     *,
     request: HttpRequest | None = None,
 ) -> None:
-    """Desactiva una categoría. Falla con ValueError si tiene productos activos."""
+    """
+    Soft delete de categoría. Marca `deleted_at`.
+    Bloquea con ValueError si existen productos activos asociados.
+    """
     _require_almacenista(user)
-    cat = Category.objects.select_for_update().get(pk=category_id)
+    cat = get_for_update_or_404(Category.objects, pk=category_id)
+    if cat.deleted_at:
+        raise ValueError("La categoría ya está eliminada.")
     active_count = Product.objects.filter(category=cat, is_active=True).count()
     if active_count:
         raise ValueError(
-            f"No se puede desactivar la categoría porque tiene {active_count} "
+            f"No se puede eliminar la categoría porque tiene {active_count} "
             f"producto(s) activo(s) asociado(s)."
         )
-    cat.is_active = False
-    cat.save(update_fields=["is_active"])
+    cat.soft_delete()
     log_event(
-        AuditEventType.CATEGORY_DEACTIVATED,
-        description=f"Categoría desactivada: {cat.name}",
+        AuditEventType.CATEGORY_SOFT_DELETED,
+        description=f"Categoría eliminada lógicamente: {cat.name}",
         user=user,
         request=request,
         detail={"category_id": str(cat.id)},
@@ -366,20 +423,83 @@ def deactivate_category(
 
 
 @transaction.atomic
-def activate_category(
+def restore_category(
     user: User,
     category_id: Any,
     *,
     request: HttpRequest | None = None,
 ) -> Category:
-    """Reactiva una categoría previamente desactivada."""
+    """Restaura una categoría previamente eliminada lógicamente."""
     _require_almacenista(user)
-    cat = Category.objects.select_for_update().get(pk=category_id)
+    cat = get_for_update_or_404(Category.objects, pk=category_id)
+    if not cat.deleted_at:
+        raise ValueError("La categoría no está eliminada.")
+    cat.restore()
+    log_event(
+        AuditEventType.CATEGORY_RESTORED,
+        description=f"Categoría restaurada: {cat.name}",
+        user=user,
+        request=request,
+        detail={"category_id": str(cat.id)},
+    )
+    return cat
+
+
+# ── Disponibilidad para asignación ───────────────────────────────────────────
+# Responsabilidad: controlar si la categoría puede asignarse a nuevos productos.
+# Nunca bloquea, incluso si hay productos activos.
+
+
+@transaction.atomic
+def disable_category_for_assignment(
+    user: User,
+    category_id: Any,
+    *,
+    request: HttpRequest | None = None,
+) -> Category:
+    """
+    Marca `is_active=False`. La categoría no puede asignarse a nuevos productos.
+    No afecta relaciones históricas. Nunca bloquea.
+    """
+    _require_almacenista(user)
+    cat = get_for_update_or_404(Category.objects, pk=category_id)
+    if cat.deleted_at:
+        raise ValueError(
+            "No se puede modificar la disponibilidad de una categoría eliminada."
+        )
+    cat.is_active = False
+    cat.save(update_fields=["is_active"])
+    log_event(
+        AuditEventType.CATEGORY_DISABLED,
+        description=f"Categoría desactivada para asignación: {cat.name}",
+        user=user,
+        request=request,
+        detail={"category_id": str(cat.id)},
+    )
+    return cat
+
+
+@transaction.atomic
+def enable_category_for_assignment(
+    user: User,
+    category_id: Any,
+    *,
+    request: HttpRequest | None = None,
+) -> Category:
+    """
+    Marca `is_active=True`. La categoría vuelve a estar disponible para nuevos productos.
+    """
+    _require_almacenista(user)
+    cat = get_for_update_or_404(Category.objects, pk=category_id)
+    if cat.deleted_at:
+        raise ValueError(
+            "No se puede modificar la disponibilidad de una categoría eliminada."
+        )
     cat.is_active = True
     cat.save(update_fields=["is_active"])
     log_event(
-        AuditEventType.CATEGORY_ACTIVATED,
-        description=f"Categoría reactivada: {cat.name}",
+        AuditEventType.CATEGORY_ENABLED,
+        description=f"Categoría reactivada para asignación: {cat.name}",
         user=user,
         request=request,
         detail={"category_id": str(cat.id)},
@@ -399,7 +519,7 @@ def update_brand(
     from django.utils.text import slugify
 
     _require_almacenista(user)
-    brand = Brand.objects.select_for_update().get(pk=brand_id)
+    brand = get_for_update_or_404(Brand.objects, pk=brand_id)
     if "name" in data:
         new_name = data["name"].strip()
         if new_name != brand.name:
@@ -413,8 +533,6 @@ def update_brand(
             brand.slug = slug
     if "description" in data:
         brand.description = data["description"] or ""
-    if "is_active" in data:
-        brand.is_active = bool(data["is_active"])
     brand.save()
     log_event(
         AuditEventType.BRAND_UPDATED,
@@ -426,27 +544,34 @@ def update_brand(
     return brand
 
 
+# ── Soft Delete ──────────────────────────────────────────────────────────────
+
+
 @transaction.atomic
-def deactivate_brand(
+def soft_delete_brand(
     user: User,
     brand_id: Any,
     *,
     request: HttpRequest | None = None,
 ) -> None:
-    """Desactiva una marca. Falla con ValueError si tiene productos activos."""
+    """
+    Soft delete de marca. Marca `deleted_at`.
+    Bloquea con ValueError si existen productos activos asociados.
+    """
     _require_almacenista(user)
-    brand = Brand.objects.select_for_update().get(pk=brand_id)
+    brand = get_for_update_or_404(Brand.objects, pk=brand_id)
+    if brand.deleted_at:
+        raise ValueError("La marca ya está eliminada.")
     active_count = Product.objects.filter(brand=brand, is_active=True).count()
     if active_count:
         raise ValueError(
-            f"No se puede desactivar la marca porque tiene {active_count} "
+            f"No se puede eliminar la marca porque tiene {active_count} "
             f"producto(s) activo(s) asociado(s)."
         )
-    brand.is_active = False
-    brand.save(update_fields=["is_active"])
+    brand.soft_delete()
     log_event(
-        AuditEventType.BRAND_DEACTIVATED,
-        description=f"Marca desactivada: {brand.name}",
+        AuditEventType.BRAND_SOFT_DELETED,
+        description=f"Marca eliminada lógicamente: {brand.name}",
         user=user,
         request=request,
         detail={"brand_id": str(brand.id)},
@@ -454,20 +579,79 @@ def deactivate_brand(
 
 
 @transaction.atomic
-def activate_brand(
+def restore_brand(
     user: User,
     brand_id: Any,
     *,
     request: HttpRequest | None = None,
 ) -> Brand:
-    """Reactiva una marca previamente desactivada."""
+    """Restaura una marca previamente eliminada lógicamente."""
     _require_almacenista(user)
-    brand = Brand.objects.select_for_update().get(pk=brand_id)
+    brand = get_for_update_or_404(Brand.objects, pk=brand_id)
+    if not brand.deleted_at:
+        raise ValueError("La marca no está eliminada.")
+    brand.restore()
+    log_event(
+        AuditEventType.BRAND_RESTORED,
+        description=f"Marca restaurada: {brand.name}",
+        user=user,
+        request=request,
+        detail={"brand_id": str(brand.id)},
+    )
+    return brand
+
+
+# ── Disponibilidad para asignación ───────────────────────────────────────────
+
+
+@transaction.atomic
+def disable_brand_for_assignment(
+    user: User,
+    brand_id: Any,
+    *,
+    request: HttpRequest | None = None,
+) -> Brand:
+    """
+    Marca `is_active=False`. La marca no puede asignarse a nuevos productos.
+    No afecta relaciones históricas. Nunca bloquea.
+    """
+    _require_almacenista(user)
+    brand = get_for_update_or_404(Brand.objects, pk=brand_id)
+    if brand.deleted_at:
+        raise ValueError(
+            "No se puede modificar la disponibilidad de una marca eliminada."
+        )
+    brand.is_active = False
+    brand.save(update_fields=["is_active"])
+    log_event(
+        AuditEventType.BRAND_DISABLED,
+        description=f"Marca desactivada para asignación: {brand.name}",
+        user=user,
+        request=request,
+        detail={"brand_id": str(brand.id)},
+    )
+    return brand
+
+
+@transaction.atomic
+def enable_brand_for_assignment(
+    user: User,
+    brand_id: Any,
+    *,
+    request: HttpRequest | None = None,
+) -> Brand:
+    """Marca `is_active=True`. La marca vuelve a estar disponible para nuevos productos."""
+    _require_almacenista(user)
+    brand = get_for_update_or_404(Brand.objects, pk=brand_id)
+    if brand.deleted_at:
+        raise ValueError(
+            "No se puede modificar la disponibilidad de una marca eliminada."
+        )
     brand.is_active = True
     brand.save(update_fields=["is_active"])
     log_event(
-        AuditEventType.BRAND_ACTIVATED,
-        description=f"Marca reactivada: {brand.name}",
+        AuditEventType.BRAND_ENABLED,
+        description=f"Marca reactivada para asignación: {brand.name}",
         user=user,
         request=request,
         detail={"brand_id": str(brand.id)},
@@ -491,7 +675,7 @@ def update_combo(
               is_active NO se acepta aquí; usar DELETE/POST restore para activar/desactivar.
     """
     _require_almacenista(user)
-    combo = ProductCombo.objects.select_for_update().get(pk=combo_id)
+    combo = get_for_update_or_404(ProductCombo.objects, pk=combo_id)
     if "name" in data:
         combo.name = data["name"].strip()
     if "sku" in data:
@@ -501,7 +685,11 @@ def update_combo(
     for field in ("price_strategy", "fixed_price_retail", "fixed_price_wholesale"):
         if field in data:
             setattr(combo, field, data[field])
-    combo.save()
+    try:
+        combo.save()
+    except IntegrityError:
+        new_sku = data.get("sku", combo.sku or "").strip()
+        raise DomainValidationError(f"El SKU '{new_sku}' ya existe en otro combo.")
 
     if "items" in data:
         items = data["items"]
@@ -512,8 +700,6 @@ def update_combo(
         for row in items:
             p = products[str(row["product_id"])]
             if not p.is_active:
-                from shared.exceptions import DomainValidationError
-
                 raise DomainValidationError(f"Producto {p.sku} no está activo.")
         ComboItem.objects.filter(combo=combo).delete()
         for row in items:
@@ -534,24 +720,64 @@ def update_combo(
 
 
 @transaction.atomic
+def soft_delete_combo(
+    user: User,
+    combo_id: Any,
+    *,
+    request: HttpRequest | None = None,
+) -> None:
+    """Elimina lógicamente un combo (soft delete)."""
+    _require_almacenista(user)
+    combo = get_for_update_or_404(ProductCombo.objects, pk=combo_id)
+    combo.deleted_at = timezone.now()
+    combo.save(update_fields=["deleted_at", "updated_at"])
+    log_event(
+        AuditEventType.COMBO_SOFT_DELETED,
+        description=f"Combo eliminado lógicamente: {combo.sku}",
+        user=user,
+        request=request,
+        detail={"combo_id": str(combo.id), "sku": combo.sku},
+    )
+
+
+@transaction.atomic
+def restore_combo(
+    user: User,
+    combo_id: Any,
+    *,
+    request: HttpRequest | None = None,
+) -> ProductCombo:
+    """Restaura un combo previamente eliminado lógicamente."""
+    _require_almacenista(user)
+    combo = get_for_update_or_404(ProductCombo.objects, pk=combo_id)
+    combo.deleted_at = None
+    combo.save(update_fields=["deleted_at", "updated_at"])
+    log_event(
+        AuditEventType.COMBO_RESTORED,
+        description=f"Combo restaurado: {combo.sku}",
+        user=user,
+        request=request,
+        detail={"combo_id": str(combo.id), "sku": combo.sku},
+    )
+    return combo
+
+
+@transaction.atomic
 def deactivate_combo(
     user: User,
     combo_id: Any,
     *,
     request: HttpRequest | None = None,
 ) -> None:
-    """Desactiva un combo."""
-    _require_almacenista(user)
-    combo = ProductCombo.objects.select_for_update().get(pk=combo_id)
-    combo.is_active = False
-    combo.save(update_fields=["is_active"])
-    log_event(
-        AuditEventType.COMBO_DEACTIVATED,
-        description=f"Combo desactivado: {combo.sku}",
-        user=user,
-        request=request,
-        detail={"combo_id": str(combo.id), "sku": combo.sku},
+    """Desactiva un combo (legacy wrapper -> soft_delete_combo)."""
+    import warnings
+
+    warnings.warn(
+        "deactivate_combo is deprecated; use soft_delete_combo",
+        DeprecationWarning,
+        stacklevel=2,
     )
+    soft_delete_combo(user, combo_id, request=request)
 
 
 @transaction.atomic
@@ -561,19 +787,15 @@ def activate_combo(
     *,
     request: HttpRequest | None = None,
 ) -> ProductCombo:
-    """Reactiva un combo previamente desactivado."""
-    _require_almacenista(user)
-    combo = ProductCombo.objects.select_for_update().get(pk=combo_id)
-    combo.is_active = True
-    combo.save(update_fields=["is_active"])
-    log_event(
-        AuditEventType.COMBO_ACTIVATED,
-        description=f"Combo reactivado: {combo.sku}",
-        user=user,
-        request=request,
-        detail={"combo_id": str(combo.id), "sku": combo.sku},
+    """Reactiva un combo (legacy wrapper -> restore_combo)."""
+    import warnings
+
+    warnings.warn(
+        "activate_combo is deprecated; use restore_combo",
+        DeprecationWarning,
+        stacklevel=2,
     )
-    return combo
+    return restore_combo(user, combo_id, request=request)
 
 
 @transaction.atomic
@@ -595,7 +817,7 @@ def update_product_prices(
     Los campos no enviados (None) se dejan intactos.
     """
     _require_almacenista(user)
-    product = Product.objects.select_for_update().get(pk=product_id)
+    product = get_for_update_or_404(Product.objects, pk=product_id)
 
     updates: dict[str, Any] = {}
     if unit_cost is not None:
@@ -637,9 +859,164 @@ def update_product_prices(
         description=f"Precios actualizados: {product.sku}",
         user=user,
         request=request,
-        detail={"product_id": str(product.id), "fields": list(updates.keys())},
     )
     return product
+
+
+# =============================================================================
+# Soft Delete / Disponibilidad — Product
+# =============================================================================
+
+
+@transaction.atomic
+def soft_delete_product(
+    user: User,
+    product_id: Any,
+    *,
+    request: HttpRequest | None = None,
+) -> None:
+    """
+    Elimina lógicamente un producto (soft delete).
+
+    Bloquea si:
+    - Existe stock > 0 en cualquier ubicación
+    - Existe PurchaseOrderItem con OC en BORRADOR, PENDIENTE o PARCIALMENTE_RECIBIDA
+    - Existe ReceptionItem en BORRADOR para este producto
+    - Existe ComboItem en combo no archivado (deleted_at=NULL)
+    """
+    _require_almacenista(user)
+    product = get_for_update_or_404(Product.objects, pk=product_id)
+
+    # 1. Stock > 0 en cualquier ubicación
+    if StockByLocation.objects.filter(product=product, current_stock__gt=0).exists():
+        raise ValueError("No se puede archivar: existe stock > 0 en ubicaciones.")
+
+    # 2. OC en borrador, pendiente o parcialmente recibida
+    blocking_po_statuses = {
+        PurchaseOrderStatus.BORRADOR,
+        PurchaseOrderStatus.PENDIENTE,
+        PurchaseOrderStatus.PARCIALMENTE_RECIBIDA,
+    }
+    if PurchaseOrderItem.objects.filter(
+        product=product, purchase_order__status__in=blocking_po_statuses
+    ).exists():
+        raise ValueError(
+            "No se puede archivar: existen órdenes de compra activas "
+            "(borrador, pendiente o parcialmente recibida)."
+        )
+
+    # 3. Recepción en borrador
+    if ReceptionItem.objects.filter(
+        purchase_order_item__product=product, reception__status=ReceptionStatus.BORRADOR
+    ).exists():
+        raise ValueError("No se puede archivar: existen recepciones en borrador.")
+
+    # 4. Combo activo (no archivado) que incluya este producto
+    if ComboItem.objects.filter(
+        product=product,
+        combo__deleted_at__isnull=True,  # no archivado
+    ).exists():
+        raise ValueError(
+            "No se puede archivar: el producto pertenece a uno o más combos activos."
+        )
+
+    product.deleted_at = timezone.now()
+    product.is_active = False  # sync legado
+    product.save(update_fields=["deleted_at", "is_active", "updated_at"])
+
+    log_event(
+        AuditEventType.PRODUCT_SOFT_DELETED,
+        description=f"Producto eliminado lógicamente: {product.sku}",
+        user=user,
+        request=request,
+        detail={"product_id": str(product.id), "sku": product.sku},
+    )
+
+
+@transaction.atomic
+def restore_product(
+    user: User,
+    product_id: Any,
+    *,
+    request: HttpRequest | None = None,
+) -> Product:
+    """Restaura un producto previamente eliminado lógicamente."""
+    _require_almacenista(user)
+    product = get_for_update_or_404(
+        Product.objects.select_related("category"), pk=product_id
+    )
+    product.deleted_at = None
+    product.is_active = True  # sync legado
+    product.save(update_fields=["deleted_at", "is_active", "updated_at"])
+
+    log_event(
+        AuditEventType.PRODUCT_RESTORED,
+        description=f"Producto restaurado: {product.sku}",
+        user=user,
+        request=request,
+        detail={"product_id": str(product.id), "sku": product.sku},
+    )
+    return product
+
+
+@transaction.atomic
+def disable_product_for_assignment(
+    user: User,
+    product_id: Any,
+    *,
+    request: HttpRequest | None = None,
+) -> None:
+    """Desactiva un producto para asignación (pausa temporal)."""
+    _require_almacenista(user)
+    product = get_for_update_or_404(Product.objects, pk=product_id)
+    if product.deleted_at is not None:
+        raise ValueError(
+            "No se puede desactivar un producto archivado; restáurelo primero."
+        )
+    product.is_active = False
+    product.save(update_fields=["is_active", "updated_at"])
+
+    log_event(
+        AuditEventType.PRODUCT_DISABLED,
+        description=f"Producto desactivado para asignación: {product.sku}",
+        user=user,
+        request=request,
+        detail={"product_id": str(product.id), "sku": product.sku},
+    )
+
+
+@transaction.atomic
+def enable_product_for_assignment(
+    user: User,
+    product_id: Any,
+    *,
+    request: HttpRequest | None = None,
+) -> Product:
+    """Reactiva un producto para asignación."""
+    _require_almacenista(user)
+    product = get_for_update_or_404(
+        Product.objects.select_related("category"), pk=product_id
+    )
+    if product.deleted_at is not None:
+        raise ValueError(
+            "No se puede activar un producto archivado; restáurelo primero."
+        )
+    product.is_active = True
+    product.save(update_fields=["is_active", "updated_at"])
+
+    log_event(
+        AuditEventType.PRODUCT_ENABLED,
+        description=f"Producto reactivado para asignación: {product.sku}",
+        user=user,
+        request=request,
+        detail={"product_id": str(product.id), "sku": product.sku},
+    )
+    return product
+
+
+# =============================================================================
+# Wrappers legacy (deprecados)
+# =============================================================================
 
 
 @transaction.atomic
@@ -649,31 +1026,13 @@ def deactivate_product(
     *,
     request: HttpRequest | None = None,
 ) -> None:
-    """
-    Desactiva un producto (soft delete explícito).
-
-    Raises:
-        ValueError: Si el producto pertenece a uno o más combos activos.
-    """
-    _require_almacenista(user)
-    product = Product.objects.select_for_update().get(pk=product_id)
-    active_combo_count = ComboItem.objects.filter(
-        product=product, combo__is_active=True
-    ).count()
-    if active_combo_count:
-        raise ValueError(
-            f"No se puede desactivar el producto porque pertenece a {active_combo_count} "
-            f"combo(s) activo(s)."
-        )
-    product.is_active = False
-    product.save(update_fields=["is_active"])
-    log_event(
-        AuditEventType.PRODUCT_DEACTIVATED,
-        description=f"Producto desactivado: {product.sku}",
-        user=user,
-        request=request,
-        detail={"product_id": str(product.id), "sku": product.sku},
+    """Legacy wrapper: desactiva producto -> soft_delete_product."""
+    warnings.warn(
+        "deactivate_product is deprecated; use soft_delete_product",
+        DeprecationWarning,
+        stacklevel=2,
     )
+    soft_delete_product(user, product_id, request=request)
 
 
 @transaction.atomic
@@ -683,24 +1042,10 @@ def activate_product(
     *,
     request: HttpRequest | None = None,
 ) -> Product:
-    """
-    Reactiva un producto previamente desactivado.
-    """
-    _require_almacenista(user)
-    # Fetch the product with a lock. Avoid select_related on nullable brand to prevent
-    # FOR UPDATE errors on outer joins (PostgreSQL limitation).
-    product = (
-        Product.objects.select_related("category")
-        .select_for_update()
-        .get(pk=product_id)
+    """Legacy wrapper: reactiva producto -> restore_product."""
+    warnings.warn(
+        "activate_product is deprecated; use restore_product",
+        DeprecationWarning,
+        stacklevel=2,
     )
-    product.is_active = True
-    product.save(update_fields=["is_active"])
-    log_event(
-        AuditEventType.PRODUCT_ACTIVATED,
-        description=f"Producto reactivado: {product.sku}",
-        user=user,
-        request=request,
-        detail={"product_id": str(product.id), "sku": product.sku},
-    )
-    return product
+    return restore_product(user, product_id, request=request)

@@ -62,5 +62,6 @@ class ComboItemInline(admin.TabularInline):
 
 @admin.register(ProductCombo)
 class ProductComboAdmin(admin.ModelAdmin):
-    list_display = ("name", "sku", "is_active")
+    list_display = ("name", "sku", "deleted_at")
+    list_filter = ("deleted_at",)
     inlines = [ComboItemInline]
