@@ -39,6 +39,8 @@ from apps.purchasing.services import (
     create_reception,
     create_supplier,
     deactivate_supplier,
+    restore_supplier,
+    soft_delete_supplier,
     update_purchase_order,
     update_supplier,
 )
@@ -93,13 +95,26 @@ def test_create_supplier_duplicate_nit_raises(almacenista_user):
 
 
 @pytest.mark.django_db
-def test_deactivate_supplier(almacenista_user):
+def test_soft_delete_supplier(almacenista_user):
+    supplier = SupplierFactory(is_active=True)
+    soft_delete_supplier(almacenista_user, supplier.id)
+    supplier.refresh_from_db()
+    assert supplier.deleted_at is not None
+    assert supplier.is_active is False
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.SUPPLIER_SOFT_DELETED
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_deactivate_supplier_legacy(almacenista_user):
     supplier = SupplierFactory(is_active=True)
     deactivate_supplier(almacenista_user, supplier.id)
     supplier.refresh_from_db()
-    assert not supplier.is_active
+    assert supplier.deleted_at is not None
+    assert supplier.is_active is False
     assert AuditLog.objects.filter(
-        event_type=AuditEventType.SUPPLIER_DEACTIVATED
+        event_type=AuditEventType.SUPPLIER_SOFT_DELETED
     ).exists()
 
 

@@ -4,10 +4,10 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Q
 
-from shared.models import BaseModel
+from shared.models import BaseModel, SoftDeleteModel
 
 
-class Supplier(BaseModel):
+class Supplier(BaseModel, SoftDeleteModel):
     """Proveedor de mercancía. Su activación/desactivación no afecta OC existentes."""
 
     nombre_comercial = models.CharField(max_length=200)
@@ -182,11 +182,11 @@ class PurchaseOrderItem(BaseModel):
         unique_together = [("purchase_order", "product")]
         constraints = [
             models.CheckConstraint(
-                check=Q(quantity_ordered__gt=0),
+                condition=Q(quantity_ordered__gt=0),
                 name="poi_qty_ordered_positive",
             ),
             models.CheckConstraint(
-                check=Q(quantity_received__gte=0),
+                condition=Q(quantity_received__gte=0),
                 name="poi_qty_received_nonneg",
             ),
         ]
@@ -308,7 +308,7 @@ class ReceptionItem(BaseModel):
         unique_together = [("reception", "purchase_order_item")]
         constraints = [
             models.CheckConstraint(
-                check=Q(quantity_received__gte=0),
+                condition=Q(quantity_received__gte=0),
                 name="ri_qty_received_nonneg",
             ),
         ]
@@ -367,7 +367,7 @@ class ReceptionItemAllocation(BaseModel):
         ordering = ("created_at", "id")
         constraints = [
             models.CheckConstraint(
-                check=Q(quantity_received__gt=0),
+                condition=Q(quantity_received__gt=0),
                 name="ria_qty_received_positive",
             ),
         ]

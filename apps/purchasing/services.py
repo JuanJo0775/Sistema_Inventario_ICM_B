@@ -9,9 +9,10 @@ garantizando que el ledger sea la única fuente de verdad.
 from __future__ import annotations
 
 import uuid
+import warnings
 from typing import Any
 
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 
 from apps.audit.models import AuditEventType
@@ -19,6 +20,7 @@ from apps.audit.services import log_event
 from apps.inventory.models import Location
 from apps.movements import services as movements_services
 from shared.exceptions import DomainValidationError
+from shared.utils.db import get_for_update_or_404
 
 from .exceptions import (
     InvalidPOStatusTransitionError,
@@ -132,7 +134,7 @@ def update_supplier(
     executor: Any, supplier_id: uuid.UUID, data: dict[str, Any], *, request: Any = None
 ) -> Supplier:
     """Actualiza datos de un proveedor existente. Solo almacenista."""
-    supplier = Supplier.objects.select_for_update().get(pk=supplier_id)
+    supplier = get_for_update_or_404(Supplier.objects, pk=supplier_id)
 
     if "nit" in data:
         new_nit = (data["nit"] or "").strip() or None
@@ -171,44 +173,6 @@ def update_supplier(
     return supplier
 
 
-@transaction.atomic
-def deactivate_supplier(
-    executor: Any, supplier_id: uuid.UUID, *, request: Any = None
-) -> Supplier:
-    """Desactiva un proveedor. No cancela OC existentes."""
-    supplier = Supplier.objects.select_for_update().get(pk=supplier_id)
-    supplier.is_active = False
-    supplier.save(update_fields=["is_active", "updated_at"])
-
-    log_event(
-        AuditEventType.SUPPLIER_DEACTIVATED,
-        description=f"Proveedor '{supplier.nombre_comercial}' desactivado.",
-        user=executor,
-        request=request,
-        metadata={"supplier_id": str(supplier.id)},
-    )
-    return supplier
-
-
-@transaction.atomic
-def activate_supplier(
-    executor: Any, supplier_id: uuid.UUID, *, request: Any = None
-) -> Supplier:
-    """Reactiva un proveedor previamente desactivado."""
-    supplier = Supplier.objects.select_for_update().get(pk=supplier_id)
-    supplier.is_active = True
-    supplier.save(update_fields=["is_active", "updated_at"])
-
-    log_event(
-        AuditEventType.SUPPLIER_ACTIVATED,
-        description=f"Proveedor '{supplier.nombre_comercial}' reactivado.",
-        user=executor,
-        request=request,
-        metadata={"supplier_id": str(supplier.id)},
-    )
-    return supplier
-
-
 # ---------------------------------------------------------------------------
 # Servicios de Orden de Compra
 # ---------------------------------------------------------------------------
@@ -228,7 +192,7 @@ def create_purchase_order(
         "items": [{"product_id": UUID, "quantity_ordered": int, "unit_cost": Decimal, "notes": str}]
     }
     """
-    supplier = Supplier.objects.select_for_update().get(pk=data["supplier_id"])
+    supplier = get_for_update_or_404(Supplier.objects, pk=data["supplier_id"])
     if not supplier.is_active:
         raise SupplierInactiveError()
 
@@ -271,7 +235,7 @@ def update_purchase_order(
     executor: Any, po_id: uuid.UUID, data: dict[str, Any], *, request: Any = None
 ) -> PurchaseOrder:
     """Actualiza una OC en estado BORRADOR. Solo se puede editar antes de confirmar."""
-    po = PurchaseOrder.objects.select_for_update().get(pk=po_id)
+    po = get_for_update_or_404(PurchaseOrder.objects, pk=po_id)
     if not po.is_editable:
         raise PurchaseOrderImmutableError(
             f"La OC {po.number} no puede modificarse en estado '{po.status}'."
@@ -285,13 +249,18 @@ def update_purchase_order(
     # Recreate items if provided in update payload
     if "items" in data:
         po.items.all().delete()
-        for item_data in data["items"]:
-            PurchaseOrderItem.objects.create(
-                purchase_order=po,
-                product_id=item_data["product_id"],
-                quantity_ordered=int(item_data["quantity_ordered"]),
-                unit_cost=item_data["unit_cost"],
-                notes=item_data.get("notes", ""),
+        try:
+            for item_data in data["items"]:
+                PurchaseOrderItem.objects.create(
+                    purchase_order=po,
+                    product_id=item_data["product_id"],
+                    quantity_ordered=int(item_data["quantity_ordered"]),
+                    unit_cost=item_data["unit_cost"],
+                    notes=item_data.get("notes", ""),
+                )
+        except IntegrityError:
+            raise DomainValidationError(
+                "Un producto aparece más de una vez en los ítems de la orden de compra."
             )
 
     log_event(
@@ -314,7 +283,7 @@ def confirm_purchase_order(
     executor: Any, po_id: uuid.UUID, *, request: Any = None
 ) -> PurchaseOrder:
     """BORRADOR → PENDIENTE. La OC queda bloqueada para modificaciones."""
-    po = PurchaseOrder.objects.select_for_update().get(pk=po_id)
+    po = get_for_update_or_404(PurchaseOrder.objects, pk=po_id)
 
     if po.status != PurchaseOrderStatus.BORRADOR:
         raise InvalidPOStatusTransitionError(
@@ -344,7 +313,7 @@ def cancel_purchase_order(
     Cancela una OC. Solo posible desde BORRADOR o PENDIENTE.
     No se puede cancelar si ya hay recepciones CONFIRMADAS.
     """
-    po = PurchaseOrder.objects.select_for_update().get(pk=po_id)
+    po = get_for_update_or_404(PurchaseOrder.objects, pk=po_id)
 
     if po.status in (PurchaseOrderStatus.COMPLETADA, PurchaseOrderStatus.CANCELADA):
         raise InvalidPOStatusTransitionError(
@@ -417,7 +386,7 @@ def create_reception(
         ]
     }
     """
-    po = PurchaseOrder.objects.select_for_update().get(pk=po_id)
+    po = get_for_update_or_404(PurchaseOrder.objects, pk=po_id)
     if not po.is_receivable:
         raise PONotReceivableError(
             f"La OC {po.number} está en estado '{po.status}' y no acepta recepciones."
@@ -448,15 +417,20 @@ def create_reception(
                 f"para el producto '{poi.product}'."
             )
 
-        item = ReceptionItem.objects.create(
-            reception=reception,
-            purchase_order_item=poi,
-            quantity_received=qty,
-            lot_code=item_data.get("lot_code", ""),
-            lot_expiration_date=item_data.get("lot_expiration_date"),
-            serial_number=item_data.get("serial_number") or None,
-            discrepancy_note=item_data.get("discrepancy_note", ""),
-        )
+        try:
+            item = ReceptionItem.objects.create(
+                reception=reception,
+                purchase_order_item=poi,
+                quantity_received=qty,
+                lot_code=item_data.get("lot_code", ""),
+                lot_expiration_date=item_data.get("lot_expiration_date"),
+                serial_number=item_data.get("serial_number") or None,
+                discrepancy_note=item_data.get("discrepancy_note", ""),
+            )
+        except IntegrityError:
+            raise DomainValidationError(
+                "El ítem de recepción ya existe para esta orden de compra."
+            )
 
         allocations = list(item_data.get("allocations") or [])
         if allocations:
@@ -525,17 +499,18 @@ def confirm_reception(
     7. Recalcula PurchaseOrder.status.
     8. Marca la recepción como CONFIRMADA.
     """
-    reception = (
-        Reception.objects.select_for_update()
-        .select_related("purchase_order", "destination_location", "received_by")
-        .get(pk=reception_id)
+    reception = get_for_update_or_404(
+        Reception.objects.select_related(
+            "purchase_order", "destination_location", "received_by"
+        ),
+        pk=reception_id,
     )
 
     if reception.status != ReceptionStatus.BORRADOR:
         raise ReceptionNotInBorradorError()
 
     # Lock PO para evitar condición de carrera con otras recepciones
-    po = PurchaseOrder.objects.select_for_update().get(pk=reception.purchase_order_id)
+    po = get_for_update_or_404(PurchaseOrder.objects, pk=reception.purchase_order_id)
 
     items = list(
         reception.items.select_related("purchase_order_item__product")
@@ -674,7 +649,7 @@ def cancel_reception(
     executor: Any, reception_id: uuid.UUID, *, request: Any = None
 ) -> Reception:
     """Cancela una recepción en estado BORRADOR. No tiene efecto en inventario."""
-    reception = Reception.objects.select_for_update().get(pk=reception_id)
+    reception = get_for_update_or_404(Reception.objects, pk=reception_id)
 
     if reception.status != ReceptionStatus.BORRADOR:
         raise ReceptionNotInBorradorError(
@@ -695,3 +670,157 @@ def cancel_reception(
         },
     )
     return reception
+
+
+# =============================================================================
+# Soft Delete / Disponibilidad — Supplier
+# =============================================================================
+
+
+@transaction.atomic
+def soft_delete_supplier(
+    executor: Any, supplier_id: uuid.UUID, *, request: Any = None
+) -> None:
+    """Elimina lógicamente un proveedor (soft delete).
+
+    Bloquea si existen Órdenes de Compra activas (BORRADOR, PENDIENTE, PARCIALMENTE_RECIBIDA)
+    o Recepciones en BORRADOR asociadas a este proveedor.
+    """
+    supplier = get_for_update_or_404(Supplier.objects, pk=supplier_id)
+
+    blocking_po_statuses = {
+        PurchaseOrderStatus.BORRADOR,
+        PurchaseOrderStatus.PENDIENTE,
+        PurchaseOrderStatus.PARCIALMENTE_RECIBIDA,
+    }
+    if PurchaseOrder.objects.filter(
+        supplier=supplier, status__in=blocking_po_statuses
+    ).exists():
+        raise DomainValidationError(
+            "No se puede archivar: existen órdenes de compra activas "
+            "(borrador, pendiente o parcialmente recibida)."
+        )
+
+    if Reception.objects.filter(
+        purchase_order__supplier=supplier, status=ReceptionStatus.BORRADOR
+    ).exists():
+        raise DomainValidationError(
+            "No se puede archivar: existen recepciones en borrador asociadas a este proveedor."
+        )
+
+    supplier.deleted_at = timezone.now()
+    supplier.is_active = False  # sync legado
+    supplier.save(update_fields=["deleted_at", "is_active", "updated_at"])
+
+    log_event(
+        AuditEventType.SUPPLIER_SOFT_DELETED,
+        description=f"Proveedor eliminado lógicamente: {supplier.nombre_comercial}",
+        user=executor,
+        request=request,
+        metadata={
+            "supplier_id": str(supplier.id),
+            "nombre_comercial": supplier.nombre_comercial,
+        },
+    )
+
+
+@transaction.atomic
+def restore_supplier(
+    executor: Any, supplier_id: uuid.UUID, *, request: Any = None
+) -> Supplier:
+    """Restaura un proveedor previamente eliminado lógicamente."""
+    supplier = get_for_update_or_404(Supplier.objects, pk=supplier_id)
+
+    supplier.deleted_at = None
+    supplier.is_active = True  # sync legado
+    supplier.save(update_fields=["deleted_at", "is_active", "updated_at"])
+
+    log_event(
+        AuditEventType.SUPPLIER_RESTORED,
+        description=f"Proveedor restaurado: {supplier.nombre_comercial}",
+        user=executor,
+        request=request,
+        metadata={
+            "supplier_id": str(supplier.id),
+            "nombre_comercial": supplier.nombre_comercial,
+        },
+    )
+    return supplier
+
+
+@transaction.atomic
+def disable_supplier(
+    executor: Any, supplier_id: uuid.UUID, *, request: Any = None
+) -> None:
+    """Desactiva un proveedor para nuevas OC (pausa temporal)."""
+    supplier = get_for_update_or_404(Supplier.objects, pk=supplier_id)
+    if supplier.deleted_at is not None:
+        raise ValueError(
+            "No se puede desactivar un proveedor archivado; restáurelo primero."
+        )
+    supplier.is_active = False
+    supplier.save(update_fields=["is_active", "updated_at"])
+
+    log_event(
+        AuditEventType.SUPPLIER_DISABLED,
+        description=f"Proveedor desactivado para nuevas OC: {supplier.nombre_comercial}",
+        user=executor,
+        request=request,
+        metadata={
+            "supplier_id": str(supplier.id),
+            "nombre_comercial": supplier.nombre_comercial,
+        },
+    )
+
+
+@transaction.atomic
+def enable_supplier(
+    executor: Any, supplier_id: uuid.UUID, *, request: Any = None
+) -> Supplier:
+    """Reactiva un proveedor para nuevas OC."""
+    supplier = get_for_update_or_404(Supplier.objects, pk=supplier_id)
+    if supplier.deleted_at is not None:
+        raise ValueError(
+            "No se puede activar un proveedor archivado; restáurelo primero."
+        )
+    supplier.is_active = True
+    supplier.save(update_fields=["is_active", "updated_at"])
+
+    log_event(
+        AuditEventType.SUPPLIER_ENABLED,
+        description=f"Proveedor reactivado para nuevas OC: {supplier.nombre_comercial}",
+        user=executor,
+        request=request,
+        metadata={
+            "supplier_id": str(supplier.id),
+            "nombre_comercial": supplier.nombre_comercial,
+        },
+    )
+    return supplier
+
+
+@transaction.atomic
+def deactivate_supplier(
+    executor: Any, supplier_id: uuid.UUID, *, request: Any = None
+) -> Supplier:
+    """Legacy wrapper: desactiva proveedor -> soft_delete_supplier."""
+    warnings.warn(
+        "deactivate_supplier is deprecated; use soft_delete_supplier",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    soft_delete_supplier(executor, supplier_id, request=request)
+    return get_for_update_or_404(Supplier.objects, pk=supplier_id)
+
+
+@transaction.atomic
+def activate_supplier(
+    executor: Any, supplier_id: uuid.UUID, *, request: Any = None
+) -> Supplier:
+    """Legacy wrapper: reactiva proveedor -> restore_supplier."""
+    warnings.warn(
+        "activate_supplier is deprecated; use restore_supplier",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return restore_supplier(executor, supplier_id, request=request)
