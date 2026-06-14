@@ -144,7 +144,7 @@ def impl_rf019_s03(authenticated_almacenista_client: APIClient, db):
 
     assert Supplier.objects.filter(pk=supplier["id"]).exists()
     assert AuditLog.objects.filter(
-        event_type=AuditEventType.SUPPLIER_DEACTIVATED
+        event_type=AuditEventType.SUPPLIER_SOFT_DELETED
     ).exists()
 
 
@@ -1075,9 +1075,9 @@ def impl_rf024_s02(
         AuditEventType.RECEPTION_CONFIRMED,
     ]
     for event in expected_events:
-        assert AuditLog.objects.filter(
-            event_type=event
-        ).exists(), f"Evento esperado en audit log no encontrado: {event}"
+        assert AuditLog.objects.filter(event_type=event).exists(), (
+            f"Evento esperado en audit log no encontrado: {event}"
+        )
 
 
 # ---------------------------------------------------------------------------

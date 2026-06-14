@@ -40,6 +40,7 @@ from shared.location_validators import (
 from shared.location_validators import (
     validate_location_for_origin as _ensure_location_allows_origin,
 )
+from shared.utils.db import get_for_update_or_404
 
 logger = logging.getLogger(__name__)
 
@@ -536,12 +537,10 @@ def register_entry(
         SerialNumberRequiredError: BR-04.
         DiscrepancyNoteRequiredError: BR-09.
     """
-    product = (
-        Product.objects.select_for_update()
-        .select_related("category")
-        .get(pk=product_id)
+    product = get_for_update_or_404(
+        Product.objects.select_related("category"), pk=product_id
     )
-    location = Location.objects.select_for_update().get(pk=location_id)
+    location = get_for_update_or_404(Location.objects, pk=location_id)
     _ensure_location_allows_destination(location, "entry")
     _validate_serial_required(product, serial_number)
     if (
@@ -673,7 +672,7 @@ def register_dispatch(
 
     sc = (scanned_code or "").strip()
     osku = (order_sku or "").strip()
-    location = Location.objects.select_for_update().get(pk=location_id)
+    location = get_for_update_or_404(Location.objects, pk=location_id)
     _ensure_location_allows_origin(location, "dispatch")
     if bool(sc) ^ bool(osku):
         raise CrossValidationFailedError(
@@ -747,9 +746,10 @@ def register_dispatch(
 
     selected_lot: Lot | None = None
     if getattr(product, "requires_expiration", False) and lot_id is not None:
-        selected_lot = Lot.objects.select_for_update().get(
-            pk=lot_id, product_id=product_id
+        selected_lot = get_for_update_or_404(
+            Lot.objects.filter(product_id=product_id), pk=lot_id
         )
+        assert selected_lot is not None
         available = ledger_net_quantity_for_lot_location(
             product_id=product_id, lot_id=selected_lot.id, location_id=location_id
         )
@@ -1031,9 +1031,10 @@ def register_internal_transfer(
 
     selected_lot: Lot | None = None
     if getattr(product, "requires_expiration", False) and lot_id is not None:
-        selected_lot = Lot.objects.select_for_update().get(
-            pk=lot_id, product_id=product_id
+        selected_lot = get_for_update_or_404(
+            Lot.objects.filter(product_id=product_id), pk=lot_id
         )
+        assert selected_lot is not None
         available = ledger_net_quantity_for_lot_location(
             product_id=product_id, lot_id=selected_lot.id, location_id=origin_id
         )
@@ -1141,12 +1142,10 @@ def register_return(
         ReturnNotAllowedError: BR-05.
         SerialNumberRequiredError: BR-04.
     """
-    product = (
-        Product.objects.select_for_update()
-        .select_related("category")
-        .get(pk=product_id)
+    product = get_for_update_or_404(
+        Product.objects.select_related("category"), pk=product_id
     )
-    location = Location.objects.select_for_update().get(pk=location_id)
+    location = get_for_update_or_404(Location.objects, pk=location_id)
     _ensure_location_allows_destination(location, "return")
     if not _product_allows_returns(product):
         raise ProductNotReturnableError()
@@ -1175,8 +1174,8 @@ def register_return(
 
     selected_lot: Lot | None = None
     if getattr(product, "requires_expiration", False) and lot_id is not None:
-        selected_lot = Lot.objects.select_for_update().get(
-            pk=lot_id, product_id=product_id
+        selected_lot = get_for_update_or_404(
+            Lot.objects.filter(product_id=product_id), pk=lot_id
         )
 
     dest = _lock_stock(product_id, location_id)
@@ -1247,7 +1246,7 @@ def register_adjustment(
 
     row = _lock_stock(product_id, location_id)
     product = Product.objects.select_related("category").get(pk=product_id)
-    location = Location.objects.select_for_update().get(pk=location_id)
+    location = get_for_update_or_404(Location.objects, pk=location_id)
 
     resolved_serial: str | None = None
     if serial_id is not None:
@@ -1687,7 +1686,7 @@ def dispatch_combo(
     from apps.catalog.models import ProductCombo
 
     combo = ProductCombo.objects.prefetch_related("combo_items__product__category").get(
-        pk=combo_id, is_active=True
+        pk=combo_id, deleted_at__isnull=True
     )
     items = list(combo.combo_items.all())
     if not items:
@@ -1702,7 +1701,7 @@ def dispatch_combo(
             )
             break
 
-    location = Location.objects.select_for_update().get(pk=location_id)
+    location = get_for_update_or_404(Location.objects, pk=location_id)
     _ensure_location_allows_origin(location, "combo_dispatch")
     movements_created: list[Movement] = []
 

@@ -65,6 +65,16 @@ from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenistaOrAdministrador
 from shared.utils.params import clamp_limit, clamp_period_days
 
+
+def _try_uuid(raw: str | None, field: str) -> UUID | None:
+    if raw is None:
+        return None
+    try:
+        return UUID(str(raw))
+    except (ValueError, AttributeError):
+        raise ValidationError({field: "UUID inválido."})
+
+
 _MOVEMENT_EXPORT_HEADERS = [
     "id",
     "movement_type",
@@ -252,9 +262,9 @@ class MovementHistoryReportView(APIView):
             else None
         )
         raw_pid = request.query_params.get("product_id")
-        product_id = UUID(str(raw_pid)) if raw_pid else None
+        product_id = _try_uuid(raw_pid, "product_id")
         raw_lid = request.query_params.get("location_id")
-        location_id = UUID(str(raw_lid)) if raw_lid else None
+        location_id = _try_uuid(raw_lid, "location_id")
         qs = movement_history(
             product_id=product_id,
             user_id=(
@@ -411,7 +421,7 @@ class InvoiceHistoryReportView(APIView):
         if inv := request.query_params.get("invoice_number"):
             filters["invoice_number"] = inv
         if pid := request.query_params.get("product_id"):
-            filters["product_id"] = UUID(str(pid))
+            filters["product_id"] = _try_uuid(pid, "product_id")
         qs = get_invoice_history(filters)
         paginator = ICMPageNumberPagination()
         page = paginator.paginate_queryset(list(qs), request, view=self)
@@ -773,9 +783,9 @@ class ReportDatasetView(APIView):
                 else None
             )
             raw_pid = request.query_params.get("product_id")
-            product_id = UUID(str(raw_pid)) if raw_pid else None
+            product_id = _try_uuid(raw_pid, "product_id")
             raw_lid = request.query_params.get("location_id")
-            location_id = UUID(str(raw_lid)) if raw_lid else None
+            location_id = _try_uuid(raw_lid, "location_id")
             qs = movement_history(
                 product_id=product_id,
                 user_id=(
@@ -804,7 +814,7 @@ class ReportDatasetView(APIView):
             if inv := request.query_params.get("invoice_number"):
                 filters_map["invoice_number"] = inv
             if pid := request.query_params.get("product_id"):
-                filters_map["product_id"] = UUID(str(pid))
+                filters_map["product_id"] = _try_uuid(pid, "product_id")
             qs = get_invoice_history(filters_map)
             data = MovementSerializer(list(qs), many=True).data
         elif kind == "kpi":
