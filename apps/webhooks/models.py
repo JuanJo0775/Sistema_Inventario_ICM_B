@@ -3,10 +3,10 @@
 from django.conf import settings
 from django.db import models
 
-from shared.models import BaseModel
+from shared.models import BaseModel, SoftDeleteModel
 
 
-class WebhookEndpoint(BaseModel):
+class WebhookEndpoint(BaseModel, SoftDeleteModel):
     """Destino externo suscrito a eventos del sistema."""
 
     url = models.URLField(max_length=500)

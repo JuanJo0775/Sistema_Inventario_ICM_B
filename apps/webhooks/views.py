@@ -19,7 +19,13 @@ from apps.webhooks.serializers import (
     WebhookEndpointSerializer,
     WebhookTestSerializer,
 )
-from apps.webhooks.services import _attempt_delivery
+from apps.webhooks.services import (
+    _attempt_delivery,
+    disable_webhook_endpoint,
+    enable_webhook_endpoint,
+    restore_webhook_endpoint,
+    soft_delete_webhook_endpoint,
+)
 from shared.openapi import TAG_WEBHOOKS, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
 from shared.permissions import IsAlmacenista
@@ -40,7 +46,9 @@ class WebhookEndpointListCreateView(APIView):
         tags=[TAG_WEBHOOKS],
     )
     def get(self, request):
-        qs = WebhookEndpoint.objects.all().order_by("-created_at")
+        qs = WebhookEndpoint.objects.filter(deleted_at__isnull=True).order_by(
+            "-created_at"
+        )
         paginator = ICMPageNumberPagination()
         page = paginator.paginate_queryset(list(qs), request, view=self)
         return paginator.get_paginated_response(
@@ -165,10 +173,11 @@ class WebhookEndpointDetailView(APIView):
         return Response(WebhookEndpointSerializer(endpoint).data)
 
     @extend_schema(
-        summary="Desactivar endpoint de webhook",
+        summary="Eliminar lógicamente endpoint de webhook (soft delete)",
         description=(
-            "Marca el endpoint como inactivo: deja de recibir eventos. "
-            "El registro NO se elimina de la base de datos ni se pierden las entregas registradas."
+            "Marca el endpoint como eliminado lógicamente (deleted_at=now). "
+            "Deja de recibir eventos y se excluye de listados por defecto. "
+            "Para restaurarlo use POST /webhooks/endpoints/{id}/restore/."
         ),
         responses={
             204: None,
@@ -177,21 +186,82 @@ class WebhookEndpointDetailView(APIView):
         tags=[TAG_WEBHOOKS],
     )
     def delete(self, request, pk):
-        endpoint = get_object_or_404(WebhookEndpoint, pk=pk)
-        endpoint.is_active = False
-        endpoint.save(update_fields=["is_active", "updated_at"])
-        log_event(
-            AuditEventType.WEBHOOK_ENDPOINT_CHANGED,
-            user=request.user,
-            detail={
-                "endpoint_id": str(endpoint.id),
-                "_entity_type": "WebhookEndpoint",
-                "_entity_id": str(endpoint.id),
-                "_origin": "API",
-                "_action": "deactivated",
-            },
-        )
+        get_object_or_404(WebhookEndpoint, pk=pk)
+        soft_delete_webhook_endpoint(request.user, pk, request=request)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class WebhookEndpointRestoreView(APIView):
+    """POST — Restaura un endpoint de webhook previamente eliminado lógicamente."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Restaurar endpoint de webhook",
+        description="Restaura un endpoint de webhook previamente eliminado lógicamente.",
+        tags=[TAG_WEBHOOKS],
+        responses={
+            200: WebhookEndpointSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        get_object_or_404(WebhookEndpoint, pk=pk)
+        endpoint = restore_webhook_endpoint(request.user, pk, request=request)
+        return Response(WebhookEndpointSerializer(endpoint).data)
+
+
+class WebhookEndpointDisableView(APIView):
+    """POST — Desactiva un endpoint para recepción de eventos (pausa temporal)."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Desactivar endpoint de webhook",
+        description=(
+            "Marca el endpoint como inactivo para recepción de eventos (pausa temporal). "
+            "El endpoint NO se elimina y puede reactivarse con POST /enable/."
+        ),
+        tags=[TAG_WEBHOOKS],
+        responses={
+            200: WebhookEndpointSerializer,
+            409: None,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        get_object_or_404(WebhookEndpoint, pk=pk)
+        try:
+            disable_webhook_endpoint(request.user, pk, request=request)
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+        endpoint = WebhookEndpoint.objects.get(pk=pk)
+        return Response(WebhookEndpointSerializer(endpoint).data)
+
+
+class WebhookEndpointEnableView(APIView):
+    """POST — Reactiva un endpoint para recepción de eventos."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Activar endpoint de webhook",
+        description="Reactiva un endpoint de webhook previamente desactivado (pausa).",
+        tags=[TAG_WEBHOOKS],
+        responses={
+            200: WebhookEndpointSerializer,
+            409: None,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        get_object_or_404(WebhookEndpoint, pk=pk)
+        try:
+            enable_webhook_endpoint(request.user, pk, request=request)
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+        endpoint = WebhookEndpoint.objects.get(pk=pk)
+        return Response(WebhookEndpointSerializer(endpoint).data)
 
 
 class WebhookTestView(APIView):

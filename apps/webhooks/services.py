@@ -9,13 +9,18 @@ import logging
 import time
 import urllib.error
 import urllib.request
+import warnings
 from datetime import timedelta
+from typing import Any
 from urllib.parse import urlparse
 
 from django.db import transaction
 from django.utils import timezone
 
+from apps.audit.models import AuditEventType
+from apps.audit.services import log_event
 from apps.webhooks.models import WebhookDelivery, WebhookEndpoint
+from shared.utils.db import get_for_update_or_404
 
 logger = logging.getLogger(__name__)
 
@@ -177,3 +182,137 @@ def _schedule_retry(delivery: WebhookDelivery, max_retries: int) -> None:
         ]
         delivery.next_retry_at = timezone.now() + timedelta(minutes=delay_minutes)
         delivery.status = WebhookDelivery.Status.PENDING
+
+
+# =============================================================================
+# Soft Delete / Disponibilidad — WebhookEndpoint
+# =============================================================================
+
+
+@transaction.atomic
+def soft_delete_webhook_endpoint(
+    executor: Any,
+    endpoint_id: Any,
+    *,
+    request: Any = None,
+) -> None:
+    """Elimina lógicamente un endpoint de webhook (soft delete)."""
+    endpoint = get_for_update_or_404(WebhookEndpoint.objects, pk=endpoint_id)
+    endpoint.deleted_at = timezone.now()
+    endpoint.is_active = False  # sync legado
+    endpoint.save(update_fields=["deleted_at", "is_active", "updated_at"])
+    log_event(
+        AuditEventType.WEBHOOK_ENDPOINT_SOFT_DELETED,
+        description=f"Endpoint webhook eliminado lógicamente: {endpoint.url}",
+        user=executor,
+        request=request,
+        detail={"endpoint_id": str(endpoint.id), "url": endpoint.url},
+    )
+
+
+@transaction.atomic
+def restore_webhook_endpoint(
+    executor: Any,
+    endpoint_id: Any,
+    *,
+    request: Any = None,
+) -> WebhookEndpoint:
+    """Restaura un endpoint de webhook previamente eliminado lógicamente."""
+    endpoint = get_for_update_or_404(WebhookEndpoint.objects, pk=endpoint_id)
+    endpoint.deleted_at = None
+    endpoint.is_active = True  # sync legado
+    endpoint.save(update_fields=["deleted_at", "is_active", "updated_at"])
+    log_event(
+        AuditEventType.WEBHOOK_ENDPOINT_RESTORED,
+        description=f"Endpoint webhook restaurado: {endpoint.url}",
+        user=executor,
+        request=request,
+        detail={"endpoint_id": str(endpoint.id), "url": endpoint.url},
+    )
+    return endpoint
+
+
+@transaction.atomic
+def disable_webhook_endpoint(
+    executor: Any,
+    endpoint_id: Any,
+    *,
+    request: Any = None,
+) -> None:
+    """Desactiva un endpoint para recepción de eventos (no borra, solo pausa)."""
+    endpoint = get_for_update_or_404(WebhookEndpoint.objects, pk=endpoint_id)
+    if endpoint.deleted_at is not None:
+        raise ValueError(
+            "No se puede desactivar un endpoint archivado; restáurelo primero."
+        )
+    endpoint.is_active = False
+    endpoint.save(update_fields=["is_active", "updated_at"])
+    log_event(
+        AuditEventType.WEBHOOK_ENDPOINT_DISABLED,
+        description=f"Endpoint webhook desactivado: {endpoint.url}",
+        user=executor,
+        request=request,
+        detail={"endpoint_id": str(endpoint.id), "url": endpoint.url},
+    )
+
+
+@transaction.atomic
+def enable_webhook_endpoint(
+    executor: Any,
+    endpoint_id: Any,
+    *,
+    request: Any = None,
+) -> WebhookEndpoint:
+    """Reactiva un endpoint para recepción de eventos."""
+    endpoint = get_for_update_or_404(WebhookEndpoint.objects, pk=endpoint_id)
+    if endpoint.deleted_at is not None:
+        raise ValueError(
+            "No se puede activar un endpoint archivado; restáurelo primero."
+        )
+    endpoint.is_active = True
+    endpoint.save(update_fields=["is_active", "updated_at"])
+    log_event(
+        AuditEventType.WEBHOOK_ENDPOINT_ENABLED,
+        description=f"Endpoint webhook reactivado: {endpoint.url}",
+        user=executor,
+        request=request,
+        detail={"endpoint_id": str(endpoint.id), "url": endpoint.url},
+    )
+    return endpoint
+
+
+# =============================================================================
+# Wrappers legacy (deprecados)
+# =============================================================================
+
+
+@transaction.atomic
+def deactivate_webhook_endpoint(
+    executor: Any,
+    endpoint_id: Any,
+    *,
+    request: Any = None,
+) -> None:
+    """Legacy wrapper: desactiva endpoint -> soft_delete_webhook_endpoint."""
+    warnings.warn(
+        "deactivate_webhook_endpoint is deprecated; use soft_delete_webhook_endpoint",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    soft_delete_webhook_endpoint(executor, endpoint_id, request=request)
+
+
+@transaction.atomic
+def activate_webhook_endpoint(
+    executor: Any,
+    endpoint_id: Any,
+    *,
+    request: Any = None,
+) -> WebhookEndpoint:
+    """Legacy wrapper: reactiva endpoint -> restore_webhook_endpoint."""
+    warnings.warn(
+        "activate_webhook_endpoint is deprecated; use restore_webhook_endpoint",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return restore_webhook_endpoint(executor, endpoint_id, request=request)
