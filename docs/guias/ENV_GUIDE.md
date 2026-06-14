@@ -140,13 +140,23 @@ DEFAULT_FROM_EMAIL=noreply@tuapp.com
 
 > Google requiere una *App Password* (no la contraseña normal de la cuenta). Se genera en: Cuenta Google → Seguridad → Verificación en dos pasos → Contraseñas de aplicación.
 
+### Formato del email
+
+Desde junio 2026, el email de recuperación de contraseña se envía en **formato HTML** con:
+- Encabezado "ICM LogiStock" en color `#1a6b72`
+- Botón "Restablecer contraseña" estilizado
+- Enlace de respaldo "haz clic aquí" en color `#e07b39`
+- Versión texto plano como fallback automático
+
 ---
+
+
 
 ## 7. Frontend
 
 | Variable | Default | Descripción |
 |---|---|---|
-| `FRONTEND_URL` | `http://localhost:3000` | URL base del frontend. El backend construye el link de reset de contraseña apuntando a esta URL: `{FRONTEND_URL}/reset-password?token=<token>` |
+| `FRONTEND_URL` | `http://localhost:5173` | URL base del frontend. El backend construye el link de reset de contraseña apuntando a esta URL: `{FRONTEND_URL}/reset-password?token=<token>`. En desarrollo con Vite el puerto por defecto es 5173 (no 3000). |
 
 **Producción:**
 ```
@@ -226,6 +236,6 @@ EMAIL_PORT=2525
 EMAIL_USE_TLS=True
 DEFAULT_FROM_EMAIL=noreply@icm.local
 
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:5173
 PASSWORD_RESET_TOKEN_EXPIRY_MINUTES=10
 ```
