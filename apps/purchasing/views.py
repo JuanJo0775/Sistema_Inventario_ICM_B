@@ -128,16 +128,16 @@ class SupplierDetailView(APIView):
         return Response(SupplierSerializer(supplier).data)
 
     @extend_schema(
-        summary="Desactivar proveedor (soft delete)",
+        summary="Eliminar lógicamente proveedor (soft delete)",
         description=(
-            "Marca el proveedor como inactivo (is_active=False). "
-            "El registro NO se elimina de la base de datos. "
-            "Para reactivar, use POST /suppliers/{id}/activate/."
+            "Marca el proveedor como eliminado lógicamente (deleted_at=now). "
+            "Deja de estar disponible para nuevas OC y se excluye de listados por defecto. "
+            "Para restaurar, use POST /suppliers/{id}/restore/."
         ),
         responses={204: None, **standard_error_responses(include_404=True)},
     )
     def delete(self, request, pk: UUID):
-        services.deactivate_supplier(request.user, pk, request=request)
+        services.soft_delete_supplier(request.user, pk, request=request)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
