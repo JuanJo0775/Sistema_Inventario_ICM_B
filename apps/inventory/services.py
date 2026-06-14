@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import contextlib
+import warnings
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from django.db import IntegrityError, transaction
+from django.utils import timezone
 from django.utils.text import slugify
 
 import apps.alerts.services as alert_services
@@ -21,6 +23,7 @@ from apps.inventory.models import (
 )
 from apps.inventory.selectors import reconstruct_stock_from_ledger
 from shared.exceptions import DomainValidationError, UnauthorizedDomainActionError
+from shared.utils.db import get_for_update_or_404
 
 if TYPE_CHECKING:
     from apps.inventory.models import StockByLocation
@@ -273,7 +276,7 @@ def update_location(executor: Any, location_id: UUID, data: dict[str, Any]) -> L
         raise UnauthorizedDomainActionError(
             "Solo el almacenista puede modificar ubicaciones."
         )
-    loc = Location.objects.select_for_update().get(pk=location_id)
+    loc = get_for_update_or_404(Location.objects, pk=location_id)
     deactivating_by_active = (
         "is_active" in data and not bool(data["is_active"]) and loc.is_active
     )
@@ -287,7 +290,7 @@ def update_location(executor: Any, location_id: UUID, data: dict[str, Any]) -> L
 
         if StockByLocation.objects.filter(location=loc, current_stock__gt=0).exists():
             raise DomainValidationError(
-                "No es posible desactivar la ubicación porque aún contiene inventario."
+                "No se puede archivar la ubicación porque aún contiene inventario."
             )
     if "name" in data:
         loc.name = str(data["name"]).strip()
@@ -409,16 +412,6 @@ def update_location(executor: Any, location_id: UUID, data: dict[str, Any]) -> L
 
 
 @transaction.atomic
-def deactivate_location(executor: Any, location_id: UUID) -> Location:
-    """RF-004 — Desactiva ubicación (no borrado físico)."""
-    return update_location(
-        executor,
-        location_id,
-        {"is_active": False, "operational_status": Location.OperationalStatus.ARCHIVED},
-    )
-
-
-@transaction.atomic
 def transition_location_state(
     executor: Any,
     location_id: UUID,
@@ -481,7 +474,7 @@ def update_storage_type(
         raise UnauthorizedDomainActionError(
             "Solo el almacenista puede modificar tipos de almacenamiento."
         )
-    st = StorageType.objects.select_for_update().get(pk=storage_type_id)
+    st = get_for_update_or_404(StorageType.objects, pk=storage_type_id)
     if "code" in data:
         code = str(data["code"] or "").strip().lower()
         if not code:
@@ -515,9 +508,17 @@ def update_storage_type(
 
 
 @transaction.atomic
-def deactivate_storage_type(executor: Any, storage_type_id: UUID) -> StorageType:
-    """Desactiva un tipo de almacenamiento (solo almacenista)."""
-    return update_storage_type(executor, storage_type_id, {"is_active": False})
+def deactivate_storage_type(
+    executor: Any, storage_type_id: UUID, *, request: Any = None
+) -> StorageType:
+    """Legacy wrapper: desactiva tipo -> soft_delete_storage_type."""
+    warnings.warn(
+        "deactivate_storage_type is deprecated; use soft_delete_storage_type",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    soft_delete_storage_type(executor, storage_type_id, request=request)
+    return get_for_update_or_404(StorageType.objects, pk=storage_type_id)
 
 
 @transaction.atomic
@@ -573,7 +574,7 @@ def update_storage_template(
         raise UnauthorizedDomainActionError(
             "Solo el almacenista puede modificar plantillas de almacenamiento."
         )
-    template = StorageTemplate.objects.select_for_update().get(pk=storage_template_id)
+    template = get_for_update_or_404(StorageTemplate.objects, pk=storage_template_id)
     if "code" in data:
         code = str(data["code"] or "").strip().lower()
         if not code:
@@ -615,9 +616,302 @@ def update_storage_template(
     return template
 
 
+# =============================================================================
+# Soft Delete / Disponibilidad — StorageType
+# =============================================================================
+
+
+@transaction.atomic
+def soft_delete_storage_type(
+    executor: Any, storage_type_id: UUID, *, request: Any = None
+) -> None:
+    """Elimina lógicamente un tipo de almacenamiento (soft delete)."""
+    st = get_for_update_or_404(StorageType.objects, pk=storage_type_id)
+    st.deleted_at = timezone.now()
+    st.is_active = False  # sync legado
+    st.save(update_fields=["deleted_at", "is_active", "updated_at"])
+    log_event(
+        AuditEventType.STORAGE_TYPE_SOFT_DELETED,
+        description=f"Tipo de almacenamiento eliminado lógicamente: {st.name}",
+        user=executor,
+        request=request,
+        detail={"storage_type_id": str(st.id), "name": st.name, "code": st.code},
+    )
+
+
+@transaction.atomic
+def restore_storage_type(
+    executor: Any, storage_type_id: UUID, *, request: Any = None
+) -> StorageType:
+    """Restaura un tipo de almacenamiento previamente eliminado lógicamente."""
+    st = get_for_update_or_404(StorageType.objects, pk=storage_type_id)
+    st.deleted_at = None
+    st.is_active = True  # sync legado
+    st.save(update_fields=["deleted_at", "is_active", "updated_at"])
+    log_event(
+        AuditEventType.STORAGE_TYPE_RESTORED,
+        description=f"Tipo de almacenamiento restaurado: {st.name}",
+        user=executor,
+        request=request,
+        detail={"storage_type_id": str(st.id), "name": st.name, "code": st.code},
+    )
+    return st
+
+
+@transaction.atomic
+def disable_storage_type(
+    executor: Any, storage_type_id: UUID, *, request: Any = None
+) -> None:
+    """Desactiva un tipo de almacenamiento para asignación (pausa temporal)."""
+    st = get_for_update_or_404(StorageType.objects, pk=storage_type_id)
+    if st.deleted_at is not None:
+        raise ValueError(
+            "No se puede desactivar un tipo archivado; restáurelo primero."
+        )
+    st.is_active = False
+    st.save(update_fields=["is_active", "updated_at"])
+    log_event(
+        AuditEventType.STORAGE_TYPE_DISABLED,
+        description=f"Tipo de almacenamiento desactivado: {st.name}",
+        user=executor,
+        request=request,
+        detail={"storage_type_id": str(st.id), "name": st.name, "code": st.code},
+    )
+
+
+@transaction.atomic
+def enable_storage_type(
+    executor: Any, storage_type_id: UUID, *, request: Any = None
+) -> StorageType:
+    """Reactiva un tipo de almacenamiento para asignación."""
+    st = get_for_update_or_404(StorageType.objects, pk=storage_type_id)
+    if st.deleted_at is not None:
+        raise ValueError("No se puede activar un tipo archivado; restáurelo primero.")
+    st.is_active = True
+    st.save(update_fields=["is_active", "updated_at"])
+    log_event(
+        AuditEventType.STORAGE_TYPE_ENABLED,
+        description=f"Tipo de almacenamiento reactivado: {st.name}",
+        user=executor,
+        request=request,
+        detail={"storage_type_id": str(st.id), "name": st.name, "code": st.code},
+    )
+    return st
+
+
+# =============================================================================
+# Soft Delete / Disponibilidad — StorageTemplate
+# =============================================================================
+
+
+@transaction.atomic
+def soft_delete_storage_template(
+    executor: Any, storage_template_id: UUID, *, request: Any = None
+) -> None:
+    """Elimina lógicamente una plantilla de almacenamiento (soft delete)."""
+    template = get_for_update_or_404(StorageTemplate.objects, pk=storage_template_id)
+    template.deleted_at = timezone.now()
+    template.is_active = False  # sync legado
+    template.save(update_fields=["deleted_at", "is_active", "updated_at"])
+    log_event(
+        AuditEventType.STORAGE_TEMPLATE_SOFT_DELETED,
+        description=f"Plantilla de almacenamiento eliminada lógicamente: {template.name}",
+        user=executor,
+        request=request,
+        detail={
+            "storage_template_id": str(template.id),
+            "name": template.name,
+            "code": template.code,
+        },
+    )
+
+
+@transaction.atomic
+def restore_storage_template(
+    executor: Any, storage_template_id: UUID, *, request: Any = None
+) -> StorageTemplate:
+    """Restaura una plantilla de almacenamiento previamente eliminada lógicamente."""
+    template = get_for_update_or_404(StorageTemplate.objects, pk=storage_template_id)
+    template.deleted_at = None
+    template.is_active = True  # sync legado
+    template.save(update_fields=["deleted_at", "is_active", "updated_at"])
+    log_event(
+        AuditEventType.STORAGE_TEMPLATE_RESTORED,
+        description=f"Plantilla de almacenamiento restaurada: {template.name}",
+        user=executor,
+        request=request,
+        detail={
+            "storage_template_id": str(template.id),
+            "name": template.name,
+            "code": template.code,
+        },
+    )
+    return template
+
+
+@transaction.atomic
+def disable_storage_template(
+    executor: Any, storage_template_id: UUID, *, request: Any = None
+) -> None:
+    """Desactiva una plantilla para asignación (pausa temporal)."""
+    template = get_for_update_or_404(StorageTemplate.objects, pk=storage_template_id)
+    if template.deleted_at is not None:
+        raise ValueError(
+            "No se puede desactivar una plantilla archivada; restáurela primero."
+        )
+    template.is_active = False
+    template.save(update_fields=["is_active", "updated_at"])
+    log_event(
+        AuditEventType.STORAGE_TEMPLATE_DISABLED,
+        description=f"Plantilla de almacenamiento desactivada: {template.name}",
+        user=executor,
+        request=request,
+        detail={
+            "storage_template_id": str(template.id),
+            "name": template.name,
+            "code": template.code,
+        },
+    )
+
+
+@transaction.atomic
+def enable_storage_template(
+    executor: Any, storage_template_id: UUID, *, request: Any = None
+) -> StorageTemplate:
+    """Reactiva una plantilla para asignación."""
+    template = get_for_update_or_404(StorageTemplate.objects, pk=storage_template_id)
+    if template.deleted_at is not None:
+        raise ValueError(
+            "No se puede activar una plantilla archivada; restáurela primero."
+        )
+    template.is_active = True
+    template.save(update_fields=["is_active", "updated_at"])
+    log_event(
+        AuditEventType.STORAGE_TEMPLATE_ENABLED,
+        description=f"Plantilla de almacenamiento reactivada: {template.name}",
+        user=executor,
+        request=request,
+        detail={
+            "storage_template_id": str(template.id),
+            "name": template.name,
+            "code": template.code,
+        },
+    )
+    return template
+
+
 @transaction.atomic
 def deactivate_storage_template(
-    executor: Any, storage_template_id: UUID
+    executor: Any, storage_template_id: UUID, *, request: Any = None
 ) -> StorageTemplate:
-    """Desactiva una plantilla de almacenamiento (solo almacenista)."""
-    return update_storage_template(executor, storage_template_id, {"is_active": False})
+    """Legacy wrapper: desactiva plantilla -> soft_delete_storage_template."""
+    warnings.warn(
+        "deactivate_storage_template is deprecated; use soft_delete_storage_template",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    soft_delete_storage_template(executor, storage_template_id, request=request)
+    return get_for_update_or_404(StorageTemplate.objects, pk=storage_template_id)
+
+
+# =============================================================================
+# Soft Delete / Disponibilidad — Location
+# =============================================================================
+
+
+@transaction.atomic
+def soft_delete_location(
+    executor: Any, location_id: UUID, *, request: Any = None
+) -> None:
+    """Elimina lógicamente una ubicación (soft delete).
+
+    Bloquea si existe stock > 0 en la ubicación o recepciones en BORRADOR.
+    """
+    if getattr(executor, "role", None) != "almacenista":
+        raise UnauthorizedDomainActionError(
+            "Solo el almacenista puede eliminar ubicaciones."
+        )
+    location = get_for_update_or_404(Location.objects, pk=location_id)
+
+    # Validar stock > 0
+    from apps.inventory.models import StockByLocation
+
+    if StockByLocation.objects.filter(location=location, current_stock__gt=0).exists():
+        raise DomainValidationError(
+            "No se puede archivar la ubicación porque aún contiene inventario."
+        )
+
+    # Validar recepciones en BORRADOR
+    from apps.purchasing.models import Reception, ReceptionStatus
+
+    if Reception.objects.filter(
+        destination_location=location, status=ReceptionStatus.BORRADOR
+    ).exists():
+        raise DomainValidationError(
+            "No se puede archivar la ubicación porque tiene recepciones en borrador."
+        )
+
+    location.deleted_at = timezone.now()
+    location.operational_status = Location.OperationalStatus.ARCHIVED
+    location.is_active = False  # sync legado
+    location.save(
+        update_fields=["deleted_at", "operational_status", "is_active", "updated_at"]
+    )
+
+    log_event(
+        AuditEventType.LOCATION_SOFT_DELETED,
+        description=f"Ubicación eliminada lógicamente: {location.name}",
+        user=executor,
+        request=request,
+        detail={
+            "location_id": str(location.id),
+            "name": location.name,
+            "code": location.code,
+        },
+    )
+
+
+@transaction.atomic
+def restore_location(
+    executor: Any, location_id: UUID, *, request: Any = None
+) -> Location:
+    """Restaura una ubicación previamente eliminada lógicamente."""
+    if getattr(executor, "role", None) != "almacenista":
+        raise UnauthorizedDomainActionError(
+            "Solo el almacenista puede restaurar ubicaciones."
+        )
+    location = get_for_update_or_404(Location.objects, pk=location_id)
+
+    location.deleted_at = None
+    location.operational_status = Location.OperationalStatus.ACTIVE
+    location.is_active = True  # sync legado
+    location.save(
+        update_fields=["deleted_at", "operational_status", "is_active", "updated_at"]
+    )
+
+    log_event(
+        AuditEventType.LOCATION_RESTORED,
+        description=f"Ubicación restaurada: {location.name}",
+        user=executor,
+        request=request,
+        detail={
+            "location_id": str(location.id),
+            "name": location.name,
+            "code": location.code,
+        },
+    )
+    return location
+
+
+@transaction.atomic
+def deactivate_location(
+    executor: Any, location_id: UUID, *, request: Any = None
+) -> Location:
+    """Legacy wrapper: desactiva ubicación -> soft_delete_location."""
+    warnings.warn(
+        "deactivate_location is deprecated; use soft_delete_location",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    soft_delete_location(executor, location_id, request=request)
+    return get_for_update_or_404(Location.objects, pk=location_id)

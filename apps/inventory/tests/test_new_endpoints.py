@@ -99,37 +99,53 @@ class TestStorageTemplatePut:
 
 class TestLocationListIncludeInactive:
     @pytest.mark.django_db
-    def test_list_excludes_inactive_by_default(
+    def test_list_excludes_non_active_by_default(
         self, authenticated_almacenista_client, sample_locations
     ):
-        active_loc = sample_locations[0]
-        # Desactivar una ubicación
-        resp_del = authenticated_almacenista_client.delete(
-            f"/api/v1/inventory/locations/{sample_locations[1].id}/"
-        )
-        assert resp_del.status_code == 204
+        # Set one location to maintenance (non-active but not deleted)
+        maintenance_loc = sample_locations[1]
+        maintenance_loc.operational_status = "maintenance"
+        maintenance_loc.save(update_fields=["operational_status"])
 
         resp = authenticated_almacenista_client.get("/api/v1/inventory/locations/")
         assert resp.status_code == 200
         ids = [loc["id"] for loc in resp.data]
-        assert str(active_loc.id) in ids
-        assert str(sample_locations[1].id) not in ids
+        assert str(sample_locations[0].id) in ids  # active
+        assert str(maintenance_loc.id) not in ids  # maintenance excluded by default
 
     @pytest.mark.django_db
-    def test_list_includes_inactive_with_param(
+    def test_list_includes_non_active_with_param(
         self, authenticated_almacenista_client, sample_locations
     ):
-        inactive_loc = sample_locations[2]
-        authenticated_almacenista_client.delete(
-            f"/api/v1/inventory/locations/{inactive_loc.id}/"
-        )
+        # Set one location to maintenance (non-active but not deleted)
+        maintenance_loc = sample_locations[2]
+        maintenance_loc.operational_status = "maintenance"
+        maintenance_loc.save(update_fields=["operational_status"])
 
         resp = authenticated_almacenista_client.get(
             "/api/v1/inventory/locations/?include_inactive=true"
         )
         assert resp.status_code == 200
         ids = [loc["id"] for loc in resp.data]
-        assert str(inactive_loc.id) in ids
+        assert str(maintenance_loc.id) in ids  # maintenance included with param
+
+    @pytest.mark.django_db
+    def test_archived_locations_excluded_even_with_param(
+        self, authenticated_almacenista_client, sample_locations
+    ):
+        # Soft delete a location (archived)
+        archived_loc = sample_locations[1]
+        authenticated_almacenista_client.delete(
+            f"/api/v1/inventory/locations/{archived_loc.id}/"
+        )
+
+        # Should not appear even with include_inactive=true
+        resp = authenticated_almacenista_client.get(
+            "/api/v1/inventory/locations/?include_inactive=true"
+        )
+        assert resp.status_code == 200
+        ids = [loc["id"] for loc in resp.data]
+        assert str(archived_loc.id) not in ids  # archived excluded even with param
 
     @pytest.mark.django_db
     def test_active_locations_always_visible(

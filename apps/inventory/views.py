@@ -7,6 +7,7 @@ from uuid import UUID
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -41,9 +42,16 @@ from apps.inventory.services import (
     create_location,
     create_storage_template,
     create_storage_type,
-    deactivate_location,
-    deactivate_storage_template,
-    deactivate_storage_type,
+    disable_storage_template,
+    disable_storage_type,
+    enable_storage_template,
+    enable_storage_type,
+    restore_location,
+    restore_storage_template,
+    restore_storage_type,
+    soft_delete_location,
+    soft_delete_storage_template,
+    soft_delete_storage_type,
     transition_location_state,
     trigger_stock_reconstruction,
     update_location,
@@ -123,11 +131,20 @@ class InventoryFullListView(APIView):
     def get(self, request):
         filters: dict = {}
         if cid := request.query_params.get("category_id"):
-            filters["category_id"] = UUID(str(cid))
+            try:
+                filters["category_id"] = UUID(str(cid))
+            except (ValueError, AttributeError):
+                raise ValidationError({"category_id": "UUID inválido."})
         if lid := request.query_params.get("location_id"):
-            filters["location_id"] = UUID(str(lid))
+            try:
+                filters["location_id"] = UUID(str(lid))
+            except (ValueError, AttributeError):
+                raise ValidationError({"location_id": "UUID inválido."})
         if stid := request.query_params.get("storage_type_id"):
-            filters["storage_type_id"] = UUID(str(stid))
+            try:
+                filters["storage_type_id"] = UUID(str(stid))
+            except (ValueError, AttributeError):
+                raise ValidationError({"storage_type_id": "UUID inválido."})
         if os_val := request.query_params.get("operational_status"):
             filters["operational_status"] = str(os_val)
         if request.query_params.get("only_in_stock", "").lower() in (
@@ -197,7 +214,7 @@ class LocationListCreateView(APIView):
 
     @extend_schema(
         summary="Listar ubicaciones",
-        description="Lista las ubicaciones registradas.",
+        description="Lista las ubicaciones registradas (excluye eliminadas lógicamente).",
         responses={
             200: LocationSerializer(many=True),
             **standard_error_responses(),
@@ -205,10 +222,10 @@ class LocationListCreateView(APIView):
         tags=[TAG_INVENTORY],
     )
     def get(self, request):
-        qs = Location.objects.all().order_by("code")
+        qs = Location.objects.filter(deleted_at__isnull=True).order_by("code")
         include_inactive = request.query_params.get("include_inactive", "").lower()
         if include_inactive not in ("1", "true", "yes"):
-            qs = qs.filter(is_active=True)
+            qs = qs.filter(operational_status=Location.OperationalStatus.ACTIVE)
         data = LocationSerializer(qs, many=True).data
         return Response(data)
 
@@ -255,7 +272,7 @@ class StorageTemplateListCreateView(APIView):
 
     @extend_schema(
         summary="Listar plantillas de almacenamiento",
-        description="Lista las plantillas de almacenamiento registradas.",
+        description="Lista las plantillas de almacenamiento registradas (excluye eliminadas lógicamente).",
         responses={
             200: StorageTemplateSerializer(many=True),
             **standard_error_responses(),
@@ -266,9 +283,9 @@ class StorageTemplateListCreateView(APIView):
         from apps.inventory.models import StorageTemplate
 
         data = StorageTemplateSerializer(
-            StorageTemplate.objects.select_related("storage_type").order_by(
-                "sort_order", "name"
-            ),
+            StorageTemplate.objects.filter(deleted_at__isnull=True)
+            .select_related("storage_type")
+            .order_by("sort_order", "name"),
             many=True,
         ).data
         return Response(data)
@@ -356,22 +373,111 @@ class StorageTemplateDetailView(APIView):
         return Response(StorageTemplateSerializer(template).data)
 
     @extend_schema(
-        summary="Desactivar plantilla de almacenamiento",
+        summary="Eliminar lógicamente plantilla de almacenamiento (soft delete)",
         description=(
-            "Marca la plantilla como inactiva. "
-            "El registro NO se elimina de la base de datos."
+            "Marca la plantilla como eliminada lógicamente (deleted_at=now). "
+            "Deja de estar disponible para asignación y se excluye de listados por defecto. "
+            "Para restaurarla use POST /storage-templates/{id}/restore/."
         ),
         responses={
             204: OpenApiResponse(
-                description="Plantilla de almacenamiento desactivada."
+                description="Plantilla de almacenamiento eliminada lógicamente."
             ),
             **standard_error_responses(include_403=True, include_404=True),
         },
         tags=[TAG_INVENTORY],
     )
     def delete(self, request, pk):
-        deactivate_storage_template(request.user, UUID(str(pk)))
+        from apps.inventory.models import StorageTemplate
+
+        get_object_or_404(StorageTemplate, pk=pk)
+        soft_delete_storage_template(request.user, UUID(str(pk)), request=request)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class StorageTemplateRestoreView(APIView):
+    """POST — Restaura una plantilla de almacenamiento previamente eliminada lógicamente."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Restaurar plantilla de almacenamiento",
+        description="Restaura una plantilla de almacenamiento previamente eliminada lógicamente.",
+        tags=[TAG_INVENTORY],
+        responses={
+            200: StorageTemplateSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        from apps.inventory.models import StorageTemplate
+
+        get_object_or_404(StorageTemplate, pk=pk)
+        template = restore_storage_template(
+            request.user, UUID(str(pk)), request=request
+        )
+        return Response(StorageTemplateSerializer(template).data)
+
+
+class StorageTemplateDisableView(APIView):
+    """POST — Desactiva una plantilla para asignación (pausa temporal)."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Desactivar plantilla de almacenamiento",
+        description=(
+            "Marca la plantilla como inactiva para asignación (pausa temporal). "
+            "La plantilla NO se elimina y puede reactivarse con POST /enable/."
+        ),
+        tags=[TAG_INVENTORY],
+        responses={
+            200: StorageTemplateSerializer,
+            409: OpenApiResponse(
+                description="Plantilla archivada; restáurela primero."
+            ),
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        from apps.inventory.models import StorageTemplate
+
+        get_object_or_404(StorageTemplate, pk=pk)
+        try:
+            disable_storage_template(request.user, UUID(str(pk)), request=request)
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+        template = StorageTemplate.objects.get(pk=pk)
+        return Response(StorageTemplateSerializer(template).data)
+
+
+class StorageTemplateEnableView(APIView):
+    """POST — Reactiva una plantilla para asignación."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Activar plantilla de almacenamiento",
+        description="Reactiva una plantilla de almacenamiento previamente desactivada (pausa).",
+        tags=[TAG_INVENTORY],
+        responses={
+            200: StorageTemplateSerializer,
+            409: OpenApiResponse(
+                description="Plantilla archivada; restáurela primero."
+            ),
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        from apps.inventory.models import StorageTemplate
+
+        get_object_or_404(StorageTemplate, pk=pk)
+        try:
+            enable_storage_template(request.user, UUID(str(pk)), request=request)
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+        template = StorageTemplate.objects.get(pk=pk)
+        return Response(StorageTemplateSerializer(template).data)
 
 
 class StorageTypeListCreateView(APIView):
@@ -384,7 +490,7 @@ class StorageTypeListCreateView(APIView):
 
     @extend_schema(
         summary="Listar tipos de almacenamiento",
-        description="Lista los tipos de almacenamiento registrados.",
+        description="Lista los tipos de almacenamiento registrados (excluye eliminados lógicamente).",
         responses={
             200: StorageTypeSerializer(many=True),
             **standard_error_responses(),
@@ -395,7 +501,10 @@ class StorageTypeListCreateView(APIView):
         from apps.inventory.models import StorageType
 
         data = StorageTypeSerializer(
-            StorageType.objects.all().order_by("sort_order", "name"), many=True
+            StorageType.objects.filter(deleted_at__isnull=True).order_by(
+                "sort_order", "name"
+            ),
+            many=True,
         ).data
         return Response(data)
 
@@ -472,22 +581,105 @@ class StorageTypeDetailView(APIView):
         return Response(StorageTypeSerializer(st).data)
 
     @extend_schema(
-        summary="Desactivar tipo de almacenamiento",
+        summary="Eliminar lógicamente tipo de almacenamiento (soft delete)",
         description=(
-            "Marca el tipo de almacenamiento como inactivo. "
-            "El registro NO se elimina de la base de datos."
+            "Marca el tipo de almacenamiento como eliminado lógicamente (deleted_at=now). "
+            "Deja de estar disponible para asignación y se excluye de listados por defecto. "
+            "Para restaurarlo use POST /storage-types/{id}/restore/."
         ),
         responses={
             204: OpenApiResponse(
-                description="Tipo de almacenamiento desactivado exitosamente."
+                description="Tipo de almacenamiento eliminado lógicamente."
             ),
             **standard_error_responses(include_403=True, include_404=True),
         },
         tags=[TAG_INVENTORY],
     )
     def delete(self, request, pk):
-        deactivate_storage_type(request.user, UUID(str(pk)))
+        from apps.inventory.models import StorageType
+
+        get_object_or_404(StorageType, pk=pk)
+        soft_delete_storage_type(request.user, UUID(str(pk)), request=request)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class StorageTypeRestoreView(APIView):
+    """POST — Restaura un tipo de almacenamiento previamente eliminado lógicamente."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Restaurar tipo de almacenamiento",
+        description="Restaura un tipo de almacenamiento previamente eliminado lógicamente.",
+        tags=[TAG_INVENTORY],
+        responses={
+            200: StorageTypeSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        from apps.inventory.models import StorageType
+
+        get_object_or_404(StorageType, pk=pk)
+        st = restore_storage_type(request.user, UUID(str(pk)), request=request)
+        return Response(StorageTypeSerializer(st).data)
+
+
+class StorageTypeDisableView(APIView):
+    """POST — Desactiva un tipo de almacenamiento para asignación (pausa temporal)."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Desactivar tipo de almacenamiento",
+        description=(
+            "Marca el tipo de almacenamiento como inactivo para asignación (pausa temporal). "
+            "El tipo NO se elimina y puede reactivarse con POST /enable/."
+        ),
+        tags=[TAG_INVENTORY],
+        responses={
+            200: StorageTypeSerializer,
+            409: OpenApiResponse(description="Tipo archivado; restáurelo primero."),
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        from apps.inventory.models import StorageType
+
+        get_object_or_404(StorageType, pk=pk)
+        try:
+            disable_storage_type(request.user, UUID(str(pk)), request=request)
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+        st = StorageType.objects.get(pk=pk)
+        return Response(StorageTypeSerializer(st).data)
+
+
+class StorageTypeEnableView(APIView):
+    """POST — Reactiva un tipo de almacenamiento para asignación."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Activar tipo de almacenamiento",
+        description="Reactiva un tipo de almacenamiento previamente desactivado (pausa).",
+        tags=[TAG_INVENTORY],
+        responses={
+            200: StorageTypeSerializer,
+            409: OpenApiResponse(description="Tipo archivado; restáurelo primero."),
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        from apps.inventory.models import StorageType
+
+        get_object_or_404(StorageType, pk=pk)
+        try:
+            enable_storage_type(request.user, UUID(str(pk)), request=request)
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+        st = StorageType.objects.get(pk=pk)
+        return Response(StorageTypeSerializer(st).data)
 
 
 class LocationDetailView(APIView):
@@ -544,20 +736,41 @@ class LocationDetailView(APIView):
         return Response(LocationSerializer(loc).data)
 
     @extend_schema(
-        summary="Desactivar ubicación",
+        summary="Eliminar lógicamente ubicación (soft delete)",
         description=(
-            "Marca la ubicación como inactiva. "
-            "El registro NO se elimina de la base de datos ni afecta el historial de movimientos."
+            "Marca la ubicación como eliminada lógicamente (deleted_at=now). "
+            "El registro NO se elimina de la base de datos ni afecta el historial de movimientos. "
+            "Para restaurarla use POST /locations/{id}/restore/."
         ),
         responses={
-            204: OpenApiResponse(description="Ubicación desactivada exitosamente."),
+            204: OpenApiResponse(description="Ubicación eliminada lógicamente."),
             **standard_error_responses(include_403=True, include_404=True),
         },
         tags=[TAG_INVENTORY],
     )
     def delete(self, request, pk):
-        deactivate_location(request.user, UUID(str(pk)))
+        soft_delete_location(request.user, UUID(str(pk)), request=request)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class LocationRestoreView(APIView):
+    """POST — Restaura una ubicación previamente eliminada lógicamente."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Restaurar ubicación",
+        description="Restaura una ubicación previamente eliminada lógicamente.",
+        tags=[TAG_INVENTORY],
+        responses={
+            200: LocationSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        get_object_or_404(Location, pk=pk)
+        loc = restore_location(request.user, UUID(str(pk)), request=request)
+        return Response(LocationSerializer(loc).data)
 
 
 class LocationStateTransitionView(APIView):
@@ -684,10 +897,18 @@ class ProductSearchView(APIView):
         q = request.query_params.get("q", "")
         category = request.query_params.get("category")
         brand = request.query_params.get("brand")
+        try:
+            cat_uuid = UUID(category) if category else None
+        except (ValueError, AttributeError):
+            raise ValidationError({"category": "UUID inválido."})
+        try:
+            brand_uuid = UUID(brand) if brand else None
+        except (ValueError, AttributeError):
+            raise ValidationError({"brand": "UUID inválido."})
         qs = search_products(
             q,
-            category_id=UUID(category) if category else None,
-            brand_id=UUID(brand) if brand else None,
+            category_id=cat_uuid,
+            brand_id=brand_uuid,
         )
         paginator = ICMPageNumberPagination()
         page = paginator.paginate_queryset(list(qs), request, view=self)

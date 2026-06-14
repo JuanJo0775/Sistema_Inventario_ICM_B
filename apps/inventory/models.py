@@ -7,12 +7,12 @@ consistente actualizada solo desde `apps.movements.services`.
 from django.db import models
 from django.db.models import Q
 
-from shared.models import BaseModel
+from shared.models import BaseModel, SoftDeleteModel
 
 # Constraint reutilizable para Meta
 _STOCK_NON_NEGATIVE_CC = models.CheckConstraint(
     name="stock_non_negative",
-    check=Q(current_stock__gte=0),
+    condition=Q(current_stock__gte=0),
 )
 
 # Palabras clave para detectar automáticamente si una ubicación es de tipo vitrina (minorista)
@@ -33,7 +33,7 @@ def _is_retail_by_name(name: str) -> bool:
     return any(kw in normalized for kw in _VITRINA_KEYWORDS)
 
 
-class StorageType(BaseModel):
+class StorageType(BaseModel, SoftDeleteModel):
     """
     Tipo configurable de almacenamiento para clasificar ubicaciones (BR-15).
 
@@ -61,7 +61,7 @@ class StorageType(BaseModel):
         return self.name
 
 
-class StorageTemplate(BaseModel):
+class StorageTemplate(BaseModel, SoftDeleteModel):
     """
     Plantilla reutilizable de configuración para crear ubicaciones rápidamente.
 
@@ -92,7 +92,7 @@ class StorageTemplate(BaseModel):
         return self.name
 
 
-class Location(BaseModel):
+class Location(BaseModel, SoftDeleteModel):
     """
     Ubicación física de almacenamiento (RF-004, BR-11, BR-14).
 
