@@ -31,8 +31,7 @@ def send_password_reset_email(to_email: str, username: str, reset_url: str) -> N
     subject = "Recuperación de contraseña — ICM LogiStock"
     expiry = getattr(settings, "PASSWORD_RESET_TOKEN_EXPIRY_MINUTES", 10)
 
-    html_body = (
-        f"""<!DOCTYPE html>
+    html_body = f"""<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#f4f7f8;font-family:Arial,Helvetica,sans-serif;">
@@ -85,7 +84,6 @@ def send_password_reset_email(to_email: str, username: str, reset_url: str) -> N
   </table>
 </body>
 </html>"""
-    )
 
     text_body = (
         f"Hola {username},\n\n"
