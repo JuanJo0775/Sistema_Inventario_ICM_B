@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.audit.models import AuditEventType, AuditLog
 from apps.catalog.models import ComboItem, ProductCombo, ProductSerial
@@ -123,13 +124,13 @@ def test_dispatch_combo_creates_audit_log(
 
 
 @pytest.mark.django_db
-def test_dispatch_combo_inactive_combo_returns_404(
+def test_dispatch_combo_deleted_combo_returns_404(
     authenticated_almacenista_client, combo_setup
 ):
-    """POST combo-dispatch con combo inactivo → 404."""
+    """POST combo-dispatch con combo eliminado (soft delete) → 404."""
     combo = combo_setup["combo"]
-    combo.is_active = False
-    combo.save(update_fields=["is_active", "updated_at"])
+    combo.deleted_at = timezone.now()
+    combo.save(update_fields=["deleted_at", "updated_at"])
 
     url = reverse("movements-combo-dispatch")
     response = authenticated_almacenista_client.post(
