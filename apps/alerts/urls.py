@@ -14,6 +14,6 @@ urlpatterns = [
     path("poll/", AlertPollView.as_view(), name="alerts-poll"),
     path("history/", AlertHistoryView.as_view(), name="alerts-history"),
     path("stats/", AlertStatsView.as_view(), name="alerts-stats"),
-    path("<uuid:pk>/", AlertDetailView.as_view(), name="alerts-detail"),
-    path("<uuid:pk>/resolve/", AlertResolveView.as_view(), name="alerts-resolve"),
+    path("<int:pk>/", AlertDetailView.as_view(), name="alerts-detail"),
+    path("<int:pk>/resolve/", AlertResolveView.as_view(), name="alerts-resolve"),
 ]

@@ -25,6 +25,7 @@ from shared.exceptions import (
 from shared.operating_hours import (  # noqa: F401 — re-exportado para compatibilidad
     is_within_operating_hours,
 )
+from shared.utils.db import get_for_update_or_404
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
@@ -150,7 +151,7 @@ def disable_user(
     from apps.authentication.models import User
 
     _require_almacenista(almacenista_user)
-    target = User.objects.select_for_update().get(pk=target_user_id)
+    target = get_for_update_or_404(User.objects, pk=target_user_id)
     target.is_active = False
     target.save(update_fields=["is_active", "updated_at"])
     for token in OutstandingToken.objects.filter(user=target):
@@ -182,7 +183,7 @@ def update_user(
     from apps.authentication.models import User
 
     _require_almacenista(executor)
-    target = User.objects.select_for_update().get(pk=user_id)
+    target = get_for_update_or_404(User.objects, pk=user_id)
     if (
         target.pk == executor.pk
         and "role" in update_data
@@ -227,7 +228,7 @@ def enable_user(
     from apps.authentication.models import User
 
     _require_almacenista(almacenista_user)
-    target = User.objects.select_for_update().get(pk=target_user_id)
+    target = get_for_update_or_404(User.objects, pk=target_user_id)
     target.is_active = True
     target.save(update_fields=["is_active", "updated_at"])
     log_event(
@@ -253,7 +254,7 @@ def update_user_password(
     from apps.authentication.models import User
 
     _require_almacenista(almacenista_user)
-    target = User.objects.select_for_update().get(pk=target_user_id)
+    target = get_for_update_or_404(User.objects, pk=target_user_id)
 
     from django.contrib.auth.password_validation import validate_password
     from django.core.exceptions import ValidationError as DjangoValidationError
@@ -487,7 +488,7 @@ def change_own_password(
 
     from apps.authentication.models import User as UserModel
 
-    target = UserModel.objects.select_for_update().get(pk=user.pk)
+    target = get_for_update_or_404(UserModel.objects, pk=user.pk)
     auth_result = authenticate(username=target.username, password=current_password)
     if auth_result is None:
         raise DomainValidationError("La contraseña actual es incorrecta.")
@@ -653,7 +654,7 @@ def revoke_temporary_permit(
     from apps.audit.services import log_event
     from apps.authentication.models import TemporaryAccessPermit
 
-    permit = TemporaryAccessPermit.objects.select_for_update().get(pk=permit_id)
+    permit = get_for_update_or_404(TemporaryAccessPermit.objects, pk=permit_id)
     if not permit.is_active:
         return permit
 
