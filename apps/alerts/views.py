@@ -217,7 +217,7 @@ class AlertResolveView(APIView):
         tags=[TAG_ALERTS],
     )
     def post(self, request, pk):
-        alert = resolve_alert(request.user, UUID(str(pk)))
+        alert = resolve_alert(request.user, pk)
         return Response(AlertSerializer(alert).data, status=status.HTTP_200_OK)
 
 

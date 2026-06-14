@@ -21,7 +21,7 @@ from apps.audit.services import log_event
 from apps.authentication.models import RoleChoices
 from apps.catalog.models import Lot, Product
 from apps.inventory.models import Location, StockByLocation
-from shared.exceptions import UnauthorizedDomainActionError
+from shared.exceptions import ResourceNotFoundError, UnauthorizedDomainActionError
 
 if TYPE_CHECKING:
     from apps.authentication.models import User
@@ -473,18 +473,22 @@ def scan_all_location_alerts(*, dry_run: bool = False) -> int:
 
 
 @transaction.atomic
-def resolve_alert(executor: User, alert_id: UUID) -> Alert:
+def resolve_alert(executor: User, alert_id: int) -> Alert:
     """
     RF-011 — Marca alerta como resuelta (solo almacenista).
 
     Raises:
         UnauthorizedDomainActionError: Rol distinto de almacenista.
+        ResourceNotFoundError: Alerta no encontrada.
     """
     if getattr(executor, "role", None) != RoleChoices.ALMACENISTA:
         raise UnauthorizedDomainActionError(
             "Solo el almacenista puede resolver alertas."
         )
-    alert = Alert.objects.select_for_update().get(pk=alert_id)
+    try:
+        alert = Alert.objects.select_for_update().get(pk=alert_id)
+    except Alert.DoesNotExist:
+        raise ResourceNotFoundError(f"Alerta con ID {alert_id} no encontrada.")
     alert.is_resolved = True
     alert.resolved_at = timezone.now()
     alert.resolved_by = executor
