@@ -114,3 +114,78 @@ def test_product_list_is_paginated(authenticated_almacenista_client):
     assert response.data["count"] >= 15
     assert "next" in response.data
     assert "previous" in response.data
+
+
+@pytest.mark.django_db
+def test_product_create_duplicate_sku_returns_400(authenticated_almacenista_client):
+    category = CategoryFactory()
+    ProductFactory(sku="DUP-0001", category=category)
+    response = authenticated_almacenista_client.post(
+        "/api/v1/catalog/products/",
+        {
+            "sku": "DUP-0001",
+            "name": "Producto duplicado",
+            "category_id": str(category.id),
+        },
+        format="json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "DUP-0001" in str(response.data)
+    assert "ya existe" in str(response.data)
+
+
+@pytest.mark.django_db
+def test_combo_create_duplicate_sku_returns_400(authenticated_almacenista_client):
+    category = CategoryFactory()
+    product = ProductFactory(sku="PROD-CMB", category=category)
+    payload = {
+        "sku": "CMB-010",
+        "name": "Combo original",
+        "items": [{"product_id": str(product.id), "quantity": 1}],
+    }
+    authenticated_almacenista_client.post(
+        "/api/v1/catalog/combos/",
+        payload,
+        format="json",
+    )
+    response = authenticated_almacenista_client.post(
+        "/api/v1/catalog/combos/",
+        payload,
+        format="json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "CMB-010" in str(response.data)
+    assert "ya existe" in str(response.data)
+
+
+@pytest.mark.django_db
+def test_combo_update_duplicate_sku_returns_400(authenticated_almacenista_client):
+    category = CategoryFactory()
+    product = ProductFactory(sku="PROD-CMB2", category=category)
+    authenticated_almacenista_client.post(
+        "/api/v1/catalog/combos/",
+        {
+            "sku": "CMB-020",
+            "name": "Combo uno",
+            "items": [{"product_id": str(product.id), "quantity": 1}],
+        },
+        format="json",
+    )
+    resp2 = authenticated_almacenista_client.post(
+        "/api/v1/catalog/combos/",
+        {
+            "sku": "CMB-021",
+            "name": "Combo dos",
+            "items": [{"product_id": str(product.id), "quantity": 1}],
+        },
+        format="json",
+    )
+    combo2_id = resp2.data["id"]
+    response = authenticated_almacenista_client.patch(
+        f"/api/v1/catalog/combos/{combo2_id}/",
+        {"sku": "CMB-020"},
+        format="json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "CMB-020" in str(response.data)
+    assert "ya existe" in str(response.data)

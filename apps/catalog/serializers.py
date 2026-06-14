@@ -19,9 +19,11 @@ class CategorySerializer(serializers.ModelSerializer):
             "is_returnable",
             "description",
             "is_active",
+            "deleted_at",
             "created_at",
             "updated_at",
         )
+        read_only_fields = ("deleted_at",)
 
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -33,9 +35,11 @@ class BrandSerializer(serializers.ModelSerializer):
             "slug",
             "description",
             "is_active",
+            "deleted_at",
             "created_at",
             "updated_at",
         )
+        read_only_fields = ("deleted_at",)
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -59,6 +63,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "weight_grams",
             "requires_cold_chain",
             "is_active",
+            "deleted_at",
             "notes",
             "reorder_point",
             "unit_cost",
@@ -71,6 +76,7 @@ class ProductSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             "id",
+            "deleted_at",
             "created_at",
             "updated_at",
             "category_slug",
@@ -169,6 +175,15 @@ class ProductUpdateSerializer(serializers.Serializer):
     reorder_point = serializers.IntegerField(required=False, min_value=0)
     is_active = serializers.BooleanField(required=False)
 
+    def validate_sku(self, value: str) -> str:
+        sku = (value or "").strip()
+        qs = Product.objects.filter(sku__iexact=sku)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError(f"El SKU '{sku}' ya existe.")
+        return sku
+
 
 class ProductCreateSerializer(serializers.Serializer):
     sku = serializers.CharField()
@@ -186,6 +201,12 @@ class ProductCreateSerializer(serializers.Serializer):
     reorder_point = serializers.IntegerField(required=False, default=0, min_value=0)
     is_active = serializers.BooleanField(required=False, default=True)
 
+    def validate_sku(self, value: str) -> str:
+        sku = (value or "").strip()
+        if Product.objects.filter(sku__iexact=sku).exists():
+            raise serializers.ValidationError(f"El SKU '{sku}' ya existe.")
+        return sku
+
 
 class ComboItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -202,7 +223,7 @@ class ComboSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "sku",
-            "is_active",
+            "deleted_at",
             "components",
             "price_strategy",
             "fixed_price_retail",
@@ -212,6 +233,7 @@ class ComboSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             "id",
+            "deleted_at",
             "created_at",
             "updated_at",
             # Precio de combo: se gestiona via ComboCreateSerializer / ComboUpdateSerializer
@@ -247,7 +269,6 @@ class ComboCreateItemSerializer(serializers.Serializer):
 class ComboCreateSerializer(serializers.Serializer):
     name = serializers.CharField()
     sku = serializers.CharField()
-    is_active = serializers.BooleanField(required=False, default=True)
     items = ComboCreateItemSerializer(many=True, allow_empty=False)
     price_strategy = serializers.ChoiceField(
         choices=["derived", "fixed"], required=False, default="derived"
@@ -258,6 +279,14 @@ class ComboCreateSerializer(serializers.Serializer):
     fixed_price_wholesale = serializers.DecimalField(
         max_digits=12, decimal_places=4, required=False, allow_null=True, min_value=0
     )
+
+    def validate_sku(self, value: str) -> str:
+        sku = (value or "").strip()
+        if ProductCombo.objects.filter(sku__iexact=sku).exists():
+            raise serializers.ValidationError(
+                f"El SKU '{sku}' ya existe en otro combo."
+            )
+        return sku
 
 
 class CategoryCreateSerializer(serializers.Serializer):
@@ -272,6 +301,7 @@ class CategoryUpdateSerializer(serializers.Serializer):
     description = serializers.CharField(required=False, allow_blank=True)
     requires_serial_number = serializers.BooleanField(required=False)
     is_returnable = serializers.BooleanField(required=False)
+    is_active = serializers.BooleanField(required=False)
 
 
 class BrandCreateSerializer(serializers.Serializer):
@@ -305,6 +335,17 @@ class ComboUpdateSerializer(serializers.Serializer):
     fixed_price_wholesale = serializers.DecimalField(
         max_digits=12, decimal_places=4, required=False, allow_null=True, min_value=0
     )
+
+    def validate_sku(self, value: str) -> str:
+        sku = (value or "").strip()
+        qs = ProductCombo.objects.filter(sku__iexact=sku)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError(
+                f"El SKU '{sku}' ya existe en otro combo."
+            )
+        return sku
 
 
 class ProductPriceUpdateSerializer(serializers.Serializer):

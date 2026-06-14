@@ -34,19 +34,25 @@ from apps.catalog.serializers import (
     ResolveIdentifierQuerySerializer,
 )
 from apps.catalog.services import (
-    activate_brand,
-    activate_category,
     activate_combo,
-    activate_product,
     create_brand,
     create_category,
     create_combo,
     create_product,
-    deactivate_brand,
-    deactivate_category,
     deactivate_combo,
-    deactivate_product,
+    disable_brand_for_assignment,
+    disable_category_for_assignment,
+    disable_product_for_assignment,
+    enable_brand_for_assignment,
+    enable_category_for_assignment,
+    enable_product_for_assignment,
     resolve_identifier,
+    restore_brand,
+    restore_category,
+    restore_product,
+    soft_delete_brand,
+    soft_delete_category,
+    soft_delete_product,
     update_brand,
     update_category,
     update_combo,
@@ -86,10 +92,21 @@ class CategoryListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         qs = Category.objects.all()
-        include_inactive = self.request.query_params.get("include_inactive", "").lower()
-        if include_inactive not in ("1", "true", "yes"):
-            qs = qs.filter(is_active=True)
-        return qs
+        status = self.request.query_params.get("status", "active")
+        include_inactive = self.request.query_params.get(
+            "include_inactive", ""
+        ).lower() in ("1", "true", "yes")
+
+        if include_inactive:
+            return qs.filter(deleted_at__isnull=True)
+
+        if status == "all":
+            return qs
+        if status == "deleted":
+            return qs.filter(deleted_at__isnull=False)
+        if status == "inactive":
+            return qs.filter(is_active=False, deleted_at__isnull=True)
+        return qs.filter(is_active=True, deleted_at__isnull=True)
 
     def create(self, request, *args, **kwargs):
         ser = CategoryCreateSerializer(data=request.data)
@@ -134,10 +151,21 @@ class BrandListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         qs = Brand.objects.all()
-        include_inactive = self.request.query_params.get("include_inactive", "").lower()
-        if include_inactive not in ("1", "true", "yes"):
-            qs = qs.filter(is_active=True)
-        return qs
+        status = self.request.query_params.get("status", "active")
+        include_inactive = self.request.query_params.get(
+            "include_inactive", ""
+        ).lower() in ("1", "true", "yes")
+
+        if include_inactive:
+            return qs.filter(deleted_at__isnull=True)
+
+        if status == "all":
+            return qs
+        if status == "deleted":
+            return qs.filter(deleted_at__isnull=False)
+        if status == "inactive":
+            return qs.filter(is_active=False, deleted_at__isnull=True)
+        return qs.filter(is_active=True, deleted_at__isnull=True)
 
     def create(self, request, *args, **kwargs):
         ser = BrandCreateSerializer(data=request.data)
@@ -183,6 +211,8 @@ class ProductListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         qs = Product.objects.select_related("category", "brand").all()
+        # Excluir eliminados lógicamente por defecto
+        qs = qs.filter(deleted_at__isnull=True)
         include_inactive = self.request.query_params.get("include_inactive", "").lower()
         if include_inactive not in ("1", "true", "yes"):
             qs = qs.filter(is_active=True)
@@ -230,12 +260,12 @@ class ProductListCreateView(generics.ListCreateAPIView):
         },
     ),
     delete=extend_schema(
-        summary="Desactivar producto",
+        summary="Eliminar lógicamente producto (soft delete)",
         description=(
-            "Marca el producto como inactivo. "
+            "Marca el producto como eliminado lógicamente (deleted_at=now). "
             "El registro NO se elimina de la base de datos ni afecta el historial de movimientos. "
-            "Devuelve HTTP 409 si el producto pertenece a uno o más combos activos. "
-            "Para reactivarlo use POST /products/{id}/restore/."
+            "Devuelve HTTP 409 si el producto tiene stock, OC activas, recepciones en borrador o combos activos. "
+            "Para restaurarlo use POST /products/{id}/restore/."
         ),
         tags=[TAG_CATALOG],
         responses={
@@ -264,7 +294,7 @@ class ProductDetailView(generics.RetrieveUpdateAPIView):
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
         try:
-            deactivate_product(request.user, instance.pk, request=request)
+            soft_delete_product(request.user, instance.pk, request=request)
         except ValueError as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -353,9 +383,8 @@ class ComboListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         qs = ProductCombo.objects.prefetch_related("combo_items__product").all()
-        include_inactive = self.request.query_params.get("include_inactive", "").lower()
-        if include_inactive not in ("1", "true", "yes"):
-            qs = qs.filter(is_active=True)
+        # Excluir eliminados lógicamente por defecto
+        qs = qs.filter(deleted_at__isnull=True)
         return qs
 
     def create(self, request, *args, **kwargs):
@@ -439,7 +468,7 @@ class CategoryDetailView(APIView):
 
     def delete(self, request, pk):
         try:
-            deactivate_category(request.user, pk, request=request)
+            soft_delete_category(request.user, pk, request=request)
         except ObjectDoesNotExist:
             raise NotFound()
         except ValueError as exc:
@@ -452,7 +481,7 @@ class CategoryRestoreView(APIView):
 
     @extend_schema(
         summary="Restaurar categoría",
-        description="Reactiva una categoría previamente desactivada.",
+        description="Restaura una categoría eliminada lógicamente.",
         tags=[TAG_CATALOG],
         responses={
             200: CategorySerializer,
@@ -460,8 +489,12 @@ class CategoryRestoreView(APIView):
         },
     )
     def post(self, request, pk):
-        get_object_or_404(Category, pk=pk)
-        cat = activate_category(request.user, pk, request=request)
+        try:
+            cat = restore_category(request.user, pk, request=request)
+        except ObjectDoesNotExist:
+            raise NotFound()
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
         return Response(CategorySerializer(cat).data)
 
 
@@ -539,7 +572,7 @@ class BrandDetailView(APIView):
 
     def delete(self, request, pk):
         try:
-            deactivate_brand(request.user, pk, request=request)
+            soft_delete_brand(request.user, pk, request=request)
         except ObjectDoesNotExist:
             raise NotFound()
         except ValueError as exc:
@@ -552,7 +585,7 @@ class BrandRestoreView(APIView):
 
     @extend_schema(
         summary="Restaurar marca",
-        description="Reactiva una marca previamente desactivada.",
+        description="Restaura una marca eliminada lógicamente.",
         tags=[TAG_CATALOG],
         responses={
             200: BrandSerializer,
@@ -560,8 +593,106 @@ class BrandRestoreView(APIView):
         },
     )
     def post(self, request, pk):
-        get_object_or_404(Brand, pk=pk)
-        brand = activate_brand(request.user, pk, request=request)
+        try:
+            brand = restore_brand(request.user, pk, request=request)
+        except ObjectDoesNotExist:
+            raise NotFound()
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+        return Response(BrandSerializer(brand).data)
+
+
+class CategoryDisableView(APIView):
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Desactivar categoría para asignación",
+        description=(
+            "Marca is_active=False. La categoría no puede asignarse a nuevos productos "
+            "pero conserva todas las relaciones históricas. Nunca bloquea."
+        ),
+        tags=[TAG_CATALOG],
+        responses={
+            200: CategorySerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        try:
+            cat = disable_category_for_assignment(request.user, pk, request=request)
+        except ObjectDoesNotExist:
+            raise NotFound()
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+        return Response(CategorySerializer(cat).data)
+
+
+class CategoryEnableView(APIView):
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Reactivar categoría para asignación",
+        description="Marca is_active=True. La categoría vuelve a estar disponible para nuevos productos.",
+        tags=[TAG_CATALOG],
+        responses={
+            200: CategorySerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        try:
+            cat = enable_category_for_assignment(request.user, pk, request=request)
+        except ObjectDoesNotExist:
+            raise NotFound()
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+        return Response(CategorySerializer(cat).data)
+
+
+class BrandDisableView(APIView):
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Desactivar marca para asignación",
+        description=(
+            "Marca is_active=False. La marca no puede asignarse a nuevos productos "
+            "pero conserva todas las relaciones históricas. Nunca bloquea."
+        ),
+        tags=[TAG_CATALOG],
+        responses={
+            200: BrandSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        try:
+            brand = disable_brand_for_assignment(request.user, pk, request=request)
+        except ObjectDoesNotExist:
+            raise NotFound()
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+        return Response(BrandSerializer(brand).data)
+
+
+class BrandEnableView(APIView):
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Reactivar marca para asignación",
+        description="Marca is_active=True. La marca vuelve a estar disponible para nuevos productos.",
+        tags=[TAG_CATALOG],
+        responses={
+            200: BrandSerializer,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        try:
+            brand = enable_brand_for_assignment(request.user, pk, request=request)
+        except ObjectDoesNotExist:
+            raise NotFound()
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
         return Response(BrandSerializer(brand).data)
 
 
@@ -601,11 +732,11 @@ class BrandRestoreView(APIView):
         },
     ),
     delete=extend_schema(
-        summary="Desactivar combo",
+        summary="Eliminar lógicamente combo (soft delete)",
         description=(
-            "Marca el combo como inactivo. "
+            "Marca el combo como eliminado lógicamente (deleted_at=now). "
             "El registro NO se elimina de la base de datos ni afecta sus productos componentes. "
-            "Para reactivarlo use POST /combos/{id}/restore/."
+            "Para restaurarlo use POST /combos/{id}/restore/."
         ),
         tags=[TAG_CATALOG],
         responses={
@@ -656,7 +787,7 @@ class ComboRestoreView(APIView):
 
     @extend_schema(
         summary="Restaurar combo",
-        description="Reactiva un combo de productos previamente desactivado.",
+        description="Restaura un combo de productos previamente eliminado lógicamente.",
         tags=[TAG_CATALOG],
         responses={
             200: ComboSerializer,
@@ -674,7 +805,7 @@ class ProductRestoreView(APIView):
 
     @extend_schema(
         summary="Restaurar producto",
-        description="Reactiva un producto previamente desactivado.",
+        description="Restaura un producto previamente eliminado lógicamente.",
         tags=[TAG_CATALOG],
         responses={
             200: ProductDetailSerializer,
@@ -683,7 +814,60 @@ class ProductRestoreView(APIView):
     )
     def post(self, request, pk):
         get_object_or_404(Product, pk=pk)
-        product = activate_product(request.user, pk, request=request)
+        product = restore_product(request.user, pk, request=request)
+        return Response(ProductDetailSerializer(product).data)
+
+
+class ProductDisableView(APIView):
+    """POST — Desactiva un producto para asignación (pausa temporal)."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Desactivar producto para asignación",
+        description=(
+            "Marca el producto como inactivo para asignación (pausa temporal). "
+            "El producto NO se elimina y puede reactivarse con POST /enable/."
+        ),
+        tags=[TAG_CATALOG],
+        responses={
+            200: ProductDetailSerializer,
+            409: None,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        get_object_or_404(Product, pk=pk)
+        try:
+            disable_product_for_assignment(request.user, pk, request=request)
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+        product = Product.objects.get(pk=pk)
+        return Response(ProductDetailSerializer(product).data)
+
+
+class ProductEnableView(APIView):
+    """POST — Reactiva un producto para asignación."""
+
+    permission_classes = (IsAuthenticated, IsAlmacenista)
+
+    @extend_schema(
+        summary="Activar producto para asignación",
+        description="Reactiva un producto previamente desactivado para asignación (pausa).",
+        tags=[TAG_CATALOG],
+        responses={
+            200: ProductDetailSerializer,
+            409: None,
+            **standard_error_responses(include_403=True, include_404=True),
+        },
+    )
+    def post(self, request, pk):
+        get_object_or_404(Product, pk=pk)
+        try:
+            enable_product_for_assignment(request.user, pk, request=request)
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+        product = Product.objects.get(pk=pk)
         return Response(ProductDetailSerializer(product).data)
 
 

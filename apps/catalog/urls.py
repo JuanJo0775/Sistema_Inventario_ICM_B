@@ -2,9 +2,13 @@ from django.urls import path
 
 from apps.catalog.views import (
     BrandDetailView,
+    BrandDisableView,
+    BrandEnableView,
     BrandListCreateView,
     BrandRestoreView,
     CategoryDetailView,
+    CategoryDisableView,
+    CategoryEnableView,
     CategoryListCreateView,
     CategoryRestoreView,
     ComboDetailView,
@@ -12,6 +16,8 @@ from apps.catalog.views import (
     ComboRestoreView,
     ProductBarcodeView,
     ProductDetailView,
+    ProductDisableView,
+    ProductEnableView,
     ProductListCreateView,
     ProductPricesView,
     ProductRestoreView,
@@ -45,6 +51,26 @@ urlpatterns = [
         BrandRestoreView.as_view(),
         name="catalog-brand-restore",
     ),
+    path(
+        "brands/<uuid:pk>/disable/",
+        BrandDisableView.as_view(),
+        name="catalog-brand-disable",
+    ),
+    path(
+        "brands/<uuid:pk>/enable/",
+        BrandEnableView.as_view(),
+        name="catalog-brand-enable",
+    ),
+    path(
+        "categories/<uuid:pk>/disable/",
+        CategoryDisableView.as_view(),
+        name="catalog-category-disable",
+    ),
+    path(
+        "categories/<uuid:pk>/enable/",
+        CategoryEnableView.as_view(),
+        name="catalog-category-enable",
+    ),
     path("products/", ProductListCreateView.as_view(), name="catalog-products"),
     path(
         "products/<uuid:pk>/",
@@ -65,6 +91,16 @@ urlpatterns = [
         "products/<uuid:pk>/restore/",
         ProductRestoreView.as_view(),
         name="catalog-product-restore",
+    ),
+    path(
+        "products/<uuid:pk>/disable/",
+        ProductDisableView.as_view(),
+        name="catalog-product-disable",
+    ),
+    path(
+        "products/<uuid:pk>/enable/",
+        ProductEnableView.as_view(),
+        name="catalog-product-enable",
     ),
     path(
         "products/resolve/",
