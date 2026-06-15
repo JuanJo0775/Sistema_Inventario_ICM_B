@@ -384,7 +384,7 @@ icm_backend/
 │       ├── run.py                                              # Punto de entrada ejecutable
 │       └── seeder.py                                           # Lógica principal del seed
 ├── shared/                                                     # Código transversal reutilizable
-│   ├── models.py                                               # BaseModel y metadatos comunes
+│   ├── models.py                                               # BaseModel + SoftDeleteModel (borrado lógico)
 │   ├── permissions.py                                          # Permisos base y reutilizables
 │   ├── exceptions.py                                           # Excepciones tipadas del sistema
 │   ├── mixins.py                                               # Mixins transversales para vistas
@@ -392,6 +392,7 @@ icm_backend/
 │   ├── openapi.py                                              # Tags OpenAPI y contratos compartidos
 │   ├── email_service.py                                        # Servicio de email desacoplado (porta-adaptador SMTP)
 │   ├── utils/                                                  # Utilidades transversales
+│   │   ├── db.py                                               # get_for_update_or_404, helpers de BD
 │   │   └── validators.py                                       # Validadores reutilizables
 │   ├── audit.py
 │   ├── exporters.py
@@ -428,6 +429,29 @@ icm_backend/
 ```
 
 Principio clave: shared contiene componentes transversales reutilizables, no logica de dominio especifica.
+
+### 2.4 Modelos Transversales: SoftDeleteModel y Utilidades de BD
+
+`shared/models.py` provee dos clases abstractas base:
+
+- **`BaseModel`**: Aporta `id` (UUID), `created_at` y `updated_at`. Usada por entidades mutables.
+- **`SoftDeleteModel`**: Aporta `deleted_at` (DateTime, nullable). Responsabilidad exclusiva: existencia lógica del registro. NO debe usarse para controlar reglas de negocio (asignación, disponibilidad). Métodos:
+  - `soft_delete()` — marca `deleted_at = now()`
+  - `restore()` — limpia `deleted_at = None`
+  - `is_deleted` (property) — `True` si `deleted_at IS NOT NULL`
+
+**Modelos que heredan `SoftDeleteModel`**:
+
+| App | Modelos |
+|-----|---------|
+| catalog | `Category`, `Brand`, `Product`, `ProductCombo` |
+| inventory | `StorageType`, `StorageTemplate`, `Location` |
+| purchasing | `Supplier` |
+| webhooks | `WebhookEndpoint` |
+
+`shared/utils/db.py` provee:
+
+- **`get_for_update_or_404(queryset, *, pk, detail=None)`**: Obtiene un objeto con `select_for_update()` o lanza `ResourceNotFoundError` (HTTP 404). Uso típico dentro de servicios `@transaction.atomic` para evitar `try/except` repetitivos.
 
 ---
 
@@ -2041,18 +2065,21 @@ La arquitectura modular facilita testing en múltiples niveles.
 
 ### 11.1 Estrategia de Pruebas
 
-**Unitarias** (60% cobertura):
+Distribución actual de la suite (~846 tests):
+
+**Unitarias** (603 tests en apps, 81 en scripts/shared):
 - Servicios: Lógica de dominio aislada.
 - Validadores y excepciones.
+- Modelos, selectores, comandos de gestión.
 
-**Integración** (25% cobertura):
+**Integración** (23 tests HTTP/API):
 - Endpoints API + autenticación + permisos.
 - Flujos completos de movimientos.
+- Pruebas cross-module y smoke.
 
-**Consistencia** (15% cobertura):
-- Invariantes de inventario (BR-11).
-- Restricciones de rol (BR-01, BR-02, BR-03).
-- Inmutabilidad de ledger (BR-10).
+**Gherkin / ERS** (138 scenarios):
+- Escenarios dinámicos alineados al ERS.
+- Trazabilidad viva en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md`.
 
 ### 11.2 Casos Críticos de Testing
 
@@ -2095,7 +2122,7 @@ markers =
 - `pytest-cov`: Cobertura.
 - `freeze-gun`: Mocking de tiempo (para BR-03, BR-06).
 
-### 11.5 Restricción actual de fidelidad de pruebas
+### 11.4 Restricción actual de fidelidad de pruebas
 
 La configuracion de pruebas usa `config.settings.test`, que ejecuta la suite sobre SQLite in-memory y desactiva `DEFAULT_THROTTLE_CLASSES`. Esto acelera la ejecucion y reduce friccion local, pero no reproduce la semantica de PostgreSQL ni valida throttling de produccion.
 
@@ -2103,9 +2130,10 @@ Impacto:
 
 - Las pruebas automatizadas no ejercitan `select_for_update()` ni bloqueos reales de PostgreSQL.
 - Los limites de peticiones se validan a nivel logico, no con el throttler activo.
+- Los tests de alerts que usan threads (`test_commands.py`, `test_detail_resolve.py`, `test_new_alert_types.py`, `test_polling.py`, `test_services.py`) fallan en SQLite local con `DatabaseError: DatabaseWrapper objects created in a thread can only be used in that same thread`. En CI se ejecutan contra PostgreSQL sin este problema.
 - Para concurrencia real o limites de produccion, hacen falta pruebas especificas contra PostgreSQL.
 
-### 11.4 CI/CD (GitHub Actions - Preparación)
+### 11.5 CI/CD (GitHub Actions - Preparación)
 
 `.github/workflows/ci.yml`:
 
@@ -2279,6 +2307,7 @@ Acceso: `GET /api/v1/docs/` → Swagger UI.
 - [ ] Toda la lógica de negocio está en `services.py`.
 - [ ] Todas las consultas complejas están en `selectors.py`.
 - [ ] No existen imports cruzados de `models.py` entre apps (salvo justificación explícita).
+- [ ] `SoftDeleteModel` usado exclusivamente para existencia lógica (`deleted_at`); `is_active` para disponibilidad/reglas de negocio.
 
 ### Reglas de Negocio Críticas
 
@@ -2299,11 +2328,13 @@ Acceso: `GET /api/v1/docs/` → Swagger UI.
 - [ ] BR-15: StorageType inactivo rechazado al asignar a ubicaciones nuevas o existentes.
 - [ ] BR-16: Precio congelado en el Movement al momento del despacho; inmutable post-creación.
 - [ ] BR-17: Cada cambio de precio registra fila inmutable en ProductPriceHistory con old_value, new_value y changed_by.
+- [ ] **Soft Delete**: Catalog (Category, Brand, Product, ProductCombo), Inventory (StorageType, StorageTemplate, Location), Purchasing (Supplier), Webhooks (WebhookEndpoint) heredan `SoftDeleteModel`.
 
 ### Transacciones y Consistencia
 
 - [ ] Todas las operaciones de `services.py` que alteren stock tienen `@transaction.atomic`.
 - [ ] Uso de `select_for_update()` en lecturas que precedan actualizaciones (prevención de race conditions).
+- [ ] Uso de `get_for_update_or_404()` para obtener objetos con lock en servicios transaccionales (evita try/except repetitivos).
 - [ ] Stock negativo imposible (constraint CHECK en BD).
 - [ ] No hay Stock actualizado sin Movement creado en la misma transacción.
 

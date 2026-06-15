@@ -18,7 +18,8 @@ El módulo `webhooks` permite notificar sistemas externos mediante HTTP POST fir
 | `url` | URLField(500) | URL destino del webhook |
 | `secret` | CharField(128) | Clave compartida HMAC-SHA256 |
 | `events` | JSONField(default=list) | Tipos de evento suscritos, ej: `["STOCK_CRITICO"]` |
-| `is_active` | BooleanField(default=True) | Endpoint activo/inactivo |
+| `is_active` | BooleanField(default=True) | Endpoint activo/inactivo para recepción |
+| `deleted_at` | DateTimeField (nullable) | SoftDeleteModel — eliminación lógica, separada de `is_active` |
 | `max_retries` | PositiveSmallIntegerField(default=3) | Reintentos máximos |
 | `created_by` | FK -> User (nullable) | Almacenista que creó |
 | `created_at` / `updated_at` | DateTimeField | Automáticos |
@@ -78,7 +79,9 @@ Bajo `/api/v1/webhooks/`. Solo almacenistas.
 | Método | Ruta | Descripción |
 |--------|------|-------------|
 | GET/POST | `endpoints/` | Listar / crear endpoints |
-| GET/PUT/PATCH/DELETE | `endpoints/<pk>/` | Detalle / actualizar / desactivar (soft-delete) |
+| GET/PUT/PATCH | `endpoints/<pk>/` | Detalle / actualizar |
+| DELETE | `endpoints/<pk>/` | Almacenista | Soft delete (eliminación lógica) |
+| POST | `endpoints/<pk>/restore/` | Almacenista | Restaurar endpoint |
 | POST | `endpoints/<pk>/test/` | Enviar evento de prueba |
 | GET | `deliveries/` | Historial de entregas |
 | GET | `stats/` | Estadísticas de entregas |
@@ -88,7 +91,7 @@ Bajo `/api/v1/webhooks/`. Solo almacenistas.
 ## 5. Seguridad
 
 - **HMAC-SHA256**: payload firmado con `secret` compartido, header `X-ICM-Signature`.
-- **Soft-delete**: endpoints nunca se eliminan físicamente, solo se marcan `is_active=False`.
+- **Soft delete**: endpoints heredan de `SoftDeleteModel`. `deleted_at` controla existencia lógica; `is_active` controla disponibilidad para recepción de eventos.
 - **Paralelismo seguro**: `select_for_update(skip_locked=True)` evita doble-entrega con múltiples workers.
 
 Management command `deliver_webhooks` para cron jobs.

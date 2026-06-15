@@ -22,6 +22,7 @@ Tipo configurable de almacenamiento (bodega grande, vitrina, cuarto frío, etc.)
 | `default_is_retail` | bool | Si las ubicaciones de este tipo son minoristas por defecto |
 | `is_system` | bool | Tipos no editables creados en seed |
 | `is_active` | bool | Solo tipos activos pueden asignarse a ubicaciones |
+| `deleted_at` | datetime (nullable) | Soft delete — existencia lógica; no rompe FKs existentes, impide nueva asignación |
 | `sort_order` | int | Orden en listas |
 
 **Regla clave:** un `StorageType` inactivo no puede asignarse ni en `create_location` ni en `update_location`.
@@ -37,6 +38,7 @@ Plantilla reutilizable que preconfiguran parámetros de ubicación.
 | `storage_type` | FK nullable | Tipo de almacenamiento que hereda la ubicación |
 | `defaults` | JSON | Valores por defecto: `is_retail`, `max_capacity`, `capacity_mode`, `capacity_level`, `capacity_score`, `occupancy_estimate_pct` |
 | `is_active` | bool | Solo plantillas activas pueden usarse al crear ubicaciones |
+| `deleted_at` | datetime (nullable) | Soft delete — existencia lógica |
 
 Al crear una `Location` con `storage_template_id`:
 1. Se aplican los valores de `defaults` si no se pasan explícitamente.
@@ -55,6 +57,7 @@ Al crear una `Location` con `storage_template_id`:
 | `capacity_level` | int 1-5 | Escala relativa de capacidad |
 | `capacity_score` | int > 0 | Puntaje abstracto de capacidad |
 | `occupancy_estimate_pct` | float 0-100 | Estimación de ocupación informativa |
+| `deleted_at` | datetime (nullable) | Soft delete — existencia lógica; al eliminar fuerza `operational_status=archived`, `is_active=False` |
 
 ---
 

@@ -26,7 +26,8 @@ El módulo `purchasing` gestiona el ciclo de vida de compras: proveedores, órde
 | `telefono` | CharField(20) | Teléfono |
 | `ciudad` | CharField(100) | Ciudad |
 | `direccion` | CharField(300) | Dirección |
-| `is_active` | BooleanField(default=True) | Proveedor activo/inactivo |
+| `is_active` | BooleanField(default=True) | Proveedor activo/inactivo para nuevas OC |
+| `deleted_at` | DateTimeField (nullable) | SoftDeleteModel — eliminación lógica |
 | `observaciones` | TextField | Notas |
 | `created_by` | FK -> User (nullable) | Creador |
 | `created_at` / `updated_at` | DateTimeField | Automáticos |
@@ -119,6 +120,8 @@ Permite distribuir una recepción entre múltiples ubicaciones/lotes.
 | `update_supplier(executor, supplier_id, data)` | — | Actualiza datos, lock con select_for_update |
 | `deactivate_supplier(executor, supplier_id)` | — | is_active=False, no afecta OC existentes |
 | `activate_supplier(executor, supplier_id)` | — | Reactiva proveedor |
+| `soft_delete_supplier(executor, supplier_id)` | SoftDelete | Eliminación lógica + `is_active=False` |
+| `restore_supplier(executor, supplier_id)` | SoftDelete | Restauración lógica + `is_active=True` |
 | `create_purchase_order(created_by, data)` | — | Crea OC en BORRADOR con items, número secuencial atómico |
 | `update_purchase_order(executor, po_id, data)` | — | Solo BORRADOR; recrea items si cambian |
 | `confirm_purchase_order(executor, po_id)` | — | BORRADOR → PENDIENTE, bloquea edición |

@@ -26,6 +26,7 @@ El módulo `inventory` gestiona ubicaciones físicas, stock derivado (`StockByLo
 | `storage_type` | FK -> StorageType (nullable) | Tipo de almacenamiento |
 | `storage_template` | FK -> StorageTemplate (nullable) | Plantilla de origen |
 | `operational_status` | CharField(20) | active / maintenance / restricted / blocked / archived |
+| `deleted_at` | DateTimeField (nullable) | SoftDeleteModel — eliminación lógica, separada de operational_status |
 | `capacity_mode` | CharField(20) | none / relative_scale / absolute_legacy |
 | `capacity_level` | Integer (1-5, nullable) | Escala relativa |
 | `capacity_score` | PositiveIntegerField (nullable) | Puntaje abstracto |
@@ -69,6 +70,7 @@ El módulo `inventory` gestiona ubicaciones físicas, stock derivado (`StockByLo
 | `default_is_retail` | BooleanField | Retail por defecto |
 | `is_system` | BooleanField | Del sistema |
 | `is_active` | BooleanField | Solo activos asignables |
+| `deleted_at` | DateTimeField (nullable) | SoftDeleteModel — eliminación lógica, separada de `is_active` |
 | `created_at` / `updated_at` | DateTimeField | Automáticos (BaseModel) |
 
 ### 2.5 StorageTemplate
@@ -80,7 +82,7 @@ El módulo `inventory` gestiona ubicaciones físicas, stock derivado (`StockByLo
 | `storage_type` | FK -> StorageType | Tipo de almacenamiento asignado |
 | `description` | TextField | Opcional |
 | `is_active` | BooleanField | Plantilla activa/inactiva |
-| `created_at` / `updated_at` | DateTimeField | Automáticos (BaseModel) |
+| `deleted_at` | DateTimeField (nullable) | SoftDeleteModel — eliminación lógica |
 | `created_at` / `updated_at` | DateTimeField | Automáticos (BaseModel) |
 
 ---
@@ -96,6 +98,12 @@ El módulo `inventory` gestiona ubicaciones físicas, stock derivado (`StockByLo
 | `trigger_stock_reconstruction(executor, product_id, location_id)` | BR-11 | Reconstrucción desde ledger |
 | `create_storage_type(executor, data)` | BR-15 | Tipo de almacenamiento |
 | `update_storage_type(executor, storage_type_id, data)` | BR-15 | Actualizar tipo |
+| `soft_delete_storage_type(executor, storage_type_id)` | SoftDelete | Eliminación lógica + `is_active=False` |
+| `restore_storage_type(executor, storage_type_id)` | SoftDelete | Restauración lógica + `is_active=True` |
+| `soft_delete_storage_template(executor, template_id)` | SoftDelete | Eliminación lógica |
+| `restore_storage_template(executor, template_id)` | SoftDelete | Restauración lógica |
+| `soft_delete_location(executor, location_id)` | SoftDelete | Eliminación lógica + `operational_status=archived` |
+| `restore_location(executor, location_id)` | SoftDelete | Restauración lógica + estado previo |
 
 ### Selectors
 

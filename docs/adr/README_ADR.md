@@ -22,6 +22,7 @@ Este directorio contiene las decisiones arquitectonicas del Sistema Inventario I
 | [ADR-012](ADR-012.md) | Alinear la imagen de produccion con dependencias runtime explicitas | Aceptado |
 | [ADR-013](ADR-013.md) | Arquitectura de precios y facturacion comercial sobre el ledger de movimientos | Aceptado |
 | [ADR-014](ADR-014.md) | Modulo de compras: proveedores, órdenes de compra y recepciones | Aceptado |
+| [ADR-015](ADR-015.md) | Manejo sistemático de DoesNotExist en servicios con select_for_update | Propuesto |
 
 ## Resumen de Decisiones Clave
 
