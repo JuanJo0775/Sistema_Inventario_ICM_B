@@ -40,13 +40,12 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-          cache-dependency-path: requirements/base.txt
+          cache-dependency-path: requirements/development.txt
 
       - name: Install dependencies
         run: |
           python -m pip install -U pip
-          pip install -r requirements/base.txt
-          pip install bandit pip-audit
+          pip install -r requirements/development.txt
 
       - name: Linting + Formatting — ruff
         run: ruff check apps/ shared/
