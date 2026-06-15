@@ -524,6 +524,7 @@ PRODUCTS: list[dict[str, Any]] = [
         "sale_price_wholesale": Decimal("78500"),
         "tax_rate_pct": Decimal("0.00"),
         "reorder_point": 8,
+        "requires_expiration": True,
     },
     {
         "sku": "TH-02",
@@ -1520,6 +1521,8 @@ PRODUCTS: list[dict[str, Any]] = [
         "sale_price_wholesale": Decimal("33800"),
         "tax_rate_pct": Decimal("0.00"),
         "reorder_point": 6,
+        "requires_expiration": True,
+        "requires_cold_chain": True,
     },
     {
         "sku": "CFCG-01",
@@ -1531,6 +1534,8 @@ PRODUCTS: list[dict[str, Any]] = [
         "sale_price_wholesale": Decimal("26500"),
         "tax_rate_pct": Decimal("0.00"),
         "reorder_point": 8,
+        "requires_expiration": True,
+        "requires_cold_chain": True,
     },
     {
         "sku": "CMA-02",
@@ -1878,7 +1883,7 @@ PRODUCTS: list[dict[str, Any]] = [
     {
         "sku": "TC-18",
         "name": "Estimulador Neuromuscular Biofeedback KM530",
-        "category_slug": "suelo-pelvico",
+        "category_slug": "electroterapia",
         "brand": "KM Medical",
         "unit_cost": Decimal("580000"),
         "sale_price_retail": Decimal("794200"),
@@ -1889,7 +1894,7 @@ PRODUCTS: list[dict[str, Any]] = [
     {
         "sku": "TC-19",
         "name": "Estimulador Neuromuscular Biofeedback KM531",
-        "category_slug": "suelo-pelvico",
+        "category_slug": "electroterapia",
         "brand": "KM Medical",
         "unit_cost": Decimal("680000"),
         "sale_price_retail": Decimal("931100"),
@@ -2710,6 +2715,13 @@ EXTRA_LOCATIONS: list[dict[str, Any]] = [
         "is_retail": True,
         "max_capacity": 100,
     },
+    {
+        "code": "cuarto-frio",
+        "name": "Cuarto Frio",
+        "description": "Almacenamiento con control de temperatura para compresas y geles con cadena de frio.",
+        "is_retail": False,
+        "max_capacity": 200,
+    },
 ]
 
 # ---------------------------------------------------------------------------
@@ -2750,5 +2762,162 @@ CUSTOMERS: list[dict[str, Any]] = [
         "customer_phone": "+57 7 3219876",
         "customer_address": "Calle 35 No 22-18, Bucaramanga",
         "privacy_notice_acknowledged": True,
+    },
+]
+
+# ---------------------------------------------------------------------------
+# Tipos de almacenamiento (Fase 15)
+# ---------------------------------------------------------------------------
+STORAGE_TYPES: list[dict[str, Any]] = [
+    {
+        "code": "almacen-seco",
+        "name": "Almacén Seco",
+        "category": "warehouse",
+        "capabilities": {"temperature_controlled": False, "refrigerated": False},
+        "default_is_retail": False,
+        "sort_order": 1,
+    },
+    {
+        "code": "vitrina-exposicion",
+        "name": "Vitrina de Exposición",
+        "category": "retail",
+        "capabilities": {"temperature_controlled": False, "display": True},
+        "default_is_retail": True,
+        "sort_order": 2,
+    },
+    {
+        "code": "almacen-controlado",
+        "name": "Almacén Controlado",
+        "category": "warehouse",
+        "capabilities": {"temperature_controlled": True, "refrigerated": False},
+        "default_is_retail": False,
+        "sort_order": 3,
+    },
+    {
+        "code": "almacen-frio",
+        "name": "Almacén Frío",
+        "category": "warehouse",
+        "capabilities": {"temperature_controlled": True, "refrigerated": True},
+        "default_is_retail": False,
+        "sort_order": 4,
+    },
+]
+
+STORAGE_TEMPLATES: list[dict[str, Any]] = [
+    {
+        "code": "bodega-estandar",
+        "name": "Bodega Estándar",
+        "storage_type_code": "almacen-seco",
+        "defaults": {"max_capacity": 5000, "capacity_mode": "absolute_legacy"},
+        "sort_order": 1,
+    },
+    {
+        "code": "vitrina-estandar",
+        "name": "Vitrina Estándar",
+        "storage_type_code": "vitrina-exposicion",
+        "defaults": {"max_capacity": 500, "capacity_mode": "absolute_legacy"},
+        "sort_order": 2,
+    },
+    {
+        "code": "cuarto-frio-estandar",
+        "name": "Cuarto Frío Estándar",
+        "storage_type_code": "almacen-frio",
+        "defaults": {"max_capacity": 200, "capacity_mode": "absolute_legacy"},
+        "sort_order": 3,
+    },
+]
+
+# location_code -> (storage_type_code, storage_template_code)
+LOCATION_STORAGE_ASSIGNMENTS: dict[str, tuple[str, str]] = {
+    "bodega": ("almacen-seco", "bodega-estandar"),
+    "bodega-norte": ("almacen-seco", "bodega-estandar"),
+    "vitrina": ("vitrina-exposicion", "vitrina-estandar"),
+    "vitrina-2": ("vitrina-exposicion", "vitrina-estandar"),
+    "cuarto-frio": ("almacen-frio", "cuarto-frio-estandar"),
+}
+
+# ---------------------------------------------------------------------------
+# Horarios y permisos de usuarios (Fase 16)
+# ---------------------------------------------------------------------------
+USER_SCHEDULES: list[dict[str, Any]] = [
+    {
+        "username": "auxiliar_despacho_1",
+        "morning_start": "07:00",
+        "morning_end": "12:00",
+        "afternoon_start": "14:00",
+        "afternoon_end": "17:00",
+    },
+    {
+        "username": "auxiliar_despacho_2",
+        "morning_start": "07:30",
+        "morning_end": "12:30",
+        "afternoon_start": "14:00",
+        "afternoon_end": "17:30",
+    },
+]
+
+TEMP_PERMITS: list[dict[str, Any]] = [
+    {
+        "username": "auxiliar_despacho_1",
+        "allow_24_7": False,
+        "custom_morning_start": "06:00",
+        "custom_morning_end": "21:00",
+        "custom_afternoon_start": None,
+        "custom_afternoon_end": None,
+        "reason": "Inventario físico anual — jornada extendida autorizada por almacenista",
+        "granted_by_username": "almacenista",
+        "is_active": True,
+        "start_offset_days": -1,
+        "end_offset_days": 2,
+    },
+]
+
+# ---------------------------------------------------------------------------
+# Lotes con trazabilidad de vencimiento (Fase 17)
+# ---------------------------------------------------------------------------
+LOTS: list[dict[str, Any]] = [
+    # Agujas: 3 próximas a vencer (≤30 días) → disparan EXPIRATION_30
+    {"sku": "AGJ-01", "code": "LOT-SEED-AGJ01-A", "offset_days": 25},
+    {"sku": "AGJ-02", "code": "LOT-SEED-AGJ02-A", "offset_days": 28},
+    {"sku": "AGJ-03", "code": "LOT-SEED-AGJ03-A", "offset_days": 30},
+    # Agujas: 5 en ~60 días → disparan EXPIRATION_60
+    {"sku": "AGJ-04", "code": "LOT-SEED-AGJ04-A", "offset_days": 55},
+    {"sku": "AGJ-05", "code": "LOT-SEED-AGJ05-A", "offset_days": 58},
+    {"sku": "AGJ-06", "code": "LOT-SEED-AGJ06-A", "offset_days": 60},
+    {"sku": "AGJ-08", "code": "LOT-SEED-AGJ08-A", "offset_days": 62},
+    {"sku": "AGJ-09", "code": "LOT-SEED-AGJ09-A", "offset_days": 65},
+    # Agujas: 5 en 12 meses → sin alerta inminente
+    {"sku": "AGJ-11", "code": "LOT-SEED-AGJ11-A", "offset_days": 365},
+    {"sku": "AGJ-13", "code": "LOT-SEED-AGJ13-A", "offset_days": 370},
+    # Electrodos y pads con vencimiento
+    {"sku": "EL-01",  "code": "LOT-SEED-EL01-A",  "offset_days": 400},
+    {"sku": "EL-04",  "code": "LOT-SEED-EL04-A",  "offset_days": 380},
+    {"sku": "TC-11",  "code": "LOT-SEED-TC11-A",  "offset_days": 365},
+    # Gel conductivo: vida util ~2 años
+    {"sku": "GL-03",  "code": "LOT-SEED-GL03-A",  "offset_days": 730},
+    # Compresas con cadena de frio: vida util ~3 años
+    {"sku": "CF-02",   "code": "LOT-SEED-CF02-A",   "offset_days": 1095},
+    {"sku": "CFCG-01", "code": "LOT-SEED-CFCG01-A", "offset_days": 1095},
+]
+
+# ---------------------------------------------------------------------------
+# Actualizaciones de precio (Fase 20) → genera ProductPriceHistory
+# (sku, campo, nuevo_valor)
+# ---------------------------------------------------------------------------
+PRICE_UPDATES: list[tuple[str, str, Any]] = [
+    ("T-01",   "sale_price_retail",    Decimal("495000")),
+    ("AGJ-01", "sale_price_retail",    Decimal("52000")),
+    ("BP-08",  "sale_price_wholesale", Decimal("7200")),
+]
+
+# ---------------------------------------------------------------------------
+# Webhooks de demostración (Fase 23)
+# ---------------------------------------------------------------------------
+WEBHOOK_ENDPOINTS: list[dict[str, Any]] = [
+    {
+        "url": "https://webhook.site/icm-test-endpoint",
+        "events": ["movement.created", "alert.created", "invoice.issued", "stock.zero"],
+        "is_active": True,
+        "created_by_username": "administrador_icm",
     },
 ]

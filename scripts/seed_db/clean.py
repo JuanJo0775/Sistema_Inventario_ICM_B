@@ -142,8 +142,11 @@ def clean() -> None:
 
     print("\n--- Limpiando tipos de almacenamiento ---")
     _deleted("StorageTemplate", StorageTemplate.objects.all().delete())
-    # StorageType: se conserva. Las ubicaciones base (bodega/vitrina) la referencian
-    # con PROTECT y no las tocamos.
+    # Desasignar tipo/plantilla en ubicaciones base para poder borrar StorageType
+    Location.objects.filter(code__in=_BASE_LOCATION_CODES).update(
+        storage_type=None, storage_template=None
+    )
+    _deleted("StorageType", StorageType.objects.all().delete())
 
     print("\n--- Limpiando usuarios adicionales ---")
     extra_users = User.objects.filter(role__in=["auxiliar_despacho", "administrador"])

@@ -82,8 +82,18 @@ class Seeder:
         self._section("Fase 5 -- Productos")
         products = self._ensure_products(almacenista, cats, brands, result)
 
+        self._section("Fase 5b -- Corrección de flags de productos")
+        self._apply_product_flag_corrections(products)
+
         self._section("Fase 6 -- Proveedores")
         suppliers = self._ensure_suppliers(almacenista)
+
+        # --- Infraestructura adicional (siempre idempotente) ---
+        self._section("Fase 15 -- Tipos y plantillas de almacenamiento")
+        self._ensure_storage_config(almacenista, locations)
+
+        self._section("Fase 16 -- Horarios y permisos de usuarios")
+        self._ensure_user_schedules()
 
         self._write(
             f"  Catalogo listo: {result.products_created} creados, "
@@ -100,6 +110,7 @@ class Seeder:
             bodega_norte = locations["bodega-norte"]
             vitrina = locations["vitrina"]
             vitrina2 = locations["vitrina-2"]
+            cuarto_frio = locations.get("cuarto-frio")
 
             by_cat = self._group_by_category(products)
 
@@ -126,6 +137,28 @@ class Seeder:
 
             self._section("Fase 14 -- Combos de productos")
             self._ensure_combos(almacenista, products)
+
+            self._section("Fase 17 -- Lotes con trazabilidad de vencimiento")
+            self._seed_lots(products)
+
+            self._section("Fase 18 -- Movimientos adicionales (devoluciones, danos, vencimientos, combos)")
+            self._seed_additional_movements(almacenista, products, by_cat, bodega, vitrina2, cuarto_frio)
+
+            self._section("Fase 19 -- OC en borrador y cancelada")
+            self._seed_po_states(almacenista, suppliers, products)
+
+            self._section("Fase 20 -- Actualizacion de precios (historial)")
+            self._seed_price_updates(almacenista, products)
+
+            self._section("Fase 21 -- Facturas comerciales")
+            self._seed_invoices(almacenista)
+
+        # --- Fases finales (siempre idempotentes) ---
+        self._section("Fase 22 -- Escaneo de alertas")
+        self._run_scan_alerts()
+
+        self._section("Fase 23 -- Webhooks de ejemplo")
+        self._ensure_webhooks()
 
         self._title("SEED completado")
         self._build_result(result, locations)
@@ -826,6 +859,511 @@ class Seeder:
         self._ok(f"Combos: {created} creados, {skipped} existentes")
 
     # =========================================================================
+    # Fase 5b: Corrección de flags de productos (idempotente)
+    # =========================================================================
+
+    def _apply_product_flag_corrections(self, products: dict) -> None:
+        """
+        Aplica correcciones de flags a productos existentes en la BD.
+        Idempotente: solo actualiza si el valor actual difiere.
+        Necesario cuando el producto ya existía antes de que el flag se añadiera al config.
+        """
+        # (sku, campo, valor)
+        corrections: list[tuple[str, str, bool]] = []
+
+        # Construir lista dinámica desde config: cualquier producto con flags no default
+        for data in config.PRODUCTS:
+            sku = data.get("sku", "")
+            if data.get("requires_expiration", False):
+                corrections.append((sku, "requires_expiration", True))
+            if data.get("requires_cold_chain", False):
+                corrections.append((sku, "requires_cold_chain", True))
+
+        done = 0
+        for sku, field, value in corrections:
+            product = products.get(sku)
+            if not product:
+                continue
+            if getattr(product, field) == value:
+                continue
+            setattr(product, field, value)
+            product.save(update_fields=[field])
+            self._ok(f"  ~ {sku}.{field} = {value}")
+            done += 1
+
+        if done == 0:
+            self._ok("  Todos los flags ya estaban correctos")
+        else:
+            self._ok(f"  {done} flags corregidos")
+
+    # =========================================================================
+    # Fase 15: Tipos y plantillas de almacenamiento
+    # =========================================================================
+
+    def _ensure_storage_config(self, almacenista, locations: dict) -> None:
+        from apps.inventory.models import StorageTemplate, StorageType
+        from apps.inventory.services import update_location
+
+        st_map: dict[str, Any] = {}
+        for data in config.STORAGE_TYPES:
+            st, created = StorageType.objects.get_or_create(
+                code=data["code"],
+                defaults={
+                    "name": data["name"],
+                    "category": data.get("category", "general"),
+                    "capabilities": data.get("capabilities", {}),
+                    "default_is_retail": data.get("default_is_retail", False),
+                    "is_active": True,
+                    "sort_order": data.get("sort_order", 0),
+                },
+            )
+            st_map[st.code] = st
+            self._ok(f"  {'+'if created else '·'} StorageType: {st.name} [{st.code}]")
+
+        tmpl_map: dict[str, Any] = {}
+        for data in config.STORAGE_TEMPLATES:
+            st = st_map.get(data.get("storage_type_code", ""))
+            tmpl, created = StorageTemplate.objects.get_or_create(
+                code=data["code"],
+                defaults={
+                    "name": data["name"],
+                    "storage_type": st,
+                    "defaults": data.get("defaults", {}),
+                    "is_active": True,
+                    "sort_order": data.get("sort_order", 0),
+                },
+            )
+            tmpl_map[tmpl.code] = tmpl
+            self._ok(f"  {'+'if created else '·'} StorageTemplate: {tmpl.name} [{tmpl.code}]")
+
+        for loc_code, (st_code, tmpl_code) in config.LOCATION_STORAGE_ASSIGNMENTS.items():
+            loc = locations.get(loc_code)
+            if not loc:
+                continue
+            st = st_map.get(st_code)
+            tmpl = tmpl_map.get(tmpl_code)
+            if loc.storage_type == st and loc.storage_template == tmpl:
+                self._ok(f"  · {loc_code}: almacenamiento ya configurado")
+                continue
+            try:
+                update_data: dict[str, Any] = {}
+                if st:
+                    update_data["storage_type_id"] = st.id
+                if tmpl:
+                    update_data["storage_template_id"] = tmpl.id
+                update_location(almacenista, loc.id, update_data)
+                self._ok(f"  + {loc_code}: {st_code} / {tmpl_code}")
+            except Exception as exc:
+                self._warn(f"Asignacion storage {loc_code}: {exc}")
+
+    # =========================================================================
+    # Fase 16: Horarios y permisos de usuarios
+    # =========================================================================
+
+    def _ensure_user_schedules(self) -> None:
+        from datetime import time as time_type, timedelta
+
+        from django.contrib.auth import get_user_model
+        from django.utils import timezone as dj_tz
+
+        from apps.authentication.models import TemporaryAccessPermit, UserSchedule
+
+        def _t(s: str) -> time_type:
+            h, m = s.split(":")
+            return time_type(int(h), int(m))
+
+        User = get_user_model()
+
+        for data in config.USER_SCHEDULES:
+            user = User.objects.filter(username=data["username"]).first()
+            if not user:
+                self._warn(f"Usuario no encontrado: {data['username']}")
+                continue
+            _, created = UserSchedule.objects.get_or_create(
+                user=user,
+                defaults={
+                    "morning_start": _t(data["morning_start"]),
+                    "morning_end": _t(data["morning_end"]),
+                    "afternoon_start": _t(data["afternoon_start"]),
+                    "afternoon_end": _t(data["afternoon_end"]),
+                    "is_active": True,
+                },
+            )
+            self._ok(f"  {'+'if created else '·'} Horario: {user.username}")
+
+        for data in config.TEMP_PERMITS:
+            user = User.objects.filter(username=data["username"]).first()
+            if not user:
+                continue
+            if TemporaryAccessPermit.objects.filter(user=user, is_active=True).exists():
+                self._ok(f"  · Permiso temporal existente: {user.username}")
+                continue
+            granted_by = User.objects.filter(username=data["granted_by_username"]).first()
+            now = dj_tz.now()
+            permit = TemporaryAccessPermit(
+                user=user,
+                start_datetime=now + timedelta(days=data["start_offset_days"]),
+                end_datetime=now + timedelta(days=data["end_offset_days"]),
+                allow_24_7=data.get("allow_24_7", False),
+                custom_morning_start=_t(data["custom_morning_start"]) if data.get("custom_morning_start") else None,
+                custom_morning_end=_t(data["custom_morning_end"]) if data.get("custom_morning_end") else None,
+                custom_afternoon_start=_t(data["custom_afternoon_start"]) if data.get("custom_afternoon_start") else None,
+                custom_afternoon_end=_t(data["custom_afternoon_end"]) if data.get("custom_afternoon_end") else None,
+                reason=data["reason"],
+                granted_by=granted_by,
+                is_active=data.get("is_active", True),
+            )
+            try:
+                permit.save()
+                self._ok(f"  + Permiso temporal: {user.username}")
+            except Exception as exc:
+                self._warn(f"Permiso temporal {user.username}: {exc}")
+
+    # =========================================================================
+    # Fase 17: Lotes con trazabilidad de vencimiento
+    # =========================================================================
+
+    def _seed_lots(self, products: dict) -> None:
+        from apps.catalog.models import Lot
+
+        done = 0
+        for data in config.LOTS:
+            sku = data["sku"]
+            product = products.get(sku)
+            if not product:
+                self._warn(f"SKU no encontrado para lote: {sku}")
+                continue
+            expiry = date.today() + timedelta(days=data["offset_days"])
+            _, created = Lot.objects.get_or_create(
+                product=product,
+                code=data["code"],
+                defaults={"expiration_date": expiry},
+            )
+            if created:
+                self._ok(f"  + Lote {data['code']} ({sku}) vence {expiry}")
+                done += 1
+            else:
+                self._ok(f"  · Lote existente: {data['code']}")
+        self._ok(f"Lotes: {done} nuevos")
+
+    # =========================================================================
+    # Fase 18: Movimientos adicionales (DEVOLUCION, SALIDA_DANO, SALIDA_VENCIMIENTO, SALIDA_COMBO)
+    # =========================================================================
+
+    def _seed_additional_movements(
+        self, almacenista, products: dict, by_cat: dict, bodega, vitrina2, cuarto_frio=None
+    ) -> None:
+        from apps.catalog.models import ProductCombo, ProductSerial
+        from apps.inventory.models import StockByLocation
+        from apps.movements.models import MovementType
+        from apps.movements.services import dispatch_combo, register_dispatch, register_return
+
+        done = 0
+
+        # --- DEVOLUCION: solo categorías retornables (electroterapia) ---
+        for product in by_cat.get("electroterapia", [])[:1]:
+            ps = ProductSerial.objects.filter(product=product).first()
+            if not ps:
+                self._warn(f"Sin serial para devolución: {product.sku}")
+                continue
+            try:
+                register_return(almacenista, product.id, bodega.id, 1, serial_id=ps.id)
+                self._ok(f"  << DEVOLUCION {product.sku} serial {ps.serial_number}")
+                done += 1
+            except Exception as exc:
+                self._warn(f"DEVOLUCION {product.sku}: {exc}")
+
+        # --- SALIDA_DANO: masajeador dañado ---
+        for product in by_cat.get("masajeadores", [])[:1]:
+            row = StockByLocation.objects.filter(product=product, location=bodega).first()
+            if not row or row.current_stock < 1:
+                continue
+            try:
+                register_dispatch(
+                    almacenista,
+                    product_id=product.id,
+                    location_id=bodega.id,
+                    quantity=1,
+                    movement_type=MovementType.SALIDA_DANO,
+                    note="Unidad golpeada durante traslado — dano irreparable",
+                )
+                self._ok(f"  x SALIDA_DANO {product.sku} (masajeador)")
+                done += 1
+            except Exception as exc:
+                self._warn(f"SALIDA_DANO {product.sku}: {exc}")
+
+        # --- SALIDA_DANO: agujas con embalaje roto ---
+        for product in by_cat.get("agujas", [])[:1]:
+            row = StockByLocation.objects.filter(product=product, location=bodega).first()
+            if not row or row.current_stock < 1:
+                continue
+            try:
+                register_dispatch(
+                    almacenista,
+                    product_id=product.id,
+                    location_id=bodega.id,
+                    quantity=1,
+                    movement_type=MovementType.SALIDA_DANO,
+                    note="Agujas con embalaje roto en contacto con humedad",
+                )
+                self._ok(f"  x SALIDA_DANO {product.sku} (agujas)")
+                done += 1
+            except Exception as exc:
+                self._warn(f"SALIDA_DANO {product.sku}: {exc}")
+
+        # --- SALIDA_VENCIMIENTO: primer lote de agujas vencido ---
+        for product in by_cat.get("agujas", []):
+            row = StockByLocation.objects.filter(product=product, location=bodega).first()
+            if not row or row.current_stock < 1:
+                continue
+            try:
+                register_dispatch(
+                    almacenista,
+                    product_id=product.id,
+                    location_id=bodega.id,
+                    quantity=1,
+                    movement_type=MovementType.SALIDA_VENCIMIENTO,
+                    note="Lote vencido detectado en inspeccion periodica bodega",
+                )
+                self._ok(f"  ! SALIDA_VENCIMIENTO {product.sku}")
+                done += 1
+                break
+            except Exception as exc:
+                self._warn(f"SALIDA_VENCIMIENTO {product.sku}: {exc}")
+
+        # --- SALIDA_COMBO: despacho del kit KIT-1 desde bodega ---
+        combo = ProductCombo.objects.filter(sku__iexact="KIT-1", deleted_at__isnull=True).first()
+        if combo:
+            try:
+                dispatch_combo(almacenista, combo.id, bodega.id)
+                self._ok(f"  + SALIDA_COMBO {combo.sku}")
+                done += 1
+            except Exception as exc:
+                self._warn(f"SALIDA_COMBO {combo.sku}: {exc}")
+        else:
+            self._warn("Combo KIT-1 no encontrado para SALIDA_COMBO")
+
+        # --- TRASLADOS A CUARTO FRIO: compresas y gel con cadena de frio ---
+        if cuarto_frio:
+            from apps.movements.services import register_internal_transfer
+
+            cold_skus = ["CF-02", "CFCG-01"]
+            for sku in cold_skus:
+                product = products.get(sku)
+                if not product:
+                    continue
+                row = StockByLocation.objects.filter(product=product, location=bodega).first()
+                if not row or row.current_stock < 4:
+                    continue
+                qty = min(4, row.current_stock)
+                try:
+                    register_internal_transfer(
+                        almacenista,
+                        product_id=product.id,
+                        origin_id=bodega.id,
+                        destination_id=cuarto_frio.id,
+                        quantity=qty,
+                        cold_chain_acknowledged=True,
+                    )
+                    self._ok(f"  TRASLADO {sku} x{qty} bodega -> cuarto-frio")
+                    done += 1
+                except Exception as exc:
+                    self._warn(f"Traslado cuarto-frio {sku}: {exc}")
+
+        self._ok(f"Movimientos adicionales: {done}")
+
+    # =========================================================================
+    # Fase 19: OC en borrador y cancelada
+    # =========================================================================
+
+    def _seed_po_states(self, almacenista, suppliers: dict, products: dict) -> None:
+        from apps.purchasing.services import cancel_purchase_order, create_purchase_order
+
+        sup_mr = suppliers.get("MedRehab Importaciones Ltda.")
+        sup_ter = suppliers.get("Terapias Medicas de Colombia Ltda")
+
+        # OC en borrador (nunca confirmada)
+        if sup_mr:
+            product = products.get("T-01")
+            if product:
+                try:
+                    po = create_purchase_order(
+                        almacenista,
+                        {
+                            "supplier_id": sup_mr.id,
+                            "expected_delivery": date.today() + timedelta(days=21),
+                            "notes": "[SEED] OC en evaluacion de presupuesto",
+                            "items": [
+                                {
+                                    "product_id": product.id,
+                                    "quantity_ordered": 5,
+                                    "unit_cost": product.unit_cost or 180000,
+                                }
+                            ],
+                        },
+                        request=None,
+                    )
+                    self._ok(f"  ~ OC borrador: {po.number}")
+                except Exception as exc:
+                    self._warn(f"OC borrador: {exc}")
+
+        # OC cancelada (creada y luego cancelada)
+        if sup_ter:
+            product = products.get("BP-08")
+            if product:
+                try:
+                    po = create_purchase_order(
+                        almacenista,
+                        {
+                            "supplier_id": sup_ter.id,
+                            "expected_delivery": date.today() + timedelta(days=14),
+                            "notes": "[SEED] OC cancelada por cambio de proveedor",
+                            "items": [
+                                {
+                                    "product_id": product.id,
+                                    "quantity_ordered": 100,
+                                    "unit_cost": product.unit_cost or 8000,
+                                }
+                            ],
+                        },
+                        request=None,
+                    )
+                    cancel_purchase_order(
+                        almacenista,
+                        po.id,
+                        "Proveedor no cumplio condiciones de entrega pactadas",
+                        request=None,
+                    )
+                    self._ok(f"  x OC cancelada: {po.number}")
+                except Exception as exc:
+                    self._warn(f"OC cancelada: {exc}")
+
+    # =========================================================================
+    # Fase 20: Actualización de precios → ProductPriceHistory
+    # =========================================================================
+
+    def _seed_price_updates(self, almacenista, products: dict) -> None:
+        from apps.catalog.services import update_product_prices
+
+        done = 0
+        for sku, field, new_val in config.PRICE_UPDATES:
+            product = products.get(sku)
+            if not product:
+                self._warn(f"SKU no encontrado para precio: {sku}")
+                continue
+            current = getattr(product, field, None)
+            if current == new_val:
+                self._ok(f"  · Precio sin cambio: {sku}.{field}")
+                continue
+            try:
+                update_product_prices(almacenista, product.id, **{field: new_val})
+                self._ok(f"  $ Precio {sku}.{field}: {current} -> {new_val}")
+                done += 1
+            except Exception as exc:
+                self._warn(f"Precio {sku}: {exc}")
+        self._ok(f"Actualizaciones de precio: {done}")
+
+    # =========================================================================
+    # Fase 21: Facturas comerciales (Invoice)
+    # =========================================================================
+
+    def _seed_invoices(self, almacenista) -> None:
+        from apps.movements.models import Invoice, Movement, MovementType
+        from apps.movements.services import create_invoice_from_movements
+
+        invoice_configs = [
+            {
+                "number": "SEED-INV-001",
+                "types": [MovementType.SALIDA_VENTA_MAYOR],
+                "limit": 3,
+                "customer": {
+                    "customer_name": "Clinica Rehabilita SAS",
+                    "customer_email": "compras@rehabilita.co",
+                    "customer_phone": "+57 1 5678901",
+                    "customer_address": "Cra 15 No 93-75, Bogota",
+                },
+            },
+            {
+                "number": "SEED-INV-002",
+                "types": [MovementType.SALIDA_VENTA_MENOR],
+                "limit": 5,
+                "customer": {
+                    "customer_name": "Cliente Mostrador",
+                    "customer_email": "mostrador@icm.local",
+                    "customer_phone": "N/A",
+                    "customer_address": "Punto de venta ICM",
+                },
+            },
+        ]
+
+        done = 0
+        for cfg in invoice_configs:
+            if Invoice.objects.filter(number=cfg["number"]).exists():
+                self._ok(f"  · Factura existente: {cfg['number']}")
+                continue
+            movements = list(
+                Movement.objects.filter(movement_type__in=cfg["types"]).order_by("created_at")[: cfg["limit"]]
+            )
+            if not movements:
+                self._warn(f"Sin movimientos para factura {cfg['number']}")
+                continue
+            try:
+                invoice = create_invoice_from_movements(
+                    movements,
+                    user=almacenista,
+                    invoice_number=cfg["number"],
+                    customer_data=cfg["customer"],
+                )
+                self._ok(f"  + Factura {invoice.number} ({len(movements)} movimientos)")
+                done += 1
+            except Exception as exc:
+                self._warn(f"Factura {cfg['number']}: {exc}")
+        self._ok(f"Facturas: {done} creadas")
+
+    # =========================================================================
+    # Fase 22: Escaneo de alertas
+    # =========================================================================
+
+    def _run_scan_alerts(self) -> None:
+        try:
+            from django.core.management import call_command
+
+            call_command("scan_alerts", verbosity=0)
+            from apps.alerts.models import Alert
+
+            count = Alert.objects.count()
+            self._ok(f"Alertas activas tras escaneo: {count}")
+        except Exception as exc:
+            self._warn(f"scan_alerts: {exc}")
+
+    # =========================================================================
+    # Fase 23: Webhooks de demostración
+    # =========================================================================
+
+    def _ensure_webhooks(self) -> None:
+        from django.contrib.auth import get_user_model
+
+        from apps.webhooks.models import WebhookEndpoint
+
+        User = get_user_model()
+        done = 0
+        for data in config.WEBHOOK_ENDPOINTS:
+            creator = User.objects.filter(username=data["created_by_username"]).first()
+            _, created = WebhookEndpoint.objects.get_or_create(
+                url=data["url"],
+                defaults={
+                    "secret": "seed-demo-secret-changeme-in-production",
+                    "events": data.get("events", []),
+                    "is_active": data.get("is_active", True),
+                    "created_by": creator,
+                },
+            )
+            self._ok(f"  {'+'if created else '·'} Webhook: {data['url']}")
+            if created:
+                done += 1
+        self._ok(f"Webhooks: {done} creados")
+
+    # =========================================================================
     # Helpers de compras (OC -> Recepcion)
     # =========================================================================
 
@@ -903,7 +1441,13 @@ class Seeder:
                 },
                 request=None,
             )
-            confirm_reception(almacenista, reception.id, request=None)
+            confirm_reception(
+                almacenista,
+                reception.id,
+                request=None,
+                cold_chain_acknowledged=True,
+                electrical_safety_acknowledged=True,
+            )
 
         self._ok(
             f"  + OC {po.number} confirmada ({len(items)} items -> {location.name})"
@@ -988,6 +1532,10 @@ class Seeder:
             ("SALIDA_MAYOR", MovementType.SALIDA_VENTA_MAYOR),
             ("TRASLADO", MovementType.TRASLADO),
             ("AJUSTE", MovementType.AJUSTE),
+            ("DEVOLUCION", MovementType.DEVOLUCION),
+            ("SALIDA_DANO", MovementType.SALIDA_DANO),
+            ("SALIDA_VENCIMIENTO", MovementType.SALIDA_VENCIMIENTO),
+            ("SALIDA_COMBO", MovementType.SALIDA_COMBO),
         ]:
             n = Movement.objects.filter(movement_type=mt).count()
             if n:
