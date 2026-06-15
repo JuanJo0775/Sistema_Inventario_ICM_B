@@ -32,11 +32,12 @@ class SupplierSerializer(serializers.ModelSerializer):
             "ciudad",
             "direccion",
             "is_active",
+            "deleted_at",
             "observaciones",
             "created_at",
             "updated_at",
         )
-        read_only_fields = ("id", "created_at", "updated_at")
+        read_only_fields = ("id", "deleted_at", "created_at", "updated_at")
 
 
 class SupplierWriteSerializer(serializers.Serializer):

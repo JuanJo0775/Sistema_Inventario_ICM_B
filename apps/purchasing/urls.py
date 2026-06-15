@@ -14,13 +14,32 @@ from .views import (
     SupplierActivateView,
     SupplierDeactivateView,
     SupplierDetailView,
+    SupplierDisableView,
+    SupplierEnableView,
     SupplierListCreateView,
+    SupplierRestoreView,
 )
 
 urlpatterns = [
     # Suppliers
     path("suppliers/", SupplierListCreateView.as_view(), name="supplier-list-create"),
     path("suppliers/<uuid:pk>/", SupplierDetailView.as_view(), name="supplier-detail"),
+    path(
+        "suppliers/<uuid:pk>/restore/",
+        SupplierRestoreView.as_view(),
+        name="supplier-restore",
+    ),
+    path(
+        "suppliers/<uuid:pk>/disable/",
+        SupplierDisableView.as_view(),
+        name="supplier-disable",
+    ),
+    path(
+        "suppliers/<uuid:pk>/enable/",
+        SupplierEnableView.as_view(),
+        name="supplier-enable",
+    ),
+    # legacy aliases — mantenidos para compatibilidad
     path(
         "suppliers/<uuid:pk>/deactivate/",
         SupplierDeactivateView.as_view(),

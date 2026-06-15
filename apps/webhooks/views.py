@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from drf_spectacular.utils import extend_schema, inline_serializer
+from drf_spectacular.utils import OpenApiParameter, extend_schema, inline_serializer
 from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -38,7 +38,16 @@ class WebhookEndpointListCreateView(APIView):
 
     @extend_schema(
         summary="Listar endpoints de webhook",
-        description="Lista los endpoints de webhook configurados.",
+        description="Lista los endpoints de webhook configurados (excluye eliminados lógicamente por defecto).",
+        parameters=[
+            OpenApiParameter(
+                name="include_archived",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Si es true, incluye endpoints eliminados lógicamente (deleted_at != null).",
+            ),
+        ],
         responses={
             200: WebhookEndpointSerializer(many=True),
             **standard_error_responses(include_403=True),
@@ -46,9 +55,14 @@ class WebhookEndpointListCreateView(APIView):
         tags=[TAG_WEBHOOKS],
     )
     def get(self, request):
-        qs = WebhookEndpoint.objects.filter(deleted_at__isnull=True).order_by(
-            "-created_at"
+        include_archived = request.query_params.get("include_archived", "").lower() in (
+            "1",
+            "true",
+            "yes",
         )
+        qs = WebhookEndpoint.objects.order_by("-created_at")
+        if not include_archived:
+            qs = qs.filter(deleted_at__isnull=True)
         paginator = ICMPageNumberPagination()
         page = paginator.paginate_queryset(list(qs), request, view=self)
         return paginator.get_paginated_response(

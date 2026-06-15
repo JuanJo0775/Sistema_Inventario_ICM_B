@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -47,14 +47,43 @@ class SupplierListCreateView(APIView):
         return [p() for p in _PERMS_OPERATOR]
 
     @extend_schema(
-        summary="Listar proveedores", responses={200: SupplierSerializer(many=True)}
+        summary="Listar proveedores",
+        description=(
+            "Lista proveedores no archivados (deleted_at=null) por defecto. "
+            "Filtros disponibles: ?is_active=true/false para activos/pausados. "
+            "?include_archived=true para incluir archivados (soft-deleted)."
+        ),
+        parameters=[
+            OpenApiParameter(
+                name="is_active",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Filtra por disponibilidad: true=activos, false=pausados.",
+            ),
+            OpenApiParameter(
+                name="include_archived",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Si true, incluye proveedores archivados (deleted_at != null).",
+            ),
+        ],
+        responses={200: SupplierSerializer(many=True)},
     )
     def get(self, request):
         is_active_param = request.query_params.get("is_active")
+        include_archived = request.query_params.get("include_archived", "").lower() in (
+            "1",
+            "true",
+            "yes",
+        )
         is_active = None
         if is_active_param is not None:
             is_active = is_active_param.lower() in ("true", "1", "yes")
-        qs = selectors.get_suppliers(is_active=is_active)
+        qs = selectors.get_suppliers(
+            is_active=is_active, include_archived=include_archived
+        )
 
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(qs, request)
@@ -142,22 +171,123 @@ class SupplierDetailView(APIView):
 
 
 @extend_schema(tags=[TAG_PURCHASING])
-class SupplierDeactivateView(APIView):
+class SupplierRestoreView(APIView):
+    """POST — Restaura un proveedor previamente archivado (soft delete)."""
+
     permission_classes = _PERMS_OPERATOR
 
-    @extend_schema(summary="Desactivar proveedor", responses={200: SupplierSerializer})
+    @extend_schema(
+        summary="Restaurar proveedor archivado",
+        description=(
+            "Restaura un proveedor previamente eliminado lógicamente. "
+            "Limpia deleted_at y reactiva is_active=True. "
+            "Use POST /suppliers/{id}/enable/ para solo reactivar sin restaurar del archivo."
+        ),
+        responses={
+            200: SupplierSerializer,
+            **standard_error_responses(include_404=True),
+        },
+    )
     def post(self, request, pk: UUID):
-        supplier = services.deactivate_supplier(request.user, pk, request=request)
+        supplier = services.restore_supplier(request.user, pk, request=request)
+        return Response(SupplierSerializer(supplier).data)
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class SupplierDisableView(APIView):
+    """POST — Desactiva un proveedor para nuevas OC (pausa temporal, sin archivar)."""
+
+    permission_classes = _PERMS_OPERATOR
+
+    @extend_schema(
+        summary="Desactivar proveedor para nuevas OC",
+        description=(
+            "Pausa el proveedor temporalmente (is_active=False). "
+            "El proveedor sigue existiendo y su historial se conserva. "
+            "No archiva el proveedor — para eso use DELETE /suppliers/{id}/."
+        ),
+        responses={
+            200: SupplierSerializer,
+            **standard_error_responses(include_404=True, include_409=True),
+        },
+    )
+    def post(self, request, pk: UUID):
+        try:
+            services.disable_supplier(request.user, pk, request=request)
+        except ValueError as e:
+            return Response(
+                {"error": "conflict", "message": str(e)},
+                status=status.HTTP_409_CONFLICT,
+            )
+        supplier = selectors.get_supplier(pk)
+        return Response(SupplierSerializer(supplier).data)
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class SupplierEnableView(APIView):
+    """POST — Reactiva un proveedor pausado (is_active=True, sin restaurar del archivo)."""
+
+    permission_classes = _PERMS_OPERATOR
+
+    @extend_schema(
+        summary="Reactivar proveedor para nuevas OC",
+        description=(
+            "Reactiva un proveedor previamente pausado (is_active=True). "
+            "Solo funciona si el proveedor no está archivado. "
+            "Para restaurar un proveedor archivado use POST /suppliers/{id}/restore/."
+        ),
+        responses={
+            200: SupplierSerializer,
+            **standard_error_responses(include_404=True, include_409=True),
+        },
+    )
+    def post(self, request, pk: UUID):
+        try:
+            supplier = services.enable_supplier(request.user, pk, request=request)
+        except ValueError as e:
+            return Response(
+                {"error": "conflict", "message": str(e)},
+                status=status.HTTP_409_CONFLICT,
+            )
+        return Response(SupplierSerializer(supplier).data)
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class SupplierDeactivateView(APIView):
+    """POST — Alias legacy: desactiva proveedor para nuevas OC (= /disable/)."""
+
+    permission_classes = _PERMS_OPERATOR
+
+    @extend_schema(
+        summary="Desactivar proveedor (legacy alias de /disable/)",
+        description="Alias de POST /suppliers/{id}/disable/. Usa /disable/ en código nuevo.",
+        responses={
+            200: SupplierSerializer,
+            **standard_error_responses(include_404=True, include_409=True),
+        },
+    )
+    def post(self, request, pk: UUID):
+        services.disable_supplier(request.user, pk, request=request)
+        supplier = selectors.get_supplier(pk)
         return Response(SupplierSerializer(supplier).data)
 
 
 @extend_schema(tags=[TAG_PURCHASING])
 class SupplierActivateView(APIView):
+    """POST — Alias legacy: reactiva proveedor (= /enable/)."""
+
     permission_classes = _PERMS_OPERATOR
 
-    @extend_schema(summary="Reactivar proveedor", responses={200: SupplierSerializer})
+    @extend_schema(
+        summary="Reactivar proveedor (legacy alias de /enable/)",
+        description="Alias de POST /suppliers/{id}/enable/. Usa /enable/ en código nuevo.",
+        responses={
+            200: SupplierSerializer,
+            **standard_error_responses(include_404=True, include_409=True),
+        },
+    )
     def post(self, request, pk: UUID):
-        supplier = services.activate_supplier(request.user, pk, request=request)
+        supplier = services.enable_supplier(request.user, pk, request=request)
         return Response(SupplierSerializer(supplier).data)
 
 
