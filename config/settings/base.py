@@ -22,10 +22,16 @@ elif "development" in _settings_module:
 else:
     _env_file = BASE_DIR / ".env"
 
+# Fallback genérico: si el archivo específico no existe, intentar .env raíz.
+# Si tampoco existe (CI, Docker sin volumen), leer directamente de os.environ.
 if not _env_file.exists():
     _env_file = BASE_DIR / ".env"
 
-config = Config(RepositoryEnv(str(_env_file)))
+if _env_file.exists():
+    config = Config(RepositoryEnv(str(_env_file)))
+else:
+    from decouple import AutoConfig  # noqa: PLC0415
+    config = AutoConfig(search_path=str(BASE_DIR))
 
 SECRET_KEY = config(
     "DJANGO_SECRET_KEY", default="insecure-dev-key-change-in-production"
