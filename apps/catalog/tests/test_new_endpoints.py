@@ -439,7 +439,7 @@ class TestBrandDetail:
         assert combo.deleted_at is not None
 
     @pytest.mark.django_db
-    def test_restore_reactivates(
+    def test_combo_restore_reactivates(
         self, authenticated_almacenista_client, sample_product
     ):
         combo = _make_combo("KIT-0006", sample_product)
