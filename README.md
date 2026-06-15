@@ -46,6 +46,8 @@ Documentación funcional y arquitectónica disponible en el repositorio:
 - [utility_tree.md](docs/architecture/utility_tree.md): Utility Tree del proyecto con escenarios e impacto.
 - [architectural_constraints.md](docs/architecture/architectural_constraints.md): restricciones formales que condicionan el diseño.
 - [adr_relationships.md](docs/architecture/adr_relationships.md): trazabilidad drivers → problema → decisión → ADR.
+- [design-patterns.md](docs/architecture/design-patterns.md): catálogo de patrones de diseño aplicados (Service Layer, Strategy, Observer, Facade, Composite y más).
+- [solid-principles.md](docs/architecture/solid-principles.md): análisis de los cinco principios SOLID con evidencia de código y oportunidades de mejora.
 - [ERS_ICM_Requisitos.md](docs/requisitos/ERS_ICM_Requisitos.md): requisitos funcionales, no funcionales y reglas de negocio.
 - [ICM_Informe_Elicitacion_v2_plus.docx.md](docs/requisitos/ICM_Informe_Elicitacion_v2_plus.docx.md): contexto de levantamiento y análisis del dominio.
 - [AGENTS.md](AGENTS.md): instrucciones y reglas para asistentes de código del proyecto.

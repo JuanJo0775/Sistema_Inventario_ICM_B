@@ -5033,7 +5033,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_user_enable.py::TestUserListIncludeInactive::test_list_accessible_by_administrador -v
 ```
 
-Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 138)
+Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 140)
 
 
 ---
@@ -5105,7 +5105,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_user_enable.py::TestUserListIncludeInactive::test_list_includes_inactive_with_param -v
 ```
 
-Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 128)
+Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 129)
 
 
 ---
@@ -5141,7 +5141,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/authentication/tests/test_user_enable.py::TestUserListIncludeInactive::test_list_not_accessible_unauthenticated -v
 ```
 
-Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 144)
+Código fuente: [apps/authentication/tests/test_user_enable.py](../../apps/authentication/tests/test_user_enable.py) (aprox. línea 146)
 
 
 ---
@@ -10973,7 +10973,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_new_endpoints.py::TestLocationListIncludeInactive::test_active_locations_always_visible -v
 ```
 
-Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 151)
+Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 154)
 
 
 ---
@@ -11009,7 +11009,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_new_endpoints.py::TestLocationListIncludeInactive::test_archived_locations_excluded_even_with_param -v
 ```
 
-Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 133)
+Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 135)
 
 
 ---
@@ -11081,7 +11081,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/inventory/tests/test_new_endpoints.py::TestLocationListIncludeInactive::test_list_includes_non_active_with_param -v
 ```
 
-Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 117)
+Código fuente: [apps/inventory/tests/test_new_endpoints.py](../../apps/inventory/tests/test_new_endpoints.py) (aprox. línea 118)
 
 
 ---
@@ -15149,7 +15149,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/movements/tests/test_views.py::test_administrador_cannot_create_entry -v
 ```
 
-Código fuente: [apps/movements/tests/test_views.py](../../apps/movements/tests/test_views.py) (aprox. línea 168)
+Código fuente: [apps/movements/tests/test_views.py](../../apps/movements/tests/test_views.py) (aprox. línea 174)
 
 
 ---

@@ -114,3 +114,13 @@ Para cada ADR existente se verifica que tenga un driver de origen y escenario en
 | ADR-010 | DF-02, DF-06 | 2.2 (atomicidad extendida) | (A,A) |
 | ADR-011 | REST-03 | — (restricción organizacional) | — |
 | ADR-012 | REST-02 | 1.1 | (A,A) |
+
+---
+
+## Ver también
+
+- [design-patterns.md](design-patterns.md) — implementación concreta de los patrones que hacen efectivas estas decisiones (Service Layer, Strategy, Observer, Facade, Composite).
+- [solid-principles.md](solid-principles.md) — evidencia de SOLID en el código, alineada con los drivers de mantenibilidad y desacoplamiento (ADR-002).
+- [architectural_constraints.md](architectural_constraints.md) — restricciones que condicionan las decisiones anteriores.
+- [architecture_drivers.md](architecture_drivers.md) — drivers de los que parten los problemas resueltos por cada ADR.
+- [docs/adr/README_ADR.md](../adr/README_ADR.md) — índice completo de ADRs.

@@ -107,3 +107,13 @@ Los reportes no son solo consultas SQL. Definen una capa de lectura separada (`r
 
 **DF-06 — Resolución SKU/barcode**
 En el flujo de despacho, el sistema recibe un código escaneado (`scanned_code`) y debe validarlo contra el SKU del pedido (`order_sku`) según reglas complejas (BR-08, BR-12, BR-13). Si el esquema de identificación cambia (ej. agregar RFID o cambiar formato de barcode), impacta el catálogo, el flujo de despacho y la validación de facturas. Es driver porque es el punto de entrada del mundo físico al sistema digital.
+
+---
+
+## Ver también
+
+- [design-patterns.md](design-patterns.md) — implementación concreta de los patrones que hacen efectivos estos drivers (Service Layer para DF-02, Strategy para DF-03, Observer para eventos de dominio, Facade para concurrencia segura).
+- [solid-principles.md](solid-principles.md) — cómo los principios SOLID traducen los drivers de mantenibilidad (SRP, OCP, DIP) y escalabilidad (ISP) a código real.
+- [adr_relationships.md](adr_relationships.md) — matriz que conecta cada driver con el ADR que lo resuelve.
+- [architectural_constraints.md](architectural_constraints.md) — restricciones derivadas de estos drivers.
+- [docs/adr/README_ADR.md](../adr/README_ADR.md) — decisiones arquitectónicas formales.

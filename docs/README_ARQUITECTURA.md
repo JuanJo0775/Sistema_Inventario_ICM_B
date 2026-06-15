@@ -52,6 +52,10 @@ En cada app se mantiene esta estructura:
 
 **Principio CRÍTICO**: La lógica de negocio NUNCA debe estar en models, serializers, o views. Eso es responsabilidad de services.py.
 
+> Documentación detallada de esta separación y los principios que la sustentan:
+> - [Patrones de diseño aplicados](architecture/design-patterns.md) — Service Layer, Selector/Query Object, Template Method, Strategy, Observer, Facade, etc.
+> - [Principios SOLID en el proyecto](architecture/solid-principles.md) — evidencia de código y oportunidades de mejora por principio.
+
 ### 2.3 Integracion frontend-backend via API REST
 
 La comunicacion entre frontend y backend se realizara exclusivamente por API REST (HTTP/JSON), bajo versionado `/api/v1/`.
@@ -210,6 +214,7 @@ icm_backend/
 │   ├── alerts/                                                 # Alertas operativas y monitoreo preventivo
 │   │   ├── tests/                                              # Pruebas del subdominio
 │   │   │   ├── test_commands.py                                # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_detail_resolve.py                          # Cobertura crítica del módulo
 │   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
 │   │   │   ├── test_new_alert_types.py                         # Reglas de negocio y transacciones del dominio
 │   │   │   ├── test_polling.py                                 # Cobertura crítica del módulo
@@ -320,16 +325,20 @@ icm_backend/
 │   │   ├── README_ATRIBUTOS_CALIDAD.md                         # Documento técnico relevante
 │   │   ├── README_RESTRICCIONES.md                             # Documento técnico relevante
 │   │   └── INFORME_COMPLETITUD_PRINCIPIOS_Y_CALIDAD.md         # Documento técnico relevante
-│   ├── architecture/                                           # Síntesis arquitectónica: drivers, Utility Tree y ADRs
+│   ├── architecture/                                           # Síntesis arquitectónica: drivers, Utility Tree, ADRs, patrones y SOLID
 │   │   ├── architecture_drivers.md                             # Drivers arquitectónicos priorizados
 │   │   ├── utility_tree.md                                     # Utility Tree con escenarios y trade-offs
 │   │   ├── architectural_constraints.md                        # Restricciones arquitectónicas y riesgos
-│   │   └── adr_relationships.md                                # Trazabilidad entre drivers y ADRs
+│   │   ├── adr_relationships.md                                # Trazabilidad entre drivers y ADRs
+│   │   ├── design-patterns.md                                  # Catálogo de patrones de diseño aplicados (10 patrones documentados)
+│   │   └── solid-principles.md                                 # Análisis SOLID con evidencia de código y oportunidades de mejora
 │   ├── guias/                                                  # Guías operativas del proyecto
 │   │   ├── ENV_GUIDE.md                                        # Guía completa de variables de entorno
 │   │   └── SEED_DB.md                                          # Guía de carga de datos semilla
 │   ├── CI/                                                     # Runbook operativo de CI/CD
 │   │   └── README_CICD.md                                      # Runbook CI/CD: pipelines, despliegue, backups y rollback
+│   ├── docker/                                                 # Documento arquitectónico relevante
+│   │   └── README_DOCKER.md                                    # Documento técnico relevante
 │   ├── evidence/                                               # Documento arquitectónico relevante
 │   │   └── README.md                                           # Documento técnico relevante
 │   ├── system_behavior/                                        # Documento arquitectónico relevante
@@ -342,7 +351,7 @@ icm_backend/
 │   │   ├── catalog/                                            # Catálogo, SKUs definidos por usuario y validación de productos
 │   │   │   ├── README_CATALOG.md                               # Documento técnico relevante
 │   │   │   └── README_PRODUCT_SERIAL.md                        # Documento técnico relevante
-│   │   ├── dashboard/                                          # Read model operacional para UI ejecutiva (solo almacenista)
+│   │   ├── dashboard/                                          # Aplicación Django detectada automáticamente
 │   │   │   └── README_DASHBOARD.md                             # Documento técnico relevante
 │   │   ├── inventory/                                          # Consulta de stock en tiempo real
 │   │   │   └── README_INVENTORY.md                             # Documento técnico relevante
@@ -351,7 +360,7 @@ icm_backend/
 │   │   ├── pricing/                                            # Documento arquitectónico relevante
 │   │   │   ├── Plan Arquitectura de Precios y Facturación — Sistema Inventario ICM.md  # Documento técnico relevante
 │   │   │   └── README_PRECIOS_FACTURACION.md                   # Documento técnico relevante
-│   │   ├── purchasing/                                         # Proveedores, órdenes de compra y recepciones (solo almacenista)
+│   │   ├── purchasing/                                         # Aplicación Django detectada automáticamente
 │   │   │   └── README_PURCHASING.md                            # Documento técnico relevante
 │   │   ├── reports/                                            # Reportes e indicadores operativos
 │   │   │   └── README_REPORTS.md                               # Documento técnico relevante
@@ -359,7 +368,7 @@ icm_backend/
 │   │   │   ├── README_LOCATION_STATES.md                       # Documento técnico relevante
 │   │   │   ├── README_STORAGE_DOMAIN.md                        # Documento técnico relevante
 │   │   │   └── README_STORAGE_TYPES.md                         # Documento técnico relevante
-│   │   ├── webhooks/                                           # Suscripción y entrega de eventos externos (solo almacenista)
+│   │   ├── webhooks/                                           # Aplicación Django detectada automáticamente
 │   │   │   └── README_WEBHOOKS.md                              # Documento técnico relevante
 │   │   └── index.md                                            # Documento técnico relevante
 │   └── GUIA_ONBOARDING.md                                      # Documento técnico relevante
@@ -377,14 +386,15 @@ icm_backend/
 │   │   └── locustfile.py
 │   ├── security/
 │   │   └── run_security_scan.py
-│   └── seed_db/
-│       ├── clean.py                                            # Limpieza de la base de datos del seed
-│       ├── config.py                                           # Datos estáticos del seed unificado
-│       ├── env.py
-│       ├── run.py                                              # Punto de entrada ejecutable
-│       └── seeder.py                                           # Lógica principal del seed
+│   ├── seed_db/
+│   │   ├── clean.py                                            # Limpieza de la base de datos del seed
+│   │   ├── config.py                                           # Datos estáticos del seed unificado
+│   │   ├── env.py
+│   │   ├── run.py                                              # Punto de entrada ejecutable
+│   │   └── seeder.py                                           # Lógica principal del seed
+│   └── _verify_neon.py
 ├── shared/                                                     # Código transversal reutilizable
-│   ├── models.py                                               # BaseModel + SoftDeleteModel (borrado lógico)
+│   ├── models.py                                               # BaseModel y metadatos comunes
 │   ├── permissions.py                                          # Permisos base y reutilizables
 │   ├── exceptions.py                                           # Excepciones tipadas del sistema
 │   ├── mixins.py                                               # Mixins transversales para vistas
@@ -392,11 +402,12 @@ icm_backend/
 │   ├── openapi.py                                              # Tags OpenAPI y contratos compartidos
 │   ├── email_service.py                                        # Servicio de email desacoplado (porta-adaptador SMTP)
 │   ├── utils/                                                  # Utilidades transversales
-│   │   ├── db.py                                               # get_for_update_or_404, helpers de BD
 │   │   └── validators.py                                       # Validadores reutilizables
 │   ├── audit.py
 │   ├── exporters.py
 │   ├── location_validators.py
+│   ├── logging_formatters.py
+│   ├── media_views.py
 │   └── operating_hours.py
 ├── tests/                                                      # Tests de integración cross-módulo
 │   ├── factories.py                                            # Factories de datos de prueba
@@ -419,6 +430,7 @@ icm_backend/
 │   │   ├── test_run_security_scan.py                           # Cobertura crítica del módulo
 │   │   └── test_seed_db.py                                     # Cobertura crítica del módulo
 │   └── shared/                                                 # Código transversal reutilizable
+│       ├── test_db_utils.py                                    # Cobertura crítica del módulo
 │       └── test_location_validators.py                         # Cobertura crítica del módulo
 ├── docker-compose.prod.yml                                     # Orquestación de producción
 ├── docker-compose.yml                                          # Orquestación local del stack

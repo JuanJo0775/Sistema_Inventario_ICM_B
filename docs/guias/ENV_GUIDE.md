@@ -1,241 +1,180 @@
 # Guía de Variables de Entorno — Sistema Inventario ICM
 
-Esta guía explica cada variable del archivo `.env.example` y cómo configurarlas para desarrollo local, staging y producción.
+## Estructura de archivos
 
-## Cómo empezar
+El proyecto usa archivos `.env` segregados por entorno. Cada uno se carga automáticamente según `DJANGO_SETTINGS_MODULE`:
+
+```
+Proyecto/
+├── .env.development           # Variables reales de desarrollo (ignorado por git)
+├── .env.production            # Variables reales de producción (ignorado por git)
+├── .env                       # Fallback legacy (ignorado por git)
+├── .env.development.example   # Template público de desarrollo (versionado)
+├── .env.production.example    # Template público de producción (versionado)
+└── .env.example               # Referencia general (versionado)
+```
+
+## Cómo funciona el switch
+
+`DJANGO_SETTINGS_MODULE` determina qué `.env` se carga. Es automático según el entry point:
+
+| Entry point | Default DJANGO_SETTINGS_MODULE | .env cargado |
+|---|---|---|
+| `python manage.py runserver` | `config.settings.development` | `.env.development` |
+| `gunicorn config.wsgi` | `config.settings.production` | `.env.production` |
+| `uvicorn config.asgi` | `config.settings.production` | `.env.production` |
+
+Para forzar un entorno manualmente:
 
 ```bash
-# Copiar la plantilla al archivo real
-copy .env.example .env      # Windows
-cp .env.example .env        # macOS/Linux
+# PowerShell
+$env:DJANGO_SETTINGS_MODULE="config.settings.production"; python manage.py shell
+
+# CMD
+set DJANGO_SETTINGS_MODULE=config.settings.production && python manage.py shell
+
+# Git Bash / Linux
+DJANGO_SETTINGS_MODULE=config.settings.production python manage.py shell
 ```
 
-El archivo `.env` **nunca** se sube al repositorio (está en `.gitignore`). El archivo `.env.example` sí — es la plantilla pública sin secretos reales.
+## Primer arranque (desarrollo local)
 
----
+```bash
+# 1. Copiar la plantilla de desarrollo
+cp .env.development.example .env.development
 
-## 1. Django Core
+# 2. Ajustar credenciales si es necesario (BD local, email, etc.)
+#    Por defecto ya funciona con PostgreSQL local sin cambios.
+
+# 3. Crear la base de datos (una sola vez)
+psql -U postgres -c "CREATE DATABASE icm_db;"
+psql -U postgres -c "CREATE USER icm_user WITH PASSWORD 'icm_password';"
+psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE icm_db TO icm_user;"
+
+# 4. Migrar y crear usuario inicial
+python manage.py migrate
+python manage.py create_almacenista
+
+# 5. (Opcional) Cargar datos de prueba
+python scripts/seed_db/run.py
+
+# 6. Iniciar servidor
+python manage.py runserver
+```
+
+## Variables por sección
+
+### Django Core
+
+| Variable | Default dev | Default prod | Descripción |
+|---|---|---|---|
+| `DJANGO_SECRET_KEY` | `insecure-dev-key-...` | *(requerido)* | Clave para firmar sesiones, CSRF, tokens. **Generar segura en producción.** |
+| `DJANGO_DEBUG` | `True` | `False` | `True` muestra trazas de error. `False` obligatorio en producción. |
+| `DJANGO_ALLOWED_HOSTS` | `localhost,127.0.0.1,0.0.0.0` | `api.icm.com.co` | Hosts que Django acepta, separados por coma. |
+
+**Generar secret key para producción:**
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+### Base de datos
+
+| Variable | Default dev | Default prod | Descripción |
+|---|---|---|---|
+| `DB_PROVIDER` | `local` | `neon` | `local` = PostgreSQL directo, `neon` = Neon Tech cloud |
+
+**Cuando DB_PROVIDER=local:**
 
 | Variable | Default | Descripción |
-|---|---|---|
-| `DJANGO_SECRET_KEY` | *(inseguro)* | Clave criptográfica para firmar sesiones, CSRF y tokens. **Cambiar obligatoriamente en producción.** |
-| `DJANGO_DEBUG` | `True` (development) / `False` (base) | `True` en desarrollo muestra trazas de error completas. `False` en producción (obligatorio). El default en `base.py` es `False`; `development.py` lo sobreescribe a `True`. |
-| `DJANGO_ALLOWED_HOSTS` | `localhost,127.0.0.1` | Hosts que el servidor acepta. En producción: el dominio real, ej. `tuapp.com,www.tuapp.com`. El default en `base.py` es `localhost,127.0.0.1`; `development.py` usa `*`. |
-| `DJANGO_SETTINGS_MODULE` | `config.settings.development` | Módulo de settings a cargar. Opciones: `development`, `test`, `production`. |
-
-**Producción:**
-```
-DJANGO_SECRET_KEY=<genera con: python -c "import secrets; print(secrets.token_urlsafe(50))">
-DJANGO_DEBUG=False
-DJANGO_ALLOWED_HOSTS=tuapp.com,www.tuapp.com
-DJANGO_SETTINGS_MODULE=config.settings.production
-```
-
----
-
-## 2. Base de datos (PostgreSQL)
-
-| Variable | Default local | Descripción |
 |---|---|---|
 | `DB_NAME` | `icm_db` | Nombre de la base de datos |
-| `DB_USER` | `icm_user` | Usuario de PostgreSQL |
-| `DB_PASSWORD` | `icm_password` | Contraseña del usuario |
-| `DB_HOST` | `localhost` | Host de PostgreSQL. En Docker: nombre del servicio, ej. `db` |
-| `DB_PORT` | `5432` | Puerto de PostgreSQL |
+| `DB_USER` | `icm_user` | Usuario PostgreSQL |
+| `DB_PASSWORD` | `icm_password` | Contraseña |
+| `DB_HOST` | `localhost` | Host (en Docker: nombre del servicio `db`) |
+| `DB_PORT` | `5432` | Puerto |
 
-**Crear la BD local (una sola vez):**
-```sql
-CREATE DATABASE icm_db;
-CREATE USER icm_user WITH PASSWORD 'icm_password';
-GRANT ALL PRIVILEGES ON DATABASE icm_db TO icm_user;
-```
+**Cuando DB_PROVIDER=neon:**
 
----
+| Variable | Ejemplo | Descripción |
+|---|---|---|
+| `DATABASE_URL` | `postgresql://user:pass@ep-xxxx.sa-east-1.aws.neon.tech/db?sslmode=require` | URL completa de conexión a Neon |
 
-## 3. JWT (tokens de acceso)
+### Email (SMTP Gmail)
 
 | Variable | Default | Descripción |
 |---|---|---|
-| `JWT_ACCESS_TOKEN_LIFETIME_MINUTES` | `60` | Vida del access token en minutos. En dev se sobreescribe a 24 h. |
-| `JWT_REFRESH_TOKEN_LIFETIME_DAYS` | `7` | Vida del refresh token en días. En dev se sobreescribe a 30 días. |
+| `EMAIL_HOST` | `smtp.gmail.com` | Servidor SMTP |
+| `EMAIL_PORT` | `587` | Puerto TLS |
+| `EMAIL_USE_TLS` | `True` | Usar TLS |
+| `EMAIL_HOST_USER` | — | Correo electrónico de la cuenta |
+| `EMAIL_HOST_PASSWORD` | — | App password de Google |
 
-En producción usa valores más cortos para el access token (15–30 min) y activa la rotación de refresh tokens.
+> **Importante:** Gmail requiere una *App Password* (no la contraseña normal de la cuenta).
+> Generar en: Cuenta Google → Seguridad → Verificación en dos pasos → Contraseñas de aplicación.
 
----
+El email se usa exclusivamente para el flujo de recuperación de contraseña (`forgot-password`). Se envía en formato HTML con branding de ICM LogiStock.
 
-## 4. Aplicación
+### JWT
 
-| Variable | Default | Descripción |
-|---|---|---|
-| `APP_TIMEZONE` | `America/Bogota` | Zona horaria del negocio. Usada en restricciones horarias del `auxiliar_despacho`. |
-| `INVOICE_SEQUENCE_PREFIX` | `ICM` | Prefijo de numeración de facturas (`ICM-0001`, `ICM-0002`, …). |
+| Variable | Default dev | Default prod | Descripción |
+|---|---|---|---|
+| `JWT_ACCESS_TOKEN_LIFETIME_MINUTES` | `1440` (24 h) | `60` (1 h) | Vida del access token |
+| `JWT_REFRESH_TOKEN_LIFETIME_DAYS` | `30` | `7` | Vida del refresh token |
 
----
+En desarrollo los tokens son más largos para no re-loguearse seguido. En producción deben ser cortos por seguridad.
 
-## 5. Usuario inicial (seed)
+### Aplicación
 
-Estas variables las usa el comando `python manage.py create_almacenista` para crear el primer usuario del sistema.
+| Variable | Default dev | Default prod | Descripción |
+|---|---|---|---|
+| `APP_TIMEZONE` | `America/Bogota` | `America/Bogota` | Zona horaria del negocio |
+| `INVOICE_SEQUENCE_PREFIX` | `ICM` | `ICM` | Prefijo de facturas (`ICM-0001`) |
+| `FRONTEND_URL` | `http://localhost:5173` | `https://app.icm.com.co` | URL del frontend para emails de recuperación |
+| `PASSWORD_RESET_TOKEN_EXPIRY_MINUTES` | `60` | `10` | Minutos de validez del token de reset |
+
+### CORS
+
+| Variable | Default dev | Default prod | Descripción |
+|---|---|---|---|
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:3000,http://localhost:5173,http://localhost:8000` | `https://app.icm.com.co` | Orígenes permitidos separados por coma |
+
+En desarrollo `development.py` sobreescribe `CORS_ALLOW_ALL_ORIGINS=True`, lo que permite cualquier origen sin importar esta variable.
+
+### Seed / Usuario inicial
 
 | Variable | Default | Descripción |
 |---|---|---|
 | `ALMACENISTA_USERNAME` | `almacenista` | Username del usuario inicial |
 | `ALMACENISTA_EMAIL` | `almacenista@icm.local` | Email del usuario inicial |
-| `ALMACENISTA_PASSWORD` | — | **Obligatorio.** Contraseña segura. Vacío = el comando falla con error explicativo. |
+| `ALMACENISTA_PASSWORD` | *(requerido)* | Contraseña. **Cambiar por una segura en producción.** |
 
-**Flujo de primer arranque:**
+## Producción — checklist de configuración
+
+Antes de desplegar, verificar:
+
+1. **`DJANGO_SECRET_KEY`** — Generar clave segura (no usar la de desarrollo)
+2. **`DJANGO_DEBUG=False`** — Obligatorio
+3. **`DJANGO_ALLOWED_HOSTS`** — Dominio real de producción
+4. **Base de datos** — Configurar `DB_PROVIDER` y credenciales correspondientes
+5. **Email** — Configurar Gmail con app password
+6. **`FRONTEND_URL`** — URL real del frontend
+7. **`CORS_ALLOWED_ORIGINS`** — Solo el dominio de producción
+8. **`ALMACENISTA_PASSWORD`** — Contraseña segura
+
 ```bash
-# 1. Configurar .env con ALMACENISTA_PASSWORD
-# 2. Aplicar migraciones
-python manage.py migrate
-# 3. Crear el almacenista inicial
-python manage.py create_almacenista
-# 4. (Opcional) Cargar datos de prueba
-python scripts/seed_db/run.py
+cp .env.production.example .env.production
+# Editar .env.production con valores reales
 ```
 
----
+## Tests
 
-## 6. Email (Mailtrap Sandbox / SMTP)
+La suite de tests usa `config/settings/test.py` con `django.core.mail.backends.locmem.EmailBackend` — los emails nunca salen a la red, se capturan en `django.core.mail.outbox`. No se necesita configuración SMTP para correr `pytest`.
 
-El sistema envía emails en el flujo de recuperación de contraseña (`forgot-password`).
+## Variables futuras (no implementar aún)
 
-| Variable | Desarrollo | Producción |
-|---|---|---|
-| `EMAIL_HOST` | `sandbox.smtp.mailtrap.io` | `smtp.gmail.com`, `smtp.mailgun.org`, etc. |
-| `EMAIL_HOST_USER` | *(credencial Mailtrap)* | Cuenta del proveedor real |
-| `EMAIL_HOST_PASSWORD` | *(credencial Mailtrap)* | Contraseña / API key del proveedor |
-| `EMAIL_PORT` | `2525` | `587` (TLS) o `465` (SSL) en la mayoría de proveedores |
-| `EMAIL_USE_TLS` | `True` | `True` para TLS (puerto 587), `False` para SSL directo |
-| `DEFAULT_FROM_EMAIL` | `noreply@icm.local` | Dirección remitente que el destinatario ve |
-
-### Mailtrap Sandbox (desarrollo)
-
-[Mailtrap](https://mailtrap.io) es un servidor SMTP ficticio: recibe los emails pero no los entrega realmente. Útil para probar el flujo sin spam real.
-
-1. Registrarse en mailtrap.io → abrir el inbox de sandbox → copiar credenciales SMTP.
-2. Pegar en `.env`:
-```
-EMAIL_HOST=sandbox.smtp.mailtrap.io
-EMAIL_HOST_USER=<tu_user_mailtrap>
-EMAIL_HOST_PASSWORD=<tu_pass_mailtrap>
-EMAIL_PORT=2525
-EMAIL_USE_TLS=True
-```
-3. Al llamar `POST /api/v1/auth/forgot-password/` el email aparece en el inbox de Mailtrap, no en un correo real.
-
-### Tests automáticos
-
-Los tests usan `django.core.mail.backends.locmem.EmailBackend` (configurado en `config/settings/test.py`) — los emails nunca salen a la red; se capturan en `django.core.mail.outbox`. No se necesita Mailtrap para correr la suite.
-
-### Gmail (producción rápida)
-
-```
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
-EMAIL_HOST_USER=tu-cuenta@gmail.com
-EMAIL_HOST_PASSWORD=<app-password-de-google>
-DEFAULT_FROM_EMAIL=noreply@tuapp.com
-```
-
-> Google requiere una *App Password* (no la contraseña normal de la cuenta). Se genera en: Cuenta Google → Seguridad → Verificación en dos pasos → Contraseñas de aplicación.
-
-### Formato del email
-
-Desde junio 2026, el email de recuperación de contraseña se envía en **formato HTML** con:
-- Encabezado "ICM LogiStock" en color `#1a6b72`
-- Botón "Restablecer contraseña" estilizado
-- Enlace de respaldo "haz clic aquí" en color `#e07b39`
-- Versión texto plano como fallback automático
-
----
-
-
-
-## 7. Frontend
-
-| Variable | Default | Descripción |
-|---|---|---|
-| `FRONTEND_URL` | `http://localhost:5173` | URL base del frontend. El backend construye el link de reset de contraseña apuntando a esta URL: `{FRONTEND_URL}/reset-password?token=<token>`. En desarrollo con Vite el puerto por defecto es 5173 (no 3000). |
-
-**Producción:**
-```
-FRONTEND_URL=https://tuapp.com
-```
-
-El link del email de recuperación queda: `https://tuapp.com/reset-password?token=<raw_token>`.
-
----
-
-## 8. Token de recuperación de contraseña
-
-| Variable | Default | Descripción |
-|---|---|---|
-| `PASSWORD_RESET_TOKEN_EXPIRY_MINUTES` | `10` | Minutos de validez del token de reset. Pasado este tiempo el link del email queda inválido y el usuario debe solicitar uno nuevo. |
-
-Aumentar si los usuarios reportan que el link llega expirado (correos lentos). El mínimo recomendado es 10 min; el máximo razonable es 60 min.
-
----
-
-## 9. CORS
-
-| Variable | Default dev | Descripción |
-|---|---|---|
-| `CORS_ALLOWED_ORIGINS` | `http://localhost:3000,http://localhost:8000` | Orígenes permitidos. En desarrollo `CORS_ALLOW_ALL_ORIGINS=True` sobreescribe esto. |
-
-**Producción:**
-```
-CORS_ALLOWED_ORIGINS=https://tuapp.com,https://www.tuapp.com
-```
-
----
-
-## 10. Futuros (no implementados aún)
-
-Estas variables están comentadas en `.env.example` y **no deben descomentarse** hasta que los módulos correspondientes existan:
+Comentadas en los templates. No descomentar hasta que los módulos existan:
 
 ```
 # REDIS_URL=redis://localhost:6379/0
 # CELERY_BROKER_URL=redis://localhost:6379/0
-```
-
-Se necesitarán si se añade procesamiento de tareas en background (envío de emails asíncrono, exportaciones pesadas, etc.).
-
----
-
-## Resumen rápido para desarrollo local
-
-Copia esto en tu `.env` y ajusta solo las credenciales de BD:
-
-```
-DJANGO_SECRET_KEY=dev-key-no-segura
-DJANGO_DEBUG=True
-DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
-DJANGO_SETTINGS_MODULE=config.settings.development
-
-DB_NAME=icm_db
-DB_USER=icm_user
-DB_PASSWORD=icm_password
-DB_HOST=localhost
-DB_PORT=5432
-
-JWT_ACCESS_TOKEN_LIFETIME_MINUTES=60
-JWT_REFRESH_TOKEN_LIFETIME_DAYS=7
-
-APP_TIMEZONE=America/Bogota
-INVOICE_SEQUENCE_PREFIX=ICM
-
-ALMACENISTA_USERNAME=almacenista
-ALMACENISTA_EMAIL=almacenista@icm.local
-ALMACENISTA_PASSWORD=ICM@Admin2026!
-
-EMAIL_HOST=sandbox.smtp.mailtrap.io
-EMAIL_HOST_USER=<tu_user_mailtrap>
-EMAIL_HOST_PASSWORD=<tu_pass_mailtrap>
-EMAIL_PORT=2525
-EMAIL_USE_TLS=True
-DEFAULT_FROM_EMAIL=noreply@icm.local
-
-FRONTEND_URL=http://localhost:5173
-PASSWORD_RESET_TOKEN_EXPIRY_MINUTES=10
 ```

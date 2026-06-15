@@ -336,28 +336,29 @@ Cada subcategoría tiene su propia numeración: `SCR-*` para scripts, `SHA-*` pa
 
 ## Estado actual de la suite
 
-**~846 tests · 603 app-level · 138 Gherkin · 105 auxiliares** _(2026-06-14, recuento de funciones `def test_`)_
+**~862 tests · 620 app-level · 138 Gherkin · 104 auxiliares** _(2026-06-15, recuento de funciones `def test_`)_
 
 | Capa | Tests | Estado |
 |------|-------|--------|
-| App-level (unit/integration por app) | 603 | Cobertura medida por `--cov=apps` |
+| App-level (unit/integration por app) | 620 | Cobertura medida por `--cov=apps` |
 | Gherkin/ERS (RF001–RF025, RNF003–RNF006) | 138 run | 131 passed, 7 skipped (6 frontend/E2E + 1 WeasyPrint) |
 | Integración cross-domain | 19 | 19 tests en 4 archivos |
 | Concurrencia | 4 | Requieren `RUN_CONCURRENCY_TESTS=1` + PostgreSQL |
-| Scripts / Shared / SLA | 81 | 70 scripts + 8 shared + 4 SLA |
+| Scripts / Shared / SLA | 92 | 75 scripts + 13 shared + 4 SLA |
 
-**Cobertura técnica (medida 2026-06-14):** 91% exacto · 12709 statements · 11606 cubiertos · 1103 perdidos
+**Cobertura técnica (medida 2026-06-14):** 91% exacto · 12709 statements · 11606 cubiertos · 1103 perdidos  
+**Ejecución validada 2026-06-15:** 862 passed, 12 skipped, 0 fallos
 
 | App | Cobertura prod | Tests |
 |-----|---------------|-------|
 | dashboard | 97% | 17 |
-| purchasing | 93% | 98 |
+| purchasing | 93% | 103 |
 | authentication | 88% | 84 |
 | alerts | 87% | 61 |
 | audit | 87% | 15 |
 | movements | 87% | 99 |
 | reports | 85% | 46 |
-| catalog | 84% | 124 |
+| catalog | 84% | 125 |
 | webhooks | 83% | 25 |
 | inventory | 74% | 45 |
 

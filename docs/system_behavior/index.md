@@ -28,3 +28,14 @@ Este directorio describe el comportamiento detallado de cada módulo del sistema
 - **Transacciones**: toda operación de escritura usa `@transaction.atomic` y `select_for_update()` donde hay riesgo de concurrencia
 - **Soft delete**: entidades del sistema usan `SoftDeleteModel` (`shared.models`) con `deleted_at` para existencia lógica; `is_active` controla disponibilidad para reglas de negocio (nunca mezclar)
 - **Lock utility**: `get_for_update_or_404()` (`shared.utils.db`) para obtener objetos con `select_for_update()` o lanzar 404
+
+## Documentación de arquitectura transversal
+
+Los patrones y principios que aplican a **todos** los módulos listados arriba están documentados aquí:
+
+| Documento | Propósito |
+|-----------|-----------|
+| [architecture/design-patterns.md](../architecture/design-patterns.md) | Catálogo de 10 patrones de diseño: Service Layer, Selector, Strategy, Observer, Facade, Composite, etc. |
+| [architecture/solid-principles.md](../architecture/solid-principles.md) | Análisis SOLID con evidencia de código por principio y oportunidades de mejora |
+| [architecture/adr_relationships.md](../architecture/adr_relationships.md) | Trazabilidad driver → decisión → ADR |
+| [README_ARQUITECTURA.md](../README_ARQUITECTURA.md) | Arquitectura consolidada: capas, ledger, Docker, testing |

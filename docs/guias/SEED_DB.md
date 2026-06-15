@@ -11,29 +11,30 @@ El seed carga **214 productos en 11 categorías**, stock en 4 ubicaciones (bodeg
 ## Requisitos previos
 
 - Entorno virtual activado (`.venv`)
-- Variables de entorno correctas en `.env` (ver [ENV_GUIDE.md](ENV_GUIDE.md))
+- Variables de entorno correctas en `.env.development` o `.env.production` (ver [ENV_GUIDE.md](ENV_GUIDE.md))
 - Base de datos accesible (`DB_PROVIDER=local` o `DB_PROVIDER=neon`)
 
 ---
 
-## Flujo completo (primera vez)
+## Inicio rápido
+
+### Desarrollo (PostgreSQL local)
+
+Un solo comando:
 
 ```powershell
-# 1. Activar entorno virtual
-.\.venv\Scripts\Activate.ps1          # PowerShell
-# source .venv/bin/activate           # bash/zsh (Linux/Mac)
-
-# 2. Aplicar migraciones
-python manage.py migrate
-
-# 3. Crear usuario almacenista inicial
-python manage.py create_almacenista
-
-# 4. Seed completo
-python scripts/seed_db/run.py
+python manage.py migrate && python manage.py create_almacenista && python scripts/seed_db/run.py
 ```
 
-El paso 4 tarda ~1 min en local y ~5–10 min contra Neon (latencia de red).
+### Producción (Neon)
+
+Un solo comando:
+
+```powershell
+python manage.py migrate --settings=config.settings.production && python manage.py create_almacenista --settings=config.settings.production && python scripts/seed_db/run.py --production
+```
+
+El seed tarda ~1 min en local y ~5–10 min contra Neon (latencia de red).
 
 ---
 
@@ -53,14 +54,28 @@ python scripts/seed_db/run.py
 
 ## Comandos de referencia
 
+### Desarrollo
+
 | Comando | Qué hace |
 |---------|----------|
-| `python manage.py migrate` | Crea/actualiza todas las tablas en la BD |
+| `python manage.py migrate` | Crea/actualiza todas las tablas en BD local |
 | `python manage.py create_almacenista` | Crea el usuario `almacenista` (idempotente) |
 | `python scripts/seed_db/run.py` | Seed completo fases 1–23 (idempotente) |
 | `python scripts/seed_db/run.py --force` | Regenera movimientos aunque ya existan |
 | `python scripts/seed_db/clean.py` | Limpia datos del seed (pide confirmación) |
 | `python scripts/seed_db/clean.py --confirm` | Limpia sin prompt interactivo |
+
+### Producción (Neon)
+
+Todos los comandos de `manage.py` aceptan `--settings=config.settings.production` para apuntar a la base de producción:
+
+| Comando | Qué hace |
+|---------|----------|
+| `python manage.py migrate --settings=config.settings.production` | Migra la base de producción |
+| `python manage.py create_almacenista --settings=config.settings.production` | Crea almacenista en producción |
+| `python scripts/seed_db/run.py --production` | Seed contra base de producción |
+| `python scripts/seed_db/run.py --production --force` | Regenera movimientos en producción |
+| `python scripts/seed_db/clean.py --production --confirm` | Limpia base de producción |
 
 ---
 
@@ -116,13 +131,32 @@ DATABASE_URL=postgresql://usuario:clave@host/neondb?sslmode=require
 
 ## Troubleshooting
 
+## Seguridad: `--production`
+
+Los scripts `run.py` y `clean.py` están diseñados para correr **solo en desarrollo por defecto**. Si detectan `DJANGO_SETTINGS_MODULE=config.settings.production` sin el flag `--production`, se detienen con error.
+
+Para ejecutar contra producción (Neon), el flag `--production` debe agregarse explícitamente:
+
+```bash
+# ✅ Correcto — explícito
+python scripts/seed_db/run.py --production
+python scripts/seed_db/clean.py --production --confirm
+
+# ❌ Error — se bloquea con mensaje
+# DJANGO_SETTINGS_MODULE=config.settings.production python scripts/seed_db/run.py
+```
+
+Esto evita que un seed accidental se ejecute contra la base de producción.
+El flag `--production` carga automáticamente `.env.production` con tu `DATABASE_URL` de Neon.
+
+---
+
 ### `no such table: authentication_user` (SQLite en vez de Neon/PostgreSQL)
 
-**Causa:** PyCharm inyecta `DJANGO_SETTINGS_MODULE=config.settings.test` en la terminal al leer `pytest.ini`. El script detecta la variable ya puesta y usa SQLite en memoria.
+**Causa:** PyCharm inyecta `DJANGO_SETTINGS_MODULE=config.settings.test` en la terminal al leer `pytest.ini`.
 
-**Solución:** Los scripts `run.py` y `clean.py` ya están corregidos para forzar siempre `config.settings.development`. Si el problema persiste, verifica que tienes la versión actualizada de los scripts.
+**Solución:** Los scripts `run.py` y `clean.py` fuerzan `config.settings.development` por defecto. Si el problema persiste:
 
-Como alternativa temporal en la terminal:
 ```powershell
 $env:DJANGO_SETTINGS_MODULE = "config.settings.development"
 python scripts/seed_db/run.py

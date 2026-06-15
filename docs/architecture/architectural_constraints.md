@@ -120,3 +120,13 @@ Esta sección presenta las restricciones en el formato requerido por el entregab
 - **Descripción:** El sistema maneja datos de clientes (nombre, contacto en despachos). La Ley 1581 de Habeas Data de Colombia exige consentimiento para el tratamiento de datos personales y restringe su exposición a terceros no autorizados.
 - **Impacto en diseño:** Obliga a restringir la exposición de datos personales a roles autorizados (no todos los reportes pueden incluir nombres de cliente). Exige que el AuditLog registre quién accedió a datos sensibles. Condiciona el diseño de los serializers de despacho para no exponer datos innecesarios. Referenciado en RNF-006 del ERS.
 - **ADR vinculado:** ADR-007 (RBAC con permisos componibles, incluyendo restricción de datos por rol). Si no existe un ADR específico de privacidad, debe crearse para el Corte 2.
+
+---
+
+## Ver también
+
+- [design-patterns.md](design-patterns.md) — cómo se materializan estas restricciones en código (Service Layer para la restricción de lógica en services, Strategy para RBAC, Facade para select_for_update, etc.).
+- [solid-principles.md](solid-principles.md) — evidencia de SRP, OCP y DIP que sostienen las restricciones estructurales.
+- [adr_relationships.md](adr_relationships.md) — trazabilidad completa driver → problema → ADR.
+- [architecture_drivers.md](architecture_drivers.md) — drivers que justifican estas restricciones.
+- [docs/calidad_restricciones/README_RESTRICCIONES.md](../calidad_restricciones/README_RESTRICCIONES.md) — catálogo operativo de restricciones no funcionales.
