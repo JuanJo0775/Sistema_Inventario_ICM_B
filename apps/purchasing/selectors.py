@@ -9,8 +9,14 @@ from django.db.models import QuerySet
 from .models import PurchaseOrder, Reception, Supplier
 
 
-def get_suppliers(*, is_active: bool | None = None) -> QuerySet:
+def get_suppliers(
+    *,
+    is_active: bool | None = None,
+    include_archived: bool = False,
+) -> QuerySet:
     qs = Supplier.objects.select_related("created_by").order_by("nombre_comercial")
+    if not include_archived:
+        qs = qs.filter(deleted_at__isnull=True)
     if is_active is not None:
         qs = qs.filter(is_active=is_active)
     return qs

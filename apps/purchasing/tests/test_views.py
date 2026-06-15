@@ -115,6 +115,77 @@ def test_deactivate_supplier(authenticated_almacenista_client):
     assert response.data["is_active"] is False
 
 
+@pytest.mark.django_db
+def test_supplier_soft_delete_returns_204(authenticated_almacenista_client):
+    supplier = SupplierFactory(is_active=True)
+    response = authenticated_almacenista_client.delete(
+        f"/api/v1/purchasing/suppliers/{supplier.id}/"
+    )
+    assert response.status_code == 204
+    supplier.refresh_from_db()
+    assert supplier.deleted_at is not None
+    assert supplier.is_active is False
+
+
+@pytest.mark.django_db
+def test_supplier_restore_after_soft_delete(authenticated_almacenista_client):
+    supplier = SupplierFactory(is_active=True)
+    authenticated_almacenista_client.delete(
+        f"/api/v1/purchasing/suppliers/{supplier.id}/"
+    )
+    response = authenticated_almacenista_client.post(
+        f"/api/v1/purchasing/suppliers/{supplier.id}/restore/"
+    )
+    assert response.status_code == 200
+    assert response.data["is_active"] is True
+    assert response.data["deleted_at"] is None
+
+
+@pytest.mark.django_db
+def test_supplier_disable_enable_cycle(authenticated_almacenista_client):
+    supplier = SupplierFactory(is_active=True)
+
+    # disable
+    r_disable = authenticated_almacenista_client.post(
+        f"/api/v1/purchasing/suppliers/{supplier.id}/disable/"
+    )
+    assert r_disable.status_code == 200
+    assert r_disable.data["is_active"] is False
+    assert r_disable.data["deleted_at"] is None  # no archivado
+
+    # enable
+    r_enable = authenticated_almacenista_client.post(
+        f"/api/v1/purchasing/suppliers/{supplier.id}/enable/"
+    )
+    assert r_enable.status_code == 200
+    assert r_enable.data["is_active"] is True
+    assert r_enable.data["deleted_at"] is None
+
+
+@pytest.mark.django_db
+def test_supplier_response_includes_deleted_at(authenticated_almacenista_client):
+    supplier = SupplierFactory(is_active=True)
+    response = authenticated_almacenista_client.get(
+        f"/api/v1/purchasing/suppliers/{supplier.id}/"
+    )
+    assert response.status_code == 200
+    assert "deleted_at" in response.data
+    assert response.data["deleted_at"] is None
+
+
+@pytest.mark.django_db
+def test_supplier_enable_blocked_when_archived(authenticated_almacenista_client):
+    supplier = SupplierFactory(is_active=True)
+    authenticated_almacenista_client.delete(
+        f"/api/v1/purchasing/suppliers/{supplier.id}/"
+    )
+    response = authenticated_almacenista_client.post(
+        f"/api/v1/purchasing/suppliers/{supplier.id}/enable/"
+    )
+    # enable en proveedor archivado debe fallar (usar /restore/ en su lugar)
+    assert response.status_code in (400, 409)
+
+
 # ---------------------------------------------------------------------------
 # PurchaseOrder endpoints
 # ---------------------------------------------------------------------------
