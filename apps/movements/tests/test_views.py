@@ -149,18 +149,24 @@ def test_corrections_endpoint_returns_201(
 
 @pytest.mark.django_db
 def test_auxiliar_can_create_entry(auxiliar_user, sample_product, sample_locations):
+    from datetime import datetime
+    from unittest.mock import patch
+    from zoneinfo import ZoneInfo
+
     client = APIClient()
     client.force_authenticate(user=auxiliar_user)
     loc = sample_locations[0]
-    response = client.post(
-        "/api/v1/movements/entries/",
-        {
-            "product_id": str(sample_product.id),
-            "location_id": str(loc.id),
-            "quantity": 2,
-        },
-        format="json",
-    )
+    _within_hours = datetime(2026, 5, 5, 9, 0, 0, tzinfo=ZoneInfo("America/Bogota"))
+    with patch("django.utils.timezone.now", return_value=_within_hours):
+        response = client.post(
+            "/api/v1/movements/entries/",
+            {
+                "product_id": str(sample_product.id),
+                "location_id": str(loc.id),
+                "quantity": 2,
+            },
+            format="json",
+        )
     assert response.status_code == status.HTTP_201_CREATED
 
 

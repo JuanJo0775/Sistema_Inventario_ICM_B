@@ -6,7 +6,7 @@ from uuid import UUID
 
 from rest_framework import serializers
 
-from apps.movements.models import Movement
+from apps.movements.models import Movement, MovementType
 
 
 class MovementSerializer(serializers.ModelSerializer):
@@ -102,7 +102,7 @@ class DispatchCreateSerializer(serializers.Serializer):
     product_id = serializers.UUIDField()
     location_id = serializers.UUIDField()
     quantity = serializers.IntegerField(min_value=1)
-    movement_type = serializers.CharField()
+    movement_type = serializers.ChoiceField(choices=MovementType.choices)
     lot_id = serializers.UUIDField(required=False, allow_null=True)
     scanned_code = serializers.CharField(
         required=False, allow_blank=True, allow_null=True

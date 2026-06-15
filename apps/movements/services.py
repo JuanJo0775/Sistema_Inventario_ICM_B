@@ -24,10 +24,12 @@ from shared.exceptions import (
     AlertAcknowledgementRequiredError,
     CrossValidationFailedError,
     DiscrepancyNoteRequiredError,
+    DomainValidationError,
     ImmutableRecordError,
     InsufficientStockError,
     LotCodeRequiredError,
     LotExpirationDateRequiredError,
+    LotMismatchError,
     PrivacyConsentRequiredError,
     ProductNotReturnableError,
     SerialNumberRequiredError,
@@ -89,7 +91,7 @@ def _resolve_serial_for_dispatch(
                 current_location_id=location_id,
             )
         except ProductSerial.DoesNotExist:
-            raise ValueError(
+            raise DomainValidationError(
                 f"Serial {serial_id} no disponible para producto {product.sku} "
                 f"en ubicación {location_id}."
             )
@@ -572,7 +574,7 @@ def register_entry(
             defaults={"expiration_date": lot_expiration_date},
         )
         if not created and lot.expiration_date != lot_expiration_date:
-            raise ValueError("Inconsistencia en fecha de vencimiento del lote.")
+            raise LotMismatchError()
 
     dest = _lock_stock(product_id, location_id)
     before = dest.current_stock
@@ -624,8 +626,8 @@ def register_entry(
     _log_alert_acknowledgement(
         user=user,
         movement=movement,
-        cold_chain_acknowledged=cold,
-        electrical_safety_acknowledged=electric,
+        cold_chain_acknowledged=cold_chain_acknowledged,
+        electrical_safety_acknowledged=electrical_safety_acknowledged,
     )
     check_and_create_alerts(product, location)
     return movement
@@ -668,7 +670,7 @@ def register_dispatch(
         MovementType.SALIDA_DANO,
         MovementType.SALIDA_VENCIMIENTO,
     }:
-        raise ValueError("Tipo de salida inválido.")
+        raise DomainValidationError("Tipo de salida inválido.")
 
     sc = (scanned_code or "").strip()
     osku = (order_sku or "").strip()
@@ -692,13 +694,17 @@ def register_dispatch(
             raise CrossValidationFailedError(
                 detail={"scanned": sc, "expected_product_id": str(product_id)},
             )
-        product = Product.objects.select_related("category").get(pk=product_id)
+        product = get_for_update_or_404(
+            Product.objects.select_related("category"), pk=product_id
+        )
         if product.sku != osku:
             raise CrossValidationFailedError(
                 detail={"resolved_sku": product.sku, "order_sku": osku}
             )
     else:
-        product = Product.objects.select_related("category").get(pk=product_id)
+        product = get_for_update_or_404(
+            Product.objects.select_related("category"), pk=product_id
+        )
 
     cold, electric = _requires_ack_flags(product)
     if cold and not cold_chain_acknowledged:
@@ -851,8 +857,8 @@ def register_dispatch(
             _log_alert_acknowledgement(
                 user=user,
                 movement=movement,
-                cold_chain_acknowledged=cold,
-                electrical_safety_acknowledged=electric,
+                cold_chain_acknowledged=cold_chain_acknowledged,
+                electrical_safety_acknowledged=electrical_safety_acknowledged,
             )
             remaining -= take
 
@@ -912,21 +918,16 @@ def register_dispatch(
         },
     )
 
-    # Crear el modelo Invoice consolidado con precio
-    try:
+    # Crear el modelo Invoice consolidado con precio (BR-13: parte de la transacción atómica)
+    if invoice_number is not None:
         create_invoice_from_movements(
             movements_created,
             user=user,
             invoice_number=invoice_number,
             customer_data=customer_snapshot,
         )
-    except Exception:
-        logger.exception(
-            "create_invoice_from_movements falló para invoice=%s; el despacho ya fue registrado.",
-            invoice_number,
-        )
 
-    # Emitir webhook dispatch.completed (falla silenciosamente)
+    # Emitir webhook dispatch.completed (falla silenciosamente — no bloquea el despacho)
     try:
         from apps.webhooks.services import queue_webhook_event
 
@@ -951,7 +952,7 @@ def register_dispatch(
                         else None
                     ),
                     "currency": first_m.currency,
-                    "customer": customer_snapshot,
+                    # RNF-006: no incluir PII del cliente en payloads de webhooks externos
                 },
             )
     except Exception:
@@ -1001,7 +1002,7 @@ def register_internal_transfer(
         StockMismatchError: Si el total consolidado cambia tras el traslado (bug / inconsistencia).
     """
     if origin_id == destination_id:
-        raise ValueError("Origen y destino deben ser distintos.")
+        raise DomainValidationError("Origen y destino deben ser distintos.")
 
     product = Product.objects.select_related("category").get(pk=product_id)
     resolved_serial = _resolve_serial_for_dispatch(product, origin_id, serial_id)
@@ -1014,7 +1015,7 @@ def register_internal_transfer(
     origin_location = locations.get(origin_id)
     destination_location = locations.get(destination_id)
     if origin_location is None or destination_location is None:
-        raise ValueError("Ubicación de origen o destino no existe.")
+        raise DomainValidationError("Ubicación de origen o destino no existe.")
     _ensure_location_allows_origin(origin_location, "internal_transfer")
     _ensure_location_allows_destination(destination_location, "internal_transfer")
     cold, electric = _requires_ack_flags(product)
@@ -1026,8 +1027,6 @@ def register_internal_transfer(
         raise AlertAcknowledgementRequiredError(
             "Debe reconocer la alerta de seguridad eléctrica."
         )
-
-    total_before = _consolidated_stock_total(product_id=product_id)
 
     selected_lot: Lot | None = None
     if getattr(product, "requires_expiration", False) and lot_id is not None:
@@ -1052,6 +1051,8 @@ def register_internal_transfer(
     first_id, second_id = sorted([origin_id, destination_id], key=lambda u: str(u))
     row_first = _lock_stock(product_id, first_id)
     row_second = _lock_stock(product_id, second_id)
+    # Compute total AFTER acquiring locks to get a consistent snapshot (ALTA-08)
+    total_before = _consolidated_stock_total(product_id=product_id)
     origin = row_first if row_first.location_id == origin_id else row_second
     dest = row_second if row_first.location_id == origin_id else row_first
 
@@ -1118,8 +1119,8 @@ def register_internal_transfer(
     _log_alert_acknowledgement(
         user=user,
         movement=movement,
-        cold_chain_acknowledged=cold,
-        electrical_safety_acknowledged=electric,
+        cold_chain_acknowledged=cold_chain_acknowledged,
+        electrical_safety_acknowledged=electrical_safety_acknowledged,
     )
     return movement
 
@@ -1158,7 +1159,7 @@ def register_return(
             )
             resolved_serial = ps.serial_number
         except ProductSerial.DoesNotExist:
-            raise ValueError(
+            raise DomainValidationError(
                 f"Serial {serial_id} no existe para producto {product.sku}."
             )
     elif product.category.requires_serial_number:
@@ -1170,7 +1171,7 @@ def register_return(
             Movement.objects.select_for_update().filter(pk=related_movement_id).first()
         )
         if related is None:
-            raise ValueError("related_movement_id no existe.")
+            raise DomainValidationError("related_movement_id no existe.")
 
     selected_lot: Lot | None = None
     if getattr(product, "requires_expiration", False) and lot_id is not None:
@@ -1248,6 +1249,11 @@ def register_adjustment(
     product = Product.objects.select_related("category").get(pk=product_id)
     location = get_for_update_or_404(Location.objects, pk=location_id)
 
+    if int(new_quantity) < 0:
+        raise DomainValidationError(
+            "La cantidad objetivo del ajuste no puede ser negativa."
+        )
+
     resolved_serial: str | None = None
     if serial_id is not None:
         try:
@@ -1256,7 +1262,7 @@ def register_adjustment(
             )
             resolved_serial = ps.serial_number
         except ProductSerial.DoesNotExist:
-            raise ValueError(
+            raise DomainValidationError(
                 f"Serial {serial_id} no existe para producto {product.sku}."
             )
     elif product.category.requires_serial_number:
@@ -1265,7 +1271,7 @@ def register_adjustment(
     before = row.current_stock
     delta = int(new_quantity) - before
     if delta == 0:
-        raise ValueError("El ajuste no cambia el stock.")
+        raise DomainValidationError("El ajuste no cambia el stock actual.")
     if delta < 0:
         _ensure_location_allows_origin(location, "adjustment")
     else:
@@ -1390,7 +1396,11 @@ def correct_movement_within_window(
     """
     from shared.exceptions import DomainValidationError
 
-    original = Movement.objects.select_related("product").get(pk=movement_id)
+    original = (
+        Movement.objects.select_related("product")
+        .select_for_update()
+        .get(pk=movement_id)
+    )
 
     if original.movement_type not in _CORRECTABLE_TYPES:
         raise DomainValidationError(
@@ -1690,16 +1700,10 @@ def dispatch_combo(
     )
     items = list(combo.combo_items.all())
     if not items:
-        raise ValueError(f"El combo {combo.sku} no tiene ítems registrados.")
+        raise DomainValidationError(f"El combo {combo.sku} no tiene ítems registrados.")
 
-    # Validar serial contra todos los ítems del combo
-    resolved_serial: str | None = None
-    for item in items:
-        if item.product.category.requires_serial_number:
-            resolved_serial = _resolve_serial_for_dispatch(
-                item.product, location_id, serial_id
-            )
-            break
+    # Ordenar ítems por product.id para consistencia de locks (previene deadlock).
+    items = sorted(items, key=lambda i: str(i.product.id))
 
     location = get_for_update_or_404(Location.objects, pk=location_id)
     _ensure_location_allows_origin(location, "combo_dispatch")
@@ -1729,6 +1733,13 @@ def dispatch_combo(
     for item in items:
         product = item.product
         qty_needed = item.quantity
+
+        # BR-04: resolver serial por ítem para marcar correctamente como DISPATCHED.
+        resolved_serial: str | None = None
+        if product.category.requires_serial_number:
+            resolved_serial = _resolve_serial_for_dispatch(
+                product, location_id, serial_id
+            )
 
         stock_row = _lock_stock(product.id, location_id)
         if stock_row.current_stock < qty_needed:
@@ -1811,6 +1822,13 @@ def dispatch_combo(
         )
         first_movement = False
         movements_created.append(movement)
+        if resolved_serial:
+            _update_serial_status(
+                resolved_serial,
+                product,
+                new_status=ProductSerial.Status.DISPATCHED,
+                movement=movement,
+            )
         check_and_create_alerts(product, location)
 
     log_event(
@@ -1825,16 +1843,10 @@ def dispatch_combo(
         },
     )
 
-    try:
-        create_invoice_from_movements(
-            movements_created,
-            user=user,
-            invoice_number=combo_invoice_number,
-        )
-    except Exception:
-        logger.exception(
-            "create_invoice_from_movements falló para combo invoice=%s; el despacho ya fue registrado.",
-            combo_invoice_number,
-        )
+    create_invoice_from_movements(
+        movements_created,
+        user=user,
+        invoice_number=combo_invoice_number,
+    )
 
     return movements_created

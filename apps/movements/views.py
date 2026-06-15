@@ -35,7 +35,11 @@ from apps.movements.services import (
 from shared.exceptions import ImmutableRecordError
 from shared.openapi import TAG_MOVEMENTS, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
-from shared.permissions import IsAlmacenista, IsAlmacenistaOrAuxiliar
+from shared.permissions import (
+    IsAlmacenista,
+    IsAlmacenistaOrAuxiliar,
+    IsWithinOperatingHours,
+)
 
 
 @extend_schema_view(
@@ -62,8 +66,14 @@ class MovementListView(generics.ListAPIView):
         product = self.request.query_params.get("product_id")
         movement_type = self.request.query_params.get("movement_type")
         if product:
-            qs = qs.filter(product_id=product)
-        if movement_type:
+            try:
+                import uuid
+
+                uuid.UUID(str(product))
+                qs = qs.filter(product_id=product)
+            except (ValueError, AttributeError):
+                pass  # product_id inválido — ignorar filtro
+        if movement_type and movement_type in MovementType.values:
             qs = qs.filter(movement_type=movement_type)
         return qs
 
@@ -88,7 +98,11 @@ class MovementListView(generics.ListAPIView):
     ),
 )
 class EntryListCreateView(generics.ListCreateAPIView):
-    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+    permission_classes = (
+        IsAuthenticated,
+        IsAlmacenistaOrAuxiliar,
+        IsWithinOperatingHours,
+    )
     pagination_class = ICMPageNumberPagination
 
     def get_serializer_class(self):
@@ -167,7 +181,11 @@ class EntryDetailView(generics.RetrieveAPIView):
     ),
 )
 class DispatchListCreateView(generics.ListCreateAPIView):
-    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+    permission_classes = (
+        IsAuthenticated,
+        IsAlmacenistaOrAuxiliar,
+        IsWithinOperatingHours,
+    )
     pagination_class = ICMPageNumberPagination
 
     def get_serializer_class(self):
@@ -252,7 +270,11 @@ class DispatchDetailView(generics.RetrieveAPIView):
 class DispatchInvoiceDownloadView(APIView):
     """BR-13 — Descarga del PDF de factura asociado al despacho."""
 
-    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+    permission_classes = (
+        IsAuthenticated,
+        IsAlmacenistaOrAuxiliar,
+        IsWithinOperatingHours,
+    )
 
     @extend_schema(
         summary="Descargar PDF de factura",
@@ -301,7 +323,11 @@ class DispatchInvoiceDownloadView(APIView):
     ),
 )
 class TransferListCreateView(generics.ListCreateAPIView):
-    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+    permission_classes = (
+        IsAuthenticated,
+        IsAlmacenistaOrAuxiliar,
+        IsWithinOperatingHours,
+    )
     pagination_class = ICMPageNumberPagination
 
     def get_serializer_class(self):
@@ -448,7 +474,11 @@ class AdjustmentListCreateView(generics.ListCreateAPIView):
 
 
 class AdjustmentCorrectView(APIView):
-    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+    permission_classes = (
+        IsAuthenticated,
+        IsAlmacenistaOrAuxiliar,
+        IsWithinOperatingHours,
+    )
 
     @extend_schema(
         summary="Corregir ajuste dentro de ventana de tiempo",
@@ -504,7 +534,11 @@ class MovementDetailView(generics.RetrieveAPIView):
 class MovementCorrectionView(APIView):
     """Corrección por id de movimiento en URL (compatibilidad)."""
 
-    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+    permission_classes = (
+        IsAuthenticated,
+        IsAlmacenistaOrAuxiliar,
+        IsWithinOperatingHours,
+    )
 
     @extend_schema(
         summary="Corrección de movimiento (URL)",
@@ -530,7 +564,11 @@ class MovementCorrectionView(APIView):
 class ComboDispatchView(APIView):
     """RF-003, Opción B — Despacha un combo completo descontando stock por ítem."""
 
-    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+    permission_classes = (
+        IsAuthenticated,
+        IsAlmacenistaOrAuxiliar,
+        IsWithinOperatingHours,
+    )
 
     @extend_schema(
         summary="Despachar combo (descuenta stock por ítem)",
@@ -572,7 +610,11 @@ class ComboDispatchView(APIView):
 class InvoiceDetailView(APIView):
     """GET /movements/invoices/<number>/ — detalle de factura con totales y movements."""
 
-    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+    permission_classes = (
+        IsAuthenticated,
+        IsAlmacenistaOrAuxiliar,
+        IsWithinOperatingHours,
+    )
 
     @extend_schema(
         summary="Detalle de factura comercial",
@@ -595,7 +637,11 @@ class InvoiceDetailView(APIView):
 class InvoicePDFDownloadView(APIView):
     """GET /movements/invoices/<number>/pdf/ — descarga el PDF enriquecido de la factura."""
 
-    permission_classes = (IsAuthenticated, IsAlmacenistaOrAuxiliar)
+    permission_classes = (
+        IsAuthenticated,
+        IsAlmacenistaOrAuxiliar,
+        IsWithinOperatingHours,
+    )
 
     @extend_schema(
         summary="Descargar PDF de factura comercial",
