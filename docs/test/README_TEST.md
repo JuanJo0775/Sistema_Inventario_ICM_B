@@ -336,15 +336,41 @@ Cada subcategoría tiene su propia numeración: `SCR-*` para scripts, `SHA-*` pa
 
 ## Estado actual de la suite
 
-**814 tests · 803 pasan · 11 skips legítimos · 0 fallos** _(2026-06-12)_
+**~846 tests · 603 app-level · 138 Gherkin · 105 auxiliares** _(2026-06-14, recuento de funciones `def test_`)_
+
+| Capa | Tests | Estado |
+|------|-------|--------|
+| App-level (unit/integration por app) | 603 | Cobertura medida por `--cov=apps` |
+| Gherkin/ERS (RF001–RF025, RNF003–RNF006) | 138 run | 131 passed, 7 skipped (6 frontend/E2E + 1 WeasyPrint) |
+| Integración cross-domain | 19 | 19 tests en 4 archivos |
+| Concurrencia | 4 | Requieren `RUN_CONCURRENCY_TESTS=1` + PostgreSQL |
+| Scripts / Shared / SLA | 81 | 70 scripts + 8 shared + 4 SLA |
+
+**Cobertura técnica (medida 2026-06-14):** 91% exacto · 12709 statements · 11606 cubiertos · 1103 perdidos
+
+| App | Cobertura prod | Tests |
+|-----|---------------|-------|
+| dashboard | 97% | 17 |
+| purchasing | 93% | 98 |
+| authentication | 88% | 84 |
+| alerts | 87% | 61 |
+| audit | 87% | 15 |
+| movements | 87% | 99 |
+| reports | 85% | 46 |
+| catalog | 84% | 124 |
+| webhooks | 83% | 25 |
+| inventory | 74% | 45 |
 
 | Capa | Archivos | Descripción |
 |------|----------|-------------|
 | Servicios (unit) | `apps/*/tests/test_services.py` | Lógica de negocio, edge cases, rollback |
 | HTTP (views) | `apps/*/tests/test_views.py` | Endpoints reales con `APIClient` |
-| Gherkin/ERS | `tests/ers/` | Escenarios RF001–RF025, RNF003–RNF006 |
-| Concurrencia | `tests/concurrency/` | Requiere `RUN_CONCURRENCY_TESTS=1` + Postgres |
+| Gherkin/ERS | `tests/ers/` | Escenarios RF001–RF025, RNF003–RNF006 — 131 passed, 7 skipped |
+| Concurrencia | `tests/concurrency/` | Requiere `RUN_CONCURRENCY_TESTS=1` + Postgres (4 skipped en SQLite) |
 | Performance (load) | `tests/performance/locustfile.py` | Locust — NO parte de pytest, correr aparte |
+| Scripts / Auxiliares | `tests/scripts/`, `tests/shared/`, `tests/test_service_sla.py` | 70 scripts + 8 shared + 4 SLA |
+
+**Nota:** Los tests de concurrencia y parte de los tests de alertas fallan en SQLite por restricciones de thread-sharing. En CI se ejecutan contra PostgreSQL real con `RUN_CONCURRENCY_TESTS=1`.
 
 Para el historial completo de cambios ver [`CHANGELOG_TESTING.md`](CHANGELOG_TESTING.md).
 

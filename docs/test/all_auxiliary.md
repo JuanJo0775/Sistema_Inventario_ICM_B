@@ -2485,6 +2485,114 @@ Código fuente: [tests/scripts/test_seed_db.py](../../tests/scripts/test_seed_db
 <!-- file: shared/SHA-0001.md -->
 **Código:** SHA-0001
 
+# test_get_for_update_or_404_custom_message
+
+## Nombre del test
+
+`tests/shared/test_db_utils.py::test_get_for_update_or_404_custom_message`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/shared/test_db_utils.py::test_get_for_update_or_404_custom_message -v
+```
+
+Código fuente: [tests/shared/test_db_utils.py](../../tests/shared/test_db_utils.py) (aprox. línea 29)
+
+
+---
+
+<!-- file: shared/SHA-0002.md -->
+**Código:** SHA-0002
+
+# test_get_for_update_or_404_found
+
+## Nombre del test
+
+`tests/shared/test_db_utils.py::test_get_for_update_or_404_found`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/shared/test_db_utils.py::test_get_for_update_or_404_found -v
+```
+
+Código fuente: [tests/shared/test_db_utils.py](../../tests/shared/test_db_utils.py) (aprox. línea 13)
+
+
+---
+
+<!-- file: shared/SHA-0003.md -->
+**Código:** SHA-0003
+
+# test_get_for_update_or_404_not_found
+
+## Nombre del test
+
+`tests/shared/test_db_utils.py::test_get_for_update_or_404_not_found`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/shared/test_db_utils.py::test_get_for_update_or_404_not_found -v
+```
+
+Código fuente: [tests/shared/test_db_utils.py](../../tests/shared/test_db_utils.py) (aprox. línea 21)
+
+
+---
+
+<!-- file: shared/SHA-0004.md -->
+**Código:** SHA-0004
+
 # test_validate_destination_passes_for_non_blocked
 
 ## Nombre del test
@@ -2518,8 +2626,8 @@ Código fuente: [tests/shared/test_location_validators.py](../../tests/shared/te
 
 ---
 
-<!-- file: shared/SHA-0002.md -->
-**Código:** SHA-0002
+<!-- file: shared/SHA-0005.md -->
+**Código:** SHA-0005
 
 # test_validate_destination_raises_for_blocked_archived
 
@@ -2554,8 +2662,8 @@ Código fuente: [tests/shared/test_location_validators.py](../../tests/shared/te
 
 ---
 
-<!-- file: shared/SHA-0003.md -->
-**Código:** SHA-0003
+<!-- file: shared/SHA-0006.md -->
+**Código:** SHA-0006
 
 # test_validate_origin_passes_for_active
 
@@ -2590,8 +2698,8 @@ Código fuente: [tests/shared/test_location_validators.py](../../tests/shared/te
 
 ---
 
-<!-- file: shared/SHA-0004.md -->
-**Código:** SHA-0004
+<!-- file: shared/SHA-0007.md -->
+**Código:** SHA-0007
 
 # test_validate_origin_raises_for_blocked_archived
 
@@ -2626,8 +2734,8 @@ Código fuente: [tests/shared/test_location_validators.py](../../tests/shared/te
 
 ---
 
-<!-- file: shared/SHA-0005.md -->
-**Código:** SHA-0005
+<!-- file: shared/SHA-0008.md -->
+**Código:** SHA-0008
 
 # test_validate_origin_raises_for_maintenance_restricted
 
