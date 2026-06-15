@@ -20,8 +20,6 @@ staticfiles/
 static/
 *.pot
 
-# Docker
-.dockerignore
 
 # Coverage / pytest
 .coverage
