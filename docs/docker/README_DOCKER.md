@@ -16,7 +16,7 @@ docker-compose.prod.yml  # Producción (Gunicorn + PostgreSQL)
 
 | Servicio | Imagen | Propósito |
 |----------|--------|-----------|
-| `db` | postgres:15 / postgres:15-alpine | Base de datos PostgreSQL |
+| `db` | postgres:18 / postgres:18-alpine | Base de datos PostgreSQL |
 | `web` | icm-web (build local) | Django dev (runserver) |
 | `test` | icm-web (target: test) | Ejecución de pytest |
 | `production` | icm-web (target: production) | Gunicorn WSGI |

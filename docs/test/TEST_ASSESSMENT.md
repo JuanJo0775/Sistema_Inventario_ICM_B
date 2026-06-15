@@ -652,10 +652,10 @@ quality → unit_tests → integration_tests ──► scenarios ──► concu
 | `quality` | Quality — lint · format · docs · migrations | Ninguna | Sí | — |
 | `unit_tests` | Unit tests (SQLite) | SQLite :memory: | Sí | `junit-unit.xml`, `coverage-unit.xml` |
 | `integration_tests` | Integration tests (scripts + root) | SQLite :memory: | Sí | `junit-integration-tests.xml` |
-| `scenarios` | Scenarios (Postgres) | PostgreSQL 15 | Sí | `junit-gherkin.xml`, `coverage-gherkin.xml` |
-| `seed_db_tests` | Seed DB tests (PR only) | PostgreSQL 15 | Sí (solo PR) | `junit-seed-db.xml` |
-| `concurrency_tests` | Concurrency tests (Postgres) | PostgreSQL 15 | Sí | `junit-concurrency.xml` |
-| `load_test` | Load test (Locust) | PostgreSQL 15 | No (informativo) | `locust-results_*.csv` |
+| `scenarios` | Scenarios (Postgres) | PostgreSQL 18 | Sí | `junit-gherkin.xml`, `coverage-gherkin.xml` |
+| `seed_db_tests` | Seed DB tests (PR only) | PostgreSQL 18 | Sí (solo PR) | `junit-seed-db.xml` |
+| `concurrency_tests` | Concurrency tests (Postgres) | PostgreSQL 18 | Sí | `junit-concurrency.xml` |
+| `load_test` | Load test (Locust) | PostgreSQL 18 | No (informativo) | `locust-results_*.csv` |
 
 #### Gates del job `quality` (estado real 2026-06-13)
 

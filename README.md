@@ -61,7 +61,7 @@ Documentación funcional y arquitectónica disponible en el repositorio:
 - Python 3.11+
 - Django 4.2+ (rango declarado en `requirements/base.txt`)
 - Django REST Framework
-- PostgreSQL 15
+- PostgreSQL 18
 - JWT con djangorestframework-simplejwt (rotación + blacklist)
 - OpenAPI 3 con **drf-spectacular** (Swagger UI y ReDoc)
 - pytest + pytest-django (769+ tests — suite completa con recuperación de contraseña)

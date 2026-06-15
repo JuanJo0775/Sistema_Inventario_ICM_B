@@ -34,7 +34,7 @@ Este directorio contiene las decisiones arquitectonicas del Sistema Inventario I
 
 ### Data & Infrastructure
 
-- **ADR-003**: PostgreSQL 15 con transacciones ACID y select_for_update.
+- **ADR-003**: PostgreSQL 18 con transacciones ACID y select_for_update.
 - **ADR-008**: Docker Compose para paridad de entornos.
 - **ADR-009**: Settings jerarquicos con gestion de secretos por variables de entorno.
 

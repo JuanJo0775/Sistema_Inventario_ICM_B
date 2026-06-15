@@ -15,7 +15,7 @@ Este documento resume las restricciones reales que condicionan el diseño del ba
 
 | Restricción | Tipo | Evidencia | Efecto arquitectónico |
 |---|---|---|---|
-| PostgreSQL 15 es la BD soportada en runtime real | Tecnológica | [docs/adr/ADR-003.md](adr/ADR-003.md) | Habilita ACID, `select_for_update()` y constraints fuertes. |
+| PostgreSQL 18 es la BD soportada en runtime real | Tecnológica | [docs/adr/ADR-003.md](adr/ADR-003.md) | Habilita ACID, `select_for_update()` y constraints fuertes. |
 | JWT Bearer es el mecanismo de autenticación | Tecnológica | [docs/adr/ADR-004.md](adr/ADR-004.md) | El API es stateless y depende de tokens con expiración y blacklist. |
 | API versionada bajo `/api/v1/` | Tecnológica | [docs/adr/ADR-006.md](adr/ADR-006.md) | Cualquier cambio incompatible exige nueva versión. |
 | Tags OpenAPI centralizados | Tecnológica | [docs/api/README_API.md](api/README_API.md) | Evita divergencias en documentación y Swagger. |

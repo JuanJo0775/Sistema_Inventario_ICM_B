@@ -171,7 +171,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:18
         env:
           POSTGRES_DB: icm_test
           POSTGRES_USER: icm
@@ -233,7 +233,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:18
         env:
           POSTGRES_DB: icm_test
           POSTGRES_USER: icm
@@ -290,7 +290,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:18
         env:
           POSTGRES_DB: icm_test
           POSTGRES_USER: icm
@@ -348,7 +348,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:18
         env:
           POSTGRES_DB: icm_test
           POSTGRES_USER: icm
