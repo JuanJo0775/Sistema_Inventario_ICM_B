@@ -58,6 +58,15 @@ COPY . .
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# Ejecutar como usuario no-root (principio de mínimo privilegio).
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+USER appuser
+
 EXPOSE 8000
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "config.wsgi:application", \
+     "--bind", "0.0.0.0:8000", \
+     "--workers", "4", \
+     "--timeout", "120", \
+     "--max-requests", "1000", \
+     "--max-requests-jitter", "100"]

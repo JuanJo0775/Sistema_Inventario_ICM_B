@@ -1,2 +1,7 @@
 -r base.txt
 gunicorn==21.2.0
+whitenoise==6.7.0
+
+# psycopg2-binary (de base.txt) es aceptable para producción; si el entorno de build
+# tiene las cabeceras de libpq (libpq-dev) se puede reemplazar por psycopg2==2.9.12
+# para evitar la dependencia en la librería empaquetada.

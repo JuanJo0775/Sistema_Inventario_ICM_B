@@ -61,8 +61,7 @@ jobs:
         run: bandit -r apps shared -ll
 
       - name: Supply-chain — pip-audit
-        continue-on-error: true
-        run: pip-audit --progress=off || true
+        run: pip-audit --progress=off
 
       - name: Migrations up-to-date
         run: python manage.py makemigrations --check --dry-run

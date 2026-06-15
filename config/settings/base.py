@@ -2,15 +2,30 @@
 
 from __future__ import annotations
 
+import os
 from datetime import timedelta
 from pathlib import Path
 
 import dj_database_url
-from decouple import config
+from decouple import Config, RepositoryEnv
 
 from shared.openapi import SPECTACULAR_SETTINGS as SPECTACULAR_SETTINGS_ICM
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# --- Cargar archivo .env según DJANGO_SETTINGS_MODULE ---
+_settings_module = os.environ.get("DJANGO_SETTINGS_MODULE", "")
+if "production" in _settings_module:
+    _env_file = BASE_DIR / ".env.production"
+elif "development" in _settings_module:
+    _env_file = BASE_DIR / ".env.development"
+else:
+    _env_file = BASE_DIR / ".env"
+
+if not _env_file.exists():
+    _env_file = BASE_DIR / ".env"
+
+config = Config(RepositoryEnv(str(_env_file)))
 
 SECRET_KEY = config(
     "DJANGO_SECRET_KEY", default="insecure-dev-key-change-in-production"
@@ -153,10 +168,13 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_CLASSES": (
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
     ),
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "100/hour",
+        "anon": "60/hour",
         "user": "1000/hour",
+        "login": "10/minute",  # usado en endpoints de autenticación (JWT obtain/refresh)
+        "password_reset": "5/hour",
     },
 }
 
@@ -175,6 +193,14 @@ SIMPLE_JWT = {
     "ALGORITHM": "HS256",
     "SIGNING_KEY": SECRET_KEY,
 }
+
+# --- Email SMTP (Gmail) ---
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = False

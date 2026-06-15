@@ -124,10 +124,35 @@ def main():
             sys.exit(0)
     # -------------------------------
 
-    # Cargar variables de entorno desde .env en la raíz del proyecto si existe.
-    # No sobrescribimos variables ya definidas en el entorno (por ejemplo CI).
+    # Cargar variables de entorno desde .env.development / .env.production
+    # según DJANGO_SETTINGS_MODULE. No sobrescribimos variables del entorno (CI).
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    env_path = os.path.join(base_dir, ".env")
+
+    # Detectar --settings en sys.argv (Django lo procesa después)
+    _from_cli = None
+    for i, arg in enumerate(sys.argv):
+        if arg == "--settings" and i + 1 < len(sys.argv):
+            _from_cli = sys.argv[i + 1]
+            break
+        if arg.startswith("--settings="):
+            _from_cli = arg.split("=", 1)[1]
+            break
+
+    _settings_mod = _from_cli or os.environ.get(
+        "DJANGO_SETTINGS_MODULE", "config.settings.development"
+    )
+    if "production" in _settings_mod:
+        _env_filename = ".env.production"
+    elif "development" in _settings_mod:
+        _env_filename = ".env.development"
+    else:
+        _env_filename = ".env"
+    env_path = os.path.join(base_dir, _env_filename)
+
+    # Fallback a .env genérico si el específico no existe
+    if not os.path.exists(env_path):
+        env_path = os.path.join(base_dir, ".env")
+
     env_values = {}
     if os.path.exists(env_path):
         try:
@@ -144,18 +169,7 @@ def main():
                     env_values[key] = val
                     os.environ.setdefault(key, val)
         except Exception:
-            # Si no podemos cargar .env por alguna razón, continuar sin fallar.
             env_values = {}
-
-    # Si la terminal tiene `config.settings.test` (p. ej. heredado de CI)
-    # y `.env` define otro `DJANGO_SETTINGS_MODULE`, preferimos el valor de `.env`
-    # cuando no estamos ejecutando la suite de tests localmente.
-    if (
-        os.environ.get("DJANGO_SETTINGS_MODULE") == "config.settings.test"
-        and env_values.get("DJANGO_SETTINGS_MODULE")
-        and not any(arg in ("test", "pytest") for arg in sys.argv)
-    ):
-        os.environ["DJANGO_SETTINGS_MODULE"] = env_values.get("DJANGO_SETTINGS_MODULE")
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
     try:

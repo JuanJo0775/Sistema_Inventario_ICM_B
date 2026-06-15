@@ -29,10 +29,15 @@ htmlcov/
 */migrations/*
 !*/migrations/__init__.py
 
-# Env
+# Env — archivos reales con secretos (ignorados)
 .env
-.env.*
+.env.development
+.env.production
+
+# Env — templates públicos (versionados)
 !.env.example
+!.env.development.example
+!.env.production.example
 
 # Pytest
 .pytest_cache/

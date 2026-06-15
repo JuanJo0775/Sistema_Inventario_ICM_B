@@ -50,3 +50,10 @@ urlpatterns = [
         name="redoc",
     ),
 ]
+
+if settings.DEBUG:
+    from shared.media_views import protected_media
+
+    urlpatterns += [
+        path("media/<path:path>", protected_media, name="protected-media"),
+    ]
