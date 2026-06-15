@@ -8,6 +8,7 @@ drf-spectacular==0.29.0
 
 # Database
 psycopg2-binary==2.9.12
+dj-database-url>=2.3,<3
 
 # Environment Variables
 python-decouple==3.8

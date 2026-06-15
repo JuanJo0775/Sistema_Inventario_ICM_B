@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import timedelta
 from pathlib import Path
 
+import dj_database_url
 from decouple import config
 
 from shared.openapi import SPECTACULAR_SETTINGS as SPECTACULAR_SETTINGS_ICM
@@ -109,17 +110,28 @@ PASSWORD_RESET_TOKEN_EXPIRY_MINUTES = config(
     "PASSWORD_RESET_TOKEN_EXPIRY_MINUTES", default=10, cast=int
 )
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME", default="icm_db"),
-        "USER": config("DB_USER", default="icm_user"),
-        "PASSWORD": config("DB_PASSWORD", default="icm_password"),
-        "HOST": config("DB_HOST", default="localhost"),
-        "PORT": config("DB_PORT", default="5432"),
-        "CONN_MAX_AGE": 600,
+DB_PROVIDER = config("DB_PROVIDER", default="local")
+
+if DB_PROVIDER == "neon":
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=config("DATABASE_URL"),
+            conn_max_age=600,
+            ssl_require=True,
+        ),
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": config("DB_NAME", default="icm_db"),
+            "USER": config("DB_USER", default="icm_user"),
+            "PASSWORD": config("DB_PASSWORD", default="icm_password"),
+            "HOST": config("DB_HOST", default="localhost"),
+            "PORT": config("DB_PORT", default="5432"),
+            "CONN_MAX_AGE": 600,
+        }
+    }
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
