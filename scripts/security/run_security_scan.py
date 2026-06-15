@@ -17,6 +17,7 @@ Uso:
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 from datetime import datetime
@@ -60,8 +61,8 @@ TOOLS: list[dict] = [
     },
     {
         "name": "bandit",
-        "cmd": ["bandit", "-r", "apps", "shared", "-l"],
-        "desc": "SAST (Bandit — severidad media y alta)",
+        "cmd": ["bandit", "-r", "apps", "shared", "-ll"],
+        "desc": "SAST (Bandit — severidad MEDIUM y HIGH)",
     },
     {
         "name": "pip-audit",
@@ -175,6 +176,7 @@ def _run_tool(
         return True, f"{label}\n         {' '.join(effective_cmd)}"
 
     try:
+        env = {**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}
         result = subprocess.run(
             effective_cmd,
             capture_output=True,
@@ -182,6 +184,7 @@ def _run_tool(
             encoding="utf-8",
             errors="replace",
             timeout=_SUBPROCESS_TIMEOUT,
+            env=env,
         )
         ok = result.returncode == 0
         if ok:

@@ -164,7 +164,8 @@ class TestParser:
     def test_default_output_path(self):
         parser = build_parser()
         args = parser.parse_args([])
-        assert "reporte_calidad.txt" in args.output
+        assert "reporte_calidad_" in args.output
+        assert args.output.endswith(".txt")
 
     def test_ci_flag(self):
         parser = build_parser()
