@@ -20,33 +20,6 @@ info:
     - **Restricción Horaria:** El rol `auxiliar_despacho` está sujeto a la regla **BR-03** (07:00-12:00 / 14:00-17:00).
 
     ---
-    ### **Módulo de Precios y Facturación — Opcional / No bloqueante**
-
-    > ⚠️ Este módulo es **completamente opcional**. El sistema funciona con normalidad sin que los productos tengan precios configurados.
-
-    El sistema incluye soporte de precios como capa aditiva sobre el ledger de inventario (**RF-013**). Su integración con el frontend puede realizarse de forma incremental:
-
-    **Lo que cambia en respuestas existentes (campos adicionales, siempre `null` por defecto):**
-    - `GET /catalog/products/<id>/` → incluye `unit_cost`, `sale_price_retail`, `sale_price_wholesale`, `tax_rate_pct`, `currency` (null si no se configuraron)
-    - `GET /movements/dispatches/` → incluye `unit_price`, `subtotal`, `tax_amount`, `total_amount`, `currency`, `price_type`, `customer_snapshot` (null si el producto no tiene precio)
-    - `GET /catalog/combos/<id>/` → incluye `price_strategy` (`"derived"`), `fixed_price_retail`, `fixed_price_wholesale` (null)
-
-    **Lo que NO cambió (backward-compatible al 100%):**
-    - `POST /movements/dispatches/` — sin campos requeridos nuevos. El campo opcional `discount_pct` puede omitirse.
-    - `POST /catalog/products/` — sin campos requeridos nuevos.
-    - `PUT/PATCH /catalog/products/<id>/` — los campos de precio son ignorados aquí; solo se modifican vía `/prices/`.
-    - `POST /catalog/combos/` — `price_strategy` es opcional, default `"derived"`.
-
-    **Endpoints nuevos (el frontend los ignora hasta que los necesite):**
-    - `PATCH /catalog/products/<id>/prices/` — configurar precios del producto (solo almacenista)
-    - `GET  /catalog/products/<id>/prices/` — historial inmutable de cambios de precio
-    - `GET  /movements/invoices/<number>/` — detalle de factura con totales comerciales
-    - `GET  /movements/invoices/<number>/pdf/` — PDF enriquecido con precios
-    - `GET  /reports/revenue-summary/` — revenue por tipo de venta
-    - `GET  /reports/margin-by-product/` — margen bruto por SKU
-    - `GET  /reports/sales-by-customer/` — ventas por cliente (venta mayor)
-
-    ---
     ### **Documentación Adicional**
     - **API (referencia detallada):** `docs/api/README_API.md`
     - **Requisitos:** `docs/requisitos/ERS_ICM_Requisitos.md`
@@ -165,8 +138,7 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
-          format: uuid
+          type: integer
         required: true
       tags:
       - alerts
@@ -219,8 +191,7 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
-          format: uuid
+          type: integer
         required: true
       tags:
       - alerts
@@ -1604,6 +1575,11 @@ paths:
       description: Lista las marcas registradas en el catálogo.
       summary: Listar marcas
       parameters:
+      - in: query
+        name: include_inactive
+        schema:
+          type: boolean
+        description: Si es true, devuelve activas e inactivas (excluye archivadas).
       - name: ordering
         required: false
         in: query
@@ -1628,6 +1604,12 @@ paths:
         description: Un término de búsqueda.
         schema:
           type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+        description: 'Filtro de estado: active (defecto), inactive, deleted, all.
+          ''deleted'' devuelve solo archivadas; ''all'' incluye todas.'
       tags:
       - catalog
       security:
@@ -1888,10 +1870,11 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: catalog_brands_destroy
-      description: Marca la marca como inactiva. El registro NO se elimina de la base
-        de datos. Devuelve HTTP 409 si la marca tiene productos activos asociados.
-        Para reactivarla use POST /brands/{id}/restore/.
-      summary: Desactivar marca
+      description: Archiva la marca (deleted_at=now). El registro NO se elimina de
+        la base de datos ni del historial de movimientos. Devuelve HTTP 409 si la
+        marca tiene productos activos asociados. Para restaurarla use POST /brands/{id}/restore/.
+        Para solo deshabilitar (is_active=False sin archivar) use POST /brands/{id}/disable/.
+      summary: Eliminar lógicamente marca (soft delete)
       parameters:
       - in: path
         name: id
@@ -1937,10 +1920,120 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/brands/{id}/disable/:
+    post:
+      operationId: catalog_brands_disable_create
+      description: Marca is_active=False. La marca no puede asignarse a nuevos productos
+        pero conserva todas las relaciones históricas. Nunca bloquea.
+      summary: Desactivar marca para asignación
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/brands/{id}/enable/:
+    post:
+      operationId: catalog_brands_enable_create
+      description: Marca is_active=True. La marca vuelve a estar disponible para nuevos
+        productos.
+      summary: Reactivar marca para asignación
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/catalog/brands/{id}/restore/:
     post:
       operationId: catalog_brands_restore_create
-      description: Reactiva una marca previamente desactivada.
+      description: Restaura una marca eliminada lógicamente.
       summary: Restaurar marca
       parameters:
       - in: path
@@ -1997,6 +2090,11 @@ paths:
       description: Lista las categorías registradas en el catálogo.
       summary: Listar categorías
       parameters:
+      - in: query
+        name: include_inactive
+        schema:
+          type: boolean
+        description: Si es true, devuelve activas e inactivas (excluye archivadas).
       - name: ordering
         required: false
         in: query
@@ -2021,6 +2119,12 @@ paths:
         description: Un término de búsqueda.
         schema:
           type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+        description: 'Filtro de estado: active (defecto), inactive, deleted, all.
+          ''deleted'' devuelve solo archivadas; ''all'' incluye todas.'
       tags:
       - catalog
       security:
@@ -2281,10 +2385,12 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: catalog_categories_destroy
-      description: Marca la categoría como inactiva. El registro NO se elimina de
-        la base de datos. Devuelve HTTP 409 si la categoría tiene productos activos
-        asociados. Para reactivarla use POST /categories/{id}/restore/.
-      summary: Desactivar categoría
+      description: Archiva la categoría (deleted_at=now). El registro NO se elimina
+        de la base de datos ni del historial de movimientos. Devuelve HTTP 409 si
+        la categoría tiene productos activos asociados. Para restaurarla use POST
+        /categories/{id}/restore/. Para solo deshabilitar (is_active=False sin archivar)
+        use POST /categories/{id}/disable/.
+      summary: Eliminar lógicamente categoría (soft delete)
       parameters:
       - in: path
         name: id
@@ -2330,10 +2436,120 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/categories/{id}/disable/:
+    post:
+      operationId: catalog_categories_disable_create
+      description: Marca is_active=False. La categoría no puede asignarse a nuevos
+        productos pero conserva todas las relaciones históricas. Nunca bloquea.
+      summary: Desactivar categoría para asignación
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/categories/{id}/enable/:
+    post:
+      operationId: catalog_categories_enable_create
+      description: Marca is_active=True. La categoría vuelve a estar disponible para
+        nuevos productos.
+      summary: Reactivar categoría para asignación
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/catalog/categories/{id}/restore/:
     post:
       operationId: catalog_categories_restore_create
-      description: Reactiva una categoría previamente desactivada.
+      description: Restaura una categoría eliminada lógicamente.
       summary: Restaurar categoría
       parameters:
       - in: path
@@ -2390,6 +2606,12 @@ paths:
       description: Lista los combos de productos registrados.
       summary: Listar combos
       parameters:
+      - in: query
+        name: include_archived
+        schema:
+          type: boolean
+        description: Si es true, incluye combos eliminados lógicamente (deleted_at
+          != null).
       - name: ordering
         required: false
         in: query
@@ -2678,9 +2900,10 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: catalog_combos_destroy
-      description: Marca el combo como inactivo. El registro NO se elimina de la base
-        de datos ni afecta sus productos componentes. Para reactivarlo use POST /combos/{id}/restore/.
-      summary: Desactivar combo
+      description: Marca el combo como eliminado lógicamente (deleted_at=now). El
+        registro NO se elimina de la base de datos ni afecta sus productos componentes.
+        Para restaurarlo use POST /combos/{id}/restore/.
+      summary: Eliminar lógicamente combo (soft delete)
       parameters:
       - in: path
         name: id
@@ -2729,7 +2952,7 @@ paths:
   /api/v1/catalog/combos/{id}/restore/:
     post:
       operationId: catalog_combos_restore_create
-      description: Reactiva un combo de productos previamente desactivado.
+      description: Restaura un combo de productos previamente eliminado lógicamente.
       summary: Restaurar combo
       parameters:
       - in: path
@@ -2786,6 +3009,22 @@ paths:
       description: Lista los productos disponibles en el catálogo.
       summary: Listar productos
       parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+        description: Filtra por UUID de categoría.
+      - in: query
+        name: include_archived
+        schema:
+          type: boolean
+        description: Si es true, incluye productos eliminados lógicamente (deleted_at
+          != null).
+      - in: query
+        name: include_inactive
+        schema:
+          type: boolean
+        description: Si es true, incluye productos con is_active=False.
       - name: ordering
         required: false
         in: query
@@ -2804,12 +3043,11 @@ paths:
         description: Número de resultados a devolver por página.
         schema:
           type: integer
-      - name: search
-        required: false
-        in: query
-        description: Un término de búsqueda.
+      - in: query
+        name: search
         schema:
           type: string
+        description: Búsqueda por nombre o SKU.
       tags:
       - catalog
       security:
@@ -3077,11 +3315,11 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: catalog_products_destroy
-      description: Marca el producto como inactivo. El registro NO se elimina de la
-        base de datos ni afecta el historial de movimientos. Devuelve HTTP 409 si
-        el producto pertenece a uno o más combos activos. Para reactivarlo use POST
-        /products/{id}/restore/.
-      summary: Desactivar producto
+      description: Marca el producto como eliminado lógicamente (deleted_at=now).
+        El registro NO se elimina de la base de datos ni afecta el historial de movimientos.
+        Devuelve HTTP 409 si el producto tiene stock, OC activas, recepciones en borrador
+        o combos activos. Para restaurarlo use POST /products/{id}/restore/.
+      summary: Eliminar lógicamente producto (soft delete)
       parameters:
       - in: path
         name: id
@@ -3167,6 +3405,127 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/products/{id}/disable/:
+    post:
+      operationId: catalog_products_disable_create
+      description: Marca el producto como inactivo para asignación (pausa temporal).
+        El producto NO se elimina y puede reactivarse con POST /enable/.
+      summary: Desactivar producto para asignación
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDetail'
+          description: ''
+        '409':
+          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/catalog/products/{id}/enable/:
+    post:
+      operationId: catalog_products_enable_create
+      description: Reactiva un producto previamente desactivado para asignación (pausa).
+      summary: Activar producto para asignación
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - catalog
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDetail'
+          description: ''
+        '409':
+          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
           content:
             application/json:
               schema:
@@ -3302,7 +3661,7 @@ paths:
   /api/v1/catalog/products/{id}/restore/:
     post:
       operationId: catalog_products_restore_create
-      description: Reactiva un producto previamente desactivado.
+      description: Restaura un producto previamente eliminado lógicamente.
       summary: Restaurar producto
       parameters:
       - in: path
@@ -3764,8 +4123,22 @@ paths:
   /api/v1/inventory/locations/:
     get:
       operationId: inventory_locations_list
-      description: Lista las ubicaciones registradas.
+      description: Lista las ubicaciones registradas (excluye eliminadas lógicamente
+        por defecto).
       summary: Listar ubicaciones
+      parameters:
+      - in: query
+        name: include_archived
+        schema:
+          type: boolean
+        description: Si es true, incluye ubicaciones eliminadas lógicamente (deleted_at
+          != null).
+      - in: query
+        name: include_inactive
+        schema:
+          type: boolean
+        description: Si es true, incluye ubicaciones con operational_status distinto
+          de ACTIVE.
       tags:
       - inventory
       security:
@@ -4029,9 +4402,10 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: inventory_locations_destroy
-      description: Marca la ubicación como inactiva. El registro NO se elimina de
-        la base de datos ni afecta el historial de movimientos.
-      summary: Desactivar ubicación
+      description: Marca la ubicación como eliminada lógicamente (deleted_at=now).
+        El registro NO se elimina de la base de datos ni afecta el historial de movimientos.
+        Para restaurarla use POST /locations/{id}/restore/.
+      summary: Eliminar lógicamente ubicación (soft delete)
       parameters:
       - in: path
         name: id
@@ -4046,7 +4420,61 @@ paths:
       - BearerAuth: []
       responses:
         '204':
-          description: Ubicación desactivada exitosamente.
+          description: Ubicación eliminada lógicamente.
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/inventory/locations/{id}/restore/:
+    post:
+      operationId: inventory_locations_restore_create
+      description: Restaura una ubicación previamente eliminada lógicamente.
+      summary: Restaurar ubicación
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - inventory
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+          description: ''
         '400':
           description: Solicitud inválida o con errores de validación.
           content:
@@ -4458,8 +4886,21 @@ paths:
   /api/v1/inventory/storage-templates/:
     get:
       operationId: inventory_storage_templates_list
-      description: Lista las plantillas de almacenamiento registradas.
+      description: Lista las plantillas de almacenamiento registradas (excluye eliminadas
+        lógicamente por defecto).
       summary: Listar plantillas de almacenamiento
+      parameters:
+      - in: query
+        name: include_archived
+        schema:
+          type: boolean
+        description: Si es true, incluye plantillas eliminadas lógicamente (deleted_at
+          != null).
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+        description: Filtra por disponibilidad (is_active=true/false).
       tags:
       - inventory
       security:
@@ -4723,9 +5164,10 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: inventory_storage_templates_destroy
-      description: Marca la plantilla como inactiva. El registro NO se elimina de
-        la base de datos.
-      summary: Desactivar plantilla de almacenamiento
+      description: Marca la plantilla como eliminada lógicamente (deleted_at=now).
+        Deja de estar disponible para asignación y se excluye de listados por defecto.
+        Para restaurarla use POST /storage-templates/{id}/restore/.
+      summary: Eliminar lógicamente plantilla de almacenamiento (soft delete)
       parameters:
       - in: path
         name: id
@@ -4740,7 +5182,184 @@ paths:
       - BearerAuth: []
       responses:
         '204':
-          description: Plantilla de almacenamiento desactivada.
+          description: Plantilla de almacenamiento eliminada lógicamente.
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/inventory/storage-templates/{id}/disable/:
+    post:
+      operationId: inventory_storage_templates_disable_create
+      description: Marca la plantilla como inactiva para asignación (pausa temporal).
+        La plantilla NO se elimina y puede reactivarse con POST /enable/.
+      summary: Desactivar plantilla de almacenamiento
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - inventory
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageTemplate'
+          description: ''
+        '409':
+          description: Plantilla archivada; restáurela primero.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/inventory/storage-templates/{id}/enable/:
+    post:
+      operationId: inventory_storage_templates_enable_create
+      description: Reactiva una plantilla de almacenamiento previamente desactivada
+        (pausa).
+      summary: Activar plantilla de almacenamiento
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - inventory
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageTemplate'
+          description: ''
+        '409':
+          description: Plantilla archivada; restáurela primero.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/inventory/storage-templates/{id}/restore/:
+    post:
+      operationId: inventory_storage_templates_restore_create
+      description: Restaura una plantilla de almacenamiento previamente eliminada
+        lógicamente.
+      summary: Restaurar plantilla de almacenamiento
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - inventory
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageTemplate'
+          description: ''
         '400':
           description: Solicitud inválida o con errores de validación.
           content:
@@ -4774,8 +5393,21 @@ paths:
   /api/v1/inventory/storage-types/:
     get:
       operationId: inventory_storage_types_list
-      description: Lista los tipos de almacenamiento registrados.
+      description: Lista los tipos de almacenamiento registrados (excluye eliminados
+        lógicamente por defecto).
       summary: Listar tipos de almacenamiento
+      parameters:
+      - in: query
+        name: include_archived
+        schema:
+          type: boolean
+        description: Si es true, incluye tipos eliminados lógicamente (deleted_at
+          != null).
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+        description: Filtra por disponibilidad (is_active=true/false).
       tags:
       - inventory
       security:
@@ -5039,9 +5671,10 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: inventory_storage_types_destroy
-      description: Marca el tipo de almacenamiento como inactivo. El registro NO se
-        elimina de la base de datos.
-      summary: Desactivar tipo de almacenamiento
+      description: Marca el tipo de almacenamiento como eliminado lógicamente (deleted_at=now).
+        Deja de estar disponible para asignación y se excluye de listados por defecto.
+        Para restaurarlo use POST /storage-types/{id}/restore/.
+      summary: Eliminar lógicamente tipo de almacenamiento (soft delete)
       parameters:
       - in: path
         name: id
@@ -5056,7 +5689,182 @@ paths:
       - BearerAuth: []
       responses:
         '204':
-          description: Tipo de almacenamiento desactivado exitosamente.
+          description: Tipo de almacenamiento eliminado lógicamente.
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/inventory/storage-types/{id}/disable/:
+    post:
+      operationId: inventory_storage_types_disable_create
+      description: Marca el tipo de almacenamiento como inactivo para asignación (pausa
+        temporal). El tipo NO se elimina y puede reactivarse con POST /enable/.
+      summary: Desactivar tipo de almacenamiento
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - inventory
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageType'
+          description: ''
+        '409':
+          description: Tipo archivado; restáurelo primero.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/inventory/storage-types/{id}/enable/:
+    post:
+      operationId: inventory_storage_types_enable_create
+      description: Reactiva un tipo de almacenamiento previamente desactivado (pausa).
+      summary: Activar tipo de almacenamiento
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - inventory
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageType'
+          description: ''
+        '409':
+          description: Tipo archivado; restáurelo primero.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/inventory/storage-types/{id}/restore/:
+    post:
+      operationId: inventory_storage_types_restore_create
+      description: Restaura un tipo de almacenamiento previamente eliminado lógicamente.
+      summary: Restaurar tipo de almacenamiento
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - inventory
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageType'
+          description: ''
         '400':
           description: Solicitud inválida o con errores de validación.
           content:
@@ -6723,6 +7531,17 @@ paths:
         required: true
       tags:
       - purchasing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReceptionConfirmRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReceptionConfirmRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReceptionConfirmRequest'
       security:
       - jwtAuth: []
       - BearerAuth: []
@@ -6767,8 +7586,21 @@ paths:
   /api/v1/purchasing/suppliers/:
     get:
       operationId: purchasing_suppliers_list
+      description: 'Lista proveedores no archivados (deleted_at=null) por defecto.
+        Filtros disponibles: ?is_active=true/false para activos/pausados. ?include_archived=true
+        para incluir archivados (soft-deleted).'
       summary: Listar proveedores
       parameters:
+      - in: query
+        name: include_archived
+        schema:
+          type: boolean
+        description: Si true, incluye proveedores archivados (deleted_at != null).
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+        description: 'Filtra por disponibilidad: true=activos, false=pausados.'
       - name: page
         required: false
         in: query
@@ -6966,9 +7798,10 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: purchasing_suppliers_destroy
-      description: Marca el proveedor como inactivo (is_active=False). El registro
-        NO se elimina de la base de datos. Para reactivar, use POST /suppliers/{id}/activate/.
-      summary: Desactivar proveedor (soft delete)
+      description: Marca el proveedor como eliminado lógicamente (deleted_at=now).
+        Deja de estar disponible para nuevas OC y se excluye de listados por defecto.
+        Para restaurar, use POST /suppliers/{id}/restore/.
+      summary: Eliminar lógicamente proveedor (soft delete)
       parameters:
       - in: path
         name: id
@@ -7011,7 +7844,8 @@ paths:
   /api/v1/purchasing/suppliers/{id}/activate/:
     post:
       operationId: purchasing_suppliers_activate_create
-      summary: Reactivar proveedor
+      description: Alias de POST /suppliers/{id}/enable/. Usa /enable/ en código nuevo.
+      summary: Reactivar proveedor (legacy alias de /enable/)
       parameters:
       - in: path
         name: id
@@ -7031,10 +7865,43 @@ paths:
               schema:
                 $ref: '#/components/schemas/Supplier'
           description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/purchasing/suppliers/{id}/deactivate/:
     post:
       operationId: purchasing_suppliers_deactivate_create
-      summary: Desactivar proveedor
+      description: Alias de POST /suppliers/{id}/disable/. Usa /disable/ en código
+        nuevo.
+      summary: Desactivar proveedor (legacy alias de /disable/)
       parameters:
       - in: path
         name: id
@@ -7054,6 +7921,201 @@ paths:
               schema:
                 $ref: '#/components/schemas/Supplier'
           description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/purchasing/suppliers/{id}/disable/:
+    post:
+      operationId: purchasing_suppliers_disable_create
+      description: Pausa el proveedor temporalmente (is_active=False). El proveedor
+        sigue existiendo y su historial se conserva. No archiva el proveedor — para
+        eso use DELETE /suppliers/{id}/.
+      summary: Desactivar proveedor para nuevas OC
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/purchasing/suppliers/{id}/enable/:
+    post:
+      operationId: purchasing_suppliers_enable_create
+      description: Reactiva un proveedor previamente pausado (is_active=True). Solo
+        funciona si el proveedor no está archivado. Para restaurar un proveedor archivado
+        use POST /suppliers/{id}/restore/.
+      summary: Reactivar proveedor para nuevas OC
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/purchasing/suppliers/{id}/restore/:
+    post:
+      operationId: purchasing_suppliers_restore_create
+      description: Restaura un proveedor previamente eliminado lógicamente. Limpia
+        deleted_at y reactiva is_active=True. Use POST /suppliers/{id}/enable/ para
+        solo reactivar sin restaurar del archivo.
+      summary: Restaurar proveedor archivado
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - purchasing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/reports/data/:
     get:
       operationId: reports_data_retrieve
@@ -8067,8 +9129,16 @@ paths:
   /api/v1/webhooks/endpoints/:
     get:
       operationId: webhooks_endpoints_list
-      description: Lista los endpoints de webhook configurados.
+      description: Lista los endpoints de webhook configurados (excluye eliminados
+        lógicamente por defecto).
       summary: Listar endpoints de webhook
+      parameters:
+      - in: query
+        name: include_archived
+        schema:
+          type: boolean
+        description: Si es true, incluye endpoints eliminados lógicamente (deleted_at
+          != null).
       tags:
       - webhooks
       security:
@@ -8344,9 +9414,10 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: webhooks_endpoints_destroy
-      description: 'Marca el endpoint como inactivo: deja de recibir eventos. El registro
-        NO se elimina de la base de datos ni se pierden las entregas registradas.'
-      summary: Desactivar endpoint de webhook
+      description: Marca el endpoint como eliminado lógicamente (deleted_at=now).
+        Deja de recibir eventos y se excluye de listados por defecto. Para restaurarlo
+        use POST /webhooks/endpoints/{id}/restore/.
+      summary: Eliminar lógicamente endpoint de webhook (soft delete)
       parameters:
       - in: path
         name: id
@@ -8362,6 +9433,181 @@ paths:
       responses:
         '204':
           description: No response body
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/webhooks/endpoints/{id}/disable/:
+    post:
+      operationId: webhooks_endpoints_disable_create
+      description: Marca el endpoint como inactivo para recepción de eventos (pausa
+        temporal). El endpoint NO se elimina y puede reactivarse con POST /enable/.
+      summary: Desactivar endpoint de webhook
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - webhooks
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEndpoint'
+          description: ''
+        '409':
+          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/webhooks/endpoints/{id}/enable/:
+    post:
+      operationId: webhooks_endpoints_enable_create
+      description: Reactiva un endpoint de webhook previamente desactivado (pausa).
+      summary: Activar endpoint de webhook
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - webhooks
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEndpoint'
+          description: ''
+        '409':
+          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/webhooks/endpoints/{id}/restore/:
+    post:
+      operationId: webhooks_endpoints_restore_create
+      description: Restaura un endpoint de webhook previamente eliminado lógicamente.
+      summary: Restaurar endpoint de webhook
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - webhooks
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEndpoint'
+          description: ''
         '400':
           description: Solicitud inválida o con errores de validación.
           content:
@@ -8680,6 +9926,13 @@ components:
           type: string
         is_active:
           type: boolean
+        deleted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Soft delete timestamp. NULL = activo; not-NULL = eliminado
+            lógicamente.
         created_at:
           type: string
           format: date-time
@@ -8692,6 +9945,7 @@ components:
           description: Fecha y hora de última modificación (UTC).
       required:
       - created_at
+      - deleted_at
       - id
       - name
       - slug
@@ -8751,6 +10005,13 @@ components:
           type: string
         is_active:
           type: boolean
+        deleted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Soft delete timestamp. NULL = activo; not-NULL = eliminado
+            lógicamente.
         created_at:
           type: string
           format: date-time
@@ -8763,6 +10024,7 @@ components:
           description: Fecha y hora de última modificación (UTC).
       required:
       - created_at
+      - deleted_at
       - id
       - name
       - slug
@@ -8810,6 +10072,8 @@ components:
           type: boolean
         is_returnable:
           type: boolean
+        is_active:
+          type: boolean
     ChangePasswordRequest:
       type: object
       description: Cambio de contraseña self-service (RF-001).
@@ -8843,8 +10107,13 @@ components:
         sku:
           type: string
           maxLength: 100
-        is_active:
-          type: boolean
+        deleted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Soft delete timestamp. NULL = activo; not-NULL = eliminado
+            lógicamente.
         components:
           type: array
           items:
@@ -8886,6 +10155,7 @@ components:
       required:
       - components
       - created_at
+      - deleted_at
       - fixed_price_retail
       - fixed_price_wholesale
       - id
@@ -8916,9 +10186,6 @@ components:
         sku:
           type: string
           minLength: 1
-        is_active:
-          type: boolean
-          default: true
         items:
           type: array
           items:
@@ -9390,18 +10657,32 @@ components:
       - PRODUCT_DEACTIVATED
       - PRODUCT_ACTIVATED
       - PRODUCT_PRICE_UPDATED
+      - PRODUCT_SOFT_DELETED
+      - PRODUCT_RESTORED
+      - PRODUCT_DISABLED
+      - PRODUCT_ENABLED
       - COMBO_CREATED
       - COMBO_UPDATED
       - COMBO_DEACTIVATED
       - COMBO_ACTIVATED
+      - COMBO_SOFT_DELETED
+      - COMBO_RESTORED
       - CATEGORY_CREATED
       - CATEGORY_UPDATED
       - CATEGORY_DEACTIVATED
       - CATEGORY_ACTIVATED
+      - CATEGORY_SOFT_DELETED
+      - CATEGORY_RESTORED
+      - CATEGORY_DISABLED
+      - CATEGORY_ENABLED
       - BRAND_CREATED
       - BRAND_UPDATED
       - BRAND_DEACTIVATED
       - BRAND_ACTIVATED
+      - BRAND_SOFT_DELETED
+      - BRAND_RESTORED
+      - BRAND_DISABLED
+      - BRAND_ENABLED
       - SUBCATEGORY_CREATED
       - SUBCATEGORY_UPDATED
       - SUBCATEGORY_DEACTIVATED
@@ -9418,6 +10699,22 @@ components:
       - SUPPLIER_UPDATED
       - SUPPLIER_DEACTIVATED
       - SUPPLIER_ACTIVATED
+      - SUPPLIER_SOFT_DELETED
+      - SUPPLIER_RESTORED
+      - SUPPLIER_DISABLED
+      - SUPPLIER_ENABLED
+      - WEBHOOK_ENDPOINT_SOFT_DELETED
+      - WEBHOOK_ENDPOINT_RESTORED
+      - WEBHOOK_ENDPOINT_DISABLED
+      - WEBHOOK_ENDPOINT_ENABLED
+      - STORAGE_TYPE_SOFT_DELETED
+      - STORAGE_TYPE_RESTORED
+      - STORAGE_TEMPLATE_SOFT_DELETED
+      - STORAGE_TEMPLATE_RESTORED
+      - STORAGE_TYPE_DISABLED
+      - STORAGE_TYPE_ENABLED
+      - STORAGE_TEMPLATE_DISABLED
+      - STORAGE_TEMPLATE_ENABLED
       - PURCHASE_ORDER_CREATED
       - PURCHASE_ORDER_CONFIRMED
       - PURCHASE_ORDER_CANCELLED
@@ -9426,6 +10723,8 @@ components:
       - RECEPTION_CANCELLED
       - LOCATION_CREATED
       - LOCATION_MODIFIED
+      - LOCATION_SOFT_DELETED
+      - LOCATION_RESTORED
       - WEBHOOK_ENDPOINT_CHANGED
       - STOCK_THRESHOLD_UPDATED
       - ALERT_RESOLVED
@@ -9454,18 +10753,32 @@ components:
         * `PRODUCT_DEACTIVATED` - Producto desactivado
         * `PRODUCT_ACTIVATED` - Producto reactivado
         * `PRODUCT_PRICE_UPDATED` - Precios de producto actualizados
+        * `PRODUCT_SOFT_DELETED` - Producto eliminado lógicamente
+        * `PRODUCT_RESTORED` - Producto restaurado
+        * `PRODUCT_DISABLED` - Producto desactivado para asignación
+        * `PRODUCT_ENABLED` - Producto reactivado para asignación
         * `COMBO_CREATED` - Combo de productos creado
         * `COMBO_UPDATED` - Combo de productos actualizado
         * `COMBO_DEACTIVATED` - Combo de productos desactivado
         * `COMBO_ACTIVATED` - Combo de productos reactivado
+        * `COMBO_SOFT_DELETED` - Combo eliminado lógicamente
+        * `COMBO_RESTORED` - Combo restaurado
         * `CATEGORY_CREATED` - Categoría de catálogo creada
         * `CATEGORY_UPDATED` - Categoría de catálogo actualizada
         * `CATEGORY_DEACTIVATED` - Categoría de catálogo desactivada
         * `CATEGORY_ACTIVATED` - Categoría de catálogo reactivada
+        * `CATEGORY_SOFT_DELETED` - Categoría eliminada lógicamente
+        * `CATEGORY_RESTORED` - Categoría restaurada
+        * `CATEGORY_DISABLED` - Categoría desactivada para nuevas asignaciones
+        * `CATEGORY_ENABLED` - Categoría reactivada para nuevas asignaciones
         * `BRAND_CREATED` - Marca de catálogo creada
         * `BRAND_UPDATED` - Marca de catálogo actualizada
         * `BRAND_DEACTIVATED` - Marca de catálogo desactivada
         * `BRAND_ACTIVATED` - Marca de catálogo reactivada
+        * `BRAND_SOFT_DELETED` - Marca eliminada lógicamente
+        * `BRAND_RESTORED` - Marca restaurada
+        * `BRAND_DISABLED` - Marca desactivada para nuevas asignaciones
+        * `BRAND_ENABLED` - Marca reactivada para nuevas asignaciones
         * `SUBCATEGORY_CREATED` - Subcategoría de catálogo creada
         * `SUBCATEGORY_UPDATED` - Subcategoría de catálogo actualizada
         * `SUBCATEGORY_DEACTIVATED` - Subcategoría de catálogo desactivada
@@ -9482,6 +10795,22 @@ components:
         * `SUPPLIER_UPDATED` - Proveedor actualizado
         * `SUPPLIER_DEACTIVATED` - Proveedor desactivado
         * `SUPPLIER_ACTIVATED` - Proveedor reactivado
+        * `SUPPLIER_SOFT_DELETED` - Proveedor eliminado lógicamente
+        * `SUPPLIER_RESTORED` - Proveedor restaurado
+        * `SUPPLIER_DISABLED` - Proveedor desactivado para nuevas OC
+        * `SUPPLIER_ENABLED` - Proveedor reactivado para nuevas OC
+        * `WEBHOOK_ENDPOINT_SOFT_DELETED` - Endpoint webhook eliminado lógicamente
+        * `WEBHOOK_ENDPOINT_RESTORED` - Endpoint webhook restaurado
+        * `WEBHOOK_ENDPOINT_DISABLED` - Endpoint webhook desactivado para recepción
+        * `WEBHOOK_ENDPOINT_ENABLED` - Endpoint webhook reactivado para recepción
+        * `STORAGE_TYPE_SOFT_DELETED` - Tipo de almacenamiento eliminado lógicamente
+        * `STORAGE_TYPE_RESTORED` - Tipo de almacenamiento restaurado
+        * `STORAGE_TEMPLATE_SOFT_DELETED` - Plantilla de almacenamiento eliminada lógicamente
+        * `STORAGE_TEMPLATE_RESTORED` - Plantilla de almacenamiento restaurada
+        * `STORAGE_TYPE_DISABLED` - Tipo de almacenamiento desactivado para asignación
+        * `STORAGE_TYPE_ENABLED` - Tipo de almacenamiento reactivado para asignación
+        * `STORAGE_TEMPLATE_DISABLED` - Plantilla de almacenamiento desactivada para asignación
+        * `STORAGE_TEMPLATE_ENABLED` - Plantilla de almacenamiento reactivada para asignación
         * `PURCHASE_ORDER_CREATED` - Orden de compra creada
         * `PURCHASE_ORDER_CONFIRMED` - Orden de compra confirmada
         * `PURCHASE_ORDER_CANCELLED` - Orden de compra cancelada
@@ -9490,6 +10819,8 @@ components:
         * `RECEPTION_CANCELLED` - Recepción de mercancía cancelada
         * `LOCATION_CREATED` - Ubicación creada
         * `LOCATION_MODIFIED` - Ubicación modificada
+        * `LOCATION_SOFT_DELETED` - Ubicación eliminada lógicamente
+        * `LOCATION_RESTORED` - Ubicación restaurada
         * `WEBHOOK_ENDPOINT_CHANGED` - Endpoint webhook modificado
         * `STOCK_THRESHOLD_UPDATED` - Umbral de stock actualizado
         * `ALERT_RESOLVED` - Alerta resuelta
@@ -9805,6 +11136,13 @@ components:
           description: Estimación informativa de ocupación calculada o ajustada.
         is_active:
           type: boolean
+        deleted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Soft delete timestamp. NULL = activo; not-NULL = eliminado
+            lógicamente.
         created_at:
           type: string
           format: date-time
@@ -9818,6 +11156,7 @@ components:
       required:
       - code
       - created_at
+      - deleted_at
       - id
       - name
       - storage_template_code
@@ -10552,6 +11891,8 @@ components:
           type: boolean
         is_returnable:
           type: boolean
+        is_active:
+          type: boolean
     PatchedComboUpdateRequest:
       type: object
       description: Campos editables de un combo. is_active no se acepta; usar DELETE/restore.
@@ -11016,6 +12357,13 @@ components:
           type: boolean
         is_active:
           type: boolean
+        deleted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Soft delete timestamp. NULL = activo; not-NULL = eliminado
+            lógicamente.
         notes:
           type: string
         reorder_point:
@@ -11070,6 +12418,7 @@ components:
       - category_slug
       - created_at
       - currency
+      - deleted_at
       - id
       - name
       - sale_price_retail
@@ -11202,6 +12551,13 @@ components:
           type: boolean
         is_active:
           type: boolean
+        deleted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Soft delete timestamp. NULL = activo; not-NULL = eliminado
+            lógicamente.
         notes:
           type: string
         reorder_point:
@@ -11273,6 +12629,7 @@ components:
       - category_slug
       - created_at
       - currency
+      - deleted_at
       - id
       - name
       - sale_price_retail
@@ -11737,6 +13094,15 @@ components:
       - status
       - supplier_nombre
       - updated_at
+    ReceptionConfirmRequest:
+      type: object
+      properties:
+        cold_chain_acknowledged:
+          type: boolean
+          default: false
+        electrical_safety_acknowledged:
+          type: boolean
+          default: false
     ReceptionCreateRequest:
       type: object
       properties:
@@ -12119,6 +13485,13 @@ components:
           type: boolean
         is_active:
           type: boolean
+        deleted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Soft delete timestamp. NULL = activo; not-NULL = eliminado
+            lógicamente.
         sort_order:
           type: integer
           maximum: 2147483647
@@ -12136,6 +13509,7 @@ components:
       required:
       - code
       - created_at
+      - deleted_at
       - id
       - name
       - storage_type_code
@@ -12195,6 +13569,13 @@ components:
           type: boolean
         is_active:
           type: boolean
+        deleted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Soft delete timestamp. NULL = activo; not-NULL = eliminado
+            lógicamente.
         sort_order:
           type: integer
           maximum: 2147483647
@@ -12212,6 +13593,7 @@ components:
       required:
       - code
       - created_at
+      - deleted_at
       - id
       - name
       - updated_at
@@ -12281,6 +13663,13 @@ components:
           maxLength: 300
         is_active:
           type: boolean
+        deleted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Soft delete timestamp. NULL = activo; not-NULL = eliminado
+            lógicamente.
         observaciones:
           type: string
         created_at:
@@ -12295,6 +13684,7 @@ components:
           description: Fecha y hora de última modificación (UTC).
       required:
       - created_at
+      - deleted_at
       - id
       - nombre_comercial
       - pais
@@ -12915,6 +14305,13 @@ components:
           description: 'Lista de event_types suscritos. Ej: ["STOCK_CRITICO"].'
         is_active:
           type: boolean
+        deleted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Soft delete timestamp. NULL = activo; not-NULL = eliminado
+            lógicamente.
         max_retries:
           type: integer
           maximum: 32767
@@ -12937,6 +14334,7 @@ components:
       required:
       - created_at
       - created_by
+      - deleted_at
       - id
       - updated_at
       - url
