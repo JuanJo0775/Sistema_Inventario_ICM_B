@@ -89,12 +89,12 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-          cache-dependency-path: requirements/base.txt
+          cache-dependency-path: requirements/development.txt
 
       - name: Install dependencies
         run: |
           python -m pip install -U pip
-          pip install -r requirements/base.txt
+          pip install -r requirements/development.txt
 
       - name: Run unit tests
         run: |
@@ -134,12 +134,12 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-          cache-dependency-path: requirements/base.txt
+          cache-dependency-path: requirements/development.txt
 
       - name: Install dependencies
         run: |
           python -m pip install -U pip
-          pip install -r requirements/base.txt
+          pip install -r requirements/development.txt
 
       - name: Run integration tests
         run: |
@@ -193,12 +193,12 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-          cache-dependency-path: requirements/base.txt
+          cache-dependency-path: requirements/development.txt
 
       - name: Install dependencies
         run: |
           python -m pip install -U pip
-          pip install -r requirements/base.txt
+          pip install -r requirements/development.txt
 
       - name: Run migrations
         run: python manage.py migrate --noinput
@@ -255,12 +255,12 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-          cache-dependency-path: requirements/base.txt
+          cache-dependency-path: requirements/development.txt
 
       - name: Install dependencies
         run: |
           python -m pip install -U pip
-          pip install -r requirements/base.txt
+          pip install -r requirements/development.txt
 
       - name: Run migrations
         run: python manage.py migrate --noinput
@@ -313,12 +313,12 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-          cache-dependency-path: requirements/base.txt
+          cache-dependency-path: requirements/development.txt
 
       - name: Install dependencies
         run: |
           python -m pip install -U pip
-          pip install -r requirements/base.txt
+          pip install -r requirements/development.txt
 
       - name: Run migrations
         run: python manage.py migrate --noinput
