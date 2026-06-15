@@ -26,6 +26,12 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 _REPORTS_DIR = Path(__file__).resolve().parent / "reports"
+_SEMGREP_LOCAL_CONFIG = Path(__file__).resolve().parents[2] / ".semgrep.yml"
+
+# Usa config local si existe; si no, cae a auto (requiere red).
+_SEMGREP_CONFIG = str(_SEMGREP_LOCAL_CONFIG) if _SEMGREP_LOCAL_CONFIG.exists() else "auto"
+
+_SUBPROCESS_TIMEOUT = 300  # segundos máximos por herramienta
 
 TOOLS: list[dict] = [
     {
@@ -44,18 +50,18 @@ TOOLS: list[dict] = [
             "semgrep",
             "scan",
             "--config",
-            "auto",
+            _SEMGREP_CONFIG,
             "--include=*.py",
             "apps/",
             "shared/",
         ],
         "ci_flags": ["--quiet", "--error"],
-        "desc": "SAST (Semgrep Registry)",
+        "desc": f"SAST (Semgrep — config: {_SEMGREP_CONFIG})",
     },
     {
         "name": "bandit",
-        "cmd": ["bandit", "-r", "apps", "shared", "-ll"],
-        "desc": "SAST (Bandit)",
+        "cmd": ["bandit", "-r", "apps", "shared", "-l"],
+        "desc": "SAST (Bandit — severidad media y alta)",
     },
     {
         "name": "pip-audit",
@@ -115,10 +121,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Escaneo integral de calidad y seguridad -- Sistema Inventario ICM",
     )
+    _default_report = str(
+        _REPORTS_DIR / f"reporte_calidad_{datetime.now():%Y-%m-%d_%H-%M}.txt"
+    )
     parser.add_argument(
         "--output",
-        default=str(_REPORTS_DIR / "reporte_calidad.txt"),
-        help=f"Ruta del archivo de reporte (default: {_REPORTS_DIR / 'reporte_calidad.txt'})",
+        default=_default_report,
+        help="Ruta del archivo de reporte (default: reporte_calidad_YYYY-MM-DD_HH-MM.txt)",
     )
     parser.add_argument(
         "--only",
@@ -172,17 +181,20 @@ def _run_tool(
             text=True,
             encoding="utf-8",
             errors="replace",
+            timeout=_SUBPROCESS_TIMEOUT,
         )
         ok = result.returncode == 0
         if ok:
-            raw = result.stdout or result.stderr or "(sin salida)"
+            raw = _sanitize(result.stdout or result.stderr or "(sin salida)")
             return True, f"{label}  OK\n{raw.strip()}"
         else:
-            stdout = result.stdout.strip() if result.stdout.strip() else ""
-            stderr = result.stderr.strip() if result.stderr.strip() else ""
+            stdout = _sanitize(result.stdout.strip()) if result.stdout.strip() else ""
+            stderr = _sanitize(result.stderr.strip()) if result.stderr.strip() else ""
             combined = "\n".join(filter(None, [stdout, stderr]))
             msg = combined or f"exit code {result.returncode}"
             return False, f"{label}  FAIL (code {result.returncode})\n{msg}"
+    except subprocess.TimeoutExpired:
+        return False, f"{label}  TIMEOUT ({_SUBPROCESS_TIMEOUT}s) — {desc}"
     except FileNotFoundError:
         return False, f"{label}  NOT FOUND - {desc}. Comando: {' '.join(cmd)}"
 
