@@ -749,7 +749,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/scripts/test_run_security_scan.py::TestParser::test_ci_flag -v
 ```
 
-Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 169)
+Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 170)
 
 
 ---
@@ -785,7 +785,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/scripts/test_run_security_scan.py::TestParser::test_default_ci_is_false -v
 ```
 
-Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 215)
+Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 216)
 
 
 ---
@@ -821,7 +821,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/scripts/test_run_security_scan.py::TestParser::test_default_dry_run_is_false -v
 ```
 
-Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 225)
+Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 226)
 
 
 ---
@@ -857,7 +857,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/scripts/test_run_security_scan.py::TestParser::test_default_list_is_false -v
 ```
 
-Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 220)
+Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 221)
 
 
 ---
@@ -893,7 +893,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/scripts/test_run_security_scan.py::TestParser::test_default_only_is_empty -v
 ```
 
-Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 205)
+Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 206)
 
 
 ---
@@ -965,7 +965,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/scripts/test_run_security_scan.py::TestParser::test_default_skip_is_empty -v
 ```
 
-Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 210)
+Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 211)
 
 
 ---
@@ -1001,7 +1001,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/scripts/test_run_security_scan.py::TestParser::test_dry_run_flag -v
 ```
 
-Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 189)
+Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 190)
 
 
 ---
@@ -1037,7 +1037,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/scripts/test_run_security_scan.py::TestParser::test_list_flag -v
 ```
 
-Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 184)
+Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 185)
 
 
 ---
@@ -1073,7 +1073,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/scripts/test_run_security_scan.py::TestParser::test_only_and_skip_parsed_together -v
 ```
 
-Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 199)
+Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 200)
 
 
 ---
@@ -1109,7 +1109,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/scripts/test_run_security_scan.py::TestParser::test_only_flag -v
 ```
 
-Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 174)
+Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 175)
 
 
 ---
@@ -1145,7 +1145,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/scripts/test_run_security_scan.py::TestParser::test_output_custom -v
 ```
 
-Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 194)
+Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 195)
 
 
 ---
@@ -1181,7 +1181,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/scripts/test_run_security_scan.py::TestParser::test_skip_flag -v
 ```
 
-Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 179)
+Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/test_run_security_scan.py) (aprox. línea 180)
 
 
 ---
