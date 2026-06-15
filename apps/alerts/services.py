@@ -51,7 +51,9 @@ def sync_stock_alerts_for_product(product_id: UUID, *, user: Any = None) -> None
         s=Sum("current_stock")
     )
     total_qty = int(agg["s"] or 0)
-    product = Product.objects.get(pk=product_id)
+    product = Product.objects.filter(pk=product_id, deleted_at__isnull=True).first()
+    if not product:
+        return
     threshold = int(product.reorder_point)
 
     open_alerts = Alert.objects.filter(
@@ -61,16 +63,19 @@ def sync_stock_alerts_for_product(product_id: UUID, *, user: Any = None) -> None
         is_resolved=False,
     )
     if total_qty <= threshold:
-        if not open_alerts.exists():
-            severity, category = _severity_and_category(AlertType.LOW_STOCK)
-            Alert.objects.create(
-                product_id=product_id,
-                alert_type=AlertType.LOW_STOCK,
-                severity=severity,
-                category=category,
-                location=None,
-                message=f"Stock total {total_qty} en o por debajo del umbral {threshold}.",
-            )
+        severity, category = _severity_and_category(AlertType.LOW_STOCK)
+        _, created = Alert.objects.get_or_create(
+            product_id=product_id,
+            alert_type=AlertType.LOW_STOCK,
+            location=None,
+            is_resolved=False,
+            defaults={
+                "severity": severity,
+                "category": category,
+                "message": f"Stock total {total_qty} en o por debajo del umbral {threshold}.",
+            },
+        )
+        if created:
             try:
                 from apps.webhooks.services import queue_webhook_event
 
@@ -301,19 +306,21 @@ def sync_cold_chain_alerts(product: Product, location: Location) -> None:
         open_alert.update(is_resolved=True, resolved_at=timezone.now())
         return
 
-    if not open_alert.exists():
-        severity, category = _severity_and_category(AlertType.COLD_CHAIN_MISSING)
-        Alert.objects.create(
-            product_id=product.id,
-            location_id=location.id,
-            alert_type=AlertType.COLD_CHAIN_MISSING,
-            severity=severity,
-            category=category,
-            message=(
+    severity, category = _severity_and_category(AlertType.COLD_CHAIN_MISSING)
+    Alert.objects.get_or_create(
+        product_id=product.id,
+        location_id=location.id,
+        alert_type=AlertType.COLD_CHAIN_MISSING,
+        is_resolved=False,
+        defaults={
+            "severity": severity,
+            "category": category,
+            "message": (
                 f"Producto {product.sku} requiere cadena de frío "
                 f"pero la ubicación '{location.code}' no es un almacenamiento refrigerado."
             ),
-        )
+        },
+    )
 
 
 def sync_stock_zero_alerts(product_id: UUID) -> None:
@@ -333,16 +340,18 @@ def sync_stock_zero_alerts(product_id: UUID) -> None:
         is_resolved=False,
     )
     if total_qty == 0:
-        if not open_alerts.exists():
-            severity, category = _severity_and_category(AlertType.STOCK_ZERO)
-            Alert.objects.create(
-                product_id=product_id,
-                alert_type=AlertType.STOCK_ZERO,
-                severity=severity,
-                category=category,
-                location=None,
-                message=f"El producto {product.sku} no tiene stock en ninguna ubicación.",
-            )
+        severity, category = _severity_and_category(AlertType.STOCK_ZERO)
+        Alert.objects.get_or_create(
+            product_id=product_id,
+            alert_type=AlertType.STOCK_ZERO,
+            location=None,
+            is_resolved=False,
+            defaults={
+                "severity": severity,
+                "category": category,
+                "message": f"El producto {product.sku} no tiene stock en ninguna ubicación.",
+            },
+        )
     else:
         open_alerts.update(is_resolved=True, resolved_at=timezone.now())
 
@@ -364,39 +373,49 @@ def sync_location_blocked_alerts_for_location(location: Location) -> None:
         ).update(is_resolved=True, resolved_at=timezone.now())
         return
 
-    products_with_stock = StockByLocation.objects.filter(
-        location_id=location.id, current_stock__gt=0
-    ).values_list("product_id", flat=True)
+    product_ids_with_stock = list(
+        StockByLocation.objects.filter(
+            location_id=location.id, current_stock__gt=0
+        ).values_list("product_id", flat=True)
+    )
 
-    for product_id in products_with_stock:
-        product = Product.objects.filter(pk=product_id).first()
-        if not product:
-            continue
-        already_open = Alert.objects.filter(
-            product_id=product_id,
+    # Batch: todos los productos y alertas abiertas en dos queries.
+    products_map = {
+        p.id: p for p in Product.objects.filter(id__in=product_ids_with_stock)
+    }
+    already_open_ids = set(
+        Alert.objects.filter(
             location_id=location.id,
             alert_type=AlertType.LOCATION_BLOCKED_WITH_STOCK,
             is_resolved=False,
-        ).exists()
-        if not already_open:
-            Alert.objects.create(
-                product_id=product_id,
-                location_id=location.id,
-                alert_type=AlertType.LOCATION_BLOCKED_WITH_STOCK,
-                severity=severity,
-                category=category,
-                message=(
-                    f"La ubicación '{location.code}' está {location.operational_status} "
-                    f"y contiene stock del producto {product.sku}."
-                ),
-            )
+            product_id__in=product_ids_with_stock,
+        ).values_list("product_id", flat=True)
+    )
+
+    to_create = [
+        Alert(
+            product_id=product_id,
+            location_id=location.id,
+            alert_type=AlertType.LOCATION_BLOCKED_WITH_STOCK,
+            severity=severity,
+            category=category,
+            message=(
+                f"La ubicación '{location.code}' está {location.operational_status} "
+                f"y contiene stock del producto {products_map[product_id].sku}."
+            ),
+        )
+        for product_id in product_ids_with_stock
+        if product_id in products_map and product_id not in already_open_ids
+    ]
+    if to_create:
+        Alert.objects.bulk_create(to_create, ignore_conflicts=True)
 
     # Resolver alertas de productos que ya no tienen stock en esta ubicación
     Alert.objects.filter(
         location_id=location.id,
         alert_type=AlertType.LOCATION_BLOCKED_WITH_STOCK,
         is_resolved=False,
-    ).exclude(product_id__in=products_with_stock).update(
+    ).exclude(product_id__in=product_ids_with_stock).update(
         is_resolved=True, resolved_at=timezone.now()
     )
 
@@ -415,24 +434,29 @@ def check_and_create_expiration_alerts() -> list[Alert]:
 
 def scan_all_expiry_alerts(*, dry_run: bool = False) -> int:
     """Escanea todos los productos activos y sincroniza alertas de vencimiento y lotes vencidos."""
-    count = 0
-    for pid in Product.objects.filter(is_active=True).values_list("id", flat=True):
-        if not dry_run:
-            sync_expiry_alerts_for_product(pid)
-            sync_lot_expired_alerts(pid)
-        count += 1
-    return count
+    # Pre-fetch products with lots to eliminate per-product DB query for lots (ALTA-07)
+    products = list(
+        Product.objects.filter(is_active=True)
+        .prefetch_related("lots")
+        .only("id", "expiration_date", "is_active")
+    )
+    if not dry_run:
+        for product in products:
+            sync_expiry_alerts_for_product(product.id)
+            sync_lot_expired_alerts(product.id)
+    return len(products)
 
 
 def scan_all_stock_alerts(*, dry_run: bool = False) -> int:
     """Escanea todos los productos activos y sincroniza alertas de stock bajo y stock cero."""
-    count = 0
-    for pid in Product.objects.filter(is_active=True).values_list("id", flat=True):
-        if not dry_run:
-            sync_stock_alerts_for_product(pid)
-            sync_stock_zero_alerts(pid)
-        count += 1
-    return count
+    products = list(
+        Product.objects.filter(is_active=True).only("id", "reorder_point", "is_active")
+    )
+    if not dry_run:
+        for product in products:
+            sync_stock_alerts_for_product(product.id)
+            sync_stock_zero_alerts(product.id)
+    return len(products)
 
 
 def scan_all_location_alerts(*, dry_run: bool = False) -> int:

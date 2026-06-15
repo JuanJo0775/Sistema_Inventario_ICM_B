@@ -15,7 +15,7 @@ from apps.alerts.selectors import (
     get_alert_stats,
     get_resolved_alerts,
 )
-from apps.alerts.serializers import AlertSerializer
+from apps.alerts.serializers import AlertSerializer, AlertStatsSerializer
 from apps.alerts.services import resolve_alert
 from apps.audit.models import AuditEventType
 from apps.audit.services import log_event
@@ -175,7 +175,10 @@ class AlertStatsView(APIView):
     @extend_schema(
         summary="Métricas de alertas",
         description="Obtiene métricas resumidas de alertas activas.",
-        responses={200: dict, **standard_error_responses(include_403=True)},
+        responses={
+            200: AlertStatsSerializer,
+            **standard_error_responses(include_403=True),
+        },
         tags=[TAG_ALERTS],
     )
     def get(self, request):
@@ -277,17 +280,30 @@ class AlertPollView(APIView):
 
         severity_param = request.query_params.get("severity")
         if severity_param:
+            from apps.alerts.models import AlertSeverity
+
+            valid_severities = {v for v, _ in AlertSeverity.choices}
             severities = [s.strip() for s in severity_param.split(",") if s.strip()]
+            invalid = [s for s in severities if s not in valid_severities]
+            if invalid:
+                return Response(
+                    {
+                        "detail": f"Severidades inválidas: {', '.join(invalid)}. Valores válidos: {', '.join(valid_severities)}."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             qs = qs.filter(severity__in=severities)
 
-        qs = qs.order_by("-created_at")[:50]
+        qs = qs.order_by("-created_at")
+        total = qs.count()
+        page = list(qs[:50])
 
         from django.utils import timezone as tz
 
         return Response(
             {
                 "server_timestamp": tz.now().isoformat(),
-                "count": qs.count(),
-                "results": AlertSerializer(qs, many=True).data,
+                "count": total,
+                "results": AlertSerializer(page, many=True).data,
             }
         )

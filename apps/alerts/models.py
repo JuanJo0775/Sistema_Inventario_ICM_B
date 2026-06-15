@@ -105,6 +105,8 @@ class Alert(models.Model):
             models.Index(fields=("severity", "is_resolved")),
             models.Index(fields=("category", "is_resolved")),
             models.Index(fields=("is_resolved", "created_at")),
+            models.Index(fields=("product", "alert_type", "is_resolved")),
+            models.Index(fields=("product", "location", "alert_type", "is_resolved")),
         ]
 
     def __str__(self) -> str:
