@@ -590,19 +590,26 @@ class Seeder:
             if not row or row.current_stock < 2:
                 continue
             qty = max(1, int(row.current_stock * pct))
-            kwargs: dict[str, Any] = {
+            base_kwargs: dict[str, Any] = {
                 "product_id": product.id,
                 "origin_id": bodega.id,
                 "destination_id": dest.id,
-                "quantity": qty,
             }
             if product.category.requires_serial_number:
-                kwargs["serial_number"] = f"SN-TRF-{product.sku}-001"
-                kwargs["electrical_safety_acknowledged"] = True
+                base_kwargs["electrical_safety_acknowledged"] = True
             if product.requires_cold_chain:
-                kwargs["cold_chain_acknowledged"] = True
+                base_kwargs["cold_chain_acknowledged"] = True
             try:
-                register_internal_transfer(almacenista, **kwargs)
+                if product.category.requires_serial_number:
+                    # Serialized: 1 call per unit so each ProductSerial moves correctly
+                    for _ in range(qty):
+                        register_internal_transfer(
+                            almacenista, **base_kwargs, quantity=1
+                        )
+                else:
+                    register_internal_transfer(
+                        almacenista, **base_kwargs, quantity=qty
+                    )
                 self._ok(f"  <-> {sku} x {qty}: bodega -> {dest.code}")
                 count += 1
             except Exception as exc:
@@ -630,19 +637,22 @@ class Seeder:
             qty = stock if stock <= 3 else (stock - 2 if stock <= 10 else stock - 3)
             if qty <= 0:
                 continue
-            kwargs: dict[str, Any] = {
+            base_kwargs: dict[str, Any] = {
                 "product_id": product.id,
                 "location_id": vitrina.id,
-                "quantity": qty,
                 "movement_type": MovementType.SALIDA_VENTA_MENOR,
             }
             if product.category.requires_serial_number:
-                kwargs["serial_number"] = f"SN-DISP-{product.sku}-001"
-                kwargs["electrical_safety_acknowledged"] = True
+                base_kwargs["electrical_safety_acknowledged"] = True
             if product.requires_cold_chain:
-                kwargs["cold_chain_acknowledged"] = True
+                base_kwargs["cold_chain_acknowledged"] = True
             try:
-                register_dispatch(almacenista, **kwargs)
+                if product.category.requires_serial_number:
+                    # Serialized: 1 dispatch per unit so each ProductSerial is dispatched
+                    for _ in range(qty):
+                        register_dispatch(almacenista, **base_kwargs, quantity=1)
+                else:
+                    register_dispatch(almacenista, **base_kwargs, quantity=qty)
                 self._ok(
                     f"  -> Venta menor {product.sku} x {qty} (queda {stock - qty})"
                 )
@@ -684,21 +694,24 @@ class Seeder:
                     continue
                 customer = config.CUSTOMERS[customer_idx % len(config.CUSTOMERS)]
                 customer_idx += 1
-                kwargs: dict[str, Any] = {
+                base_kwargs: dict[str, Any] = {
                     "product_id": product.id,
                     "location_id": bodega.id,
-                    "quantity": qty,
                     "movement_type": MovementType.SALIDA_VENTA_MAYOR,
                     "customer_data": customer,
                     "privacy_notice_acknowledged": True,
                 }
                 if product.category.requires_serial_number:
-                    kwargs["serial_number"] = f"SN-MAYOR-{product.sku}-001"
-                    kwargs["electrical_safety_acknowledged"] = True
+                    base_kwargs["electrical_safety_acknowledged"] = True
                 if product.requires_cold_chain:
-                    kwargs["cold_chain_acknowledged"] = True
+                    base_kwargs["cold_chain_acknowledged"] = True
                 try:
-                    register_dispatch(almacenista, **kwargs)
+                    if product.category.requires_serial_number:
+                        # Serialized: 1 dispatch per unit so each ProductSerial is dispatched
+                        for _ in range(qty):
+                            register_dispatch(almacenista, **base_kwargs, quantity=1)
+                    else:
+                        register_dispatch(almacenista, **base_kwargs, quantity=qty)
                     self._ok(
                         f"  -> Venta mayor {product.sku} x {qty} -- {customer['customer_name']}"
                     )

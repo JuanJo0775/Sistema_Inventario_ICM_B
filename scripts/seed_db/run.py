@@ -22,7 +22,19 @@ from pathlib import Path
 _ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(_ROOT))
 
-os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings.development"
+_FORCED_PROD = "--production" in sys.argv
+if _FORCED_PROD:
+    os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings.production"
+else:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
+
+_settings = os.environ["DJANGO_SETTINGS_MODULE"]
+if "production" in _settings and not _FORCED_PROD:
+    print(
+        "[ERROR] El seed no debe ejecutarse con settings de producción.",
+        file=sys.stderr,
+    )
+    sys.exit(1)
 
 import django  # noqa: E402
 
@@ -81,6 +93,11 @@ def main() -> None:
         "--force",
         action="store_true",
         help="Regenera movimientos aunque ya existan.",
+    )
+    parser.add_argument(
+        "--production",
+        action="store_true",
+        help="Ejecuta seed contra base de datos de producción (Neon).",
     )
     args = parser.parse_args()
 
