@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema, inline_serializer
 from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
@@ -20,11 +19,11 @@ from apps.webhooks.serializers import (
     WebhookTestSerializer,
 )
 from apps.webhooks.services import (
-    _attempt_delivery,
     disable_webhook_endpoint,
     enable_webhook_endpoint,
     restore_webhook_endpoint,
     soft_delete_webhook_endpoint,
+    test_webhook_endpoint,
 )
 from shared.openapi import TAG_WEBHOOKS, standard_error_responses
 from shared.pagination import ICMPageNumberPagination
@@ -297,19 +296,12 @@ class WebhookTestView(APIView):
         endpoint = get_object_or_404(WebhookEndpoint, pk=pk)
         ser = WebhookTestSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-
-        delivery = WebhookDelivery(
-            endpoint=endpoint,
+        result = test_webhook_endpoint(
+            endpoint,
             event_type=ser.validated_data.get("event_type", "TEST"),
             payload=ser.validated_data.get("payload", {}),
-            status=WebhookDelivery.Status.PENDING,
-            next_retry_at=timezone.now(),
         )
-        delivery.save()
-        _attempt_delivery(delivery)
-        return Response(
-            {"status": delivery.status, "response_code": delivery.response_code}
-        )
+        return Response(result)
 
 
 class WebhookDeliveryListView(APIView):
@@ -319,7 +311,30 @@ class WebhookDeliveryListView(APIView):
 
     @extend_schema(
         summary="Historial de entregas de webhook",
-        description="Lista el historial de entregas de webhooks.",
+        description="Lista el historial de entregas de webhooks con filtros opcionales.",
+        parameters=[
+            OpenApiParameter(
+                name="endpoint_id",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="UUID del endpoint.",
+            ),
+            OpenApiParameter(
+                name="status",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Estado: PENDING, DELIVERED, FAILED.",
+            ),
+            OpenApiParameter(
+                name="event_type",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Tipo de evento.",
+            ),
+        ],
         responses={
             200: WebhookDeliverySerializer(many=True),
             **standard_error_responses(include_403=True),
@@ -328,6 +343,12 @@ class WebhookDeliveryListView(APIView):
     )
     def get(self, request):
         qs = WebhookDelivery.objects.select_related("endpoint").order_by("-created_at")
+        if endpoint_id := request.query_params.get("endpoint_id"):
+            qs = qs.filter(endpoint_id=endpoint_id)
+        if status_param := request.query_params.get("status"):
+            qs = qs.filter(status=status_param.upper())
+        if event_type := request.query_params.get("event_type"):
+            qs = qs.filter(event_type=event_type)
         paginator = ICMPageNumberPagination()
         page = paginator.paginate_queryset(list(qs), request, view=self)
         return paginator.get_paginated_response(

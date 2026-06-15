@@ -78,7 +78,8 @@ def deliver_pending_webhooks(*, batch_size: int = 50) -> tuple[int, int]:
     delivered = 0
     failed = 0
 
-    # Leer IDs en una transacción corta para evitar locks prolongados
+    # Reclamar deliveries en una transacción corta: leer IDs bajo lock y empujar
+    # next_retry_at al futuro para que otro worker no los reencole mientras procesamos.
     with transaction.atomic():
         pending_ids = list(
             WebhookDelivery.objects.select_for_update(skip_locked=True)
@@ -88,6 +89,10 @@ def deliver_pending_webhooks(*, batch_size: int = 50) -> tuple[int, int]:
             )
             .values_list("id", flat=True)[:batch_size]
         )
+        if pending_ids:
+            WebhookDelivery.objects.filter(id__in=pending_ids).update(
+                next_retry_at=now + timedelta(hours=1)
+            )
 
     if not pending_ids:
         return 0, 0
@@ -106,7 +111,24 @@ def deliver_pending_webhooks(*, batch_size: int = 50) -> tuple[int, int]:
     return delivered, failed
 
 
-def _attempt_delivery(delivery: WebhookDelivery) -> None:
+def test_webhook_endpoint(
+    endpoint: WebhookEndpoint,
+    event_type: str = "TEST",
+    payload: dict | None = None,
+) -> dict:
+    """Sends a test delivery without persisting to the database (MEDIA-22)."""
+    delivery = WebhookDelivery(
+        endpoint=endpoint,
+        event_type=event_type,
+        payload=payload or {},
+        status=WebhookDelivery.Status.PENDING,
+        next_retry_at=timezone.now(),
+    )
+    _attempt_delivery(delivery, persist=False)
+    return {"status": delivery.status, "response_code": delivery.response_code}
+
+
+def _attempt_delivery(delivery: WebhookDelivery, *, persist: bool = True) -> None:
     """Intenta entregar un webhook; actualiza status, attempts, y next_retry_at."""
     endpoint = delivery.endpoint
     body = json.dumps(delivery.payload, default=str).encode("utf-8")
@@ -153,17 +175,18 @@ def _attempt_delivery(delivery: WebhookDelivery) -> None:
             delivery.attempts,
             elapsed,
         )
-        delivery.save(
-            update_fields=[
-                "status",
-                "attempts",
-                "last_attempt_at",
-                "next_retry_at",
-                "response_code",
-                "response_body",
-                "updated_at",
-            ]
-        )
+        if persist:
+            delivery.save(
+                update_fields=[
+                    "status",
+                    "attempts",
+                    "last_attempt_at",
+                    "next_retry_at",
+                    "response_code",
+                    "response_body",
+                    "updated_at",
+                ]
+            )
 
 
 def _schedule_retry(delivery: WebhookDelivery, max_retries: int) -> None:
