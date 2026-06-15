@@ -131,20 +131,21 @@ def impl_rf019_s02(authenticated_almacenista_client: APIClient, db):
 
 
 def impl_rf019_s03(authenticated_almacenista_client: APIClient, db):
-    """Desactivación de proveedor — el registro persiste, solo cambia is_active."""
+    """Desactivación de proveedor — el registro persiste, solo cambia is_active (pausa temporal)."""
     supplier = _create_supplier_via_api(
         authenticated_almacenista_client, nit="900222333-5"
     )
     r = authenticated_almacenista_client.post(
-        reverse("supplier-deactivate", kwargs={"pk": supplier["id"]})
+        reverse("supplier-disable", kwargs={"pk": supplier["id"]})
     )
     assert r.status_code == status.HTTP_200_OK
     assert r.data["is_active"] is False
+    assert r.data["deleted_at"] is None  # no archivado, solo pausado
     from apps.purchasing.models import Supplier
 
     assert Supplier.objects.filter(pk=supplier["id"]).exists()
     assert AuditLog.objects.filter(
-        event_type=AuditEventType.SUPPLIER_SOFT_DELETED
+        event_type=AuditEventType.SUPPLIER_DISABLED
     ).exists()
 
 
