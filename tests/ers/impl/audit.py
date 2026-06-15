@@ -125,18 +125,20 @@ def impl_rf012_s07(
     a, b = sample_locations[0], sample_locations[1]
     api_client.force_authenticate(user=auxiliar_user)
     StockByLocation.objects.create(product=sample_product, location=a, current_stock=10)
-    create = api_client.post(
-        reverse("movements-transfers"),
-        {
-            "product_id": str(sample_product.id),
-            "origin_id": str(a.id),
-            "destination_id": str(b.id),
-            "quantity": 2,
-            "cold_chain_acknowledged": True,
-            "electrical_safety_acknowledged": True,
-        },
-        format="json",
-    )
+    _within_hours = datetime(2026, 5, 5, 9, 0, 0, tzinfo=_BOGOTA)
+    with patch("django.utils.timezone.now", return_value=_within_hours):
+        create = api_client.post(
+            reverse("movements-transfers"),
+            {
+                "product_id": str(sample_product.id),
+                "origin_id": str(a.id),
+                "destination_id": str(b.id),
+                "quantity": 2,
+                "cold_chain_acknowledged": True,
+                "electrical_safety_acknowledged": True,
+            },
+            format="json",
+        )
     assert create.status_code == status.HTTP_201_CREATED
     original = Movement.objects.get(pk=create.data["id"])
     corrected_at = original.created_at + timedelta(minutes=2)

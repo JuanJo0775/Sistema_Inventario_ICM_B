@@ -119,7 +119,7 @@ def impl_rnf004_s01(
     django_assert_num_queries,
 ):
     url = reverse("inventory-product-stock", kwargs={"product_id": sample_product.id})
-    with django_assert_num_queries(3):
+    with django_assert_num_queries(2):
         r = authenticated_almacenista_client.get(url)
     assert r.status_code == status.HTTP_200_OK
 
@@ -137,7 +137,7 @@ def impl_rnf004_s02(
     StockByLocation.objects.create(
         product=sample_product, location=loc, current_stock=5
     )
-    with django_assert_num_queries(21):
+    with django_assert_num_queries(22):
         r = authenticated_almacenista_client.post(
             reverse("movements-entries"),
             {

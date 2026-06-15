@@ -12,6 +12,7 @@ from rest_framework.test import APIClient
 
 from apps.movements.models import MovementType
 from apps.movements.services import register_internal_transfer
+from shared.exceptions import DomainValidationError
 
 # Datos de cliente mayorista reutilizados en RF006 y RF010
 _MAJEUR_CD = {
@@ -38,23 +39,30 @@ def _entry_payload(product_id, location_id, **extra):
 def _create_transfer(
     api_client: APIClient, user, product, origin, destination, quantity: int
 ):
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    from unittest.mock import patch
+
     from apps.inventory.models import StockByLocation
 
     api_client.force_authenticate(user=user)
     StockByLocation.objects.create(product=product, location=origin, current_stock=10)
     url = reverse("movements-transfers")
-    return api_client.post(
-        url,
-        {
-            "product_id": str(product.id),
-            "origin_id": str(origin.id),
-            "destination_id": str(destination.id),
-            "quantity": quantity,
-            "cold_chain_acknowledged": True,
-            "electrical_safety_acknowledged": True,
-        },
-        format="json",
-    )
+    # Patch time to a valid auxiliar window so IsWithinOperatingHours passes
+    _within_hours = datetime(2026, 5, 5, 9, 0, 0, tzinfo=ZoneInfo("America/Bogota"))
+    with patch("django.utils.timezone.now", return_value=_within_hours):
+        return api_client.post(
+            url,
+            {
+                "product_id": str(product.id),
+                "origin_id": str(origin.id),
+                "destination_id": str(destination.id),
+                "quantity": quantity,
+                "cold_chain_acknowledged": True,
+                "electrical_safety_acknowledged": True,
+            },
+            format="json",
+        )
 
 
 # --- RF-005 (API movimientos / entradas) ------------------------------------
@@ -419,7 +427,7 @@ def impl_rf007_s03(almacenista_user, sample_product, sample_locations, db):
     from apps.inventory.models import StockByLocation
 
     StockByLocation.objects.create(product=sample_product, location=a, current_stock=3)
-    with pytest.raises(ValueError, match="distintos"):
+    with pytest.raises(DomainValidationError, match="distintos"):
         register_internal_transfer(
             almacenista_user,
             sample_product.id,
