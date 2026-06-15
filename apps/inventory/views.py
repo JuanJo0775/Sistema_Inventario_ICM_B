@@ -249,8 +249,13 @@ class LocationListCreateView(APIView):
         include_inactive = request.query_params.get("include_inactive", "").lower()
         if include_inactive not in ("1", "true", "yes"):
             qs = qs.filter(operational_status=Location.OperationalStatus.ACTIVE)
-        data = LocationSerializer(qs, many=True).data
-        return Response(data)
+        paginator = ICMPageNumberPagination()
+        page = paginator.paginate_queryset(qs, request)
+        if page is not None:
+            return paginator.get_paginated_response(
+                LocationSerializer(page, many=True).data
+            )
+        return Response(LocationSerializer(qs, many=True).data)
 
     @extend_schema(
         summary="Crear ubicación",

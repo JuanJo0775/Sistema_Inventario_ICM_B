@@ -122,7 +122,7 @@ class TestCategoryDetail:
             f"/api/v1/catalog/categories/{cat.id}/"
         )
         assert resp.status_code == 409
-        assert "producto" in resp.data["detail"].lower()
+        assert "producto" in resp.data["message"].lower()
 
     @pytest.mark.django_db
     def test_delete_category_with_only_inactive_products_succeeds(
@@ -581,7 +581,7 @@ class TestProductDeactivateComboGuard:
             f"/api/v1/catalog/products/{sample_product.id}/"
         )
         assert resp.status_code == 409
-        assert "combo" in resp.data["detail"].lower()
+        assert "combo" in resp.data["message"].lower()
         sample_product.refresh_from_db()
         assert sample_product.deleted_at is None
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import contextlib
+
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
@@ -24,7 +26,8 @@ class AuditLogListView(generics.ListAPIView):
         if et := self.request.query_params.get("event_type"):
             filters["event_type"] = et
         if uid := self.request.query_params.get("user_id"):
-            filters["user_id"] = uid
+            with contextlib.suppress(ValueError, TypeError):
+                filters["user_id"] = int(uid)
         if s := self.request.query_params.get("start"):
             filters["start"] = s
         if e := self.request.query_params.get("end"):

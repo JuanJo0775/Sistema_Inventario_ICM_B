@@ -109,7 +109,8 @@ class TestLocationListIncludeInactive:
 
         resp = authenticated_almacenista_client.get("/api/v1/inventory/locations/")
         assert resp.status_code == 200
-        ids = [loc["id"] for loc in resp.data]
+        results = resp.data.get("results", resp.data)
+        ids = [loc["id"] for loc in results]
         assert str(sample_locations[0].id) in ids  # active
         assert str(maintenance_loc.id) not in ids  # maintenance excluded by default
 
@@ -126,7 +127,8 @@ class TestLocationListIncludeInactive:
             "/api/v1/inventory/locations/?include_inactive=true"
         )
         assert resp.status_code == 200
-        ids = [loc["id"] for loc in resp.data]
+        results = resp.data.get("results", resp.data)
+        ids = [loc["id"] for loc in results]
         assert str(maintenance_loc.id) in ids  # maintenance included with param
 
     @pytest.mark.django_db
@@ -144,7 +146,8 @@ class TestLocationListIncludeInactive:
             "/api/v1/inventory/locations/?include_inactive=true"
         )
         assert resp.status_code == 200
-        ids = [loc["id"] for loc in resp.data]
+        results = resp.data.get("results", resp.data)
+        ids = [loc["id"] for loc in results]
         assert str(archived_loc.id) not in ids  # archived excluded even with param
 
     @pytest.mark.django_db
@@ -153,6 +156,7 @@ class TestLocationListIncludeInactive:
     ):
         resp = authenticated_almacenista_client.get("/api/v1/inventory/locations/")
         assert resp.status_code == 200
-        ids = [loc["id"] for loc in resp.data]
+        results = resp.data.get("results", resp.data)
+        ids = [loc["id"] for loc in results]
         for loc in sample_locations:
             assert str(loc.id) in ids

@@ -966,12 +966,14 @@ def disable_product_for_assignment(
     product_id: Any,
     *,
     request: HttpRequest | None = None,
-) -> None:
+) -> Product:
     """Desactiva un producto para asignación (pausa temporal)."""
+    from shared.exceptions import DomainValidationError
+
     _require_almacenista(user)
     product = get_for_update_or_404(Product.objects, pk=product_id)
     if product.deleted_at is not None:
-        raise ValueError(
+        raise DomainValidationError(
             "No se puede desactivar un producto archivado; restáurelo primero."
         )
     product.is_active = False
@@ -984,6 +986,7 @@ def disable_product_for_assignment(
         request=request,
         detail={"product_id": str(product.id), "sku": product.sku},
     )
+    return product
 
 
 @transaction.atomic

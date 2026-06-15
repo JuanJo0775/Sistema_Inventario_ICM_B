@@ -54,12 +54,7 @@ def get_stock_by_product(product_id: UUID) -> dict[str, Any]:
         }
         for r in rows
     ]
-    total = int(
-        StockByLocation.objects.filter(product_id=product_id).aggregate(
-            s=Sum("current_stock")
-        )["s"]
-        or 0
-    )
+    total = sum(item["quantity"] for item in by_location)
     return {
         "product_id": str(product_id),
         "product_name": getattr(product, "name", "") if product else "",

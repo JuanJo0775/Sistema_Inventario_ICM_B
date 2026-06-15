@@ -105,12 +105,18 @@ _EXPIRING_EXPORT_HEADERS = [
 
 
 def _parse_range(request):
+    from django.utils.timezone import make_aware
+
     start = parse_datetime(request.query_params.get("start", ""))
     end = parse_datetime(request.query_params.get("end", ""))
     if not start or not end:
         raise ValidationError(
             {"detail": "Parámetros start y end son obligatorios (ISO-8601)."}
         )
+    if start.tzinfo is None:
+        start = make_aware(start)
+    if end.tzinfo is None:
+        end = make_aware(end)
     return start, end
 
 
@@ -265,13 +271,14 @@ class MovementHistoryReportView(APIView):
         product_id = _try_uuid(raw_pid, "product_id")
         raw_lid = request.query_params.get("location_id")
         location_id = _try_uuid(raw_lid, "location_id")
+        _raw_uid = request.query_params.get("user_id")
+        try:
+            _user_id = int(_raw_uid) if _raw_uid else None
+        except (ValueError, TypeError):
+            _user_id = None
         qs = movement_history(
             product_id=product_id,
-            user_id=(
-                int(request.query_params["user_id"])
-                if request.query_params.get("user_id")
-                else None
-            ),
+            user_id=_user_id,
             location_id=location_id,
             start=start,
             end=end,
@@ -314,7 +321,13 @@ class InventorySummaryReportView(APIView):
         tags=[TAG_REPORTS],
     )
     def get(self, request):
-        return Response(get_inventory_summary())
+        data = get_inventory_summary()
+        by_category = data.pop("by_category", [])
+        paginator = ICMPageNumberPagination()
+        page = paginator.paginate_queryset(by_category, request, view=self)
+        if page is not None:
+            return paginator.get_paginated_response({**data, "by_category": page})
+        return Response({**data, "by_category": by_category})
 
 
 class MovementReportView(APIView):
@@ -786,13 +799,14 @@ class ReportDatasetView(APIView):
             product_id = _try_uuid(raw_pid, "product_id")
             raw_lid = request.query_params.get("location_id")
             location_id = _try_uuid(raw_lid, "location_id")
+            _raw_uid2 = request.query_params.get("user_id")
+            try:
+                _user_id2 = int(_raw_uid2) if _raw_uid2 else None
+            except (ValueError, TypeError):
+                _user_id2 = None
             qs = movement_history(
                 product_id=product_id,
-                user_id=(
-                    int(request.query_params["user_id"])
-                    if request.query_params.get("user_id")
-                    else None
-                ),
+                user_id=_user_id2,
                 location_id=location_id,
                 start=start,
                 end=end,
@@ -945,7 +959,7 @@ class GrossMarginReportView(APIView):
     )
     def get(self, request):
         start, end = _parse_period_params(request)
-        limit = int(request.query_params.get("limit", 50))
+        limit = clamp_limit(request.query_params.get("limit", 50), default=50)
         return Response(gross_margin_by_product(start=start, end=end, limit=limit))
 
 
@@ -982,5 +996,5 @@ class SalesByCustomerReportView(APIView):
     )
     def get(self, request):
         start, end = _parse_period_params(request)
-        limit = int(request.query_params.get("limit", 50))
+        limit = clamp_limit(request.query_params.get("limit", 50), default=50)
         return Response(sales_by_customer(start=start, end=end, limit=limit))

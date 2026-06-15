@@ -120,7 +120,8 @@ class TestUserListIncludeInactive:
         inactive = UserFactory(is_active=False)
         resp = authenticated_almacenista_client.get("/api/v1/auth/users/")
         assert resp.status_code == 200
-        ids = [u["id"] for u in resp.data]
+        results = resp.data.get("results", resp.data)
+        ids = [u["id"] for u in results]
         assert str(active.id) in ids
         assert str(inactive.id) not in ids
 
@@ -131,7 +132,8 @@ class TestUserListIncludeInactive:
             "/api/v1/auth/users/?include_inactive=true"
         )
         assert resp.status_code == 200
-        ids = [u["id"] for u in resp.data]
+        results = resp.data.get("results", resp.data)
+        ids = [u["id"] for u in results]
         assert str(inactive.id) in ids
 
     @pytest.mark.django_db

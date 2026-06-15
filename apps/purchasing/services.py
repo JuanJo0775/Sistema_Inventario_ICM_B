@@ -106,18 +106,21 @@ def create_supplier(
     if nit and Supplier.objects.filter(nit=nit).exists():
         raise SupplierNITDuplicateError()
 
-    supplier = Supplier.objects.create(
-        nombre_comercial=data["nombre_comercial"],
-        razon_social=data.get("razon_social", data["nombre_comercial"]),
-        nit=nit,
-        pais=data.get("pais", "Colombia"),
-        correo=data.get("correo", ""),
-        telefono=data.get("telefono", ""),
-        ciudad=data.get("ciudad", ""),
-        direccion=data.get("direccion", ""),
-        observaciones=data.get("observaciones", ""),
-        created_by=created_by,
-    )
+    try:
+        supplier = Supplier.objects.create(
+            nombre_comercial=data["nombre_comercial"],
+            razon_social=data.get("razon_social", data["nombre_comercial"]),
+            nit=nit,
+            pais=data.get("pais", "Colombia"),
+            correo=data.get("correo", ""),
+            telefono=data.get("telefono", ""),
+            ciudad=data.get("ciudad", ""),
+            direccion=data.get("direccion", ""),
+            observaciones=data.get("observaciones", ""),
+            created_by=created_by,
+        )
+    except IntegrityError:
+        raise SupplierNITDuplicateError()
 
     log_event(
         AuditEventType.SUPPLIER_CREATED,

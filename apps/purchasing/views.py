@@ -216,7 +216,7 @@ class SupplierDisableView(APIView):
             services.disable_supplier(request.user, pk, request=request)
         except ValueError as e:
             return Response(
-                {"error": "conflict", "message": str(e)},
+                {"error": "CONFLICT", "message": str(e), "detail": {}},
                 status=status.HTTP_409_CONFLICT,
             )
         supplier = selectors.get_supplier(pk)
@@ -246,7 +246,7 @@ class SupplierEnableView(APIView):
             supplier = services.enable_supplier(request.user, pk, request=request)
         except ValueError as e:
             return Response(
-                {"error": "conflict", "message": str(e)},
+                {"error": "CONFLICT", "message": str(e), "detail": {}},
                 status=status.HTTP_409_CONFLICT,
             )
         return Response(SupplierSerializer(supplier).data)

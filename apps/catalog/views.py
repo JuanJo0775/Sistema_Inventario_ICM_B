@@ -367,7 +367,10 @@ class ProductDetailView(generics.RetrieveUpdateAPIView):
         try:
             soft_delete_product(request.user, instance.pk, request=request)
         except ValueError as exc:
-            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+            return Response(
+                {"error": "CONFLICT", "message": str(exc), "detail": {}},
+                status=status.HTTP_409_CONFLICT,
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -387,7 +390,9 @@ class ProductBarcodeView(APIView):
         tags=[TAG_CATALOG],
     )
     def get(self, request, pk):
-        product = Product.objects.select_related("category", "brand").get(pk=pk)
+        product = get_object_or_404(
+            Product.objects.select_related("category", "brand"), pk=pk
+        )
         return Response(ProductBarcodeSerializer.from_product(product))
 
 
@@ -556,7 +561,10 @@ class CategoryDetailView(APIView):
         except ObjectDoesNotExist:
             raise NotFound()
         except ValueError as exc:
-            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+            return Response(
+                {"error": "CONFLICT", "message": str(exc), "detail": {}},
+                status=status.HTTP_409_CONFLICT,
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -578,7 +586,10 @@ class CategoryRestoreView(APIView):
         except ObjectDoesNotExist:
             raise NotFound()
         except ValueError as exc:
-            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+            return Response(
+                {"error": "CONFLICT", "message": str(exc), "detail": {}},
+                status=status.HTTP_409_CONFLICT,
+            )
         return Response(CategorySerializer(cat).data)
 
 
@@ -661,7 +672,10 @@ class BrandDetailView(APIView):
         except ObjectDoesNotExist:
             raise NotFound()
         except ValueError as exc:
-            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+            return Response(
+                {"error": "CONFLICT", "message": str(exc), "detail": {}},
+                status=status.HTTP_409_CONFLICT,
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -683,7 +697,10 @@ class BrandRestoreView(APIView):
         except ObjectDoesNotExist:
             raise NotFound()
         except ValueError as exc:
-            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+            return Response(
+                {"error": "CONFLICT", "message": str(exc), "detail": {}},
+                status=status.HTTP_409_CONFLICT,
+            )
         return Response(BrandSerializer(brand).data)
 
 
@@ -708,7 +725,10 @@ class CategoryDisableView(APIView):
         except ObjectDoesNotExist:
             raise NotFound()
         except ValueError as exc:
-            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+            return Response(
+                {"error": "CONFLICT", "message": str(exc), "detail": {}},
+                status=status.HTTP_409_CONFLICT,
+            )
         return Response(CategorySerializer(cat).data)
 
 
@@ -730,7 +750,10 @@ class CategoryEnableView(APIView):
         except ObjectDoesNotExist:
             raise NotFound()
         except ValueError as exc:
-            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+            return Response(
+                {"error": "CONFLICT", "message": str(exc), "detail": {}},
+                status=status.HTTP_409_CONFLICT,
+            )
         return Response(CategorySerializer(cat).data)
 
 
@@ -755,7 +778,10 @@ class BrandDisableView(APIView):
         except ObjectDoesNotExist:
             raise NotFound()
         except ValueError as exc:
-            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+            return Response(
+                {"error": "CONFLICT", "message": str(exc), "detail": {}},
+                status=status.HTTP_409_CONFLICT,
+            )
         return Response(BrandSerializer(brand).data)
 
 
@@ -777,7 +803,10 @@ class BrandEnableView(APIView):
         except ObjectDoesNotExist:
             raise NotFound()
         except ValueError as exc:
-            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
+            return Response(
+                {"error": "CONFLICT", "message": str(exc), "detail": {}},
+                status=status.HTTP_409_CONFLICT,
+            )
         return Response(BrandSerializer(brand).data)
 
 
@@ -923,11 +952,7 @@ class ProductDisableView(APIView):
     )
     def post(self, request, pk):
         get_object_or_404(Product, pk=pk)
-        try:
-            disable_product_for_assignment(request.user, pk, request=request)
-        except ValueError as exc:
-            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
-        product = Product.objects.get(pk=pk)
+        product = disable_product_for_assignment(request.user, pk, request=request)
         return Response(ProductDetailSerializer(product).data)
 
 
@@ -949,10 +974,12 @@ class ProductEnableView(APIView):
     def post(self, request, pk):
         get_object_or_404(Product, pk=pk)
         try:
-            enable_product_for_assignment(request.user, pk, request=request)
+            product = enable_product_for_assignment(request.user, pk, request=request)
         except ValueError as exc:
-            return Response({"detail": str(exc)}, status=status.HTTP_409_CONFLICT)
-        product = Product.objects.get(pk=pk)
+            return Response(
+                {"error": "CONFLICT", "message": str(exc), "detail": {}},
+                status=status.HTTP_409_CONFLICT,
+            )
         return Response(ProductDetailSerializer(product).data)
 
 

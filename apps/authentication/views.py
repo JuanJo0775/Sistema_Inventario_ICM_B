@@ -67,6 +67,7 @@ from shared.openapi import TAG_AUTH, TAG_SYSTEM, standard_error_responses
 )
 class ICMTokenObtainPairView(TokenObtainPairView):
     serializer_class = ICMTokenObtainPairSerializer
+    throttle_scope = "login"
 
 
 @extend_schema(
@@ -171,13 +172,12 @@ class UserListCreateView(APIView):
             role=params.get("role") or None,
             search=params.get("search") or None,
         )
-        if "page" in params or "page_size" in params:
-            paginator = ICMPageNumberPagination()
-            page = paginator.paginate_queryset(users, request)
-            if page is not None:
-                return paginator.get_paginated_response(
-                    UserSerializer(page, many=True).data
-                )
+        paginator = ICMPageNumberPagination()
+        page = paginator.paginate_queryset(users, request)
+        if page is not None:
+            return paginator.get_paginated_response(
+                UserSerializer(page, many=True).data
+            )
         return Response(UserSerializer(users, many=True).data)
 
     @extend_schema(
@@ -255,6 +255,10 @@ class UserDetailView(APIView):
         if password:
             if isinstance(password, list):
                 password = password[0]
+            if len(password) < 8:
+                raise ValidationError(
+                    {"password": "La contraseña debe tener al menos 8 caracteres."}
+                )
             update_user_password(request.user, instance.id, password, request=request)
 
         serializer = UserSerializer(instance, data=data, partial=partial)
@@ -499,6 +503,7 @@ class ForgotPasswordView(APIView):
     """POST — Solicitar recuperación de contraseña por email (sin autenticación)."""
 
     permission_classes = (AllowAny,)
+    throttle_scope = "password_reset"
 
     @extend_schema(
         summary="Solicitar recuperación de contraseña",
