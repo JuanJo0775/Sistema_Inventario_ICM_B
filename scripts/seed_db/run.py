@@ -22,7 +22,7 @@ from pathlib import Path
 _ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(_ROOT))
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
+os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings.development"
 
 import django  # noqa: E402
 
