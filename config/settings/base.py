@@ -31,6 +31,7 @@ if _env_file.exists():
     config = Config(RepositoryEnv(str(_env_file)))
 else:
     from decouple import AutoConfig  # noqa: PLC0415
+
     config = AutoConfig(search_path=str(BASE_DIR))
 
 SECRET_KEY = config(
