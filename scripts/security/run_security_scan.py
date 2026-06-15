@@ -21,7 +21,6 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import List
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -31,7 +30,7 @@ _REPORTS_DIR = Path(__file__).resolve().parent / "reports"
 TOOLS: list[dict] = [
     {
         "name": "ruff lint",
-        "cmd": ["ruff", "check", "apps/", "shared/"],
+        "cmd": ["ruff", "check", "apps/", "shared/", "config/"],
         "desc": "Linting Python (ruff)",
     },
     {
@@ -42,10 +41,13 @@ TOOLS: list[dict] = [
     {
         "name": "semgrep",
         "cmd": [
-            "semgrep", "scan",
-            "--config", "auto",
-            "--include", "*.py",
-            "apps/", "shared/",
+            "semgrep",
+            "scan",
+            "--config",
+            "auto",
+            "--include=*.py",
+            "apps/",
+            "shared/",
         ],
         "ci_flags": ["--quiet", "--error"],
         "desc": "SAST (Semgrep Registry)",
@@ -62,12 +64,28 @@ TOOLS: list[dict] = [
     },
     {
         "name": "mypy",
-        "cmd": ["mypy", "apps/", "shared/", "--ignore-missing-imports", "--no-error-summary"],
+        "cmd": [
+            "mypy",
+            "apps/",
+            "shared/",
+            "--ignore-missing-imports",
+            "--no-error-summary",
+            "--show-error-codes",
+        ],
         "desc": "Tipado estático (mypy)",
     },
 ]
 
 _TOOL_NAMES = {t["name"] for t in TOOLS}
+
+
+def _sanitize(text: str) -> str:
+    """Strip Unicode box-drawing and checkmark characters for plain-text reports."""
+    import re
+
+    text = re.sub(r"[\u2500-\u257f]", "", text)
+    text = re.sub(r"[\u2705\u274c]", "", text)
+    return text
 
 
 def _resolve_tools(only: str, skip: str) -> list[dict]:
@@ -130,16 +148,14 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _sanitize(text: str) -> str:
-    """Reemplaza caracteres Unicode no imprimibles en Windows cp1252."""
-    try:
-        text.encode("cp1252")
-        return text
-    except UnicodeEncodeError:
-        return text.encode("cp1252", errors="replace").decode("cp1252")
-
-
-def _run_tool(name: str, cmd: list[str], desc: str, dry_run: bool, ci: bool = False, ci_flags: list[str] | None = None) -> tuple[bool, str]:
+def _run_tool(
+    name: str,
+    cmd: list[str],
+    desc: str,
+    dry_run: bool,
+    ci: bool = False,
+    ci_flags: list[str] | None = None,
+) -> tuple[bool, str]:
     effective_cmd = list(cmd)
     if ci and ci_flags:
         effective_cmd.extend(ci_flags)
@@ -150,14 +166,22 @@ def _run_tool(name: str, cmd: list[str], desc: str, dry_run: bool, ci: bool = Fa
         return True, f"{label}\n         {' '.join(effective_cmd)}"
 
     try:
-        result = subprocess.run(effective_cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        result = subprocess.run(
+            effective_cmd,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
         ok = result.returncode == 0
-        raw = result.stdout or result.stderr or "(sin salida)"
-        detail = _sanitize(raw.strip())
         if ok:
-            return True, f"{label}  OK\n{detail}"
+            raw = result.stdout or result.stderr or "(sin salida)"
+            return True, f"{label}  OK\n{raw.strip()}"
         else:
-            msg = result.stderr.strip() or result.stdout.strip() or f"exit code {result.returncode}"
+            stdout = result.stdout.strip() if result.stdout.strip() else ""
+            stderr = result.stderr.strip() if result.stderr.strip() else ""
+            combined = "\n".join(filter(None, [stdout, stderr]))
+            msg = combined or f"exit code {result.returncode}"
             return False, f"{label}  FAIL (code {result.returncode})\n{msg}"
     except FileNotFoundError:
         return False, f"{label}  NOT FOUND - {desc}. Comando: {' '.join(cmd)}"
@@ -195,30 +219,43 @@ def run_scan(args: argparse.Namespace) -> int:
     print(header)
 
     all_ok = True
+    results: list[tuple[str, bool, str]] = []
 
     for tool in tools_to_run:
         ok, output = _run_tool(
-            tool["name"], tool["cmd"], tool["desc"],
-            args.dry_run, args.ci, tool.get("ci_flags"),
+            tool["name"],
+            tool["cmd"],
+            tool["desc"],
+            args.dry_run,
+            args.ci,
+            tool.get("ci_flags"),
         )
         if not ok:
             all_ok = False
+        results.append((tool["name"], ok, output))
         print(output)
         print()
 
+    summary_parts: list[str] = []
+    summary_parts.append("")
+    summary_parts.append("  Resumen por herramienta:")
+    summary_parts.append(f"  {'HERRAMIENTA':20s} {'ESTADO':10s}")
+    summary_parts.append(f"  {'-' * 20} {'-' * 10}")
+    for tool_name, ok, _ in results:
+        status = "[OK]" if ok else "[FAIL]"
+        summary_parts.append(f"  {tool_name:20s} {status:10s}")
+    summary_parts.append("")
+    summary_text = "\n".join(summary_parts)
+
     summary_line = f"  {'[OK]' if all_ok else '[FAIL]'}  Resultado: {'TODAS PASARON' if all_ok else 'ALGUNAS FALLARON'}"
+    print(summary_text)
     print(summary_line)
     print(f"  Finalizado: {datetime.now():%Y-%m-%d %H:%M:%S}")
     print("=" * 72)
 
-    report_lines.extend(
-        tool_output
-        for tool in tools_to_run
-        if (tool_output := _run_tool(
-            tool["name"], tool["cmd"], tool["desc"],
-            False, args.ci, tool.get("ci_flags"),
-        )[1])
-    )
+    for _, _, output in results:
+        report_lines.append(output)
+    report_lines.append(summary_text)
     report_lines.append(summary_line)
     report_lines.append(f"  Finalizado: {datetime.now():%Y-%m-%d %H:%M:%S}")
     report_lines.append("=" * 72)
