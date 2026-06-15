@@ -281,6 +281,11 @@ Checklist rápido:
 - `serializers.py`: validación I/O, sin lógica de dominio que requiera BD o transacción.
 - `services.py`: `@transaction.atomic`, `select_for_update()` cuando aplique, creación de `Movement`.
 
+**Trampa Django 5.2 — `CheckConstraint`:** En Django ≥5.1 el parámetro `check=` fue renombrado a `condition=`. Usar `check=` causa error de tipo en mypy/django-stubs. Ejemplo correcto:
+```python
+models.CheckConstraint(condition=Q(quantity__gt=0), name="qty_positive")
+```
+
 ### 3) API / OpenAPI (contrato)
 
 - Prefijo: `/api/v1/`. Documentar con `@extend_schema` y usar solo `tags` oficiales de `shared/openapi.py`.
