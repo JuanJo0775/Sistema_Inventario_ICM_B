@@ -29,6 +29,8 @@ def impl_rnf003_s01(api_client: APIClient):
         "DB_USER": "ci_user",
         "DB_PASSWORD": "ci_pass",
         "DB_HOST": "localhost",
+        "DJANGO_SECRET_KEY": "ci-dummy-secret-key-for-settings-import-test",
+        "DJANGO_ALLOWED_HOSTS": "localhost",
     }
     with patch.dict(os.environ, db_env):
         production_settings = importlib.import_module("config.settings.production")
