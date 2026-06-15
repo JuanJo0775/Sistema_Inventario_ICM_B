@@ -26,3 +26,5 @@ Este directorio describe el comportamiento detallado de cada módulo del sistema
 - **Stock**: `Movement` es la fuente de verdad; `StockByLocation` es derivado sincronizado en transacción
 - **Inmutabilidad**: movimientos y auditoría no se editan ni eliminan; las correcciones crean nuevos registros
 - **Transacciones**: toda operación de escritura usa `@transaction.atomic` y `select_for_update()` donde hay riesgo de concurrencia
+- **Soft delete**: entidades del sistema usan `SoftDeleteModel` (`shared.models`) con `deleted_at` para existencia lógica; `is_active` controla disponibilidad para reglas de negocio (nunca mezclar)
+- **Lock utility**: `get_for_update_or_404()` (`shared.utils.db`) para obtener objetos con `select_for_update()` o lanzar 404
