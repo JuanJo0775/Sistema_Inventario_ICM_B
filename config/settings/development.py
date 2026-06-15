@@ -13,17 +13,7 @@ ALLOWED_HOSTS = [
     if h.strip()
 ]
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME", default="icm_db"),
-        "USER": config("DB_USER", default="icm_user"),
-        "PASSWORD": config("DB_PASSWORD", default="icm_password"),
-        "HOST": config("DB_HOST", default="localhost"),
-        "PORT": config("DB_PORT", default="5432"),
-        "CONN_MAX_AGE": 600,
-    }
-}
+# DATABASES viene de base.py con el switch DB_PROVIDER (local/neon)
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = []

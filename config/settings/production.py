@@ -18,20 +18,10 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
-        "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT", default="5432"),
-        "CONN_MAX_AGE": 600,
-        "OPTIONS": {
-            "connect_timeout": 10,
-        },
-    }
-}
+# DATABASES viene de base.py con el switch DB_PROVIDER (local/neon)
+# Solo se fuerza connect_timeout para producción:
+if config("DB_PROVIDER", default="local") == "local":
+    DATABASES["default"].setdefault("OPTIONS", {})["connect_timeout"] = 10
 
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [config("FRONTEND_URL", default="https://example.com").strip()]

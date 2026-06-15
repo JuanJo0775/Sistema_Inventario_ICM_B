@@ -6,19 +6,16 @@ compartan la misma base de datos, lo que requiere un motor persistente.
 """
 
 import os
-import urllib.parse
+
+import dj_database_url
 
 from .test import *  # noqa: F401,F403
 
-_db = urllib.parse.urlparse(os.environ.get("DATABASE_URL", ""))
+_db_url = os.environ.get("DATABASE_URL", "")
+if _db_url:
+    DATABASES = {"default": dj_database_url.config(default=_db_url)}
+else:
+    # Fallback local para desarrollo
+    from .base import DATABASES as _base_db  # noqa: F401
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": _db.path.lstrip("/") or "icm_test",
-        "USER": _db.username or "icm",
-        "PASSWORD": _db.password or "icm_pass",
-        "HOST": _db.hostname or "localhost",
-        "PORT": str(_db.port or 5432),
-    }
-}
+    DATABASES = _base_db
