@@ -187,6 +187,14 @@ class LocationStateNotAllowedError(DomainValidationError):
     default_code = "LOCATION_STATE_NOT_ALLOWED"
 
 
+class ResourceNotFoundError(ICMBaseException):
+    """Recurso solicitado no encontrado (404)."""
+
+    default_message = "El recurso solicitado no existe."
+    default_code = "NOT_FOUND"
+    status_code = status.HTTP_404_NOT_FOUND
+
+
 class ImmutableRecordError(ICMBaseException):
     """BR-10: Intento de modificar un registro inmutable o ventana de corrección cerrada."""
 
