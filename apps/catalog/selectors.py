@@ -24,16 +24,19 @@ def get_product_by_id(product_id: UUID) -> Product:
 
 def get_all_products(filters: dict[str, Any] | None = None) -> QuerySet[Product]:
     """
-    RF-003 — Listado filtrable de productos activos/inactivos y categoría.
+    RF-003 — Listado filtrable de productos (excluye archivados por defecto).
 
     Args:
-        filters: Opcional: `category_id`, `is_active`, `search` (nombre/SKU).
+        filters: Opcional: `category_id`, `is_active`, `search` (nombre/SKU),
+                 `include_archived` (bool, default False).
 
     Returns:
         QuerySet ordenado por SKU.
     """
     filters = filters or {}
     qs = Product.objects.select_related("category", "brand").all()
+    if not filters.get("include_archived"):
+        qs = qs.filter(deleted_at__isnull=True)
     if filters.get("category_id"):
         qs = qs.filter(category_id=filters["category_id"])
     if filters.get("is_active") is not None:
@@ -47,9 +50,12 @@ def get_all_products(filters: dict[str, Any] | None = None) -> QuerySet[Product]
     return qs.order_by("sku")
 
 
-def get_categories() -> QuerySet[Category]:
-    """RF-003 — Todas las categorías ordenadas por nombre."""
-    return Category.objects.all().order_by("name")
+def get_categories(*, include_archived: bool = False) -> QuerySet[Category]:
+    """RF-003 — Categorías ordenadas por nombre (excluye archivadas por defecto)."""
+    qs = Category.objects.all()
+    if not include_archived:
+        qs = qs.filter(deleted_at__isnull=True)
+    return qs.order_by("name")
 
 
 def get_products_expiring_soon(days: int = 30) -> QuerySet[Product]:

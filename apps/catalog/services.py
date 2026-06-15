@@ -216,7 +216,8 @@ def create_combo(
                 quantity=int(row.get("quantity", 1)),
             )
     except IntegrityError:
-        combo.delete()
+        # @transaction.atomic hace rollback automático de todo el bloque,
+        # incluyendo la creación del combo. No se necesita combo.delete() aquí.
         raise DomainValidationError("Uno o más productos ya están en el combo.")
     log_event(
         AuditEventType.COMBO_CREATED,

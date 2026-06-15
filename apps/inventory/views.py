@@ -214,7 +214,23 @@ class LocationListCreateView(APIView):
 
     @extend_schema(
         summary="Listar ubicaciones",
-        description="Lista las ubicaciones registradas (excluye eliminadas lógicamente).",
+        description="Lista las ubicaciones registradas (excluye eliminadas lógicamente por defecto).",
+        parameters=[
+            OpenApiParameter(
+                name="include_archived",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Si es true, incluye ubicaciones eliminadas lógicamente (deleted_at != null).",
+            ),
+            OpenApiParameter(
+                name="include_inactive",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Si es true, incluye ubicaciones con operational_status distinto de ACTIVE.",
+            ),
+        ],
         responses={
             200: LocationSerializer(many=True),
             **standard_error_responses(),
@@ -222,7 +238,14 @@ class LocationListCreateView(APIView):
         tags=[TAG_INVENTORY],
     )
     def get(self, request):
-        qs = Location.objects.filter(deleted_at__isnull=True).order_by("code")
+        include_archived = request.query_params.get("include_archived", "").lower() in (
+            "1",
+            "true",
+            "yes",
+        )
+        qs = Location.objects.order_by("code")
+        if not include_archived:
+            qs = qs.filter(deleted_at__isnull=True)
         include_inactive = request.query_params.get("include_inactive", "").lower()
         if include_inactive not in ("1", "true", "yes"):
             qs = qs.filter(operational_status=Location.OperationalStatus.ACTIVE)
@@ -272,7 +295,23 @@ class StorageTemplateListCreateView(APIView):
 
     @extend_schema(
         summary="Listar plantillas de almacenamiento",
-        description="Lista las plantillas de almacenamiento registradas (excluye eliminadas lógicamente).",
+        description="Lista las plantillas de almacenamiento registradas (excluye eliminadas lógicamente por defecto).",
+        parameters=[
+            OpenApiParameter(
+                name="include_archived",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Si es true, incluye plantillas eliminadas lógicamente (deleted_at != null).",
+            ),
+            OpenApiParameter(
+                name="is_active",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Filtra por disponibilidad (is_active=true/false).",
+            ),
+        ],
         responses={
             200: StorageTemplateSerializer(many=True),
             **standard_error_responses(),
@@ -282,11 +321,19 @@ class StorageTemplateListCreateView(APIView):
     def get(self, request):
         from apps.inventory.models import StorageTemplate
 
+        include_archived = request.query_params.get("include_archived", "").lower() in (
+            "1",
+            "true",
+            "yes",
+        )
+        qs = StorageTemplate.objects.select_related("storage_type")
+        if not include_archived:
+            qs = qs.filter(deleted_at__isnull=True)
+        is_active_param = request.query_params.get("is_active")
+        if is_active_param is not None:
+            qs = qs.filter(is_active=is_active_param.lower() in ("true", "1", "yes"))
         data = StorageTemplateSerializer(
-            StorageTemplate.objects.filter(deleted_at__isnull=True)
-            .select_related("storage_type")
-            .order_by("sort_order", "name"),
-            many=True,
+            qs.order_by("sort_order", "name"), many=True
         ).data
         return Response(data)
 
@@ -490,7 +537,23 @@ class StorageTypeListCreateView(APIView):
 
     @extend_schema(
         summary="Listar tipos de almacenamiento",
-        description="Lista los tipos de almacenamiento registrados (excluye eliminados lógicamente).",
+        description="Lista los tipos de almacenamiento registrados (excluye eliminados lógicamente por defecto).",
+        parameters=[
+            OpenApiParameter(
+                name="include_archived",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Si es true, incluye tipos eliminados lógicamente (deleted_at != null).",
+            ),
+            OpenApiParameter(
+                name="is_active",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Filtra por disponibilidad (is_active=true/false).",
+            ),
+        ],
         responses={
             200: StorageTypeSerializer(many=True),
             **standard_error_responses(),
@@ -500,12 +563,18 @@ class StorageTypeListCreateView(APIView):
     def get(self, request):
         from apps.inventory.models import StorageType
 
-        data = StorageTypeSerializer(
-            StorageType.objects.filter(deleted_at__isnull=True).order_by(
-                "sort_order", "name"
-            ),
-            many=True,
-        ).data
+        include_archived = request.query_params.get("include_archived", "").lower() in (
+            "1",
+            "true",
+            "yes",
+        )
+        qs = StorageType.objects.all()
+        if not include_archived:
+            qs = qs.filter(deleted_at__isnull=True)
+        is_active_param = request.query_params.get("is_active")
+        if is_active_param is not None:
+            qs = qs.filter(is_active=is_active_param.lower() in ("true", "1", "yes"))
+        data = StorageTypeSerializer(qs.order_by("sort_order", "name"), many=True).data
         return Response(data)
 
     @extend_schema(

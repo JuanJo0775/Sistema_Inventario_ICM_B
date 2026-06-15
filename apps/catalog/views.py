@@ -34,12 +34,10 @@ from apps.catalog.serializers import (
     ResolveIdentifierQuerySerializer,
 )
 from apps.catalog.services import (
-    activate_combo,
     create_brand,
     create_category,
     create_combo,
     create_product,
-    deactivate_combo,
     disable_brand_for_assignment,
     disable_category_for_assignment,
     disable_product_for_assignment,
@@ -49,9 +47,11 @@ from apps.catalog.services import (
     resolve_identifier,
     restore_brand,
     restore_category,
+    restore_combo,
     restore_product,
     soft_delete_brand,
     soft_delete_category,
+    soft_delete_combo,
     soft_delete_product,
     update_brand,
     update_category,
@@ -69,6 +69,25 @@ from shared.permissions import IsAlmacenista
         summary="Listar categorías",
         description="Lista las categorías registradas en el catálogo.",
         tags=[TAG_CATALOG],
+        parameters=[
+            OpenApiParameter(
+                name="status",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description=(
+                    "Filtro de estado: active (defecto), inactive, deleted, all. "
+                    "'deleted' devuelve solo archivadas; 'all' incluye todas."
+                ),
+            ),
+            OpenApiParameter(
+                name="include_inactive",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Si es true, devuelve activas e inactivas (excluye archivadas).",
+            ),
+        ],
         responses={
             200: CategorySerializer(many=True),
             **standard_error_responses(),
@@ -128,6 +147,25 @@ class CategoryListCreateView(generics.ListCreateAPIView):
         summary="Listar marcas",
         description="Lista las marcas registradas en el catálogo.",
         tags=[TAG_CATALOG],
+        parameters=[
+            OpenApiParameter(
+                name="status",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description=(
+                    "Filtro de estado: active (defecto), inactive, deleted, all. "
+                    "'deleted' devuelve solo archivadas; 'all' incluye todas."
+                ),
+            ),
+            OpenApiParameter(
+                name="include_inactive",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Si es true, devuelve activas e inactivas (excluye archivadas).",
+            ),
+        ],
         responses={
             200: BrandSerializer(many=True),
             **standard_error_responses(),
@@ -188,6 +226,36 @@ class BrandListCreateView(generics.ListCreateAPIView):
         summary="Listar productos",
         description="Lista los productos disponibles en el catálogo.",
         tags=[TAG_CATALOG],
+        parameters=[
+            OpenApiParameter(
+                name="include_archived",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Si es true, incluye productos eliminados lógicamente (deleted_at != null).",
+            ),
+            OpenApiParameter(
+                name="include_inactive",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Si es true, incluye productos con is_active=False.",
+            ),
+            OpenApiParameter(
+                name="category",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Filtra por UUID de categoría.",
+            ),
+            OpenApiParameter(
+                name="search",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Búsqueda por nombre o SKU.",
+            ),
+        ],
         responses={
             200: ProductSerializer(many=True),
             **standard_error_responses(include_403=True),
@@ -211,8 +279,11 @@ class ProductListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         qs = Product.objects.select_related("category", "brand").all()
-        # Excluir eliminados lógicamente por defecto
-        qs = qs.filter(deleted_at__isnull=True)
+        include_archived = self.request.query_params.get(
+            "include_archived", ""
+        ).lower() in ("1", "true", "yes")
+        if not include_archived:
+            qs = qs.filter(deleted_at__isnull=True)
         include_inactive = self.request.query_params.get("include_inactive", "").lower()
         if include_inactive not in ("1", "true", "yes"):
             qs = qs.filter(is_active=True)
@@ -360,6 +431,15 @@ class ResolveIdentifierView(APIView):
         summary="Listar combos",
         description="Lista los combos de productos registrados.",
         tags=[TAG_CATALOG],
+        parameters=[
+            OpenApiParameter(
+                name="include_archived",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Si es true, incluye combos eliminados lógicamente (deleted_at != null).",
+            ),
+        ],
         responses={
             200: ComboSerializer(many=True),
             **standard_error_responses(),
@@ -383,8 +463,11 @@ class ComboListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         qs = ProductCombo.objects.prefetch_related("combo_items__product").all()
-        # Excluir eliminados lógicamente por defecto
-        qs = qs.filter(deleted_at__isnull=True)
+        include_archived = self.request.query_params.get(
+            "include_archived", ""
+        ).lower() in ("1", "true", "yes")
+        if not include_archived:
+            qs = qs.filter(deleted_at__isnull=True)
         return qs
 
     def create(self, request, *args, **kwargs):
@@ -425,12 +508,13 @@ class ComboListCreateView(generics.ListCreateAPIView):
         },
     ),
     delete=extend_schema(
-        summary="Desactivar categoría",
+        summary="Eliminar lógicamente categoría (soft delete)",
         description=(
-            "Marca la categoría como inactiva. "
-            "El registro NO se elimina de la base de datos. "
+            "Archiva la categoría (deleted_at=now). "
+            "El registro NO se elimina de la base de datos ni del historial de movimientos. "
             "Devuelve HTTP 409 si la categoría tiene productos activos asociados. "
-            "Para reactivarla use POST /categories/{id}/restore/."
+            "Para restaurarla use POST /categories/{id}/restore/. "
+            "Para solo deshabilitar (is_active=False sin archivar) use POST /categories/{id}/disable/."
         ),
         tags=[TAG_CATALOG],
         responses={
@@ -529,12 +613,13 @@ class CategoryRestoreView(APIView):
         },
     ),
     delete=extend_schema(
-        summary="Desactivar marca",
+        summary="Eliminar lógicamente marca (soft delete)",
         description=(
-            "Marca la marca como inactiva. "
-            "El registro NO se elimina de la base de datos. "
+            "Archiva la marca (deleted_at=now). "
+            "El registro NO se elimina de la base de datos ni del historial de movimientos. "
             "Devuelve HTTP 409 si la marca tiene productos activos asociados. "
-            "Para reactivarla use POST /brands/{id}/restore/."
+            "Para restaurarla use POST /brands/{id}/restore/. "
+            "Para solo deshabilitar (is_active=False sin archivar) use POST /brands/{id}/disable/."
         ),
         tags=[TAG_CATALOG],
         responses={
@@ -776,7 +861,7 @@ class ComboDetailView(APIView):
 
     def delete(self, request, pk):
         try:
-            deactivate_combo(request.user, pk, request=request)
+            soft_delete_combo(request.user, pk, request=request)
         except ObjectDoesNotExist:
             raise NotFound()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -796,7 +881,7 @@ class ComboRestoreView(APIView):
     )
     def post(self, request, pk):
         get_object_or_404(ProductCombo, pk=pk)
-        combo = activate_combo(request.user, pk, request=request)
+        combo = restore_combo(request.user, pk, request=request)
         return Response(ComboSerializer(combo).data)
 
 
