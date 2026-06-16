@@ -189,11 +189,10 @@ def _next_invoice_number() -> str:
     return f"ICM-{row.last_number:04d}"
 
 
+@transaction.atomic
 def generate_invoice_number() -> str:
     """
     BR-13 — Numeración secuencial de factura.
-
-    Debe invocarse dentro de la misma transacción `atomic` que el despacho que persiste el movimiento.
     """
     return _next_invoice_number()
 
@@ -336,7 +335,7 @@ def create_invoice_from_movements(
     currency = next((m.currency for m in movements if m.currency), "COP")
 
     cd = customer_data or {}
-    invoice, _ = Invoice.objects.get_or_create(
+    invoice, _ = Invoice.objects.select_for_update().get_or_create(
         number=invoice_number,
         defaults={
             "customer_name": cd.get("customer_name", ""),
