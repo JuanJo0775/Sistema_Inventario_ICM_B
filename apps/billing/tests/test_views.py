@@ -201,6 +201,87 @@ def test_create_invoice_atomicity_on_second_item_fail(
     assert Invoice.objects.count() == invoice_count_before
 
 
+@pytest.mark.django_db
+def test_create_invoice_mixes_combo_and_product(
+    almacenista_user, sample_locations, api_client
+):
+    """RF-006, RF-003 — El carrito acepta combo_id y product_id en el mismo POST."""
+    from apps.catalog.models import ComboItem, ProductCombo
+
+    api_client.force_authenticate(user=almacenista_user)
+    loc = sample_locations[1]
+    combo_component = ProductFactory(sale_price_retail=Decimal("3000"))
+    individual_product = ProductFactory(sale_price_retail=Decimal("7000"))
+    combo = ProductCombo.objects.create(name="Combo Vista", sku="KIT-VIEW-01")
+    ComboItem.objects.create(combo=combo, product=combo_component, quantity=1)
+    _seed(almacenista_user, combo_component, loc, 10)
+    _seed(almacenista_user, individual_product, loc, 10)
+
+    payload = {
+        "invoice_type": "retail",
+        "location_id": str(loc.id),
+        "customer": {"name": "Cliente Mixto"},
+        "items": [
+            {"combo_id": str(combo.id), "quantity": 1},
+            {"product_id": str(individual_product.id), "quantity": 1},
+        ],
+    }
+    resp = api_client.post(reverse("billing-invoice-list"), payload, format="json")
+    assert resp.status_code == 201
+    data = resp.json()
+    assert len(data["movements_detail"]) == 2
+
+
+@pytest.mark.django_db
+def test_create_invoice_item_with_both_product_and_combo_returns_400(
+    almacenista_user, sample_locations, api_client
+):
+    api_client.force_authenticate(user=almacenista_user)
+    p = ProductFactory(sale_price_retail=Decimal("1000"))
+    payload = {
+        "invoice_type": "retail",
+        "location_id": str(sample_locations[1].id),
+        "customer": {"name": "Test"},
+        "items": [
+            {"product_id": str(p.id), "combo_id": str(p.id), "quantity": 1},
+        ],
+    }
+    resp = api_client.post(reverse("billing-invoice-list"), payload, format="json")
+    assert resp.status_code == 400
+
+
+@pytest.mark.django_db
+def test_create_invoice_item_with_neither_product_nor_combo_returns_400(
+    almacenista_user, sample_locations, api_client
+):
+    api_client.force_authenticate(user=almacenista_user)
+    payload = {
+        "invoice_type": "retail",
+        "location_id": str(sample_locations[1].id),
+        "customer": {"name": "Test"},
+        "items": [{"quantity": 1}],
+    }
+    resp = api_client.post(reverse("billing-invoice-list"), payload, format="json")
+    assert resp.status_code == 400
+
+
+@pytest.mark.django_db
+def test_create_invoice_unknown_combo_returns_404(
+    almacenista_user, sample_locations, api_client
+):
+    from uuid import uuid4
+
+    api_client.force_authenticate(user=almacenista_user)
+    payload = {
+        "invoice_type": "retail",
+        "location_id": str(sample_locations[1].id),
+        "customer": {"name": "Test"},
+        "items": [{"combo_id": str(uuid4()), "quantity": 1}],
+    }
+    resp = api_client.post(reverse("billing-invoice-list"), payload, format="json")
+    assert resp.status_code == 404
+
+
 # ---------------------------------------------------------------------------
 # GET /billing/invoices/{id}/ — detalle
 # ---------------------------------------------------------------------------

@@ -133,6 +133,131 @@ def test_multi_dispatch_insufficient_stock_raises(almacenista_user, sample_locat
         )
 
 
+def _make_combo(product, quantity=1, sku="KIT-BILL-01"):
+    """Crea un ProductCombo de un solo ítem para los tests del carrito mixto."""
+    from apps.catalog.models import ComboItem, ProductCombo
+
+    combo = ProductCombo.objects.create(name=f"Combo {sku}", sku=sku)
+    ComboItem.objects.create(combo=combo, product=product, quantity=quantity)
+    return combo
+
+
+@pytest.mark.django_db
+def test_multi_dispatch_mixes_combo_and_individual_product_in_one_invoice(
+    almacenista_user, sample_locations
+):
+    """RF-006, RF-003 — Un combo y un producto individual caben en la misma factura."""
+    loc = sample_locations[1]
+    combo_component = ProductFactory(
+        sale_price_retail=Decimal("3000"), tax_rate_pct=Decimal("0")
+    )
+    individual_product = ProductFactory(
+        sale_price_retail=Decimal("7000"), tax_rate_pct=Decimal("0")
+    )
+    combo = _make_combo(combo_component, quantity=2)
+    _seed(almacenista_user, combo_component, loc, 10)
+    _seed(almacenista_user, individual_product, loc, 10)
+
+    invoice = create_multi_dispatch_invoice(
+        almacenista_user,
+        invoice_type="retail",
+        location_id=loc.id,
+        customer_data={"name": "Cliente Mixto"},
+        items=[
+            {"combo_id": combo.id, "quantity": 1},
+            {"product_id": individual_product.id, "quantity": 1},
+        ],
+    )
+
+    # 1 movement por el componente del combo + 1 movement del producto individual
+    assert invoice.movements.count() == 2
+    assert (
+        invoice.movements.filter(movement_type=MovementType.SALIDA_COMBO).count() == 1
+    )
+    numbers = set(invoice.movements.values_list("invoice_number", flat=True))
+    assert len(numbers) == 1
+    assert numbers.pop() == invoice.number
+
+
+@pytest.mark.django_db
+def test_multi_dispatch_combo_quantity_dispatches_combo_multiple_times(
+    almacenista_user, sample_locations
+):
+    """quantity=2 en un ítem combo despacha el combo completo dos veces."""
+    loc = sample_locations[1]
+    component = ProductFactory(sale_price_retail=Decimal("1000"))
+    combo = _make_combo(component, quantity=1, sku="KIT-BILL-02")
+    _seed(almacenista_user, component, loc, 10)
+
+    invoice = create_multi_dispatch_invoice(
+        almacenista_user,
+        invoice_type="retail",
+        location_id=loc.id,
+        customer_data={"name": "Test"},
+        items=[{"combo_id": combo.id, "quantity": 2}],
+    )
+
+    assert invoice.movements.count() == 2  # 2 despachos del combo (1 ítem cada uno)
+
+
+@pytest.mark.django_db
+def test_multi_dispatch_unknown_combo_raises_does_not_exist(
+    almacenista_user, sample_locations
+):
+    from apps.catalog.models import ProductCombo
+    from uuid import uuid4
+
+    with pytest.raises(ProductCombo.DoesNotExist):
+        create_multi_dispatch_invoice(
+            almacenista_user,
+            invoice_type="retail",
+            location_id=sample_locations[1].id,
+            customer_data={"name": "Test"},
+            items=[{"combo_id": uuid4(), "quantity": 1}],
+        )
+
+
+@pytest.mark.django_db
+def test_void_invoice_with_mixed_combo_and_product_restores_all_stock(
+    almacenista_user, sample_locations
+):
+    """Anular una factura mixta revierte el stock tanto del combo como del producto suelto."""
+    from apps.inventory.models import StockByLocation
+
+    loc = sample_locations[1]
+    combo_component = ProductFactory(sale_price_retail=Decimal("3000"))
+    individual_product = ProductFactory(sale_price_retail=Decimal("7000"))
+    combo = _make_combo(combo_component, quantity=2, sku="KIT-BILL-03")
+    _seed(almacenista_user, combo_component, loc, 10)
+    _seed(almacenista_user, individual_product, loc, 10)
+
+    invoice = create_multi_dispatch_invoice(
+        almacenista_user,
+        invoice_type="retail",
+        location_id=loc.id,
+        customer_data={"name": "Test"},
+        items=[
+            {"combo_id": combo.id, "quantity": 1},
+            {"product_id": individual_product.id, "quantity": 3},
+        ],
+    )
+
+    void_invoice(invoice.pk, user=almacenista_user, reason="Anulación mixta")
+
+    assert (
+        StockByLocation.objects.get(
+            product=combo_component, location=loc
+        ).current_stock
+        == 10
+    )
+    assert (
+        StockByLocation.objects.get(
+            product=individual_product, location=loc
+        ).current_stock
+        == 10
+    )
+
+
 @pytest.mark.django_db
 def test_multi_dispatch_each_item_shares_same_invoice_number(
     almacenista_user, sample_locations
