@@ -334,11 +334,19 @@ def create_invoice_from_movements(
     tax_total = sum((m.tax_amount or Decimal("0")) for m in movements)
     total_amount = sum((m.total_amount or Decimal("0")) for m in movements)
     currency = next((m.currency for m in movements if m.currency), "COP")
+    # BR-13: invoice_type es NOT NULL en BD; se infiere del movement_type
+    # del despacho (wholesale solo si es SALIDA_VENTA_MAYOR explícito).
+    invoice_type = (
+        Invoice.InvoiceType.WHOLESALE
+        if any(m.movement_type == MovementType.SALIDA_VENTA_MAYOR for m in movements)
+        else Invoice.InvoiceType.RETAIL
+    )
 
     cd = customer_data or {}
     invoice, _ = Invoice.objects.select_for_update().get_or_create(
         number=invoice_number,
         defaults={
+            "invoice_type": invoice_type,
             "customer_name": cd.get("customer_name", ""),
             "customer_email": cd.get("customer_email", ""),
             "customer_phone": cd.get("customer_phone", ""),
