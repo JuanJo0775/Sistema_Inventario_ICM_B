@@ -141,7 +141,9 @@ def main():
     if _from_cli:
         _settings_mod = _from_cli
     else:
-        _settings_mod = "config.settings.development"
+        _settings_mod = (
+            os.environ.get("DJANGO_SETTINGS_MODULE") or "config.settings.development"
+        )
     if "production" in _settings_mod:
         _env_filename = ".env.production"
     elif "development" in _settings_mod:
