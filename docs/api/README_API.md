@@ -22,6 +22,7 @@ La API cubre los dominios funcionales del backend:
 - auditoría
 - webhooks (notificaciones a sistemas externos)
 - compras (proveedores, órdenes de compra, recepciones)
+- facturación comercial (carrito multi-producto, anulación, estadísticas)
 
 > **Documentos relacionados:**
 > - Referencia completa de endpoints con ejemplos: [REFERENCIA_ENDPOINTS.md](REFERENCIA_ENDPOINTS.md)
@@ -95,6 +96,7 @@ Los tags se definen centralmente en [shared/openapi.py](../../shared/openapi.py)
 | `TAG_AUDIT` | `audit` | Logs de auditoría inmutables |
 | `TAG_WEBHOOKS` | `webhooks` | Gestión de webhooks |
 | `TAG_PURCHASING` | `purchasing` | Compras, proveedores y recepciones |
+| `TAG_BILLING` | `billing` | Facturación comercial multi-producto |
 
 ### 4.3 Frontera de dashboard y reportes
 
@@ -498,6 +500,36 @@ assert expected == request.headers["X-ICM-Signature"]
 | `GET` | `/purchasing/receptions/<uuid:pk>/` | Detalle de recepción |
 | `POST` | `/purchasing/receptions/<uuid:pk>/confirm/` | Confirmar recepción (crea Movement, actualiza stock) |
 | `POST` | `/purchasing/receptions/<uuid:pk>/cancel/` | Cancelar recepción (solo si no está confirmada) |
+
+Para contratos detallados con ejemplos request/response, ver [REFERENCIA_ENDPOINTS.md](REFERENCIA_ENDPOINTS.md).
+
+### 10.11 Facturación Comercial (`/api/v1/billing/`)
+
+> Módulo de facturación multi-producto. `almacenista` tiene acceso completo. `auxiliar_despacho` solo puede crear facturas (dentro de horario operativo). `administrador` tiene solo lectura.
+
+| Método | Ruta | Descripción | Permiso |
+|--------|------|-------------|---------|
+| `GET` | `/billing/invoices/stats/` | Estadísticas de ventas del día y del mes | Almacenista, Administrador |
+| `GET` | `/billing/invoices/` | Listar facturas (filtros: fecha, tipo, búsqueda) | Almacenista, Administrador |
+| `POST` | `/billing/invoices/` | Crear factura multi-producto | Almacenista, Auxiliar (horario) |
+| `GET` | `/billing/invoices/<uuid:pk>/` | Detalle de factura con ítems | Almacenista, Administrador |
+| `POST` | `/billing/invoices/<uuid:pk>/void/` | Anular factura y revertir stock | Almacenista |
+| `GET` | `/billing/config/company/` | Obtener configuración fiscal de empresa | Almacenista, Administrador |
+| `PUT` | `/billing/config/company/` | Actualizar configuración fiscal de empresa | Almacenista |
+
+**Filtros disponibles en `GET /billing/invoices/`:**
+- `?start_date=YYYY-MM-DD` / `?end_date=YYYY-MM-DD` — rango de fecha de emisión
+- `?invoice_type=retail|wholesale` — tipo de factura
+- `?search=` — búsqueda por nombre de cliente o número de factura
+- `?include_voided=true` — incluir facturas anuladas (por defecto excluidas)
+
+**Errores específicos del módulo:**
+
+| Código HTTP | `error` | Descripción |
+|-------------|---------|-------------|
+| 409 | `INVOICE_ALREADY_VOIDED` | Intento de anular una factura ya anulada |
+| 409 | `INSUFFICIENT_STOCK` | Stock insuficiente al crear factura |
+| 422 | `DOMAIN_VALIDATION_ERROR` | Violación de reglas de negocio (ej: ítems vacíos, motivo de anulación < 5 chars) |
 
 Para contratos detallados con ejemplos request/response, ver [REFERENCIA_ENDPOINTS.md](REFERENCIA_ENDPOINTS.md).
 

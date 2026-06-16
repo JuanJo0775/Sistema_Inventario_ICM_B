@@ -141,8 +141,12 @@ class Seeder:
             self._section("Fase 17 -- Lotes con trazabilidad de vencimiento")
             self._seed_lots(products)
 
-            self._section("Fase 18 -- Movimientos adicionales (devoluciones, danos, vencimientos, combos)")
-            self._seed_additional_movements(almacenista, products, by_cat, bodega, vitrina2, cuarto_frio)
+            self._section(
+                "Fase 18 -- Movimientos adicionales (devoluciones, danos, vencimientos, combos)"
+            )
+            self._seed_additional_movements(
+                almacenista, products, by_cat, bodega, vitrina2, cuarto_frio
+            )
 
             self._section("Fase 19 -- OC en borrador y cancelada")
             self._seed_po_states(almacenista, suppliers, products)
@@ -159,6 +163,10 @@ class Seeder:
 
         self._section("Fase 23 -- Webhooks de ejemplo")
         self._ensure_webhooks()
+
+        # --- Fases finales siempre idempotentes ---
+        self._section("Fase 24 -- Datos fiscales de empresa (CompanyInfo)")
+        self._ensure_company_info()
 
         self._title("SEED completado")
         self._build_result(result, locations)
@@ -607,9 +615,7 @@ class Seeder:
                             almacenista, **base_kwargs, quantity=1
                         )
                 else:
-                    register_internal_transfer(
-                        almacenista, **base_kwargs, quantity=qty
-                    )
+                    register_internal_transfer(almacenista, **base_kwargs, quantity=qty)
                 self._ok(f"  <-> {sku} x {qty}: bodega -> {dest.code}")
                 count += 1
             except Exception as exc:
@@ -931,7 +937,7 @@ class Seeder:
                 },
             )
             st_map[st.code] = st
-            self._ok(f"  {'+'if created else '·'} StorageType: {st.name} [{st.code}]")
+            self._ok(f"  {'+' if created else '·'} StorageType: {st.name} [{st.code}]")
 
         tmpl_map: dict[str, Any] = {}
         for data in config.STORAGE_TEMPLATES:
@@ -947,9 +953,14 @@ class Seeder:
                 },
             )
             tmpl_map[tmpl.code] = tmpl
-            self._ok(f"  {'+'if created else '·'} StorageTemplate: {tmpl.name} [{tmpl.code}]")
+            self._ok(
+                f"  {'+' if created else '·'} StorageTemplate: {tmpl.name} [{tmpl.code}]"
+            )
 
-        for loc_code, (st_code, tmpl_code) in config.LOCATION_STORAGE_ASSIGNMENTS.items():
+        for loc_code, (
+            st_code,
+            tmpl_code,
+        ) in config.LOCATION_STORAGE_ASSIGNMENTS.items():
             loc = locations.get(loc_code)
             if not loc:
                 continue
@@ -1002,7 +1013,7 @@ class Seeder:
                     "is_active": True,
                 },
             )
-            self._ok(f"  {'+'if created else '·'} Horario: {user.username}")
+            self._ok(f"  {'+' if created else '·'} Horario: {user.username}")
 
         for data in config.TEMP_PERMITS:
             user = User.objects.filter(username=data["username"]).first()
@@ -1011,17 +1022,27 @@ class Seeder:
             if TemporaryAccessPermit.objects.filter(user=user, is_active=True).exists():
                 self._ok(f"  · Permiso temporal existente: {user.username}")
                 continue
-            granted_by = User.objects.filter(username=data["granted_by_username"]).first()
+            granted_by = User.objects.filter(
+                username=data["granted_by_username"]
+            ).first()
             now = dj_tz.now()
             permit = TemporaryAccessPermit(
                 user=user,
                 start_datetime=now + timedelta(days=data["start_offset_days"]),
                 end_datetime=now + timedelta(days=data["end_offset_days"]),
                 allow_24_7=data.get("allow_24_7", False),
-                custom_morning_start=_t(data["custom_morning_start"]) if data.get("custom_morning_start") else None,
-                custom_morning_end=_t(data["custom_morning_end"]) if data.get("custom_morning_end") else None,
-                custom_afternoon_start=_t(data["custom_afternoon_start"]) if data.get("custom_afternoon_start") else None,
-                custom_afternoon_end=_t(data["custom_afternoon_end"]) if data.get("custom_afternoon_end") else None,
+                custom_morning_start=_t(data["custom_morning_start"])
+                if data.get("custom_morning_start")
+                else None,
+                custom_morning_end=_t(data["custom_morning_end"])
+                if data.get("custom_morning_end")
+                else None,
+                custom_afternoon_start=_t(data["custom_afternoon_start"])
+                if data.get("custom_afternoon_start")
+                else None,
+                custom_afternoon_end=_t(data["custom_afternoon_end"])
+                if data.get("custom_afternoon_end")
+                else None,
                 reason=data["reason"],
                 granted_by=granted_by,
                 is_active=data.get("is_active", True),
@@ -1064,12 +1085,22 @@ class Seeder:
     # =========================================================================
 
     def _seed_additional_movements(
-        self, almacenista, products: dict, by_cat: dict, bodega, vitrina2, cuarto_frio=None
+        self,
+        almacenista,
+        products: dict,
+        by_cat: dict,
+        bodega,
+        vitrina2,
+        cuarto_frio=None,
     ) -> None:
         from apps.catalog.models import ProductCombo, ProductSerial
         from apps.inventory.models import StockByLocation
         from apps.movements.models import MovementType
-        from apps.movements.services import dispatch_combo, register_dispatch, register_return
+        from apps.movements.services import (
+            dispatch_combo,
+            register_dispatch,
+            register_return,
+        )
 
         done = 0
 
@@ -1088,7 +1119,9 @@ class Seeder:
 
         # --- SALIDA_DANO: masajeador dañado ---
         for product in by_cat.get("masajeadores", [])[:1]:
-            row = StockByLocation.objects.filter(product=product, location=bodega).first()
+            row = StockByLocation.objects.filter(
+                product=product, location=bodega
+            ).first()
             if not row or row.current_stock < 1:
                 continue
             try:
@@ -1107,7 +1140,9 @@ class Seeder:
 
         # --- SALIDA_DANO: agujas con embalaje roto ---
         for product in by_cat.get("agujas", [])[:1]:
-            row = StockByLocation.objects.filter(product=product, location=bodega).first()
+            row = StockByLocation.objects.filter(
+                product=product, location=bodega
+            ).first()
             if not row or row.current_stock < 1:
                 continue
             try:
@@ -1126,7 +1161,9 @@ class Seeder:
 
         # --- SALIDA_VENCIMIENTO: primer lote de agujas vencido ---
         for product in by_cat.get("agujas", []):
-            row = StockByLocation.objects.filter(product=product, location=bodega).first()
+            row = StockByLocation.objects.filter(
+                product=product, location=bodega
+            ).first()
             if not row or row.current_stock < 1:
                 continue
             try:
@@ -1145,7 +1182,9 @@ class Seeder:
                 self._warn(f"SALIDA_VENCIMIENTO {product.sku}: {exc}")
 
         # --- SALIDA_COMBO: despacho del kit KIT-1 desde bodega ---
-        combo = ProductCombo.objects.filter(sku__iexact="KIT-1", deleted_at__isnull=True).first()
+        combo = ProductCombo.objects.filter(
+            sku__iexact="KIT-1", deleted_at__isnull=True
+        ).first()
         if combo:
             try:
                 dispatch_combo(almacenista, combo.id, bodega.id)
@@ -1165,7 +1204,9 @@ class Seeder:
                 product = products.get(sku)
                 if not product:
                     continue
-                row = StockByLocation.objects.filter(product=product, location=bodega).first()
+                row = StockByLocation.objects.filter(
+                    product=product, location=bodega
+                ).first()
                 if not row or row.current_stock < 4:
                     continue
                 qty = min(4, row.current_stock)
@@ -1190,7 +1231,10 @@ class Seeder:
     # =========================================================================
 
     def _seed_po_states(self, almacenista, suppliers: dict, products: dict) -> None:
-        from apps.purchasing.services import cancel_purchase_order, create_purchase_order
+        from apps.purchasing.services import (
+            cancel_purchase_order,
+            create_purchase_order,
+        )
 
         sup_mr = suppliers.get("MedRehab Importaciones Ltda.")
         sup_ter = suppliers.get("Terapias Medicas de Colombia Ltda")
@@ -1315,7 +1359,9 @@ class Seeder:
                 self._ok(f"  · Factura existente: {cfg['number']}")
                 continue
             movements = list(
-                Movement.objects.filter(movement_type__in=cfg["types"]).order_by("created_at")[: cfg["limit"]]
+                Movement.objects.filter(movement_type__in=cfg["types"]).order_by(
+                    "created_at"
+                )[: cfg["limit"]]
             )
             if not movements:
                 self._warn(f"Sin movimientos para factura {cfg['number']}")
@@ -1371,10 +1417,38 @@ class Seeder:
                     "created_by": creator,
                 },
             )
-            self._ok(f"  {'+'if created else '·'} Webhook: {data['url']}")
+            self._ok(f"  {'+' if created else '·'} Webhook: {data['url']}")
             if created:
                 done += 1
         self._ok(f"Webhooks: {done} creados")
+
+    # =========================================================================
+    # Fase 24: Datos fiscales de la empresa (CompanyInfo)
+    # =========================================================================
+
+    def _ensure_company_info(self) -> None:
+        """Crea/actualiza el singleton CompanyInfo con datos fiscales ICM."""
+        from apps.billing.models import CompanyInfo
+
+        info, created = CompanyInfo.objects.get_or_create(
+            pk=1,
+            defaults={
+                "company_name": "Import Corporal Medical S.A.S",
+                "nit": "901.234.567-8",
+                "address": "Cra 45 # 23-12, Bogotá D.C., Colombia",
+                "phone": "+57 1 555 1234",
+                "email": "contabilidad@icm.com.co",
+                "dian_resolution": "Resolución DIAN No. 18760000001 del 15-Ene-2024",
+                "dian_range_from": 1,
+                "dian_range_to": 10000,
+                "invoice_series": "ICM",
+                "invoice_footer": "Import Corporal Medical S.A.S — NIT 901.234.567-8 — Régimen Común",
+            },
+        )
+        if created:
+            self._ok(f"  + CompanyInfo: {info.company_name} (NIT {info.nit})")
+        else:
+            self._ok(f"  · CompanyInfo existente: {info.company_name}")
 
     # =========================================================================
     # Helpers de compras (OC -> Recepcion)

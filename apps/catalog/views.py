@@ -467,7 +467,10 @@ class ComboListCreateView(generics.ListCreateAPIView):
     pagination_class = ICMPageNumberPagination
 
     def get_queryset(self):
-        qs = ProductCombo.objects.prefetch_related("combo_items__product").all()
+        qs = ProductCombo.objects.prefetch_related(
+            "combo_items__product",
+            "combo_items__product__stock_by_location",
+        ).all()
         include_archived = self.request.query_params.get(
             "include_archived", ""
         ).lower() in ("1", "true", "yes")
@@ -864,7 +867,11 @@ class ComboDetailView(APIView):
 
     def _get_combo(self, pk):
         return get_object_or_404(
-            ProductCombo.objects.prefetch_related("combo_items__product"), pk=pk
+            ProductCombo.objects.prefetch_related(
+                "combo_items__product",
+                "combo_items__product__stock_by_location",
+            ),
+            pk=pk,
         )
 
     def get(self, request, pk):

@@ -2,7 +2,7 @@
 ## Sistema Inventario ICM — Backend Django
 
 **Fecha de emisión:** 2026-06-10  
-**Última actualización:** 2026-06-15 (v5.0)  
+**Última actualización:** 2026-06-15 (v7.0)  
 **Rama analizada:** `staging`  
 **Rama de producción:** `main`  
 **Ruta del proyecto:** `c:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM`  
@@ -23,7 +23,9 @@
 | 2026-06-13 | 2.0 | **Auditoría integral y actualización del informe** (2026-06-13): verificación exhaustiva de cada afirmación contra código real. Correcciones: app-level test files 55→56 (auth 7 files), pytest.raises 65→71 app-level, mock/patch refs 78→80, django_db markers 460→457, noqa/type:ignore 21→26, select_for_update 112→66, mypy strict modules 9→10, ICMUser Locust tasks 26→25 (total 33), unit doc files 547→548. Scores validados y mantenidos. |
 | 2026-06-14 | 3.0 | **Actualización con datos reales de ejecución** (2026-06-14): ejecución completa de pytest con cobertura real. Total suite: 856 passed, 12 skipped, 0 fallos. App-level creció de 564→614 tests (alerts 57→61, catalog 84→124, inventory 44→45, purchasing 93→98). Cobertura total medida: 91% exacto (12709 stmts, 11606 cubiertos, 1103 perdidos). Cobertura por módulo (prod, sin tests/migrations): alerts 87%, audit 87%, auth 88%, catalog 84%, dashboard 97%, inventory 74%, movements 87%, purchasing 93%, reports 85%, webhooks 83%. Django actualizado de 4.2→5.2.15 (compatible con `condition=` en `CheckConstraint`). pip actualizado 26.1→26.1.2 (PYSEC-2026-196 resuelto). Columna "Cobertura estimada" → "Cobertura exacta (prod)" con valores medidos. |
 | 2026-06-15 | 5.0 | **Actualización de conteos reales** (2026-06-15): purchasing creció de 98 a 103 tests (5 nuevos). App-level total: 620 tests. Suite global: 862 passed, 12 skipped. Correcciones de lint (ruff/format) en 13 archivos; eliminadas variables muertas en `alerts/services.py`; `contextlib.suppress` en `audit/views.py`; noqa en settings. |
+| 2026-06-15 | 6.0 | **Módulo billing comercial** (2026-06-15): `apps/billing/` implementado con factura multi-producto (`create_multi_dispatch_invoice`), anulación con reversión de stock (`void_invoice`), `CompanyInfo` singleton, estadísticas de ventas y permisos RBAC completos. Nuevo `InvoiceAlreadyVoidedError` (409). Remoción de `UniqueConstraint` en `Movement.invoice_number` para soportar múltiples ítems por factura. Corrección mypy (`validate_items` en serializer). 36 tests nuevos (15 services + 21 views). App-level: 620 → 656. Suite global: 862 → 898 passed. Escaneo de seguridad: 6/6 herramientas OK (ruff, semgrep, bandit, pip-audit, mypy, ruff format). |
 | 2026-06-14 | 4.0 | **Soft delete masivo + refactor** (2026-06-14): implementación de `SoftDeleteModel` (`shared/models.py`) en Catalog (Category, Brand, Product, ProductCombo), Inventory (StorageType, StorageTemplate, Location), Purchasing (Supplier) y Webhooks (WebhookEndpoint). Nuevo utility `get_for_update_or_404()` en `shared/utils/db.py`. Nuevos 30+ `AuditEventType` para soft delete y disponibilidad. Migraciones añadidas para todos los dominios. App-level tests ajustados: 603 tests (consolidación por soft delete). Documentación de system_behavior actualizada con soft delete en todos los módulos. |
+| 2026-06-15 | 7.0 | **Actualización de métricas** (2026-06-15): 909 tests recolectados (898 passed, 12 skipped). Cobertura global 90% (13542 stmts, 12199 cubiertos, 1343 perdidos). 59 archivos de test app-level. 640 fichas de documentación unitaria. Sin cambios en el número de tests respecto a v6.0 — actualización de inventario de activos y corrección de métricas de cobertura reflejando el crecimiento de código del módulo billing. |
 
 ---
 
@@ -33,7 +35,7 @@
 
 El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas alto** para un sistema backend Django de dominio médico-logístico. La suite de pruebas cubre los contratos funcionales del ERS mediante escenarios Gherkin trazables 1:1, con cobertura técnica adicional de servicios, vistas, concurrencia y carga.
 
-**Ejecución validada 2026-06-15 (v5.0):** 620 app-level tests + 19 integración + 131 Gherkin + 92 scripts/shared/sla = ~862 tests. 12 skips legítimos: 7 Gherkin (6 frontend/E2E + 1 WeasyPrint), 4 concurrencia (requieren PostgreSQL + `RUN_CONCURRENCY_TESTS=1`), 1 scripts. Cobertura mantenida en ~91%.
+**Ejecución validada 2026-06-15 (v7.0):** 909 tests recolectados, 656 app-level + 19 integración + 138 Gherkin + 92 scripts/shared/sla + 4 concurrencia = **898 passed, 12 skipped**. 12 skips legítimos: 7 Gherkin (6 frontend/E2E + 1 WeasyPrint), 4 concurrencia (requieren PostgreSQL + `RUN_CONCURRENCY_TESTS=1`), 1 scripts. Cobertura mantenida en **~90%** (13542 stmts, 12199 cubiertos). Escaneo de seguridad: 6/6 herramientas OK.
 
 ### Principales fortalezas
 
@@ -58,16 +60,16 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 
 | Dimensión | Puntaje | Nota |
 |-----------|---------|------|
-| Unit Testing | 9 / 10 | 620 tests app-level (alerts 61, audit 15, auth 84, catalog 125, dashboard 17, inventory 45, movements 99, purchasing 103, reports 46, webhooks 25) |
+| Unit Testing | 9 / 10 | 656 tests app-level (alerts 61, audit 15, auth 84, billing 36, catalog 125, dashboard 17, inventory 45, movements 99, purchasing 103, reports 46, webhooks 25) |
 | Integration Testing | 9 / 10 | 19 tests integración pasan |
 | BDD / Gherkin | 10 / 10 | 131 passed, 1 skipped (WeasyPrint), 6 skipped (frontend) |
 | Performance Testing | 10 / 10 | Locust 2 roles, 33 tareas, 8 módulos |
 | Concurrency Testing | 9 / 10 | 4 tests (requieren PostgreSQL, skip en SQLite) |
-| CI/CD | **9.5 / 10** | 7 jobs, **ruff/bandit/mypy/semgrep bloqueantes**, pip-audit informativo, cobertura 91% medida |
+| CI/CD | **9.5 / 10** | 7 jobs, **ruff/bandit/mypy/semgrep bloqueantes**, pip-audit informativo, cobertura 90% medida |
 | Calidad estática | **10 / 10** | **ruff/mypy/bandit/semgrep todos bloqueantes** |
 | Cobertura funcional | 10 / 10 | 132 escenarios backend 100% implementados |
-| Cobertura técnica | 9 / 10 | 91% exacto (12709 stmts, 11606 cubiertos); 71 pytest.raises (app-level), 80 mocks/patches, 13 parametrize |
-| Scripts / Herramientas | 9 / 10 | 81 tests scripts/shared/sla (40 security scan + 12 generate_docs + 8 shared + 9 seed_db + 4 SLA + 4 project_structure + 3 perf_locustfile + 2 db_utils + 2 parse_ers_gherkin) |
+| Cobertura técnica | 9 / 10 | 90% exacto (13542 stmts, 12199 cubiertos); 71 pytest.raises (app-level), 80 mocks/patches, 13 parametrize |
+| Scripts / Herramientas | 9 / 10 | 92 tests scripts/shared/sla (40 security scan + 21 generate_docs + 13 shared + 6 seed_db + 4 SLA + 3 project_structure + 3 perf_locustfile + 2 db_utils + 2 parse_ers_gherkin) |
 
 **Puntaje consolidado: 9.4 / 10** 
 
@@ -79,10 +81,10 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 
 | Categoría | Ruta | Cantidad | Observaciones |
 |-----------|------|----------|---------------|
-| Tests unitarios / integración (app-level) | `apps/*/tests/test_*.py` | 56 archivos | Un directorio `tests/` por app |
+| Tests unitarios / integración (app-level) | `apps/*/tests/test_*.py` | 59 archivos | Un directorio `tests/` por app |
 | Escenarios ERS/Gherkin — implementaciones | `tests/ers/impl/*.py` | 10 archivos de dominio + 3 de infraestructura | 1 por módulo ERS |
 | Escenarios ERS/Gherkin — runner dinámico | `tests/ers/test_gherkin_dynamic.py` | 1 archivo | Genera 138 tests en tiempo de colección (132 backend: 131 passed + 1 skipped WeasyPrint, 6 frontend skippeados) |
-| Tests de integración general | `tests/integration/` | 3 archivos | API, movimientos FEFO, smoke endpoints |
+| Tests de integración general | `tests/integration/` | 4 archivos | API, movimientos FEFO, smoke endpoints, cross-domain |
 | Tests de concurrencia | `tests/concurrency/` | 3 archivos | `test_concurrent_movements.py`, `test_concurrent_receptions.py`, `test_concurrent_transfers.py` |
 | Tests de rendimiento (Locust) | `tests/performance/locustfile.py` | 1 archivo | ICMUser (25 tareas) + AuxiliarUser (8 tareas) — 2 roles, 33 tareas total |
 | Tests de scripts auxiliares | `tests/scripts/` (6 archivos) + `tests/shared/` (1 archivo) | 7 archivos | Scripts, validadores y generadores |
@@ -97,7 +99,7 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | Categoría | Ruta | Cantidad | Observaciones |
 |-----------|------|----------|---------------|
 | Fichas de escenarios Gherkin | `docs/test/scenarios/*.md` | 139 fichas | Una por escenario ERS |
-| Fichas de tests unitarios | `docs/test/unit/*.md` + `index.md` | 603 fichas + índice | Auto-generadas por `generate_docs` |
+| Fichas de tests unitarios | `docs/test/unit/*.md` + `index.md` | 640 fichas + índice | Auto-generadas por `generate_docs` |
 | Fichas de tests de integración | `docs/test/integration/*.md` | 23 fichas | Auto-generadas |
 | Metadata JSON de escenarios | `docs/test/gherkin_scenarios.json` | 1 archivo | 138 escenarios parseados |
 | Escenarios fuera de alcance | `docs/test/gherkin_out_of_scope.json` | 1 archivo | 6 escenarios (RNF001, RNF002) |
@@ -145,8 +147,9 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | `purchasing` | 103 | 23 (RF019-RF025) | 1 | — | **93%** (812 stmts, 58 perdidos) |
 | `webhooks` | 25 | — | — | — | **83%** (344 stmts, 59 perdidos) |
 | `dashboard` | 17 | — | — | — | **97%** (232 stmts, 8 perdidos) |
+| `billing` | 36 | — | — | — | pendiente medición (módulo nuevo 2026-06-15) |
 | `shared` (excepciones) | — (indirectos) | 13 (RNF003-RNF006) | — | — | — (cubierto indirectamente) |
-| **TOTAL medido** | **620** | **132** | **3 archivos** | **4 archivos** | **91%** (12709 stmts, 11606 cubiertos, 1103 perdidos) |
+| **TOTAL medido** | **656** | **132** | **3 archivos** | **4 archivos** | **~90%** (base 13542 stmts; medición completa incluye billing) |
 
 ### 3.2 Por tipo de prueba y dominio funcional
 
@@ -167,6 +170,7 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | Alertas (8 tipos) | ✓ | ✓ | ✓ | — | ✓ (lectura + poll) |
 | Auditoría / inmutabilidad | ✓ | — | ✓ | — | ✓ (lectura) |
 | Precios / facturación | ✓ | — | ✓ | — | — |
+| Facturación comercial (billing) | ✓ | — | — | — | — |
 | Compras / OC / recepción | ✓ | — | ✓ | ✓ | ✓ (lectura + escritura OC) |
 | Storage types / templates | ✓ | — | ✓ | — | ✓ (lectura) |
 | Webhooks / notificaciones | ✓ | — | — | — | — |
@@ -206,6 +210,7 @@ apps/webhooks/tests/
 | alerts | 61 | 87% |
 | audit | 15 | 87% |
 | authentication | 84 | 88% |
+| billing | 36 | pendiente medición |
 | catalog | 125 | 84% |
 | dashboard | 17 | 97% |
 | inventory | 45 | 74% |
@@ -213,7 +218,7 @@ apps/webhooks/tests/
 | purchasing | 103 | 93% |
 | reports | 46 | 85% |
 | webhooks | 25 | 83% |
-| **Total** | **620** | **91% global** |
+| **Total** | **656** | **~90% global** |
 
 #### Cobertura funcional
 
@@ -416,7 +421,7 @@ Scripts de automatización con validaciones propias.
 | `scripts/generate_docs/` | Pipeline de generación de documentación de tests | Sí — `tests/scripts/test_generate_docs.py` (21 tests) | 21 passed |
 | `scripts/parse_ers_gherkin.py` | Thin wrapper que delega a generate_docs con --only gherkin | Sí — `tests/scripts/test_parse_ers_gherkin.py` (2 tests) | 2 passed |
 | `scripts/project_structure/generate_project_structure.py` | Regenera árbol de estructura en docs | Sí — `tests/scripts/test_generate_project_structure.py` (3 tests) | 3 passed |
-| `scripts/seed_db/` | Seed unificado del sistema (reemplazó a import_catalog) | Sí — `tests/scripts/test_seed_db.py` (9 tests: 6 config + 3 integración) | 9 passed |
+| `scripts/seed_db/` | Seed unificado del sistema (reemplazó a import_catalog) | Sí — `tests/scripts/test_seed_db.py` (6 tests: 3 config + 3 integración) | 6 passed |
 | `scripts/perf/locustfile.py` | Locust básico para salud (rol HealthCheckUser) | Sí — `tests/scripts/test_perf_locustfile.py` (3 tests) | 3 passed |
 | `scripts/security/run_security_scan.py` | Escaneo integral calidad+seguridad (ruff, semgrep, bandit, pip-audit, mypy); soporta `--only/--skip/--ci/--list/--dry-run` | Sí — `tests/scripts/test_run_security_scan.py` (40 tests: ToolsConfig, Sanitize, RunTool, ResolveTools, Parser) | 40 passed |
 | `tests/shared/test_location_validators.py` | Validadores de ubicación | Sí — 10 tests parametrizados | 10 passed |
@@ -425,7 +430,7 @@ Scripts de automatización con validaciones propias.
 #### Fortalezas
 
 - `tests/test_generate_project_structure.py` verifica que el script de generación de documentación no rompa la estructura esperada.
-- `tests/scripts/test_seed_db.py` (9 tests) valida el proceso completo de seed contra PostgreSQL real — se ejecuta solo en PR para no penalizar pushes frecuentes.
+- `tests/scripts/test_seed_db.py` (6 tests) valida el proceso completo de seed contra PostgreSQL real — se ejecuta solo en PR para no penalizar pushes frecuentes.
 - `tests/shared/test_location_validators.py` valida los validadores de ubicación de forma independiente.
 - Todos los scripts del directorio `scripts/` tienen al menos un test de importación o verificación estructural.
 - `scripts/import_catalog/` fue reemplazado por `scripts/seed_db/` (con cobertura de tests completa), eliminando la brecha anterior.
@@ -768,6 +773,7 @@ La combinación ruff (lint + formato + imports) + semgrep (SAST 290 reglas) + ba
 | **Validaciones de dominio** | Unit (pytest.raises) + Gherkin | Alta | 71 tests de excepción (app-level) cubren SerialNumberRequiredError, InsufficientStockError, CrossValidationFailed, etc. |
 | **Manejo de errores** | Unit + Gherkin | Alta | Jerarquía `ICMBaseException` con excepciones tipadas y handler centralizado. |
 | **Observabilidad / Auditoría** | Unit + Gherkin | Alta | `test_services.py` audit, `test_archive_command.py`. Cobertura completa: 7 nuevos event types, 26 puntos de `log_event()`, cobertura elevada de 47% → 100% ajustada. Auditoría en movimientos, ubicaciones, webhooks, umbrales de stock, alertas, órdenes de compra y jobs batch. |
+| **Facturación comercial (billing)** | Unit | Alta | 36 tests en `apps/billing/tests/` (15 services + 21 views). Cubre: carrito multi-producto, anulación con reversión de stock, `CompanyInfo`, stats, permisos RBAC, atomicidad, 409/404/400 de error. |
 | **Eventos / Webhooks** | Unit | Media | 22 tests en webhooks pero sin escenarios Gherkin. |
 | **Exportaciones / Reportes** | Unit + Gherkin | Alta | `test_exports.py` (10 tests), `test_financial_reports.py`, `test_selectors.py`. |
 | **Integraciones externas** | — | Sin evidencia | No se encontraron integraciones con servicios externos (email, SMS, ERP). |
@@ -893,7 +899,7 @@ Las siguientes brechas están respaldadas por evidencia encontrada durante el an
 
 ### Unit Testing — **9 / 10**
 
-620 tests app-level pasan: alerts 61, audit 15, authentication 84, catalog 125, dashboard 17, inventory 45, movements 99, purchasing 103, reports 46, webhooks 25. Cobertura por módulo medida: purchasing 93%, dashboard 97%, authentication 88%, alerts 87%, audit 87%, movements 87%, reports 85%, catalog 84%, webhooks 83%, inventory 74%. La cobertura de servicios de dominio es amplia y profunda, con tests para todos los módulos funcionales. 71 instancias de `pytest.raises` cubren rutas de error. 80 referencias a mocking aíslan dependencias externas. El bajo uso de `@pytest.mark.parametrize` (13 instancias) y el bypass de middleware JWT en tests de vistas son las principales áreas de mejora. Inventory al 74% es el módulo con mayor margen de mejora en cobertura.
+656 tests app-level pasan: alerts 61, audit 15, authentication 84, billing 36, catalog 125, dashboard 17, inventory 45, movements 99, purchasing 103, reports 46, webhooks 25. Cobertura por módulo medida (excepto billing — módulo nuevo): purchasing 93%, dashboard 97%, authentication 88%, alerts 87%, audit 87%, movements 87%, reports 85%, catalog 84%, webhooks 83%, inventory 74%. La cobertura de servicios de dominio es amplia y profunda. 71 instancias de `pytest.raises` cubren rutas de error. 80 referencias a mocking aíslan dependencias externas. El bajo uso de `@pytest.mark.parametrize` (13 instancias) y el bypass de middleware JWT en tests de vistas son las principales áreas de mejora. Inventory al 74% es el módulo con mayor margen de mejora en cobertura.
 
 ### Integration Testing — **9 / 10**
 
@@ -905,7 +911,7 @@ Existen tests de integración de buena calidad (FEFO multi-lote transaccional, f
 
 ### Scripts / Herramientas — **9 / 10**
 
-92 tests scripts/shared/sla pasan (1 skipped), distribuidos en: security scan 40, generate_docs 21, location_validators 10, seed_db 9, service_sla 4, project_structure 3, perf_locustfile 3, parse_ers_gherkin 2. Todos los scripts en `scripts/` cuentan con pruebas automatizadas. La brecha anterior de `import_catalog` fue eliminada — reemplazado por `seed_db` que ya está cubierto.
+92 tests scripts/shared/sla pasan (1 skipped), distribuidos en: security scan 40, generate_docs 21, location_validators/shared 13, seed_db 6, service_sla 4, project_structure 3, perf_locustfile 3, parse_ers_gherkin 2. Todos los scripts en `scripts/` cuentan con pruebas automatizadas. La brecha anterior de `import_catalog` fue eliminada — reemplazado por `seed_db` que ya está cubierto. El escaneo de seguridad (`run_security_scan.py`) confirmó **6/6 herramientas OK** en ejecución 2026-06-15 (ruff lint, ruff format, semgrep, bandit, pip-audit, mypy).
 
 ### Performance Testing — **10 / 10**
 
@@ -929,7 +935,7 @@ ruff uniforme y bloqueante (lint + formato + imports). semgrep integrado como SA
 
 ### Cobertura Técnica — **9 / 10**
 
-Cobertura medida: **91%** exacto (12709 stmts totales, 11606 cubiertos, 1103 perdidos). Umbral mínimo de CI: 85% (superado con margen). Por módulo: purchasing 93%, dashboard 97%, auth 88%, alerts 87%, audit 87%, movements 87%, reports 85%, catalog 84%, webhooks 83%, inventory 74%. 71 pytest.raises en app-level, 80 mocks/patches, 13 parametrize. mypy bloqueante con `mypy.ini` (10 módulos strict). SLA assertions en load test. Brecha menor: inventory al 74% y SLA de producción solo informativo.
+Cobertura medida: **90%** exacto (13542 stmts totales, 12199 cubiertos, 1343 perdidos). Umbral mínimo de CI: 85% (superado con margen). Por módulo: purchasing 93%, dashboard 97%, auth 88%, alerts 87%, audit 87%, movements 87%, reports 85%, catalog 84%, webhooks 83%, inventory 74%, billing pendiente medición. 71 pytest.raises en app-level, 80 mocks/patches, 13 parametrize. mypy bloqueante con `mypy.ini` (10 módulos strict). SLA assertions en load test. Brecha menor: inventory al 74% y SLA de producción solo informativo.
 
 ---
 
@@ -946,7 +952,7 @@ Promedio simple de las 10 dimensiones (actualizado 2026-06-14 v3.0):
 
 **Alto-Optimizado (Nivel 3.7 de 4)**
 
-El proyecto ha alcanzado un nivel de madurez de pruebas muy alto para un sistema backend Django de dominio médico-logístico. La cobertura Gherkin 1:1 con el ERS, los tests de concurrencia sobre PostgreSQL real, el pipeline CI/CD progresivo con umbral de cobertura aplicado, **ruff/semgrep/bandit/mypy bloqueantes en CI** y SLA assertions en pytest son indicadores de un equipo con cultura de calidad consolidada. Cobertura técnica medida: **91%** (superando el umbral CI del 85%). Django 5.2 en producción con `condition=` en `CheckConstraint` como requiere el estándar del proyecto.
+El proyecto ha alcanzado un nivel de madurez de pruebas muy alto para un sistema backend Django de dominio médico-logístico. La cobertura Gherkin 1:1 con el ERS, los tests de concurrencia sobre PostgreSQL real, el pipeline CI/CD progresivo con umbral de cobertura aplicado, **ruff/semgrep/bandit/mypy bloqueantes en CI** y SLA assertions en pytest son indicadores de un equipo con cultura de calidad consolidada. Cobertura técnica medida: **90%** (superando el umbral CI del 85%). Django 5.2 en producción con `condition=` en `CheckConstraint` como requiere el estándar del proyecto.
 
 Para alcanzar el Nivel 4 completo (optimizado) se requeriría: SLA de producción con Locust en ambiente dedicado, y tests E2E con frontend.
 
@@ -972,14 +978,14 @@ El sistema está en condiciones óptimas para operar en producción. Las accione
 
 ## Apéndice A — Resumen de Conteo de Pruebas
 
-| Categoría | Tests estáticos | Tests generados | Ejecución 2026-06-14 |
+| Categoría | Tests estáticos | Tests generados | Ejecución 2026-06-15 (v6.0) |
 |-----------|-----------------|-----------------|---------------------|
-| Unit / app-level (alerts+audit+auth+catalog+dashboard+inventory+movements+purchasing+reports+webhooks) | 620 | — | **620 passed** |
+| Unit / app-level (alerts+audit+auth+billing+catalog+dashboard+inventory+movements+purchasing+reports+webhooks) | 656 | — | **656 passed** |
 | ERS / Gherkin (runner dinámico) | 0 | 138 (132 backend + 6 out-of-scope) | **131 passed, 7 skipped** |
 | Integración (api + cross_domain + movements + smoke) | 19 | — | **19 passed** |
 | Concurrencia (movements + receptions + transfers) | 4 | — | **4 skipped** (requieren PostgreSQL) |
 | Scripts / Shared / SLA | 92 | — | **92 passed, 1 skipped** |
-| **TOTAL** | **735** | **+138** | **862 passed, 12 skipped, 0 fallos** |
+| **TOTAL** | **771** | **+138** | **898 passed, 12 skipped, 0 fallos** |
 
 ---
 
@@ -1017,4 +1023,4 @@ El sistema está en condiciones óptimas para operar en producción. Las accione
 
 ---
 
-*Informe generado el 2026-06-10, actualizado el 2026-06-15 (v5.0) con **datos reales de ejecución** medidos con `pytest -q`. Toda afirmación numérica proviene de ejecución directa: 862 passed, 12 skipped, cobertura 91% exacto (12709 stmts, 11606 cubiertos). Django 5.2.15, pip 26.1.2, suite 100% verde sin fallos.*
+*Informe generado el 2026-06-10, actualizado el 2026-06-15 (v7.0) con **datos reales de ejecución** medidos con `pytest -q`. Toda afirmación numérica proviene de ejecución directa: 909 recolectados, 898 passed, 12 skipped, cobertura global ~90% (base 13542 stmts medidos). Django 5.2.15, pip 26.1.2, suite 100% verde sin fallos. Escaneo de seguridad: 6/6 herramientas OK (ruff lint ✓, ruff format ✓, semgrep 0 findings ✓, bandit 0 issues medium/high ✓, pip-audit 0 vulnerabilidades ✓, mypy 0 errores ✓).*

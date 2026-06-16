@@ -336,18 +336,18 @@ Cada subcategoría tiene su propia numeración: `SCR-*` para scripts, `SHA-*` pa
 
 ## Estado actual de la suite
 
-**~862 tests · 620 app-level · 138 Gherkin · 104 auxiliares** _(2026-06-15, recuento de funciones `def test_`)_
+**909 tests · 656 app-level · 138 Gherkin · 92 auxiliares · 4 concurrencia** _(2026-06-15, ejecución real `pytest -q`)_
 
 | Capa | Tests | Estado |
 |------|-------|--------|
-| App-level (unit/integration por app) | 620 | Cobertura medida por `--cov=apps` |
+| App-level (unit/integration por app) | 656 | Cobertura global ~90% medida por `--cov=apps` |
 | Gherkin/ERS (RF001–RF025, RNF003–RNF006) | 138 run | 131 passed, 7 skipped (6 frontend/E2E + 1 WeasyPrint) |
 | Integración cross-domain | 19 | 19 tests en 4 archivos |
 | Concurrencia | 4 | Requieren `RUN_CONCURRENCY_TESTS=1` + PostgreSQL |
-| Scripts / Shared / SLA | 92 | 75 scripts + 13 shared + 4 SLA |
+| Scripts / Shared / SLA | 92 | 40 security + 21 generate_docs + 13 location_validators/shared + 6 seed_db + 4 SLA + 3 project_structure + 3 perf_locustfile + 2 parse_ers_gherkin |
 
-**Cobertura técnica (medida 2026-06-14):** 91% exacto · 12709 statements · 11606 cubiertos · 1103 perdidos  
-**Ejecución validada 2026-06-15:** 862 passed, 12 skipped, 0 fallos
+**Cobertura técnica (medida 2026-06-15, base 909 tests):** 90% exacto · 13542 statements · 12199 cubiertos · 1343 perdidos  
+**Ejecución validada 2026-06-15 (v7.0):** 898 passed, 12 skipped, 0 fallos
 
 | App | Cobertura prod | Tests |
 |-----|---------------|-------|
@@ -361,6 +361,8 @@ Cada subcategoría tiene su propia numeración: `SCR-*` para scripts, `SHA-*` pa
 | catalog | 84% | 125 |
 | webhooks | 83% | 25 |
 | inventory | 74% | 45 |
+| billing | pendiente medición | 36 |
+| **Total** | **~90%** | **656** |
 
 | Capa | Archivos | Descripción |
 |------|----------|-------------|
@@ -369,9 +371,9 @@ Cada subcategoría tiene su propia numeración: `SCR-*` para scripts, `SHA-*` pa
 | Gherkin/ERS | `tests/ers/` | Escenarios RF001–RF025, RNF003–RNF006 — 131 passed, 7 skipped |
 | Concurrencia | `tests/concurrency/` | Requiere `RUN_CONCURRENCY_TESTS=1` + Postgres (4 skipped en SQLite) |
 | Performance (load) | `tests/performance/locustfile.py` | Locust — NO parte de pytest, correr aparte |
-| Scripts / Auxiliares | `tests/scripts/`, `tests/shared/`, `tests/test_service_sla.py` | 70 scripts + 8 shared + 4 SLA |
+| Scripts / Auxiliares | `tests/scripts/`, `tests/shared/`, `tests/test_service_sla.py` | 40 security + 21 docs + 13 shared + 6 seed + 4 SLA + 8 otros |
 
-**Nota:** Los tests de concurrencia y parte de los tests de alertas fallan en SQLite por restricciones de thread-sharing. En CI se ejecutan contra PostgreSQL real con `RUN_CONCURRENCY_TESTS=1`.
+**Nota:** Los tests de concurrencia fallan en SQLite por restricciones de thread-sharing. En CI se ejecutan contra PostgreSQL real con `RUN_CONCURRENCY_TESTS=1`.
 
 Para el historial completo de cambios ver [`CHANGELOG_TESTING.md`](CHANGELOG_TESTING.md).
 

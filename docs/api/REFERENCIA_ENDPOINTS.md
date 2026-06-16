@@ -17,6 +17,7 @@
 - [Auditoría](#auditoria)
 - [Compras](#compras)
 - [Webhooks](#webhooks)
+- [Facturación Comercial](#facturacion-comercial)
 - [Errores](#errores)
 - [Paginación](#paginacion)
 - [Tipos de datos](#tipos-de-datos)
@@ -1279,6 +1280,8 @@ GET /api/v1/audit/<uuid>/    → detalle log
 | `ALERT_ACKNOWLEDGED` | Alerta reconocida |
 | `UNAUTHORIZED_ACCESS_ATTEMPT` | Intento de acceso no autorizado |
 | `MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD` | Intento de modificar ledger |
+| `INVOICE_VOIDED` | Factura comercial anulada (billing) |
+| `COMPANY_INFO_UPDATED` | Configuración fiscal de empresa actualizada (billing) |
 
 ---
 
@@ -1561,6 +1564,253 @@ def receive_webhook():
 
 ---
 
+## Facturación Comercial
+
+> `almacenista` — acceso completo. `auxiliar_despacho` — solo crear facturas (dentro de horario operativo). `administrador` — solo lectura.
+
+### Listar facturas
+
+```
+GET /api/v1/billing/invoices/
+```
+
+**Query params:**
+- `?start_date=YYYY-MM-DD` / `?end_date=YYYY-MM-DD` — rango por fecha de emisión
+- `?invoice_type=retail|wholesale`
+- `?search=` — nombre de cliente o número de factura
+- `?include_voided=true` — incluir facturas anuladas (por defecto excluidas)
+
+**Response 200:**
+```json
+{
+  "count": 42,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": "uuid",
+      "number": "ICM-0001",
+      "invoice_type": "retail",
+      "customer_name": "Ana Torres",
+      "customer_id_number": "1012345678",
+      "total_amount": "45600.0000",
+      "currency": "COP",
+      "issued_by_username": "almacenista1",
+      "issued_at": "2026-06-15T10:30:00Z",
+      "is_voided": false,
+      "item_count": 3
+    }
+  ]
+}
+```
+
+---
+
+### Crear factura (carrito multi-producto)
+
+```
+POST /api/v1/billing/invoices/
+```
+
+**Request:**
+```json
+{
+  "invoice_type": "retail",
+  "location_id": "<location_uuid>",
+  "customer": {
+    "name": "Ana Torres",
+    "id_number": "1012345678",
+    "email": "ana@email.com",
+    "phone": "3001234567",
+    "address": "Calle 45 # 10-20, Bogotá"
+  },
+  "items": [
+    {
+      "product_id": "<product_uuid>",
+      "quantity": 2,
+      "discount_pct": null
+    },
+    {
+      "product_id": "<otro_product_uuid>",
+      "quantity": 1,
+      "discount_pct": "5.00"
+    }
+  ],
+  "note": "Entrega inmediata",
+  "privacy_notice_acknowledged": false
+}
+```
+
+- `invoice_type`: `"retail"` (SALIDA_VENTA_MENOR) o `"wholesale"` (SALIDA_VENTA_MAYOR).
+- `privacy_notice_acknowledged`: requerido `true` para `wholesale` (Ley 1581, RNF-006).
+- `discount_pct`: porcentaje 0–100; `null` para no aplicar descuento.
+
+**Response 201:**
+```json
+{
+  "id": "uuid",
+  "number": "ICM-0001",
+  "invoice_type": "retail",
+  "customer_name": "Ana Torres",
+  "customer_id_number": "1012345678",
+  "customer_email": "ana@email.com",
+  "customer_phone": "3001234567",
+  "customer_address": "Calle 45 # 10-20, Bogotá",
+  "subtotal": "38655.0000",
+  "discount_total": "965.0000",
+  "tax_total": "5000.0000",
+  "total_amount": "42690.0000",
+  "currency": "COP",
+  "pdf": null,
+  "issued_by": 1,
+  "issued_by_username": "almacenista1",
+  "issued_at": "2026-06-15T10:30:00Z",
+  "is_voided": false,
+  "void_reason": null,
+  "voided_at": null,
+  "voided_by": null,
+  "voided_by_username": null,
+  "movements_detail": [
+    {
+      "id": "uuid-movement-1",
+      "movement_type": "SALIDA_VENTA_MENOR",
+      "product": "<product_uuid>",
+      "product_sku": "MED-0001",
+      "product_name": "Electrodo de superficie 5cm",
+      "quantity": 2,
+      "unit_price": "15000.0000",
+      "discount_pct": null,
+      "discount_amount": null,
+      "subtotal": "30000.0000",
+      "tax_rate_pct": "0.00",
+      "tax_amount": "0.0000",
+      "total_amount": "30000.0000",
+      "origin_location": "<location_uuid>",
+      "created_at": "2026-06-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+**Errores:**
+- `400` — ítems vacíos, campos requeridos faltantes.
+- `403` — rol sin permiso o auxiliar fuera de horario.
+- `409 INSUFFICIENT_STOCK` — stock insuficiente para algún ítem.
+
+---
+
+### Detalle de factura
+
+```
+GET /api/v1/billing/invoices/<uuid>/
+```
+
+Devuelve el mismo schema que la respuesta 201 de creación (incluye `movements_detail`).
+
+---
+
+### Anular factura
+
+```
+POST /api/v1/billing/invoices/<uuid>/void/
+```
+
+**Request:**
+```json
+{
+  "reason": "Error en la cantidad despachada"
+}
+```
+
+- `reason`: obligatorio, mínimo 5 caracteres.
+- Solo `almacenista` puede anular.
+- La anulación revierte automáticamente el stock de todos los ítems.
+
+**Response 200:**
+```json
+{
+  "id": "uuid",
+  "number": "ICM-0001",
+  "is_voided": true,
+  "void_reason": "Error en la cantidad despachada",
+  "voided_at": "2026-06-15T11:00:00Z",
+  "voided_by": 1,
+  "voided_by_username": "almacenista1"
+}
+```
+
+**Errores:**
+- `403` — solo almacenista puede anular.
+- `404` — factura no encontrada.
+- `409 INVOICE_ALREADY_VOIDED` — la factura ya fue anulada previamente.
+
+---
+
+### Estadísticas de ventas
+
+```
+GET /api/v1/billing/invoices/stats/
+```
+
+**Response 200:**
+```json
+{
+  "total_sales_today": "250000.0000",
+  "total_sales_month": "4750000.0000",
+  "invoice_count_today": 5,
+  "invoice_count_month": 87
+}
+```
+
+Solo incluye facturas activas (excluye anuladas).
+
+---
+
+### Configuración fiscal de empresa
+
+```
+GET /api/v1/billing/config/company/
+PUT /api/v1/billing/config/company/
+```
+
+**Request PUT:**
+```json
+{
+  "company_name": "ICM Insumos Médicos SAS",
+  "nit": "900123456-7",
+  "address": "Cra 45 # 20-30, Bogotá",
+  "phone": "+573001234567",
+  "email": "facturacion@icm.com",
+  "dian_resolution": "18764000001234",
+  "dian_range_from": 1,
+  "dian_range_to": 1000,
+  "invoice_series": "ICM",
+  "invoice_footer": "Gracias por su compra."
+}
+```
+
+**Response 200:**
+```json
+{
+  "id": 1,
+  "company_name": "ICM Insumos Médicos SAS",
+  "nit": "900123456-7",
+  "address": "Cra 45 # 20-30, Bogotá",
+  "phone": "+573001234567",
+  "email": "facturacion@icm.com",
+  "dian_resolution": "18764000001234",
+  "dian_range_from": 1,
+  "dian_range_to": 1000,
+  "invoice_series": "ICM",
+  "invoice_footer": "Gracias por su compra.",
+  "updated_at": "2026-06-15T09:00:00Z"
+}
+```
+
+Solo `almacenista` puede hacer PUT. GET disponible para almacenista y administrador.
+
+---
+
 ## Errores
 
 Todos los errores siguen el formato uniforme:
@@ -1603,6 +1853,7 @@ Todos los errores siguen el formato uniforme:
 | Lote requerido pero ausente | 422 | `VALIDATION_ERROR` |
 | Auxiliar fuera de horario | 403 | `PERMISSION_DENIED` |
 | Token expirado | 401 | `NOT_AUTHENTICATED` |
+| Factura ya anulada | 409 | `INVOICE_ALREADY_VOIDED` |
 
 ---
 
@@ -1669,7 +1920,11 @@ Los listados están paginados. Respuesta estándar:
 | Ver auditoría | ✅ | ❌ | ✅ |
 | Gestionar webhooks | ✅ | ❌ | ❌ |
 | Configurar precios de producto | ✅ | ❌ | ❌ |
-| Ver facturas comerciales | ✅ | ✅ | ❌ |
+| Ver facturas comerciales (billing) | ✅ | ❌ | ✅ |
+| Crear facturas comerciales | ✅ | ✅ (horario) | ❌ |
+| Anular facturas comerciales | ✅ | ❌ | ❌ |
+| Ver estadísticas de ventas | ✅ | ❌ | ✅ |
+| Configurar empresa (billing) | ✅ | ❌ | ✅ (solo lectura) |
 | Ver reportes financieros | ✅ | ❌ | ✅ |
 | Gestionar proveedores | ✅ | ❌ | ✅ (solo lectura) |
 | Gestionar órdenes de compra | ✅ | ❌ | ✅ (solo lectura) |
@@ -1679,4 +1934,4 @@ Para la matriz completa de cada endpoint, ver [README_MATRIZ_PERMISOS.md](README
 
 ---
 
-*Actualizado: 2026-06-11. Sincronizado con el estado real del código.*
+*Actualizado: 2026-06-15. Sincronizado con el estado real del código. Incluye módulo billing (facturación comercial).*

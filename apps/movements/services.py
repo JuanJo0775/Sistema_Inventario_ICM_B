@@ -651,6 +651,8 @@ def register_dispatch(
     electrical_safety_acknowledged: bool = False,
     privacy_notice_acknowledged: bool = False,
     discount_pct: Any | None = None,
+    external_invoice_number: str | None = None,
+    skip_invoice_creation: bool = False,
 ) -> list[Movement]:
     """
     RF-006, BR-04, BR-08, BR-11, BR-13, BR-14 — Salida con validación cruzada opcional y factura.
@@ -782,12 +784,21 @@ def register_dispatch(
         )
 
     # Prepare invoice and PDF once for the whole dispatch
-    invoice_number = generate_invoice_number()
-    pdf_file = _try_build_invoice_pdf(
-        invoice_number=invoice_number,
-        product=product,
-        quantity=quantity,
-        movement_type=movement_type,
+    invoice_number = (
+        external_invoice_number
+        if external_invoice_number
+        else generate_invoice_number()
+    )
+    # Skip per-movement PDF in bulk mode (caller generates enriched Invoice PDF at the end)
+    pdf_file = (
+        None
+        if skip_invoice_creation
+        else _try_build_invoice_pdf(
+            invoice_number=invoice_number,
+            product=product,
+            quantity=quantity,
+            movement_type=movement_type,
+        )
     )
 
     movements_created: list[Movement] = []
@@ -919,7 +930,8 @@ def register_dispatch(
     )
 
     # Crear el modelo Invoice consolidado con precio (BR-13: parte de la transacción atómica)
-    if invoice_number is not None:
+    # skip_invoice_creation=True cuando el caller (bulk billing) creará el Invoice una vez al final.
+    if invoice_number is not None and not skip_invoice_creation:
         create_invoice_from_movements(
             movements_created,
             user=user,
