@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("movements", "0011_remove_invoice_customer_id_number_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
