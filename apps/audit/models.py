@@ -125,6 +125,17 @@ class AuditEventType(models.TextChoices):
         "WEBHOOK_ENDPOINT_ENABLED",
         "Endpoint webhook reactivado para recepción",
     )
+    # Storage — Creación / edición
+    STORAGE_TYPE_CREATED = "STORAGE_TYPE_CREATED", "Tipo de almacenamiento creado"
+    STORAGE_TYPE_UPDATED = "STORAGE_TYPE_UPDATED", "Tipo de almacenamiento actualizado"
+    STORAGE_TEMPLATE_CREATED = (
+        "STORAGE_TEMPLATE_CREATED",
+        "Plantilla de almacenamiento creada",
+    )
+    STORAGE_TEMPLATE_UPDATED = (
+        "STORAGE_TEMPLATE_UPDATED",
+        "Plantilla de almacenamiento actualizada",
+    )
     # Storage — Soft delete
     STORAGE_TYPE_SOFT_DELETED = (
         "STORAGE_TYPE_SOFT_DELETED",

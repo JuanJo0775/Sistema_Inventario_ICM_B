@@ -243,7 +243,9 @@ class LocationListCreateView(APIView):
             "true",
             "yes",
         )
-        qs = Location.objects.order_by("code")
+        qs = Location.objects.select_related(
+            "storage_type", "storage_template"
+        ).order_by("code")
         if not include_archived:
             qs = qs.filter(deleted_at__isnull=True)
         include_inactive = request.query_params.get("include_inactive", "").lower()
