@@ -651,6 +651,8 @@ def register_dispatch(
     electrical_safety_acknowledged: bool = False,
     privacy_notice_acknowledged: bool = False,
     discount_pct: Any | None = None,
+    external_invoice_number: str | None = None,
+    skip_invoice_creation: bool = False,
 ) -> list[Movement]:
     """
     RF-006, BR-04, BR-08, BR-11, BR-13, BR-14 — Salida con validación cruzada opcional y factura.
@@ -782,131 +784,13 @@ def register_dispatch(
         )
 
     # Prepare invoice and PDF once for the whole dispatch
-    invoice_number = generate_invoice_number()
+    invoice_number = external_invoice_number or generate_invoice_number()
     pdf_file = _try_build_invoice_pdf(
         invoice_number=invoice_number,
         product=product,
         quantity=quantity,
         movement_type=movement_type,
     )
-
-    movements_created: list[Movement] = []
-
-    if product.requires_expiration and selected_lot is None:
-        # evaluate lots available and ensure total covers requested quantity
-        candidates = available_lots_at_location(
-            product_id=product_id, location_id=location_id
-        )
-        total_available = sum(c["available"] for c in candidates)
-        if total_available < quantity:
-            raise InsufficientStockError(
-                detail={
-                    "product_id": str(product_id),
-                    "location_id": str(location_id),
-                    "requested": quantity,
-                    "available": total_available,
-                }
-            )
-        # prefer single-lot if possible
-        single_candidate = next(
-            (c for c in candidates if c["available"] >= quantity), None
-        )
-        if single_candidate is not None:
-            selected_lot = single_candidate["lot"]
-
-    if product.requires_expiration and selected_lot is None:
-        # Multi-lot consumption: take from earliest-expiring lots
-        remaining = int(quantity)
-        candidates = available_lots_at_location(
-            product_id=product_id, location_id=location_id
-        )
-        for candidate in candidates:
-            if remaining <= 0:
-                break
-            lot = candidate["lot"]
-            take = min(candidate["available"], remaining)
-            prev = origin.current_stock
-            after = prev - take
-            origin.current_stock = after
-            origin.last_movement_at = timezone.now()
-            origin.save(
-                update_fields=["current_stock", "last_movement_at", "updated_at"]
-            )
-
-            lot_price = _resolve_price_snapshot(
-                product, take, movement_type, discount_pct=discount_pct
-            )
-            movement = Movement.objects.create(
-                movement_type=movement_type,
-                product_id=product_id,
-                lot=lot,
-                origin_location_id=location_id,
-                quantity=take,
-                stock_previo_origen=prev,
-                stock_resultante_origen=after,
-                scanned_code=sc or None,
-                order_sku=osku or None,
-                serial_number=resolved_serial,
-                invoice_number=invoice_number,
-                invoice_pdf=pdf_file,
-                executed_by=user,
-                customer_snapshot=customer_snapshot,
-                **lot_price,
-            )
-            movements_created.append(movement)
-            _log_alert_acknowledgement(
-                user=user,
-                movement=movement,
-                cold_chain_acknowledged=cold_chain_acknowledged,
-                electrical_safety_acknowledged=electrical_safety_acknowledged,
-            )
-            remaining -= take
-
-        if remaining > 0:
-            raise InsufficientStockError(
-                detail={"requested": quantity, "remaining": remaining}
-            )
-
-    else:
-        # Single movement (either non-expiring product or selected_lot provided)
-        before = origin.current_stock
-        after = before - quantity
-        origin.current_stock = after
-        origin.last_movement_at = timezone.now()
-        origin.save(update_fields=["current_stock", "last_movement_at", "updated_at"])
-
-        movement = Movement.objects.create(
-            movement_type=movement_type,
-            product_id=product_id,
-            lot=selected_lot,
-            origin_location_id=location_id,
-            quantity=quantity,
-            stock_previo_origen=before,
-            stock_resultante_origen=after,
-            scanned_code=sc or None,
-            order_sku=osku or None,
-            serial_number=resolved_serial,
-            invoice_number=invoice_number,
-            invoice_pdf=pdf_file,
-            executed_by=user,
-            customer_snapshot=customer_snapshot,
-            **price_snapshot,
-        )
-        movements_created.append(movement)
-
-    check_and_create_alerts(product, location)
-    for m in movements_created:
-        m.refresh_from_db()
-
-    # Marcar ProductSerial como despachado
-    for m in movements_created:
-        if m.serial_number and product.category.requires_serial_number:
-            _update_serial_status(
-                serial_number=m.serial_number,
-                product=product,
-                new_status=ProductSerial.Status.DISPATCHED,
-                movement=m,
-            )
 
     movements_created: list[Movement] = []
 
@@ -1037,7 +921,7 @@ def register_dispatch(
     )
 
     # Crear el modelo Invoice consolidado con precio (BR-13: parte de la transacción atómica)
-    if invoice_number is not None:
+    if not skip_invoice_creation and invoice_number is not None:
         create_invoice_from_movements(
             movements_created,
             user=user,
