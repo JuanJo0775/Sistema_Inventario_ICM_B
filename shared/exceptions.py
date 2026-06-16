@@ -211,3 +211,11 @@ class CorrectionWindowClosedError(ImmutableRecordError):
     )
     default_code = "CORRECTION_WINDOW_CLOSED"
     status_code = status.HTTP_409_CONFLICT
+
+
+class InvoiceAlreadyVoidedError(ICMBaseException):
+    """Intento de anular una factura que ya fue anulada (409 Conflict)."""
+
+    default_message = "La factura ya fue anulada y no puede anularse de nuevo."
+    default_code = "INVOICE_ALREADY_VOIDED"
+    status_code = status.HTTP_409_CONFLICT
