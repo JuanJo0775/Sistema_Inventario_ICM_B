@@ -179,8 +179,11 @@ class PurchaseOrderItem(BaseModel):
     class Meta:
         verbose_name = "Ítem de OC"
         verbose_name_plural = "Ítems de OC"
-        unique_together = [("purchase_order", "product")]
         constraints = [
+            models.UniqueConstraint(
+                fields=["purchase_order", "product"],
+                name="uniq_po_item_product",
+            ),
             models.CheckConstraint(
                 condition=Q(quantity_ordered__gt=0),
                 name="poi_qty_ordered_positive",
@@ -305,8 +308,11 @@ class ReceptionItem(BaseModel):
     class Meta:
         verbose_name = "Ítem de Recepción"
         verbose_name_plural = "Ítems de Recepción"
-        unique_together = [("reception", "purchase_order_item")]
         constraints = [
+            models.UniqueConstraint(
+                fields=["reception", "purchase_order_item"],
+                name="uniq_reception_item",
+            ),
             models.CheckConstraint(
                 condition=Q(quantity_received__gte=0),
                 name="ri_qty_received_nonneg",
