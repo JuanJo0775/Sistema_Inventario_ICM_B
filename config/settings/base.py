@@ -38,11 +38,8 @@ SECRET_KEY = config(
     "DJANGO_SECRET_KEY", default="insecure-dev-key-change-in-production"
 )
 DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
-ALLOWED_HOSTS = [
-    h.strip()
-    for h in config("DJANGO_ALLOWED_HOSTS", default="localhost,127.0.0.1").split(",")
-    if h.strip()
-]
+_allowed_hosts_raw = str(config("DJANGO_ALLOWED_HOSTS", default="localhost,127.0.0.1"))
+ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_raw.split(",") if h.strip()]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -138,7 +135,7 @@ DB_PROVIDER = config("DB_PROVIDER", default="local")
 if DB_PROVIDER == "neon":
     DATABASES = {
         "default": dj_database_url.config(
-            default=config("DATABASE_URL"),
+            default=str(config("DATABASE_URL", default="")),
             conn_max_age=600,
             ssl_require=True,
         ),
@@ -182,7 +179,7 @@ REST_FRAMEWORK = {
         "anon": "60/hour",
         "user": "1000/hour",
         "login": "10/minute",  # usado en endpoints de autenticación (JWT obtain/refresh)
-        "password_reset": "5/hour",
+        "password_reset": "10/hour",
     },
 }
 
@@ -212,14 +209,13 @@ EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = [
-    o.strip()
-    for o in config(
+_cors_origins_raw = str(
+    config(
         "CORS_ALLOWED_ORIGINS",
         default="http://localhost:3000,http://localhost:8000",
-    ).split(",")
-    if o.strip()
-]
+    )
+)
+CORS_ALLOWED_ORIGINS = [o.strip() for o in _cors_origins_raw.split(",") if o.strip()]
 
 LOGGING = {
     "version": 1,
