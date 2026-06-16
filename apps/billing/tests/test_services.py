@@ -104,6 +104,125 @@ def test_multi_dispatch_wholesale_requires_customer_data(
 
 
 @pytest.mark.django_db
+def test_multi_dispatch_electric_product_requires_acknowledgement(
+    almacenista_user, sample_locations
+):
+    """BR-04 — producto de categoría con serial obligatorio exige electrical_safety_acknowledged."""
+    from shared.exceptions import AlertAcknowledgementRequiredError
+    from tests.factories import ElectroCategoryFactory
+
+    loc = sample_locations[1]
+    p = ProductFactory(
+        category=ElectroCategoryFactory(),
+        sale_price_retail=Decimal("100"),
+        tax_rate_pct=Decimal("0"),
+        requires_expiration=False,
+    )
+    register_entry(
+        almacenista_user,
+        p.id,
+        loc.id,
+        5,
+        serial_number="SN-BASE",
+        electrical_safety_acknowledged=True,
+    )
+
+    with pytest.raises(AlertAcknowledgementRequiredError):
+        create_multi_dispatch_invoice(
+            almacenista_user,
+            invoice_type="retail",
+            location_id=loc.id,
+            customer_data={"name": "Test"},
+            items=[{"product_id": p.id, "quantity": 1}],
+        )
+
+
+@pytest.mark.django_db
+def test_multi_dispatch_electric_product_succeeds_when_acknowledged(
+    almacenista_user, sample_locations
+):
+    """Con electrical_safety_acknowledged=True el despacho se completa normalmente."""
+    from tests.factories import ElectroCategoryFactory
+
+    loc = sample_locations[1]
+    p = ProductFactory(
+        category=ElectroCategoryFactory(),
+        sale_price_retail=Decimal("100"),
+        tax_rate_pct=Decimal("0"),
+        requires_expiration=False,
+    )
+    register_entry(
+        almacenista_user,
+        p.id,
+        loc.id,
+        5,
+        serial_number="SN-BASE",
+        electrical_safety_acknowledged=True,
+    )
+
+    invoice = create_multi_dispatch_invoice(
+        almacenista_user,
+        invoice_type="retail",
+        location_id=loc.id,
+        customer_data={"name": "Test"},
+        items=[{"product_id": p.id, "quantity": 1}],
+        electrical_safety_acknowledged=True,
+    )
+
+    assert invoice.movements.count() == 1
+
+
+@pytest.mark.django_db
+def test_multi_dispatch_cold_chain_product_requires_acknowledgement(
+    almacenista_user, sample_locations
+):
+    """Producto con requires_cold_chain=True exige cold_chain_acknowledged."""
+    from shared.exceptions import AlertAcknowledgementRequiredError
+
+    loc = sample_locations[1]
+    p = ProductFactory(
+        requires_cold_chain=True,
+        sale_price_retail=Decimal("100"),
+        tax_rate_pct=Decimal("0"),
+    )
+    register_entry(almacenista_user, p.id, loc.id, 5, cold_chain_acknowledged=True)
+
+    with pytest.raises(AlertAcknowledgementRequiredError):
+        create_multi_dispatch_invoice(
+            almacenista_user,
+            invoice_type="retail",
+            location_id=loc.id,
+            customer_data={"name": "Test"},
+            items=[{"product_id": p.id, "quantity": 1}],
+        )
+
+
+@pytest.mark.django_db
+def test_multi_dispatch_cold_chain_product_succeeds_when_acknowledged(
+    almacenista_user, sample_locations
+):
+    """Con cold_chain_acknowledged=True el despacho se completa normalmente."""
+    loc = sample_locations[1]
+    p = ProductFactory(
+        requires_cold_chain=True,
+        sale_price_retail=Decimal("100"),
+        tax_rate_pct=Decimal("0"),
+    )
+    register_entry(almacenista_user, p.id, loc.id, 5, cold_chain_acknowledged=True)
+
+    invoice = create_multi_dispatch_invoice(
+        almacenista_user,
+        invoice_type="retail",
+        location_id=loc.id,
+        customer_data={"name": "Test"},
+        items=[{"product_id": p.id, "quantity": 1}],
+        cold_chain_acknowledged=True,
+    )
+
+    assert invoice.movements.count() == 1
+
+
+@pytest.mark.django_db
 def test_multi_dispatch_invalid_type_raises(almacenista_user, sample_locations):
     with pytest.raises(DomainValidationError):
         create_multi_dispatch_invoice(

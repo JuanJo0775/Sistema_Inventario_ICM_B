@@ -139,6 +139,75 @@ def test_create_invoice_success(almacenista_user, sample_locations, api_client):
 
 
 @pytest.mark.django_db
+def test_create_invoice_electric_product_without_ack_returns_422(
+    almacenista_user, sample_locations, api_client
+):
+    """Sin electrical_safety_acknowledged, el endpoint propaga el error 422."""
+    from tests.factories import ElectroCategoryFactory
+
+    api_client.force_authenticate(user=almacenista_user)
+    loc = sample_locations[1]
+    p = ProductFactory(
+        category=ElectroCategoryFactory(),
+        sale_price_retail=Decimal("100"),
+        tax_rate_pct=Decimal("0"),
+        requires_expiration=False,
+    )
+    register_entry(
+        almacenista_user,
+        p.id,
+        loc.id,
+        5,
+        serial_number="SN-BASE",
+        electrical_safety_acknowledged=True,
+    )
+
+    payload = {
+        "invoice_type": "retail",
+        "location_id": str(loc.id),
+        "customer": {"name": "Test"},
+        "items": [{"product_id": str(p.id), "quantity": 1}],
+    }
+    resp = api_client.post(reverse("billing-invoice-list"), payload, format="json")
+    assert resp.status_code == 422
+
+
+@pytest.mark.django_db
+def test_create_invoice_electric_product_with_ack_returns_201(
+    almacenista_user, sample_locations, api_client
+):
+    """Con electrical_safety_acknowledged=True el endpoint crea la factura."""
+    from tests.factories import ElectroCategoryFactory
+
+    api_client.force_authenticate(user=almacenista_user)
+    loc = sample_locations[1]
+    p = ProductFactory(
+        category=ElectroCategoryFactory(),
+        sale_price_retail=Decimal("100"),
+        tax_rate_pct=Decimal("0"),
+        requires_expiration=False,
+    )
+    register_entry(
+        almacenista_user,
+        p.id,
+        loc.id,
+        5,
+        serial_number="SN-BASE",
+        electrical_safety_acknowledged=True,
+    )
+
+    payload = {
+        "invoice_type": "retail",
+        "location_id": str(loc.id),
+        "customer": {"name": "Test"},
+        "items": [{"product_id": str(p.id), "quantity": 1}],
+        "electrical_safety_acknowledged": True,
+    }
+    resp = api_client.post(reverse("billing-invoice-list"), payload, format="json")
+    assert resp.status_code == 201
+
+
+@pytest.mark.django_db
 def test_create_invoice_insufficient_stock_returns_409(
     almacenista_user, sample_locations, api_client
 ):

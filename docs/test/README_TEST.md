@@ -336,7 +336,7 @@ Cada subcategoría tiene su propia numeración: `SCR-*` para scripts, `SHA-*` pa
 
 ## Estado actual de la suite
 
-**~862 tests · 620 app-level · 138 Gherkin · 104 auxiliares** _(2026-06-15, recuento de funciones `def test_`)_
+**935 tests · 620 app-level · 138 Gherkin · 95 auxiliares · 82 integración/otros** _(2026-06-16, pytest --collect-only)_
 
 | Capa | Tests | Estado |
 |------|-------|--------|
@@ -344,7 +344,11 @@ Cada subcategoría tiene su propia numeración: `SCR-*` para scripts, `SHA-*` pa
 | Gherkin/ERS (RF001–RF025, RNF003–RNF006) | 138 run | 131 passed, 7 skipped (6 frontend/E2E + 1 WeasyPrint) |
 | Integración cross-domain | 19 | 19 tests en 4 archivos |
 | Concurrencia | 4 | Requieren `RUN_CONCURRENCY_TESTS=1` + PostgreSQL |
-| Scripts / Shared / SLA | 92 | 75 scripts + 13 shared + 4 SLA |
+| Scripts / Shared / SLA | 95 | 78 scripts + 13 shared + 4 SLA |
+| Integración (API, movements, smoke, seed) | 32 | 10 API + 1 FEFO + 6 cross-domain + 2 smoke + 13 seed |
+| Performance (Locust) | 2 | Tests de estructura/importación |
+| Project structure / parse ERS | 5 | 3 project_structure + 2 parse_ers_gherkin |
+| **Total pytest collect** | **935** | |
 
 **Cobertura técnica (medida 2026-06-14):** 91% exacto · 12709 statements · 11606 cubiertos · 1103 perdidos  
 **Ejecución validada 2026-06-15:** 862 passed, 12 skipped, 0 fallos
