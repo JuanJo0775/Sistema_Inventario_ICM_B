@@ -397,8 +397,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: {}
+                $ref: '#/components/schemas/AlertStats'
           description: ''
         '400':
           description: Solicitud inválida o con errores de validación.
@@ -1559,6 +1558,402 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/billing/config/company/:
+    get:
+      operationId: billing_config_company_retrieve
+      description: Retorna la configuración fiscal de la empresa usada en los encabezados
+        de factura.
+      summary: Obtener datos de empresa
+      tags:
+      - billing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyInfo'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: billing_config_company_update
+      description: Actualiza los datos fiscales de la empresa (razón social, NIT,
+        resolución DIAN, etc.). Solo almacenista.
+      summary: Actualizar datos de empresa
+      tags:
+      - billing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyInfoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CompanyInfoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CompanyInfoRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyInfo'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/billing/invoices/:
+    get:
+      operationId: billing_invoices_list
+      description: Lista las facturas comerciales con filtros de fecha, tipo y búsqueda.
+        Soporta ?start_date=, ?end_date=, ?invoice_type=, ?search= (número, cliente,
+        doc), ?include_voided= (default false).
+      summary: Listar facturas
+      parameters:
+      - in: query
+        name: end_date
+        schema:
+          type: string
+        description: Fecha fin ISO 8601 (YYYY-MM-DD).
+      - in: query
+        name: include_voided
+        schema:
+          type: boolean
+        description: Si true, incluye facturas anuladas.
+      - in: query
+        name: invoice_type
+        schema:
+          type: string
+        description: '''retail'' | ''wholesale''.'
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Busca en número, nombre o documento de cliente.
+      - in: query
+        name: start_date
+        schema:
+          type: string
+        description: Fecha inicio ISO 8601 (YYYY-MM-DD).
+      tags:
+      - billing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInvoiceListList'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: billing_invoices_create
+      description: RF-006, RF-003, BR-13 — Crea una factura agrupando múltiples productos
+        y/o combos en una única transacción atómica. Cada ítem trae `product_id` o
+        `combo_id` (excluyentes). Genera movements de salida por cada ítem y un Invoice
+        compartido con numeración ICM-XXXX.
+      summary: Crear factura multi-producto
+      tags:
+      - billing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InvoiceCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InvoiceCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceDetail'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/billing/invoices/{id}/:
+    get:
+      operationId: billing_invoices_retrieve
+      description: Retorna el detalle completo de una factura por ID, incluyendo todos
+        sus movements.
+      summary: Detalle de factura
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - billing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceDetail'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/billing/invoices/{id}/void/:
+    post:
+      operationId: billing_invoices_void_create
+      description: Anula la factura y crea movements ANULACION compensatorios que
+        revierten el stock. Solo el almacenista puede anular. Los movements originales
+        son inmutables (BR-10). Retorna 409 si la factura ya fue anulada.
+      summary: Anular factura
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - billing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceVoidRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InvoiceVoidRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InvoiceVoidRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceDetail'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Permiso denegado para ejecutar la acción.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recurso no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflicto de estado (ej. stock insuficiente, o regla de negocio
+            restrictiva).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Entidad no procesable (errores lógicos o de dominio ICM).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/billing/invoices/stats/:
+    get:
+      operationId: billing_invoices_stats_retrieve
+      description: Retorna totales de ventas y cantidad de facturas para hoy y el
+        mes en curso.
+      summary: Estadísticas de facturación
+      tags:
+      - billing
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceStats'
+          description: ''
+        '400':
+          description: Solicitud inválida o con errores de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado o token inválido/expirado.
           content:
             application/json:
               schema:
@@ -9086,8 +9481,24 @@ paths:
   /api/v1/webhooks/deliveries/:
     get:
       operationId: webhooks_deliveries_list
-      description: Lista el historial de entregas de webhooks.
+      description: Lista el historial de entregas de webhooks con filtros opcionales.
       summary: Historial de entregas de webhook
+      parameters:
+      - in: query
+        name: endpoint_id
+        schema:
+          type: string
+        description: UUID del endpoint.
+      - in: query
+        name: event_type
+        schema:
+          type: string
+        description: Tipo de evento.
+      - in: query
+        name: status
+        schema:
+          type: string
+        description: 'Estado: PENDING, DELIVERED, FAILED.'
       tags:
       - webhooks
       security:
@@ -9716,6 +10127,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/WebhookStatsResponse'
           description: ''
+  /media/{path}:
+    get:
+      operationId: media_retrieve
+      description: |-
+        Serve MEDIA_ROOT files only to authenticated users.
+
+        In production, delegate to Nginx X-Accel-Redirect instead of this view.
+      parameters:
+      - in: path
+        name: path
+        schema:
+          type: string
+        required: true
+      tags:
+      - media
+      security:
+      - jwtAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: No response body
 components:
   schemas:
     AdjustmentCorrectionRequest:
@@ -9758,6 +10190,13 @@ components:
           minimum: 0
         justification:
           type: string
+        lot_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Lote a asociar. Obligatorio si el ajuste incrementa stock de
+            un producto con vencimiento (requires_expiration=True); opcional si reduce
+            stock (se infiere por FEFO cuando es posible).
         serial_number:
           type: string
           nullable: true
@@ -9845,6 +10284,26 @@ components:
       - resolved_at
       - resolved_by
       - severity
+    AlertStats:
+      type: object
+      properties:
+        total_active:
+          type: integer
+        by_severity:
+          type: object
+          additionalProperties:
+            type: integer
+        by_category:
+          type: object
+          additionalProperties:
+            type: integer
+        generated_at:
+          type: string
+      required:
+      - by_category
+      - by_severity
+      - generated_at
+      - total_active
     AlertTypeEnum:
       enum:
       - LOW_STOCK
@@ -10119,6 +10578,9 @@ components:
           items:
             $ref: '#/components/schemas/ComboItem'
           readOnly: true
+        available_quantity:
+          type: string
+          readOnly: true
         price_strategy:
           allOf:
           - $ref: '#/components/schemas/ComboPriceStrategyEnum'
@@ -10153,6 +10615,7 @@ components:
           readOnly: true
           description: Fecha y hora de última modificación (UTC).
       required:
+      - available_quantity
       - components
       - created_at
       - deleted_at
@@ -10293,6 +10756,83 @@ components:
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
           nullable: true
+    CompanyInfo:
+      type: object
+      description: GET/PUT /billing/config/company/.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        company_name:
+          type: string
+          maxLength: 200
+        nit:
+          type: string
+          maxLength: 50
+        address:
+          type: string
+        phone:
+          type: string
+          maxLength: 50
+        email:
+          type: string
+          format: email
+        dian_resolution:
+          type: string
+        dian_range_from:
+          type: integer
+          nullable: true
+        dian_range_to:
+          type: integer
+          nullable: true
+        invoice_series:
+          type: string
+          maxLength: 10
+        invoice_footer:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - company_name
+      - id
+      - updated_at
+    CompanyInfoRequest:
+      type: object
+      description: GET/PUT /billing/config/company/.
+      properties:
+        company_name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        nit:
+          type: string
+          maxLength: 50
+        address:
+          type: string
+        phone:
+          type: string
+          maxLength: 50
+        email:
+          type: string
+          format: email
+        dian_resolution:
+          type: string
+        dian_range_from:
+          type: integer
+          nullable: true
+        dian_range_to:
+          type: integer
+          nullable: true
+        invoice_series:
+          type: string
+          minLength: 1
+          maxLength: 10
+        invoice_footer:
+          type: string
+      required:
+      - company_name
     CorrectionCreateRequest:
       type: object
       properties:
@@ -10314,6 +10854,33 @@ components:
       - destination_id
       - origin_id
       - quantity
+    CustomerDataInputRequest:
+      type: object
+      description: Datos del cliente para la factura.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: Nombre o razón social.
+          maxLength: 255
+        id_number:
+          type: string
+          default: ''
+          description: NIT o número de documento.
+          maxLength: 50
+        email:
+          type: string
+          format: email
+          default: ''
+        phone:
+          type: string
+          default: ''
+          maxLength: 50
+        address:
+          type: string
+          default: ''
+      required:
+      - name
     DashboardAlertSummary:
       type: object
       properties:
@@ -10489,8 +11056,7 @@ components:
           type: integer
           minimum: 1
         movement_type:
-          type: string
-          minLength: 1
+          $ref: '#/components/schemas/MovementTypeEnum'
         lot_id:
           type: string
           format: uuid
@@ -10694,6 +11260,8 @@ components:
       - UNAUTHORIZED_ACCESS_ATTEMPT
       - MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD
       - INVOICE_GENERATED
+      - INVOICE_VOIDED
+      - COMPANY_INFO_UPDATED
       - DISPATCH_WITH_PRICE_COMPLETED
       - SUPPLIER_CREATED
       - SUPPLIER_UPDATED
@@ -10707,6 +11275,10 @@ components:
       - WEBHOOK_ENDPOINT_RESTORED
       - WEBHOOK_ENDPOINT_DISABLED
       - WEBHOOK_ENDPOINT_ENABLED
+      - STORAGE_TYPE_CREATED
+      - STORAGE_TYPE_UPDATED
+      - STORAGE_TEMPLATE_CREATED
+      - STORAGE_TEMPLATE_UPDATED
       - STORAGE_TYPE_SOFT_DELETED
       - STORAGE_TYPE_RESTORED
       - STORAGE_TEMPLATE_SOFT_DELETED
@@ -10790,6 +11362,8 @@ components:
         * `UNAUTHORIZED_ACCESS_ATTEMPT` - Intento de acceso no autorizado
         * `MODIFICATION_ATTEMPT_ON_IMMUTABLE_RECORD` - Intento de modificación sobre registro inmutable
         * `INVOICE_GENERATED` - Factura generada
+        * `INVOICE_VOIDED` - Factura anulada
+        * `COMPANY_INFO_UPDATED` - Datos de empresa actualizados
         * `DISPATCH_WITH_PRICE_COMPLETED` - Despacho con precio completado
         * `SUPPLIER_CREATED` - Proveedor creado
         * `SUPPLIER_UPDATED` - Proveedor actualizado
@@ -10803,6 +11377,10 @@ components:
         * `WEBHOOK_ENDPOINT_RESTORED` - Endpoint webhook restaurado
         * `WEBHOOK_ENDPOINT_DISABLED` - Endpoint webhook desactivado para recepción
         * `WEBHOOK_ENDPOINT_ENABLED` - Endpoint webhook reactivado para recepción
+        * `STORAGE_TYPE_CREATED` - Tipo de almacenamiento creado
+        * `STORAGE_TYPE_UPDATED` - Tipo de almacenamiento actualizado
+        * `STORAGE_TEMPLATE_CREATED` - Plantilla de almacenamiento creada
+        * `STORAGE_TEMPLATE_UPDATED` - Plantilla de almacenamiento actualizada
         * `STORAGE_TYPE_SOFT_DELETED` - Tipo de almacenamiento eliminado lógicamente
         * `STORAGE_TYPE_RESTORED` - Tipo de almacenamiento restaurado
         * `STORAGE_TEMPLATE_SOFT_DELETED` - Plantilla de almacenamiento eliminada lógicamente
@@ -11031,6 +11609,314 @@ components:
       - subtotal
       - tax_total
       - total_amount
+    InvoiceCreateInvoiceTypeEnum:
+      enum:
+      - retail
+      - wholesale
+      type: string
+      description: |-
+        * `retail` - retail
+        * `wholesale` - wholesale
+    InvoiceCreateRequest:
+      type: object
+      description: |-
+        Cuerpo para POST /billing/invoices/ — factura multi-producto.
+
+        RF-006, BR-13 — Crea múltiples movements de salida y los agrupa en un Invoice.
+      properties:
+        invoice_type:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceCreateInvoiceTypeEnum'
+          description: |-
+            'retail' → SALIDA_VENTA_MENOR | 'wholesale' → SALIDA_VENTA_MAYOR.
+
+            * `retail` - retail
+            * `wholesale` - wholesale
+        location_id:
+          type: string
+          format: uuid
+          description: UUID de la ubicación origen del stock.
+        customer:
+          $ref: '#/components/schemas/CustomerDataInputRequest'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceItemInputRequest'
+        note:
+          type: string
+          default: ''
+        privacy_notice_acknowledged:
+          type: boolean
+          default: false
+          description: Requerido para wholesale (Ley 1581, RNF-006).
+      required:
+      - customer
+      - invoice_type
+      - items
+      - location_id
+    InvoiceDetail:
+      type: object
+      description: Detalle completo de factura para GET /billing/invoices/{id}/.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        number:
+          type: string
+          readOnly: true
+          description: Número ICM-XXXX.
+        invoice_type:
+          readOnly: true
+          nullable: true
+          description: |-
+            Tipo de venta: retail o wholesale.
+
+            * `retail` - Venta menor (retail)
+            * `wholesale` - Venta mayor (wholesale)
+          oneOf:
+          - $ref: '#/components/schemas/InvoiceType423Enum'
+          - $ref: '#/components/schemas/NullEnum'
+        customer_name:
+          type: string
+          readOnly: true
+        customer_id_number:
+          type: string
+          readOnly: true
+          description: NIT/CC del cliente.
+        customer_email:
+          type: string
+          format: email
+          readOnly: true
+        customer_phone:
+          type: string
+          readOnly: true
+        customer_address:
+          type: string
+          readOnly: true
+        subtotal:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,4})?$
+          readOnly: true
+        discount_total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+        tax_total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,4})?$
+          readOnly: true
+        currency:
+          type: string
+          readOnly: true
+        pdf:
+          type: string
+          format: uri
+          readOnly: true
+          nullable: true
+        issued_by:
+          type: string
+          format: uuid
+          readOnly: true
+        issued_by_username:
+          type: string
+          readOnly: true
+        issued_at:
+          type: string
+          format: date-time
+          readOnly: true
+        is_voided:
+          type: boolean
+          readOnly: true
+          description: True si la factura fue anulada.
+        void_reason:
+          type: string
+          readOnly: true
+          description: Motivo de anulación.
+        voided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        voided_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        voided_by_username:
+          type: string
+          readOnly: true
+          nullable: true
+        movements_detail:
+          type: array
+          items:
+            $ref: '#/components/schemas/MovementSummary'
+          readOnly: true
+      required:
+      - currency
+      - customer_address
+      - customer_email
+      - customer_id_number
+      - customer_name
+      - customer_phone
+      - discount_total
+      - id
+      - invoice_type
+      - is_voided
+      - issued_at
+      - issued_by
+      - issued_by_username
+      - movements_detail
+      - number
+      - pdf
+      - subtotal
+      - tax_total
+      - total_amount
+      - void_reason
+      - voided_at
+      - voided_by
+      - voided_by_username
+    InvoiceItemInputRequest:
+      type: object
+      description: |-
+        Un ítem del carrito al crear una factura multi-producto.
+
+        RF-006, RF-003 — Cada ítem es un producto individual (`product_id`) o un
+        combo (`combo_id`), nunca ambos. El carrito permite mezclar ítems de
+        ambos tipos en la misma factura.
+      properties:
+        product_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: UUID del producto a despachar. Excluyente con `combo_id`.
+        combo_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: UUID del combo a despachar. Excluyente con `product_id`.
+        quantity:
+          type: integer
+          minimum: 1
+          description: Cantidad a despachar (para combos, número de combos completos).
+        discount_pct:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+          description: Porcentaje de descuento (0-100). Solo aplica a productos individuales.
+      required:
+      - quantity
+    InvoiceList:
+      type: object
+      description: Resumen de factura para GET /billing/invoices/.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        number:
+          type: string
+          readOnly: true
+          description: Número ICM-XXXX.
+        invoice_type:
+          readOnly: true
+          nullable: true
+          description: |-
+            Tipo de venta: retail o wholesale.
+
+            * `retail` - Venta menor (retail)
+            * `wholesale` - Venta mayor (wholesale)
+          oneOf:
+          - $ref: '#/components/schemas/InvoiceType423Enum'
+          - $ref: '#/components/schemas/NullEnum'
+        customer_name:
+          type: string
+          readOnly: true
+        customer_id_number:
+          type: string
+          readOnly: true
+          description: NIT/CC del cliente.
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,4})?$
+          readOnly: true
+        currency:
+          type: string
+          readOnly: true
+        issued_by_username:
+          type: string
+          readOnly: true
+        issued_at:
+          type: string
+          format: date-time
+          readOnly: true
+        is_voided:
+          type: boolean
+          readOnly: true
+          description: True si la factura fue anulada.
+        item_count:
+          type: integer
+          readOnly: true
+      required:
+      - currency
+      - customer_id_number
+      - customer_name
+      - id
+      - invoice_type
+      - is_voided
+      - issued_at
+      - issued_by_username
+      - item_count
+      - number
+      - total_amount
+    InvoiceStats:
+      type: object
+      description: Respuesta de GET /billing/invoices/stats/.
+      properties:
+        total_sales_today:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,14}(?:\.\d{0,4})?$
+        total_sales_month:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,14}(?:\.\d{0,4})?$
+        invoice_count_today:
+          type: integer
+        invoice_count_month:
+          type: integer
+      required:
+      - invoice_count_month
+      - invoice_count_today
+      - total_sales_month
+      - total_sales_today
+    InvoiceType423Enum:
+      enum:
+      - retail
+      - wholesale
+      type: string
+      description: |-
+        * `retail` - Venta menor (retail)
+        * `wholesale` - Venta mayor (wholesale)
+    InvoiceVoidRequest:
+      type: object
+      description: Cuerpo para POST /billing/invoices/{id}/void/.
+      properties:
+        reason:
+          type: string
+          minLength: 5
+          description: Motivo de anulación (obligatorio, mínimo 5 caracteres).
+          maxLength: 500
+      required:
+      - reason
     KpiDashboard:
       type: object
       properties:
@@ -11586,6 +12472,105 @@ components:
       required:
       - executed_by__username
       - movements
+    MovementSummary:
+      type: object
+      description: Resumen de Movement para el detalle de factura.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        movement_type:
+          allOf:
+          - $ref: '#/components/schemas/MovementTypeEnum'
+          readOnly: true
+        product:
+          type: string
+          format: uuid
+          readOnly: true
+        product_sku:
+          type: string
+          readOnly: true
+        product_name:
+          type: string
+          readOnly: true
+        quantity:
+          type: integer
+          readOnly: true
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: Precio unitario de venta congelado al momento del despacho.
+        discount_pct:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+          description: Porcentaje de descuento aplicado (0-100).
+        discount_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: Monto de descuento calculado.
+        subtotal:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: unit_price × quantity.
+        tax_rate_pct:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+          description: Tasa de IVA congelada al momento del despacho.
+        tax_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: Monto de IVA calculado sobre la base imponible.
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,4})?$
+          readOnly: true
+          nullable: true
+          description: 'Total a cobrar: subtotal - discount_amount + tax_amount.'
+        origin_location:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - discount_amount
+      - discount_pct
+      - id
+      - movement_type
+      - origin_location
+      - product
+      - product_name
+      - product_sku
+      - quantity
+      - subtotal
+      - tax_amount
+      - tax_rate_pct
+      - total_amount
+      - unit_price
     MovementSummaryResponse:
       type: object
       properties:
@@ -11606,6 +12591,7 @@ components:
       - AJUSTE
       - DEVOLUCION
       - SALIDA_COMBO
+      - ANULACION
       type: string
       description: |-
         * `ENTRADA` - Entrada
@@ -11617,6 +12603,10 @@ components:
         * `AJUSTE` - Ajuste
         * `DEVOLUCION` - Devolución
         * `SALIDA_COMBO` - Salida por combo
+        * `ANULACION` - Anulación de factura
+    NullEnum:
+      enum:
+      - null
     OperationalStatusEnum:
       enum:
       - active
@@ -11754,6 +12744,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Combo'
+    PaginatedInvoiceListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceList'
     PaginatedMovementList:
       type: object
       required:
@@ -12219,7 +13232,7 @@ components:
             type: string
             minLength: 1
             maxLength: 64
-          description: 'Lista de event_types a suscribir. Ej: ["STOCK_CRITICO"].'
+          description: 'Lista de event_types a suscribir. Ej: ["dispatch.completed"].'
           minItems: 1
         is_active:
           type: boolean
@@ -14356,7 +15369,7 @@ components:
             type: string
             minLength: 1
             maxLength: 64
-          description: 'Lista de event_types a suscribir. Ej: ["STOCK_CRITICO"].'
+          description: 'Lista de event_types a suscribir. Ej: ["dispatch.completed"].'
           minItems: 1
         is_active:
           type: boolean
@@ -14428,3 +15441,6 @@ tags:
   description: Audit logs (read-only, immutable).
 - name: webhooks
   description: Webhook endpoints and delivery management (almacenista only — IsAlmacenista).
+- name: billing
+  description: 'Commercial billing: multi-product invoices, void, stats and company
+    config.'

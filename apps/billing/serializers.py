@@ -90,6 +90,14 @@ class InvoiceCreateSerializer(serializers.Serializer):
         default=False,
         help_text="Requerido para wholesale (Ley 1581, RNF-006).",
     )
+    cold_chain_acknowledged = serializers.BooleanField(
+        default=False,
+        help_text="Requerido si algún ítem exige cadena de frío.",
+    )
+    electrical_safety_acknowledged = serializers.BooleanField(
+        default=False,
+        help_text="Requerido si algún ítem es de una categoría que exige serial (Electroterapia).",
+    )
 
     def validate_items(self, value: list) -> list:
         if not value:

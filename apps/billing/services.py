@@ -84,6 +84,8 @@ def create_multi_dispatch_invoice(
     items: list[dict[str, Any]],
     note: str | None = None,
     privacy_notice_acknowledged: bool = False,
+    cold_chain_acknowledged: bool = False,
+    electrical_safety_acknowledged: bool = False,
 ) -> Invoice:
     """
     RF-006, RF-003, BR-13 — Crea una factura multi-ítem en una única transacción atómica.
@@ -102,11 +104,16 @@ def create_multi_dispatch_invoice(
             productos individuales aceptan además `discount_pct` opcional.
         note: Nota libre asociada a la factura.
         privacy_notice_acknowledged: Requerido para wholesale (Ley 1581).
+        cold_chain_acknowledged: Requerido si algún producto exige cadena de frío.
+        electrical_safety_acknowledged: Requerido si algún producto es de una
+            categoría que exige serial (Electroterapia).
 
     Raises:
         DomainValidationError: Si invoice_type no es válido o items está vacío.
         CrossValidationFailedError: Si wholesale y faltan datos del cliente.
         PrivacyConsentRequiredError: Si wholesale y no hay consentimiento.
+        AlertAcknowledgementRequiredError: Si falta reconocer cadena de frío o
+            seguridad eléctrica para algún producto que lo exija.
         InsufficientStockError: Si no hay stock suficiente para algún ítem.
         ProductCombo.DoesNotExist: Si algún `combo_id` no existe o está inactivo.
     """
@@ -164,6 +171,8 @@ def create_multi_dispatch_invoice(
             else None,
             note=note,
             privacy_notice_acknowledged=privacy_notice_acknowledged,
+            cold_chain_acknowledged=cold_chain_acknowledged,
+            electrical_safety_acknowledged=electrical_safety_acknowledged,
             discount_pct=discount_pct,
             external_invoice_number=invoice_number,
             skip_invoice_creation=True,

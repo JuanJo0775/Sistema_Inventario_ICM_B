@@ -467,6 +467,7 @@ class AdjustmentListCreateView(generics.ListCreateAPIView):
             d["new_quantity"],
             d["justification"],
             serial_id=d.get("serial_id"),
+            lot_id=d.get("lot_id"),
         )
         return Response(
             MovementSerializer(movement).data, status=status.HTTP_201_CREATED
