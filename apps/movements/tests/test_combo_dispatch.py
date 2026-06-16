@@ -248,3 +248,35 @@ def test_dispatch_combo_with_mixed_products_serial_not_required(
     )
     assert len(movements) == 2
     assert all(m.serial_number is None for m in movements)
+
+
+@pytest.mark.django_db
+def test_dispatch_combo_with_external_invoice_number_skips_own_invoice(
+    almacenista_user,
+):
+    """
+    RF-003, BR-13 — Con external_invoice_number + skip_invoice_creation=True,
+    el combo no genera su propio Invoice; el llamador (carrito multi-ítem) es
+    responsable de consolidarlo con create_invoice_from_movements.
+    """
+    from apps.catalog.models import ComboItem, ProductCombo
+    from apps.movements.models import Invoice
+    from apps.movements.services import dispatch_combo
+
+    product = ProductFactory(sku="CMB-EXT-01")
+    location = LocationFactory(code="BODEGA_CMB_EXT")
+    combo = ProductCombo.objects.create(name="Kit Externo", sku="KIT-EXT")
+    ComboItem.objects.create(combo=combo, product=product, quantity=1)
+    StockByLocation.objects.create(product=product, location=location, current_stock=5)
+
+    movements = dispatch_combo(
+        almacenista_user,
+        combo.id,
+        location.id,
+        external_invoice_number="ICM-9999",
+        skip_invoice_creation=True,
+    )
+
+    assert len(movements) == 1
+    assert movements[0].invoice_number == "ICM-9999"
+    assert not Invoice.objects.filter(number="ICM-9999").exists()

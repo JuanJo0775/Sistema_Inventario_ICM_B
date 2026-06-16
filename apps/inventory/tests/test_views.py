@@ -74,6 +74,60 @@ def test_storage_type_create_returns_201(authenticated_almacenista_client):
     )
     assert response.status_code == status.HTTP_201_CREATED
     assert response.data["code"] == "st-test-01"
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.STORAGE_TYPE_CREATED,
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_storage_type_update_logs_audit(authenticated_almacenista_client):
+    create = authenticated_almacenista_client.post(
+        "/api/v1/inventory/storage-types/",
+        {"code": "st-test-02", "name": "Tipo Test 2"},
+        format="json",
+    )
+    assert create.status_code == status.HTTP_201_CREATED
+    response = authenticated_almacenista_client.patch(
+        f"/api/v1/inventory/storage-types/{create.data['id']}/",
+        {"name": "Tipo Test 2 actualizado"},
+        format="json",
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.STORAGE_TYPE_UPDATED,
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_storage_template_create_logs_audit(authenticated_almacenista_client):
+    response = authenticated_almacenista_client.post(
+        "/api/v1/inventory/storage-templates/",
+        {"code": "tpl-test-01", "name": "Plantilla Test"},
+        format="json",
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.STORAGE_TEMPLATE_CREATED,
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_storage_template_update_logs_audit(authenticated_almacenista_client):
+    create = authenticated_almacenista_client.post(
+        "/api/v1/inventory/storage-templates/",
+        {"code": "tpl-test-02", "name": "Plantilla Test 2"},
+        format="json",
+    )
+    assert create.status_code == status.HTTP_201_CREATED
+    response = authenticated_almacenista_client.patch(
+        f"/api/v1/inventory/storage-templates/{create.data['id']}/",
+        {"name": "Plantilla Test 2 actualizada"},
+        format="json",
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert AuditLog.objects.filter(
+        event_type=AuditEventType.STORAGE_TEMPLATE_UPDATED,
+    ).exists()
 
 
 @pytest.mark.django_db

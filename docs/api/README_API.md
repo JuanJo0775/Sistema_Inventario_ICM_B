@@ -308,8 +308,8 @@ El token expira en `PASSWORD_RESET_TOKEN_EXPIRY_MINUTES` minutos (default 10). `
 |---|---|---|
 | `GET/POST` | `/catalog/categories/` | Categorías |
 | `GET/PUT/PATCH` | `/catalog/categories/<uuid:pk>/` | Detalle categoría |
-| `GET/POST` | `/catalog/subcategories/` | Subcategorías |
-| `GET/PUT/PATCH` | `/catalog/subcategories/<uuid:pk>/` | Detalle subcategoría |
+| `GET/POST` | `/catalog/brands/` | Marcas |
+| `GET/PUT/PATCH` | `/catalog/brands/<uuid:pk>/` | Detalle marca |
 | `GET/POST` | `/catalog/products/` | Productos |
 | `GET/PUT/PATCH` | `/catalog/products/<uuid:pk>/` | Detalle producto |
 | `GET` | `/catalog/products/<uuid:pk>/barcode/` | Payload de código de barras del SKU (SVG, Data URI) |
@@ -601,6 +601,28 @@ GET  /api/v1/movements/dispatches/<uuid>/invoice/ → PDF legacy (solo SKU y can
 
 Los totales son `0` cuando el producto no tenía precio. La factura se crea igualmente.
 
+**Carrito multi-ítem (`apps/billing`)** — RF-006, RF-003, BR-13. Permite crear una
+factura agrupando varios ítems en una única transacción atómica:
+
+```http
+POST /api/v1/billing/invoices/
+{
+  "invoice_type": "retail",
+  "location_id": "...",
+  "customer": { "name": "Cliente" },
+  "items": [
+    { "product_id": "...", "quantity": 2 },
+    { "combo_id": "...", "quantity": 1 }
+  ]
+}
+```
+
+Cada ítem trae exactamente uno de `product_id` (producto individual, vía
+`register_dispatch()`) o `combo_id` (combo, vía `dispatch_combo()`); **un mismo
+carrito puede mezclar ambos tipos libremente** y todos quedan agrupados bajo un
+único `invoice_number`. Ver detalle completo en
+[REFERENCIA_ENDPOINTS.md → Facturación](REFERENCIA_ENDPOINTS.md#facturacion).
+
 ### 14.6 Reportes financieros
 
 Requieren `?start=<ISO-8601>&end=<ISO-8601>`. Período default: últimos 30 días.
@@ -638,6 +660,7 @@ Al crear o actualizar un combo se puede especificar `price_strategy: "fixed"` y 
 | `PUT/PATCH /catalog/products/<id>/` | No | Los campos de precio son ignorados aquí. |
 | `POST /catalog/combos/` | No | `price_strategy` opcional, default `"derived"`. |
 | `POST /movements/combo-dispatch/` | No | Comportamiento idéntico. |
+| `POST /billing/invoices/` | No | `items[].combo_id` opcional y excluyente con `product_id`. Sin `combo_id`, comportamiento idéntico al carrito solo-productos previo. |
 
 *Los campos adicionales en respuestas JSON no rompen clientes REST que ignoran propiedades desconocidas.
 

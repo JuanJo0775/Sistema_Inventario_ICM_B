@@ -33,6 +33,7 @@ htmlcov/
 .env
 .env.development
 .env.production
+.env.render
 
 # Env — templates públicos (versionados)
 !.env.example

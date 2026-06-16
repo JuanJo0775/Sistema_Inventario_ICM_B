@@ -47,6 +47,7 @@ class SupplierListCreateView(APIView):
         return [p() for p in _PERMS_OPERATOR]
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Listar proveedores",
         description=(
             "Lista proveedores no archivados (deleted_at=null) por defecto. "
@@ -94,6 +95,7 @@ class SupplierListCreateView(APIView):
         return Response(SupplierSerializer(qs, many=True).data)
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Crear proveedor",
         request=SupplierWriteSerializer,
         responses={
@@ -119,12 +121,17 @@ class SupplierDetailView(APIView):
             return [p() for p in _PERMS_VIEWER]
         return [p() for p in _PERMS_OPERATOR]
 
-    @extend_schema(summary="Detalle de proveedor", responses={200: SupplierSerializer})
+    @extend_schema(
+        summary="Detalle de proveedor",
+        tags=[TAG_PURCHASING],
+        responses={200: SupplierSerializer},
+    )
     def get(self, request, pk: UUID):
         supplier = selectors.get_supplier(pk)
         return Response(SupplierSerializer(supplier).data)
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Actualizar proveedor (completo)",
         request=SupplierWriteSerializer,
         responses={
@@ -141,6 +148,7 @@ class SupplierDetailView(APIView):
         return Response(SupplierSerializer(supplier).data)
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Actualizar proveedor (parcial)",
         request=SupplierWriteSerializer,
         responses={
@@ -157,6 +165,7 @@ class SupplierDetailView(APIView):
         return Response(SupplierSerializer(supplier).data)
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Eliminar lógicamente proveedor (soft delete)",
         description=(
             "Marca el proveedor como eliminado lógicamente (deleted_at=now). "
@@ -177,6 +186,7 @@ class SupplierRestoreView(APIView):
     permission_classes = _PERMS_OPERATOR
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Restaurar proveedor archivado",
         description=(
             "Restaura un proveedor previamente eliminado lógicamente. "
@@ -200,6 +210,7 @@ class SupplierDisableView(APIView):
     permission_classes = _PERMS_OPERATOR
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Desactivar proveedor para nuevas OC",
         description=(
             "Pausa el proveedor temporalmente (is_active=False). "
@@ -230,6 +241,7 @@ class SupplierEnableView(APIView):
     permission_classes = _PERMS_OPERATOR
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Reactivar proveedor para nuevas OC",
         description=(
             "Reactiva un proveedor previamente pausado (is_active=True). "
@@ -259,6 +271,7 @@ class SupplierDeactivateView(APIView):
     permission_classes = _PERMS_OPERATOR
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Desactivar proveedor (legacy alias de /disable/)",
         description="Alias de POST /suppliers/{id}/disable/. Usa /disable/ en código nuevo.",
         responses={
@@ -279,6 +292,7 @@ class SupplierActivateView(APIView):
     permission_classes = _PERMS_OPERATOR
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Reactivar proveedor (legacy alias de /enable/)",
         description="Alias de POST /suppliers/{id}/enable/. Usa /enable/ en código nuevo.",
         responses={
@@ -306,6 +320,7 @@ class PurchaseOrderListCreateView(APIView):
         return [p() for p in _PERMS_OPERATOR]
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Listar órdenes de compra",
         responses={200: PurchaseOrderSerializer(many=True)},
     )
@@ -323,6 +338,7 @@ class PurchaseOrderListCreateView(APIView):
         return Response(PurchaseOrderSerializer(qs, many=True).data)
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Crear orden de compra",
         request=PurchaseOrderCreateSerializer,
         responses={
@@ -349,12 +365,17 @@ class PurchaseOrderDetailView(APIView):
             return [p() for p in _PERMS_VIEWER]
         return [p() for p in _PERMS_OPERATOR]
 
-    @extend_schema(summary="Detalle de OC", responses={200: PurchaseOrderSerializer})
+    @extend_schema(
+        summary="Detalle de OC",
+        tags=[TAG_PURCHASING],
+        responses={200: PurchaseOrderSerializer},
+    )
     def get(self, request, pk: UUID):
         po = selectors.get_purchase_order(pk)
         return Response(PurchaseOrderSerializer(po).data)
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Actualizar OC (completo, solo BORRADOR)",
         request=PurchaseOrderUpdateSerializer,
         responses={
@@ -373,6 +394,7 @@ class PurchaseOrderDetailView(APIView):
         )
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Actualizar OC (parcial, solo BORRADOR)",
         request=PurchaseOrderUpdateSerializer,
         responses={
@@ -396,6 +418,7 @@ class PurchaseOrderConfirmView(APIView):
     permission_classes = _PERMS_OPERATOR
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Confirmar OC (BORRADOR → PENDIENTE)",
         responses={
             200: PurchaseOrderSerializer,
@@ -414,6 +437,7 @@ class PurchaseOrderCancelView(APIView):
     permission_classes = _PERMS_OPERATOR
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Cancelar OC",
         request=POCancelSerializer,
         responses={
@@ -447,6 +471,7 @@ class ReceptionListCreateView(APIView):
         return [p() for p in _PERMS_OPERATOR]
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Listar recepciones",
         responses={200: ReceptionSerializer(many=True)},
     )
@@ -464,6 +489,7 @@ class ReceptionListCreateView(APIView):
         return Response(ReceptionSerializer(qs, many=True).data)
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Crear recepción en BORRADOR",
         request=ReceptionCreateSerializer,
         responses={
@@ -517,7 +543,11 @@ class ReceptionListCreateView(APIView):
 class ReceptionDetailView(APIView):
     permission_classes = _PERMS_VIEWER
 
-    @extend_schema(summary="Detalle de recepción", responses={200: ReceptionSerializer})
+    @extend_schema(
+        summary="Detalle de recepción",
+        tags=[TAG_PURCHASING],
+        responses={200: ReceptionSerializer},
+    )
     def get(self, request, pk: UUID):
         reception = selectors.get_reception(pk)
         return Response(ReceptionSerializer(reception).data)
@@ -528,6 +558,7 @@ class ReceptionConfirmView(APIView):
     permission_classes = _PERMS_OPERATOR
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Confirmar recepción (genera Movements de ENTRADA)",
         request=ReceptionConfirmSerializer,
         responses={
@@ -558,6 +589,7 @@ class ReceptionCancelView(APIView):
     permission_classes = _PERMS_OPERATOR
 
     @extend_schema(
+        tags=[TAG_PURCHASING],
         summary="Cancelar recepción (solo BORRADOR)",
         responses={
             200: ReceptionSerializer,

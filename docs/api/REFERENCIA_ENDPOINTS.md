@@ -11,6 +11,7 @@
 - [Catálogo](#catalogo)
 - [Inventario](#inventario)
 - [Movimientos](#movimientos)
+- [Facturación](#facturacion)
 - [Dashboard](#dashboard)
 - [Reportes y exportación](#reportes-y-exportacion)
 - [Alertas y polling](#alertas-y-polling)
@@ -326,14 +327,36 @@ PATCH /api/v1/catalog/categories/<uuid>/     → parcial
 
 ---
 
-### Subcategorías
+### Marcas
 
 ```
-GET  /api/v1/catalog/subcategories/          → listar
-POST /api/v1/catalog/subcategories/          → crear
-GET  /api/v1/catalog/subcategories/<uuid>/   → detalle
-PUT  /api/v1/catalog/subcategories/<uuid>/   → actualizar
-PATCH /api/v1/catalog/subcategories/<uuid>/  → parcial
+GET  /api/v1/catalog/brands/                 → listar (todos autenticados)
+POST /api/v1/catalog/brands/                 → crear (solo almacenista)
+GET  /api/v1/catalog/brands/<uuid>/          → detalle
+PUT  /api/v1/catalog/brands/<uuid>/          → actualizar
+PATCH /api/v1/catalog/brands/<uuid>/         → parcial
+POST /api/v1/catalog/brands/<uuid>/disable/  → desactivar (solo almacenista)
+POST /api/v1/catalog/brands/<uuid>/enable/   → reactivar (solo almacenista)
+POST /api/v1/catalog/brands/<uuid>/restore/  → restaurar eliminada (solo almacenista)
+```
+
+**Request POST:**
+```json
+{ "name": "Medco", "slug": "medco", "description": "..." }
+```
+
+**Campos de marca:**
+```json
+{
+  "id": "uuid",
+  "name": "Medco",
+  "slug": "medco",
+  "description": "...",
+  "is_active": true,
+  "deleted_at": null,
+  "created_at": "2026-01-01T00:00:00Z",
+  "updated_at": "2026-01-01T00:00:00Z"
+}
 ```
 
 ---
@@ -948,6 +971,179 @@ Disponible para `almacenista` y `auxiliar_despacho`. Descuenta stock por cada í
 **Errores:**
 - `404` — combo no existe o está inactivo
 - `409` — stock insuficiente para algún ítem
+
+---
+
+## Facturación
+
+> RF-006, RF-003, BR-13 — Carrito multi-ítem: agrupa varios productos individuales y/o
+> combos en una sola factura. Disponible para `almacenista` y `auxiliar_despacho`
+> (dentro de su franja horaria); anulación y configuración de empresa solo `almacenista`.
+
+### Crear factura (carrito multi-ítem)
+
+```
+POST /api/v1/billing/invoices/
+```
+
+Cada ítem trae `quantity` y **exactamente uno** de `product_id` o `combo_id` (son
+excluyentes). El carrito permite mezclar productos individuales y combos libremente
+en la misma factura — todos comparten un único `invoice_number` (`ICM-XXXX`).
+
+**Request:**
+```json
+{
+  "invoice_type": "retail",
+  "location_id": "uuid-ubicacion",
+  "customer": {
+    "name": "Clínica Los Andes",
+    "id_number": "900123456-1",
+    "email": "compras@clinica.co",
+    "phone": "+573001234567",
+    "address": "Cra 7 # 32-16, Bogotá"
+  },
+  "items": [
+    { "product_id": "uuid-prod1", "quantity": 2, "discount_pct": "10.00" },
+    { "combo_id": "uuid-combo1", "quantity": 1 }
+  ],
+  "note": "Entrega prioritaria",
+  "privacy_notice_acknowledged": true
+}
+```
+
+- `invoice_type`: `"retail"` (SALIDA_VENTA_MENOR) o `"wholesale"` (SALIDA_VENTA_MAYOR). Los
+  ítems de combo siempre generan `SALIDA_COMBO` independientemente de `invoice_type`.
+- `discount_pct` solo aplica a ítems con `product_id` (se ignora en combos).
+- `customer` completo + `privacy_notice_acknowledged: true` son obligatorios si
+  `invoice_type = "wholesale"` (Ley 1581).
+- Para un combo, `quantity` indica cuántas veces se despacha el combo completo (cada
+  uno descuenta stock de todos sus componentes según la receta).
+
+**Response 201:** objeto `Invoice` (ver esquema de detalle abajo).
+
+**Errores:**
+- `400` — `invoice_type` inválido, `items` vacío, o un ítem sin/con ambos `product_id`/`combo_id`
+- `404` — algún `combo_id` no existe o está inactivo
+- `409` — stock insuficiente para algún ítem (producto o componente de combo)
+- `422` — `wholesale` sin datos completos de cliente o sin consentimiento de privacidad
+
+---
+
+### Listar / detalle / anular factura
+
+```
+GET  /api/v1/billing/invoices/                → listar (almacenista, administrador)
+GET  /api/v1/billing/invoices/<int:pk>/        → detalle
+POST /api/v1/billing/invoices/<int:pk>/void/   → anular (solo almacenista)
+```
+
+**Filtros en listado:** `?start_date=`, `?end_date=`, `?invoice_type=`, `?search=`
+(número, cliente, documento), `?include_voided=` (default `false`).
+
+**Request POST void:**
+```json
+{ "reason": "Cliente canceló el pedido" }
+```
+
+Crea movimientos `ANULACION` que revierten el stock de **todos** los movimientos de
+venta de la factura, incluyendo los generados por ítems de combo (`SALIDA_COMBO`). Los
+movimientos originales no se modifican (BR-10, inmutabilidad del ledger).
+
+**Errores:** `404` factura no existe · `409` factura ya anulada · `422` motivo vacío.
+
+**Response (detalle de factura):**
+```json
+{
+  "id": 1,
+  "number": "ICM-0001",
+  "invoice_type": "retail",
+  "customer_name": "Clínica Los Andes",
+  "customer_id_number": "900123456-1",
+  "customer_email": "compras@clinica.co",
+  "customer_phone": "+573001234567",
+  "customer_address": "Cra 7 # 32-16, Bogotá",
+  "subtotal": "35000.0000",
+  "discount_total": "0.0000",
+  "tax_total": "0.0000",
+  "total_amount": "35000.0000",
+  "currency": "COP",
+  "pdf": "/media/invoices/ICM-0001.pdf",
+  "issued_by": 1,
+  "issued_by_username": "almacenista1",
+  "issued_at": "2026-06-15T10:00:00Z",
+  "is_voided": false,
+  "void_reason": "",
+  "voided_at": null,
+  "voided_by": null,
+  "voided_by_username": null,
+  "movements_detail": [
+    {
+      "id": "uuid",
+      "movement_type": "SALIDA_VENTA_MENOR",
+      "product": "uuid-producto",
+      "product_sku": "ELE-0001",
+      "product_name": "Electroestimulador Premium",
+      "quantity": 2,
+      "unit_price": "10000.0000",
+      "discount_pct": "10.00",
+      "discount_amount": "2000.0000",
+      "subtotal": "18000.0000",
+      "tax_rate_pct": "0.00",
+      "tax_amount": "0.0000",
+      "total_amount": "18000.0000",
+      "origin_location": "uuid-ubicacion",
+      "created_at": "2026-06-15T10:00:00Z"
+    }
+  ]
+}
+```
+
+---
+
+### Estadísticas de facturación
+
+```
+GET /api/v1/billing/invoices/stats/
+```
+
+**Response:**
+```json
+{
+  "total_sales_today": "120000.0000",
+  "total_sales_month": "3500000.0000",
+  "invoice_count_today": 4,
+  "invoice_count_month": 87
+}
+```
+
+Solo considera facturas no anuladas.
+
+---
+
+### Datos fiscales de la empresa
+
+```
+GET /api/v1/billing/config/company/   → todos (almacenista, administrador)
+PUT /api/v1/billing/config/company/   → solo almacenista
+```
+
+**Request PUT (todos los campos opcionales):**
+```json
+{
+  "company_name": "Import Corporal Medical S.A.S",
+  "nit": "900123456-1",
+  "address": "Cra 7 # 32-16, Bogotá",
+  "phone": "+573001234567",
+  "email": "facturacion@icm.co",
+  "dian_resolution": "Resolución DIAN 18764000001234 de 2026",
+  "dian_range_from": 1,
+  "dian_range_to": 5000,
+  "invoice_series": "ICM",
+  "invoice_footer": "Gracias por su compra"
+}
+```
+
+Singleton (un único registro) usado en el encabezado de los PDF de factura.
 
 ---
 
@@ -1670,6 +1866,9 @@ Los listados están paginados. Respuesta estándar:
 | Gestionar webhooks | ✅ | ❌ | ❌ |
 | Configurar precios de producto | ✅ | ❌ | ❌ |
 | Ver facturas comerciales | ✅ | ✅ | ❌ |
+| Crear factura (carrito multi-ítem, producto y/o combo) | ✅ | ✅ (horario) | ❌ |
+| Anular factura | ✅ | ❌ | ❌ |
+| Configurar datos fiscales de empresa | ✅ | ❌ | ❌ (solo lectura) |
 | Ver reportes financieros | ✅ | ❌ | ✅ |
 | Gestionar proveedores | ✅ | ❌ | ✅ (solo lectura) |
 | Gestionar órdenes de compra | ✅ | ❌ | ✅ (solo lectura) |
@@ -1679,4 +1878,4 @@ Para la matriz completa de cada endpoint, ver [README_MATRIZ_PERMISOS.md](README
 
 ---
 
-*Actualizado: 2026-06-11. Sincronizado con el estado real del código.*
+*Actualizado: 2026-06-16. Sincronizado con el estado real del código.*

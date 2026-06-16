@@ -21,6 +21,7 @@ from apps.billing.models import CompanyInfo
 from apps.movements.models import Invoice, Movement, MovementType
 from apps.movements.services import (
     create_invoice_from_movements,
+    dispatch_combo,
     generate_invoice_number,
     register_dispatch,
 )
@@ -85,16 +86,20 @@ def create_multi_dispatch_invoice(
     privacy_notice_acknowledged: bool = False,
 ) -> Invoice:
     """
-    RF-006, BR-13 — Crea una factura multi-producto en una única transacción atómica.
+    RF-006, RF-003, BR-13 — Crea una factura multi-ítem en una única transacción atómica.
 
-    Reutiliza register_dispatch() para cada ítem con un número de factura compartido,
-    evitando duplicar la lógica de stock, FIFO, seriales y validación cruzada.
+    Reutiliza register_dispatch() para productos individuales y dispatch_combo()
+    para combos, ambos con un número de factura compartido, evitando duplicar la
+    lógica de stock, FIFO, seriales y validación cruzada. Un mismo carrito puede
+    mezclar productos individuales y combos libremente.
 
     Args:
         invoice_type: "retail" | "wholesale"
         location_id: UUID de la ubicación origen del stock.
         customer_data: Datos del cliente (name, id_number, email, phone, address).
-        items: Lista de items con product_id, quantity, y opcionalmente discount_pct.
+        items: Lista de items, cada uno con `quantity` y exactamente uno de
+            `product_id` (producto individual) o `combo_id` (combo). Los
+            productos individuales aceptan además `discount_pct` opcional.
         note: Nota libre asociada a la factura.
         privacy_notice_acknowledged: Requerido para wholesale (Ley 1581).
 
@@ -103,6 +108,7 @@ def create_multi_dispatch_invoice(
         CrossValidationFailedError: Si wholesale y faltan datos del cliente.
         PrivacyConsentRequiredError: Si wholesale y no hay consentimiento.
         InsufficientStockError: Si no hay stock suficiente para algún ítem.
+        ProductCombo.DoesNotExist: Si algún `combo_id` no existe o está inactivo.
     """
     movement_type = _INVOICE_TYPE_TO_MOVEMENT.get(invoice_type)
     if movement_type is None:
@@ -121,13 +127,30 @@ def create_multi_dispatch_invoice(
         "privacy_notice_acknowledged": privacy_notice_acknowledged,
     }
 
-    # Generar número de factura ÚNICO para todos los ítems
+    # Generar número de factura ÚNICO para todos los ítems (productos y combos)
     invoice_number = generate_invoice_number()
 
     all_movements: list[Movement] = []
     for item in items:
-        product_id: UUID = item["product_id"]
         quantity: int = item["quantity"]
+        combo_id: UUID | None = item.get("combo_id")
+
+        if combo_id:
+            # Un combo es una unidad indivisible (Opción B: plantilla virtual);
+            # `quantity` combos completos se despachan en llamadas independientes
+            # que comparten el mismo invoice_number.
+            for _ in range(quantity):
+                combo_movements = dispatch_combo(
+                    user,
+                    combo_id,
+                    location_id,
+                    external_invoice_number=invoice_number,
+                    skip_invoice_creation=True,
+                )
+                all_movements.extend(combo_movements)
+            continue
+
+        product_id: UUID = item["product_id"]
         discount_pct = item.get("discount_pct") or item.get("discount")
 
         movements = register_dispatch(

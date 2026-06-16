@@ -439,7 +439,10 @@ def create_storage_type(
     is_system: bool = False,
     sort_order: int = 0,
 ) -> StorageType:
-    """Crea un tipo de almacenamiento configurable (solo almacenista)."""
+    """Crea un tipo de almacenamiento configurable (solo almacenista).
+
+    RF-012 — Registra AuditLog (STORAGE_TYPE_CREATED).
+    """
     if getattr(executor, "role", None) != "almacenista":
         raise UnauthorizedDomainActionError(
             "Solo el almacenista puede crear tipos de almacenamiento."
@@ -452,7 +455,7 @@ def create_storage_type(
         raise DomainValidationError(f"Ya existe un tipo con code '{code}'.")
     if StorageType.objects.filter(name__iexact=name).exists():
         raise DomainValidationError(f"Ya existe un tipo con nombre '{name}'.")
-    return StorageType.objects.create(
+    st = StorageType.objects.create(
         code=code,
         name=name,
         category=(category or "general").strip() or "general",
@@ -463,13 +466,23 @@ def create_storage_type(
         is_active=True,
         sort_order=max(int(sort_order), 0),
     )
+    log_event(
+        AuditEventType.STORAGE_TYPE_CREATED,
+        description=f"Tipo de almacenamiento creado: {st.name}",
+        user=executor,
+        detail={"storage_type_id": str(st.id), "name": st.name, "code": st.code},
+    )
+    return st
 
 
 @transaction.atomic
 def update_storage_type(
     executor: Any, storage_type_id: UUID, data: dict[str, Any]
 ) -> StorageType:
-    """Actualiza un tipo de almacenamiento (solo almacenista)."""
+    """Actualiza un tipo de almacenamiento (solo almacenista).
+
+    RF-012 — Registra AuditLog (STORAGE_TYPE_UPDATED).
+    """
     if getattr(executor, "role", None) != "almacenista":
         raise UnauthorizedDomainActionError(
             "Solo el almacenista puede modificar tipos de almacenamiento."
@@ -504,6 +517,17 @@ def update_storage_type(
     if "sort_order" in data:
         st.sort_order = max(int(data["sort_order"]), 0)
     st.save()
+    log_event(
+        AuditEventType.STORAGE_TYPE_UPDATED,
+        description=f"Tipo de almacenamiento actualizado: {st.name}",
+        user=executor,
+        detail={
+            "storage_type_id": str(st.id),
+            "name": st.name,
+            "code": st.code,
+            "updated_fields": list(data.keys()),
+        },
+    )
     return st
 
 
@@ -533,7 +557,10 @@ def create_storage_template(
     is_system: bool = False,
     sort_order: int = 0,
 ) -> StorageTemplate:
-    """Crea una plantilla de almacenamiento configurable (solo almacenista)."""
+    """Crea una plantilla de almacenamiento configurable (solo almacenista).
+
+    RF-012 — Registra AuditLog (STORAGE_TEMPLATE_CREATED).
+    """
     if getattr(executor, "role", None) != "almacenista":
         raise UnauthorizedDomainActionError(
             "Solo el almacenista puede crear plantillas de almacenamiento."
@@ -553,7 +580,7 @@ def create_storage_template(
         if storage_type is None:
             raise DomainValidationError("El tipo de almacenamiento no existe.")
 
-    return StorageTemplate.objects.create(
+    template = StorageTemplate.objects.create(
         code=code,
         name=name,
         storage_type=storage_type,
@@ -563,13 +590,27 @@ def create_storage_template(
         is_active=True,
         sort_order=max(int(sort_order), 0),
     )
+    log_event(
+        AuditEventType.STORAGE_TEMPLATE_CREATED,
+        description=f"Plantilla de almacenamiento creada: {template.name}",
+        user=executor,
+        detail={
+            "storage_template_id": str(template.id),
+            "name": template.name,
+            "code": template.code,
+        },
+    )
+    return template
 
 
 @transaction.atomic
 def update_storage_template(
     executor: Any, storage_template_id: UUID, data: dict[str, Any]
 ) -> StorageTemplate:
-    """Actualiza una plantilla de almacenamiento (solo almacenista)."""
+    """Actualiza una plantilla de almacenamiento (solo almacenista).
+
+    RF-012 — Registra AuditLog (STORAGE_TEMPLATE_UPDATED).
+    """
     if getattr(executor, "role", None) != "almacenista":
         raise UnauthorizedDomainActionError(
             "Solo el almacenista puede modificar plantillas de almacenamiento."
@@ -613,6 +654,17 @@ def update_storage_template(
     if "sort_order" in data:
         template.sort_order = max(int(data["sort_order"]), 0)
     template.save()
+    log_event(
+        AuditEventType.STORAGE_TEMPLATE_UPDATED,
+        description=f"Plantilla de almacenamiento actualizada: {template.name}",
+        user=executor,
+        detail={
+            "storage_template_id": str(template.id),
+            "name": template.name,
+            "code": template.code,
+            "updated_fields": list(data.keys()),
+        },
+    )
     return template
 
 

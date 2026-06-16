@@ -75,14 +75,17 @@ from shared.permissions import (
     post=extend_schema(
         summary="Crear factura multi-producto",
         description=(
-            "RF-006, BR-13 — Crea una factura agrupando múltiples productos en una única transacción atómica."
+            "RF-006, RF-003, BR-13 — Crea una factura agrupando múltiples productos y/o combos"
+            " en una única transacción atómica. Cada ítem trae `product_id` o `combo_id` (excluyentes)."
             " Genera movements de salida por cada ítem y un Invoice compartido con numeración ICM-XXXX."
         ),
         tags=[TAG_BILLING],
         request=InvoiceCreateSerializer,
         responses={
             201: InvoiceDetailSerializer,
-            **standard_error_responses(include_403=True, include_409=True),
+            **standard_error_responses(
+                include_403=True, include_404=True, include_409=True
+            ),
         },
     ),
 )
@@ -153,19 +156,27 @@ class InvoiceListCreateView(generics.GenericAPIView):
         return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):
+        from apps.catalog.models import ProductCombo
+
         ser = InvoiceCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         d = ser.validated_data
 
-        invoice = create_multi_dispatch_invoice(
-            request.user,
-            invoice_type=d["invoice_type"],
-            location_id=d["location_id"],
-            customer_data=d["customer"],
-            items=d["items"],
-            note=d.get("note") or None,
-            privacy_notice_acknowledged=d.get("privacy_notice_acknowledged", False),
-        )
+        try:
+            invoice = create_multi_dispatch_invoice(
+                request.user,
+                invoice_type=d["invoice_type"],
+                location_id=d["location_id"],
+                customer_data=d["customer"],
+                items=d["items"],
+                note=d.get("note") or None,
+                privacy_notice_acknowledged=d.get("privacy_notice_acknowledged", False),
+            )
+        except ProductCombo.DoesNotExist:
+            return Response(
+                {"detail": "Combo no encontrado o inactivo."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
         return Response(
             InvoiceDetailSerializer(invoice).data,
             status=status.HTTP_201_CREATED,

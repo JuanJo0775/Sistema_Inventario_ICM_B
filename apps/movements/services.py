@@ -189,11 +189,10 @@ def _next_invoice_number() -> str:
     return f"ICM-{row.last_number:04d}"
 
 
+@transaction.atomic
 def generate_invoice_number() -> str:
     """
     BR-13 — Numeración secuencial de factura.
-
-    Debe invocarse dentro de la misma transacción `atomic` que el despacho que persiste el movimiento.
     """
     return _next_invoice_number()
 
@@ -336,7 +335,7 @@ def create_invoice_from_movements(
     currency = next((m.currency for m in movements if m.currency), "COP")
 
     cd = customer_data or {}
-    invoice, _ = Invoice.objects.get_or_create(
+    invoice, _ = Invoice.objects.select_for_update().get_or_create(
         number=invoice_number,
         defaults={
             "customer_name": cd.get("customer_name", ""),
@@ -1683,9 +1682,11 @@ def dispatch_combo(
     *,
     serial_id: UUID | None = None,
     request: Any = None,
+    external_invoice_number: str | None = None,
+    skip_invoice_creation: bool = False,
 ) -> list[Movement]:
     """
-    RF-003, BR-04, BR-11 — Despacha un combo (Opción B: plantilla virtual).
+    RF-003, BR-04, BR-11, BR-13 — Despacha un combo (Opción B: plantilla virtual).
 
     Lee la receta del combo y por cada ítem genera un movimiento SALIDA_COMBO
     descontando el stock del producto en la ubicación indicada.
@@ -1695,6 +1696,11 @@ def dispatch_combo(
         combo_id: UUID del combo a despachar.
         location_id: UUID de la ubicación desde donde se sacan los productos.
         serial_id: UUID del serial (obligatorio si algún componente lo exige).
+        external_invoice_number: Número de factura compartido. Si se provee
+            (ver `create_multi_dispatch_invoice`), el combo se agrupa en esa
+            factura en vez de generar la suya propia.
+        skip_invoice_creation: Si True, no crea/actualiza el Invoice — el
+            llamador es responsable de consolidarlo con `create_invoice_from_movements`.
 
     Returns:
         Lista de Movements creados (uno por ítem del combo).
@@ -1720,8 +1726,8 @@ def dispatch_combo(
     _ensure_location_allows_origin(location, "combo_dispatch")
     movements_created: list[Movement] = []
 
-    # Generar un número de factura para el combo completo
-    combo_invoice_number = generate_invoice_number()
+    # Generar un número de factura para el combo completo (o reutilizar el compartido)
+    combo_invoice_number = external_invoice_number or generate_invoice_number()
     # Solo el primer Movement del combo recibirá invoice_number (por restricción UNIQUE).
     # Los demás quedan sin ese campo; el modelo Invoice los agrupa todos vía M2M.
     first_movement = True
@@ -1854,10 +1860,11 @@ def dispatch_combo(
         },
     )
 
-    create_invoice_from_movements(
-        movements_created,
-        user=user,
-        invoice_number=combo_invoice_number,
-    )
+    if not skip_invoice_creation:
+        create_invoice_from_movements(
+            movements_created,
+            user=user,
+            invoice_number=combo_invoice_number,
+        )
 
     return movements_created

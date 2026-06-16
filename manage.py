@@ -138,9 +138,12 @@ def main():
             _from_cli = arg.split("=", 1)[1]
             break
 
-    _settings_mod = _from_cli or os.environ.get(
-        "DJANGO_SETTINGS_MODULE", "config.settings.development"
-    )
+    if _from_cli:
+        _settings_mod = _from_cli
+    else:
+        _settings_mod = (
+            os.environ.get("DJANGO_SETTINGS_MODULE") or "config.settings.development"
+        )
     if "production" in _settings_mod:
         _env_filename = ".env.production"
     elif "development" in _settings_mod:
@@ -171,7 +174,7 @@ def main():
         except Exception:
             env_values = {}
 
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
+    os.environ["DJANGO_SETTINGS_MODULE"] = _settings_mod
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
