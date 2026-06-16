@@ -154,6 +154,20 @@ class LotMismatchError(DomainValidationError):
     default_code = "LOT_MISMATCH"
 
 
+class LotSelectionRequiredError(DomainValidationError):
+    """RF-007 / lote: falta lot_id al mover un producto que requiere vencimiento.
+
+    Evita que un TRASLADO (u otro movimiento entre ubicaciones) deje stock
+    de un producto con `requires_expiration=True` sin lote asociado, lo que
+    rompe la trazabilidad de vencimiento en la ubicación destino.
+    """
+
+    default_message = (
+        "El producto requiere seleccionar un lote de origen para esta operación."
+    )
+    default_code = "LOT_SELECTION_REQUIRED"
+
+
 class InventoryError(ICMBaseException):
     """Errores de inventario y consistencia de stock."""
 

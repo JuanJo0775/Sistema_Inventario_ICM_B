@@ -195,6 +195,15 @@ class AdjustmentCreateSerializer(serializers.Serializer):
     location_id = serializers.UUIDField()
     new_quantity = serializers.IntegerField(min_value=0)
     justification = serializers.CharField(allow_blank=True)
+    lot_id = serializers.UUIDField(
+        required=False,
+        allow_null=True,
+        help_text=(
+            "Lote a asociar. Obligatorio si el ajuste incrementa stock de un "
+            "producto con vencimiento (requires_expiration=True); opcional "
+            "si reduce stock (se infiere por FEFO cuando es posible)."
+        ),
+    )
     serial_number = serializers.CharField(
         required=False,
         allow_blank=True,

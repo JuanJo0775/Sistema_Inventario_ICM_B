@@ -30,6 +30,7 @@ from shared.exceptions import (
     LotCodeRequiredError,
     LotExpirationDateRequiredError,
     LotMismatchError,
+    LotSelectionRequiredError,
     PrivacyConsentRequiredError,
     ProductNotReturnableError,
     SerialNumberRequiredError,
@@ -803,21 +804,17 @@ def register_dispatch(
     movements_created: list[Movement] = []
 
     if product.requires_expiration and selected_lot is None:
-        # evaluate lots available and ensure total covers requested quantity
+        # Evaluar lotes disponibles para preferir lote único cuando alcance.
+        # No se rechaza aquí por falta de lotes trackeados: el stock total
+        # ya fue validado contra StockByLocation.current_stock (línea ~775).
+        # Hay productos con requires_expiration cuyo stock llegó por
+        # TRASLADO/AJUSTE sin lot_id asociado (lot_id es opcional incluso
+        # si el producto trackea vencimiento), y available_lots_at_location()
+        # solo contempla movimientos con lot_id asignado, lo que antes
+        # producía un falso INSUFFICIENT_STOCK con available=0.
         candidates = available_lots_at_location(
             product_id=product_id, location_id=location_id
         )
-        total_available = sum(c["available"] for c in candidates)
-        if total_available < quantity:
-            raise InsufficientStockError(
-                detail={
-                    "product_id": str(product_id),
-                    "location_id": str(location_id),
-                    "requested": quantity,
-                    "available": total_available,
-                }
-            )
-        # prefer single-lot if possible
         single_candidate = next(
             (c for c in candidates if c["available"] >= quantity), None
         )
@@ -873,9 +870,46 @@ def register_dispatch(
             remaining -= take
 
         if remaining > 0:
-            raise InsufficientStockError(
-                detail={"requested": quantity, "remaining": remaining}
+            # Remanente sin lote trackeado: origin.current_stock ya validado
+            # arriba (línea ~775) cubre la diferencia, así que se despacha
+            # sin asociar lote en vez de rechazar la operación asumiendo
+            # stock=0 para el faltante (ver comentario en el bloque anterior).
+            prev = origin.current_stock
+            after = prev - remaining
+            origin.current_stock = after
+            origin.last_movement_at = timezone.now()
+            origin.save(
+                update_fields=["current_stock", "last_movement_at", "updated_at"]
             )
+
+            untracked_price = _resolve_price_snapshot(
+                product, remaining, movement_type, discount_pct=discount_pct
+            )
+            movement = Movement.objects.create(
+                movement_type=movement_type,
+                product_id=product_id,
+                lot=None,
+                origin_location_id=location_id,
+                quantity=remaining,
+                stock_previo_origen=prev,
+                stock_resultante_origen=after,
+                scanned_code=sc or None,
+                order_sku=osku or None,
+                serial_number=resolved_serial,
+                invoice_number=invoice_number,
+                invoice_pdf=pdf_file,
+                executed_by=user,
+                customer_snapshot=customer_snapshot,
+                **untracked_price,
+            )
+            movements_created.append(movement)
+            _log_alert_acknowledgement(
+                user=user,
+                movement=movement,
+                cold_chain_acknowledged=cold_chain_acknowledged,
+                electrical_safety_acknowledged=electrical_safety_acknowledged,
+            )
+            remaining = 0
 
     else:
         # Single movement (either non-expiring product or selected_lot provided)
@@ -1006,9 +1040,16 @@ def register_internal_transfer(
     """
     RF-007, BR-04, BR-11, BR-14 — Traslado interno entre ubicaciones.
 
+    BR-04 (lote): si el producto tiene `requires_expiration=True`, `lot_id` es
+    obligatorio. Sin esta validación, el traslado podía dejar stock en la
+    ubicación destino sin lote asociado en el ledger (movimiento con
+    `lot_id=NULL`), rompiendo la trazabilidad de vencimiento aunque
+    `StockByLocation` siguiera contando el stock correctamente.
+
     Raises:
         InsufficientStockError: Stock insuficiente en origen.
         SerialNumberRequiredError: BR-04.
+        LotSelectionRequiredError: Falta `lot_id` para producto con vencimiento.
         StockMismatchError: Si el total consolidado cambia tras el traslado (bug / inconsistencia).
     """
     if origin_id == destination_id:
@@ -1039,7 +1080,11 @@ def register_internal_transfer(
         )
 
     selected_lot: Lot | None = None
-    if getattr(product, "requires_expiration", False) and lot_id is not None:
+    if getattr(product, "requires_expiration", False):
+        if lot_id is None:
+            raise LotSelectionRequiredError(
+                detail={"product_id": str(product_id)}
+            )
         selected_lot = get_for_update_or_404(
             Lot.objects.filter(product_id=product_id), pk=lot_id
         )
@@ -1149,9 +1194,16 @@ def register_return(
     """
     RF-008 — Devolución que incrementa stock en ubicación (BR-04, BR-05, BR-11, BR-14).
 
+    BR-04 (lote): si el producto tiene `requires_expiration=True`, se exige un
+    lote para no dejar stock sin trazabilidad de vencimiento en destino. Si no
+    se envía `lot_id` explícito pero la devolución referencia un movimiento
+    original (`related_movement_id`), se hereda el lote de ese movimiento.
+
     Raises:
         ReturnNotAllowedError: BR-05.
         SerialNumberRequiredError: BR-04.
+        LotSelectionRequiredError: Falta `lot_id` (y no hay movimiento
+            relacionado del cual heredarlo) para producto con vencimiento.
     """
     product = get_for_update_or_404(
         Product.objects.select_related("category"), pk=product_id
@@ -1184,9 +1236,14 @@ def register_return(
             raise DomainValidationError("related_movement_id no existe.")
 
     selected_lot: Lot | None = None
-    if getattr(product, "requires_expiration", False) and lot_id is not None:
+    if getattr(product, "requires_expiration", False):
+        effective_lot_id = lot_id if lot_id is not None else (
+            related.lot_id if related is not None else None
+        )
+        if effective_lot_id is None:
+            raise LotSelectionRequiredError(detail={"product_id": str(product_id)})
         selected_lot = get_for_update_or_404(
-            Lot.objects.filter(product_id=product_id), pk=lot_id
+            Lot.objects.filter(product_id=product_id), pk=effective_lot_id
         )
 
     dest = _lock_stock(product_id, location_id)
@@ -1239,14 +1296,25 @@ def register_adjustment(
     justification: str,
     *,
     serial_id: UUID | None = None,
+    lot_id: UUID | None = None,
 ) -> Movement:
     """
     RF-009, BR-04, BR-07, BR-14 — Ajuste formal con delta explícito.
+
+    BR-04 (lote): para productos con `requires_expiration=True`, un ajuste que
+    incrementa stock (delta > 0) representa unidades "aparecidas" que deben
+    asignarse a un lote existente, así que `lot_id` es obligatorio en ese caso.
+    Un ajuste que reduce stock (delta < 0) acepta `lot_id` opcional: si no se
+    envía, se intenta inferir un único lote con stock suficiente (FEFO); si
+    ninguno cubre la cantidad completa, el ajuste se registra sin lote (mismo
+    comportamiento histórico, no se bloquea una corrección de inventario).
 
     Raises:
         UnauthorizedDomainActionError: Solo almacenista.
         AdjustmentJustificationRequiredError: Justificación vacía.
         SerialNumberRequiredError: BR-04.
+        LotSelectionRequiredError: Incremento de stock sin `lot_id` en
+            producto con vencimiento.
     """
     if getattr(almacenista_user, "role", None) != "almacenista":
         raise UnauthorizedDomainActionError(
@@ -1286,6 +1354,36 @@ def register_adjustment(
         _ensure_location_allows_origin(location, "adjustment")
     else:
         _ensure_location_allows_destination(location, "adjustment")
+
+    selected_lot: Lot | None = None
+    if getattr(product, "requires_expiration", False):
+        if delta > 0:
+            # Stock "aparecido" en el conteo: debe asignarse a un lote
+            # existente, igual que una entrada normal.
+            if lot_id is None:
+                raise LotSelectionRequiredError(
+                    detail={"product_id": str(product_id)}
+                )
+            selected_lot = get_for_update_or_404(
+                Lot.objects.filter(product_id=product_id), pk=lot_id
+            )
+        elif lot_id is not None:
+            selected_lot = get_for_update_or_404(
+                Lot.objects.filter(product_id=product_id), pk=lot_id
+            )
+        else:
+            # Reducción sin lote explícito: preferir un único lote con stock
+            # suficiente (FEFO) para conservar trazabilidad; si ninguno
+            # alcanza, se registra sin lote (no se bloquea la corrección).
+            candidates = available_lots_at_location(
+                product_id=product_id, location_id=location_id
+            )
+            single_candidate = next(
+                (c for c in candidates if c["available"] >= abs(delta)), None
+            )
+            if single_candidate is not None:
+                selected_lot = single_candidate["lot"]
+
     row.current_stock = int(new_quantity)
     row.last_movement_at = timezone.now()
     row.save(update_fields=["current_stock", "last_movement_at", "updated_at"])
@@ -1295,6 +1393,7 @@ def register_adjustment(
     movement = Movement.objects.create(
         movement_type=MovementType.AJUSTE,
         product_id=product_id,
+        lot=selected_lot,
         origin_location_id=origin_id,
         destination_location_id=dest_id,
         quantity=abs(delta),
@@ -1447,6 +1546,11 @@ def correct_movement_within_window(
 
         rev_serial_id = _serial_id_from_corrected(corrected_data, orig_serial)
         fixed_serial_id = _serial_id_from_corrected(corrected_data, orig_serial)
+        # Propagar el lote del TRASLADO original (lot_id ahora es obligatorio
+        # en register_internal_transfer para productos con requires_expiration;
+        # sin esto, corregir un traslado con lote se rompería con
+        # LotSelectionRequiredError). corrected_data permite override explícito.
+        fixed_lot_id = corrected_data.get("lot_id", original.lot_id)
 
         # Los ACKs se propagan del original: el usuario ya los reconoció (BR-06).
         rev = register_internal_transfer(
@@ -1455,6 +1559,7 @@ def correct_movement_within_window(
             UUID(str(original.destination_location_id)),
             UUID(str(original.origin_location_id)),
             int(original.quantity),
+            lot_id=original.lot_id,
             serial_id=rev_serial_id,
             cold_chain_acknowledged=True,
             electrical_safety_acknowledged=True,
@@ -1465,6 +1570,7 @@ def correct_movement_within_window(
             new_origin,
             new_dest,
             new_qty,
+            lot_id=fixed_lot_id,
             serial_id=fixed_serial_id,
             cold_chain_acknowledged=True,
             electrical_safety_acknowledged=True,

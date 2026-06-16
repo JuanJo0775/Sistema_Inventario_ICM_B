@@ -29,10 +29,12 @@ from shared.exceptions import (
     LocationStateNotAllowedError,
     LotCodeRequiredError,
     LotExpirationDateRequiredError,
+    LotSelectionRequiredError,
     ProductNotReturnableError,
     SerialNumberRequiredError,
 )
 from tests.factories import (
+    CategoryFactory,
     ElectroCategoryFactory,
     LocationFactory,
     LotFactory,
@@ -142,6 +144,201 @@ def test_dispatch_chooses_earliest_lot_when_expiring_product(
     # should produce at least one movement; the earliest lot is consumed first
     assert isinstance(movements, list)
     assert movements[0].lot_id == lot_early.id
+
+
+@pytest.mark.django_db
+def test_dispatch_expiring_product_with_untracked_stock_at_location(
+    almacenista_user, sample_locations
+):
+    """Bug fix: producto requires_expiration=True con stock en la ubicación
+    que no tiene ningún movimiento de lote asociado (datos legados, o
+    cargado por una vía que aún no exige lote, ej. register_return/
+    register_adjustment). available_lots_at_location() solo cuenta
+    movimientos con lot_id, por lo que antes del fix se lanzaba
+    InsufficientStockError(available=0) aunque StockByLocation.current_stock
+    fuera suficiente. El despacho debe completarse usando ese stock sin lote
+    como fallback."""
+    cat = CategoryFactory()
+    product = ProductFactory(category=cat, sku="PRD-0205", requires_expiration=True)
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=product, location=loc, current_stock=4)
+
+    movements = register_dispatch(
+        almacenista_user,
+        product.id,
+        loc.id,
+        1,
+        MovementType.SALIDA_VENTA_MENOR,
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+    assert isinstance(movements, list)
+    assert movements[0].lot_id is None
+    assert movements[0].quantity == 1
+    assert (
+        StockByLocation.objects.get(product=product, location=loc).current_stock == 3
+    )
+
+
+@pytest.mark.django_db
+def test_internal_transfer_requires_lot_for_expiring_product(
+    almacenista_user, sample_locations
+):
+    """BR-04 (lote): un TRASLADO de producto con requires_expiration=True sin
+    lot_id debe rechazarse con LotSelectionRequiredError, para no dejar stock
+    sin lote asociado en la ubicación destino (causa raíz del bug de
+    INSUFFICIENT_STOCK reportado en despacho)."""
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="PRD-0206", requires_expiration=True)
+    bodega, vitrina = sample_locations[0], sample_locations[1]
+    lot = LotFactory(
+        product=product,
+        code="L-TRANSFER",
+        expiration_date=timezone.now().date() + timedelta(days=30),
+    )
+    register_entry(
+        almacenista_user,
+        product.id,
+        bodega.id,
+        10,
+        lot_code=lot.code,
+        lot_expiration_date=lot.expiration_date,
+        serial_number="SN-TRANSFER",
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+    with pytest.raises(LotSelectionRequiredError):
+        register_internal_transfer(
+            almacenista_user,
+            product.id,
+            bodega.id,
+            vitrina.id,
+            4,
+            cold_chain_acknowledged=True,
+            electrical_safety_acknowledged=True,
+        )
+
+
+@pytest.mark.django_db
+def test_internal_transfer_with_explicit_lot_preserves_traceability(
+    almacenista_user, sample_locations
+):
+    """Caso feliz: traslado con lot_id explícito preserva la trazabilidad de
+    lote en la ubicación destino."""
+    cat = ElectroCategoryFactory()
+    product = ProductFactory(category=cat, sku="PRD-0207", requires_expiration=True)
+    bodega, vitrina = sample_locations[0], sample_locations[1]
+    lot = LotFactory(
+        product=product,
+        code="L-TRANSFER-OK",
+        expiration_date=timezone.now().date() + timedelta(days=30),
+    )
+    register_entry(
+        almacenista_user,
+        product.id,
+        bodega.id,
+        10,
+        lot_code=lot.code,
+        lot_expiration_date=lot.expiration_date,
+        serial_number="SN-TRANSFER-OK",
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+    movement = register_internal_transfer(
+        almacenista_user,
+        product.id,
+        bodega.id,
+        vitrina.id,
+        4,
+        lot_id=lot.id,
+        cold_chain_acknowledged=True,
+        electrical_safety_acknowledged=True,
+    )
+    assert movement.lot_id == lot.id
+
+
+@pytest.mark.django_db
+def test_return_requires_lot_for_expiring_product_without_related_movement(
+    almacenista_user, sample_locations
+):
+    """BR-04 (lote): una devolución de producto con requires_expiration=True
+    sin lot_id ni related_movement_id debe rechazarse con
+    LotSelectionRequiredError, para no dejar stock sin trazabilidad de lote
+    en destino."""
+    cat = CategoryFactory(is_returnable=True)
+    product = ProductFactory(category=cat, sku="PRD-0208", requires_expiration=True)
+    loc = sample_locations[0]
+    with pytest.raises(LotSelectionRequiredError):
+        register_return(
+            almacenista_user,
+            product.id,
+            loc.id,
+            1,
+        )
+
+
+@pytest.mark.django_db
+def test_return_inherits_lot_from_related_movement(
+    almacenista_user, sample_locations
+):
+    """Si la devolución referencia el despacho original (related_movement_id)
+    y no se envía lot_id explícito, hereda el lote de ese movimiento en vez
+    de exigir que el cliente lo reenvíe."""
+    cat = CategoryFactory(is_returnable=True)
+    product = ProductFactory(category=cat, sku="PRD-0209", requires_expiration=True)
+    loc = sample_locations[0]
+    lot = LotFactory(
+        product=product,
+        code="L-RETURN",
+        expiration_date=timezone.now().date() + timedelta(days=30),
+    )
+    register_entry(
+        almacenista_user,
+        product.id,
+        loc.id,
+        5,
+        lot_code=lot.code,
+        lot_expiration_date=lot.expiration_date,
+    )
+    dispatch = register_dispatch(
+        almacenista_user,
+        product.id,
+        loc.id,
+        2,
+        MovementType.SALIDA_VENTA_MENOR,
+    )[0]
+
+    movement = register_return(
+        almacenista_user,
+        product.id,
+        loc.id,
+        1,
+        related_movement_id=dispatch.id,
+    )
+    assert movement.lot_id == lot.id
+
+
+@pytest.mark.django_db
+def test_return_with_explicit_lot_for_expiring_product(
+    almacenista_user, sample_locations
+):
+    """Caso feliz: devolución con lot_id explícito preserva trazabilidad."""
+    cat = CategoryFactory(is_returnable=True)
+    product = ProductFactory(category=cat, sku="PRD-0210", requires_expiration=True)
+    loc = sample_locations[0]
+    lot = LotFactory(
+        product=product,
+        code="L-RETURN-OK",
+        expiration_date=timezone.now().date() + timedelta(days=30),
+    )
+    movement = register_return(
+        almacenista_user,
+        product.id,
+        loc.id,
+        1,
+        lot_id=lot.id,
+    )
+    assert movement.lot_id == lot.id
 
 
 @pytest.mark.django_db
@@ -1065,3 +1262,136 @@ def test_adjustment_downwards_without_serial_optional_when_not_required(
         "Ajuste sin serial",
     )
     assert movement.serial_number is None
+
+
+# ── BR-04: Lote en Ajustes (solo si requires_expiration=True) ────────────────
+
+
+@pytest.mark.django_db
+def test_adjustment_does_not_require_lot_for_non_expiring_product(
+    almacenista_user, sample_product, sample_locations
+):
+    """El lote NUNCA se exige si el producto no tiene requires_expiration=True,
+    sin importar si el ajuste incrementa o reduce stock."""
+    assert sample_product.requires_expiration is False
+    loc = sample_locations[0]
+    StockByLocation.objects.create(
+        product=sample_product, location=loc, current_stock=10
+    )
+    increase = register_adjustment(
+        almacenista_user,
+        sample_product.id,
+        loc.id,
+        15,
+        "Ajuste positivo sin lote (producto sin vencimiento)",
+    )
+    assert increase.lot_id is None
+    decrease = register_adjustment(
+        almacenista_user,
+        sample_product.id,
+        loc.id,
+        10,
+        "Ajuste negativo sin lote (producto sin vencimiento)",
+    )
+    assert decrease.lot_id is None
+
+
+@pytest.mark.django_db
+def test_adjustment_increase_requires_lot_for_expiring_product(
+    almacenista_user, sample_locations
+):
+    """Un ajuste que incrementa stock (delta>0) de un producto con
+    requires_expiration=True debe exigir lot_id: ese stock "aparecido" no
+    puede quedar sin lote asociado."""
+    cat = CategoryFactory()
+    product = ProductFactory(category=cat, sku="ADJ-LOT-01", requires_expiration=True)
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=product, location=loc, current_stock=10)
+    with pytest.raises(LotSelectionRequiredError):
+        register_adjustment(
+            almacenista_user,
+            product.id,
+            loc.id,
+            14,
+            "Ajuste positivo sin lote",
+        )
+
+
+@pytest.mark.django_db
+def test_adjustment_increase_with_lot_for_expiring_product(
+    almacenista_user, sample_locations
+):
+    """Caso feliz: ajuste positivo con lot_id explícito persiste el lote."""
+    cat = CategoryFactory()
+    product = ProductFactory(category=cat, sku="ADJ-LOT-02", requires_expiration=True)
+    loc = sample_locations[0]
+    StockByLocation.objects.create(product=product, location=loc, current_stock=10)
+    lot = LotFactory(
+        product=product,
+        code="L-ADJ-INCREASE",
+        expiration_date=timezone.now().date() + timedelta(days=30),
+    )
+    movement = register_adjustment(
+        almacenista_user,
+        product.id,
+        loc.id,
+        14,
+        "Ajuste positivo con lote",
+        lot_id=lot.id,
+    )
+    assert movement.lot_id == lot.id
+
+
+@pytest.mark.django_db
+def test_adjustment_decrease_infers_single_lot_when_available(
+    almacenista_user, sample_locations
+):
+    """Ajuste que reduce stock (delta<0) sin lot_id explícito: si un único
+    lote en la ubicación cubre la cantidad, se infiere automáticamente (FEFO)
+    en vez de exigir que el usuario lo seleccione manualmente."""
+    cat = CategoryFactory()
+    product = ProductFactory(category=cat, sku="ADJ-LOT-03", requires_expiration=True)
+    loc = sample_locations[0]
+    lot = LotFactory(
+        product=product,
+        code="L-ADJ-DECREASE",
+        expiration_date=timezone.now().date() + timedelta(days=30),
+    )
+    register_entry(
+        almacenista_user,
+        product.id,
+        loc.id,
+        10,
+        lot_code=lot.code,
+        lot_expiration_date=lot.expiration_date,
+    )
+    movement = register_adjustment(
+        almacenista_user,
+        product.id,
+        loc.id,
+        7,
+        "Merma detectada en conteo",
+    )
+    assert movement.lot_id == lot.id
+
+
+@pytest.mark.django_db
+def test_adjustment_decrease_without_covering_lot_falls_back_to_no_lot(
+    almacenista_user, sample_locations
+):
+    """Ajuste que reduce stock sin lot_id y sin ningún lote único que cubra
+    la cantidad completa: se registra sin lote (no bloquea la corrección de
+    inventario), igual que el comportamiento histórico."""
+    cat = CategoryFactory()
+    product = ProductFactory(category=cat, sku="ADJ-LOT-04", requires_expiration=True)
+    loc = sample_locations[0]
+    # Stock sin ningún movimiento de lote asociado en esta ubicación.
+    StockByLocation.objects.create(product=product, location=loc, current_stock=10)
+    movement = register_adjustment(
+        almacenista_user,
+        product.id,
+        loc.id,
+        6,
+        "Merma sin lote trackeado",
+    )
+    assert movement.lot_id is None
