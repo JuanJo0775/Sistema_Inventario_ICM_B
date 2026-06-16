@@ -12,8 +12,12 @@ from rest_framework.response import Response
 from rest_framework.views import exception_handler as drf_exception_handler
 
 from apps.catalog.models import Product
-from shared.exceptions import (AuthenticationError, AuthorizationError,
-                               ICMBaseException, ImmutableRecordError)
+from shared.exceptions import (
+    AuthenticationError,
+    AuthorizationError,
+    ICMBaseException,
+    ImmutableRecordError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +84,7 @@ def custom_exception_handler(
             message = "El recurso solicitado no existe."
         elif status_code == status.HTTP_405_METHOD_NOT_ALLOWED:
             error_code = "METHOD_NOT_ALLOWED"
-            message = f"El método HTTP no está permitido."
+            message = "El método HTTP no está permitido."
         elif status_code == status.HTTP_429_TOO_MANY_REQUESTS:
             error_code = "THROTTLED"
             message = "Límite de peticiones excedido."

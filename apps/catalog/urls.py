@@ -1,17 +1,106 @@
 from django.urls import path
 
-from apps.catalog.views import (CategoryListCreateView, ComboListCreateView,
-                                ProductDetailView, ProductListCreateView,
-                                ResolveIdentifierView, SubcategoryListView)
+from apps.catalog.views import (
+    BrandDetailView,
+    BrandDisableView,
+    BrandEnableView,
+    BrandListCreateView,
+    BrandRestoreView,
+    CategoryDetailView,
+    CategoryDisableView,
+    CategoryEnableView,
+    CategoryListCreateView,
+    CategoryRestoreView,
+    ComboDetailView,
+    ComboListCreateView,
+    ComboRestoreView,
+    ProductBarcodeView,
+    ProductDetailView,
+    ProductDisableView,
+    ProductEnableView,
+    ProductListCreateView,
+    ProductPricesView,
+    ProductRestoreView,
+    ResolveIdentifierView,
+)
 
 urlpatterns = [
     path("categories/", CategoryListCreateView.as_view(), name="catalog-categories"),
-    path("subcategories/", SubcategoryListView.as_view(), name="catalog-subcategories"),
+    path(
+        "categories/<uuid:pk>/",
+        CategoryDetailView.as_view(),
+        name="catalog-category-detail",
+    ),
+    path(
+        "categories/<uuid:pk>/restore/",
+        CategoryRestoreView.as_view(),
+        name="catalog-category-restore",
+    ),
+    path(
+        "brands/",
+        BrandListCreateView.as_view(),
+        name="catalog-brands",
+    ),
+    path(
+        "brands/<uuid:pk>/",
+        BrandDetailView.as_view(),
+        name="catalog-brand-detail",
+    ),
+    path(
+        "brands/<uuid:pk>/restore/",
+        BrandRestoreView.as_view(),
+        name="catalog-brand-restore",
+    ),
+    path(
+        "brands/<uuid:pk>/disable/",
+        BrandDisableView.as_view(),
+        name="catalog-brand-disable",
+    ),
+    path(
+        "brands/<uuid:pk>/enable/",
+        BrandEnableView.as_view(),
+        name="catalog-brand-enable",
+    ),
+    path(
+        "categories/<uuid:pk>/disable/",
+        CategoryDisableView.as_view(),
+        name="catalog-category-disable",
+    ),
+    path(
+        "categories/<uuid:pk>/enable/",
+        CategoryEnableView.as_view(),
+        name="catalog-category-enable",
+    ),
     path("products/", ProductListCreateView.as_view(), name="catalog-products"),
     path(
         "products/<uuid:pk>/",
         ProductDetailView.as_view(),
         name="catalog-product-detail",
+    ),
+    path(
+        "products/<uuid:pk>/barcode/",
+        ProductBarcodeView.as_view(),
+        name="catalog-product-barcode",
+    ),
+    path(
+        "products/<uuid:pk>/prices/",
+        ProductPricesView.as_view(),
+        name="catalog-product-prices",
+    ),
+    path(
+        "products/<uuid:pk>/restore/",
+        ProductRestoreView.as_view(),
+        name="catalog-product-restore",
+    ),
+    path(
+        "products/<uuid:pk>/disable/",
+        ProductDisableView.as_view(),
+        name="catalog-product-disable",
+    ),
+    path(
+        "products/<uuid:pk>/enable/",
+        ProductEnableView.as_view(),
+        name="catalog-product-enable",
     ),
     path(
         "products/resolve/",
@@ -20,4 +109,14 @@ urlpatterns = [
     ),
     path("resolve/", ResolveIdentifierView.as_view(), name="catalog-resolve"),
     path("combos/", ComboListCreateView.as_view(), name="catalog-combos"),
+    path(
+        "combos/<uuid:pk>/",
+        ComboDetailView.as_view(),
+        name="catalog-combo-detail",
+    ),
+    path(
+        "combos/<uuid:pk>/restore/",
+        ComboRestoreView.as_view(),
+        name="catalog-combo-restore",
+    ),
 ]

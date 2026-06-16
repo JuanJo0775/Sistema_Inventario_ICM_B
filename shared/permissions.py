@@ -6,7 +6,7 @@ from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
 class IsAlmacenista(BasePermission):
-    """BR-02 — Solo rol `almacenista` (gestión operativa y credenciales)."""
+    """BR-02 — Rol rector del sistema: permisos operativos y administrativos principales."""
 
     def has_permission(self, request, view) -> bool:
         u = request.user
@@ -26,7 +26,7 @@ class IsAuxiliarDespacho(BasePermission):
 
 
 class IsAdministrador(BasePermission):
-    """BR-01 — Solo rol `administrador` (lectura de reportes y KPI)."""
+    """BR-01 — Rol de lectura limitada para reportes y KPI; no desplaza al almacenista."""
 
     def has_permission(self, request, view) -> bool:
         u = request.user
@@ -48,7 +48,7 @@ class IsAlmacenistaOrAuxiliar(BasePermission):
 
 
 class IsAlmacenistaOrAdministrador(BasePermission):
-    """RF-010 — Reportes e inventario resumido para almacenista o administrador."""
+    """RF-010 — Lectura compartida para reportes y resumenes; el almacenista conserva el control principal."""
 
     def has_permission(self, request, view) -> bool:
         u = request.user
@@ -61,22 +61,19 @@ class IsAlmacenistaOrAdministrador(BasePermission):
 
 class IsWithinOperatingHours(BasePermission):
     """
-    BR-03 — Auxiliares de despacho solo operan en franjas permitidas (America/Bogota).
-
-    Horario local: 07:00–12:00 y 14:00–17:00 inclusive. Otros roles no tienen esta restricción
-    adicional tras autenticación JWT.
+    BR-03 — Auxiliares de despacho solo operan en franjas permitidas.
     """
 
-    message = "Acceso denegado: el auxiliar de despacho solo opera en horario 07:00–12:00 y 14:00–17:00 (Bogotá)."
+    message = "Acceso denegado: fuera del horario operativo del auxiliar de despacho."
 
     def has_permission(self, request, view) -> bool:
         if not request.user or not request.user.is_authenticated:
             return False
         if getattr(request.user, "role", None) != "auxiliar_despacho":
             return True
-        from apps.authentication.services import is_within_operating_hours
+        from apps.authentication.selectors import check_user_access
 
-        return is_within_operating_hours()
+        return check_user_access(request.user)
 
 
 class IsReadOnly(BasePermission):

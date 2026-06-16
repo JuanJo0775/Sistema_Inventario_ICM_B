@@ -5,10 +5,11 @@
     "scenario_number": 1,
     "title": "Inicio de sesión exitoso como Almacenista",
     "given_when_then": "**Given (Dado que):**\n- El usuario tiene un rol de \"Almacenista\"\n- Sus credenciales están activas en el sistema\n\n**When (Cuando):**\n- Ingresa su nombre de usuario y contraseña correctos\n- Hace clic en \"Iniciar sesión\"\n\n**Then (Entonces):**\n- El sistema autentica al usuario correctamente\n- Lo redirige al dashboard del Almacenista\n- Registra el evento de inicio de sesión con el UserID y timestamp exacto\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario tiene un rol de \"Almacenista\"\n- Sus credenciales están activas en el sistema",
-    "when": "**When (Cuando):**\n- Ingresa su nombre de usuario y contraseña correctos\n- Hace clic en \"Iniciar sesión\"",
-    "then": "**Then (Entonces):**\n- El sistema autentica al usuario correctamente\n- Lo redirige al dashboard del Almacenista\n- Registra el evento de inicio de sesión con el UserID y timestamp exacto\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF001-S02",
@@ -16,10 +17,11 @@
     "scenario_number": 2,
     "title": "Inicio de sesión exitoso como Auxiliar de Despacho dentro del horario permitido",
     "given_when_then": "**Given (Dado que):**\n- El usuario tiene rol \"Auxiliar de Despacho\"\n- La hora actual está dentro de la franja 07:00–12:00 o 14:00–17:00\n- Sus credenciales están activas\n\n**When (Cuando):**\n- Ingresa sus credenciales correctas y hace clic en \"Iniciar sesión\"\n\n**Then (Entonces):**\n- El sistema lo autentica y redirige a la vista del Auxiliar de Despacho\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario tiene rol \"Auxiliar de Despacho\"\n- La hora actual está dentro de la franja 07:00–12:00 o 14:00–17:00\n- Sus credenciales están activas",
-    "when": "**When (Cuando):**\n- Ingresa sus credenciales correctas y hace clic en \"Iniciar sesión\"",
-    "then": "**Then (Entonces):**\n- El sistema lo autentica y redirige a la vista del Auxiliar de Despacho\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF001-S03",
@@ -27,10 +29,11 @@
     "scenario_number": 3,
     "title": "Intento de inicio de sesión de Auxiliar fuera del horario permitido",
     "given_when_then": "**Given (Dado que):**\n- El usuario tiene rol \"Auxiliar de Despacho\"\n- La hora actual está fuera de las franjas 07:00–12:00 y 14:00–17:00\n\n**When (Cuando):**\n- Ingresa sus credenciales correctas y hace clic en \"Iniciar sesión\"\n\n**Then (Entonces):**\n- El sistema bloquea el acceso\n- Muestra un mensaje indicando que su horario de acceso no está activo\n- No genera sesión ni redirige a ninguna vista\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario tiene rol \"Auxiliar de Despacho\"\n- La hora actual está fuera de las franjas 07:00–12:00 y 14:00–17:00",
-    "when": "**When (Cuando):**\n- Ingresa sus credenciales correctas y hace clic en \"Iniciar sesión\"",
-    "then": "**Then (Entonces):**\n- El sistema bloquea el acceso\n- Muestra un mensaje indicando que su horario de acceso no está activo\n- No genera sesión ni redirige a ninguna vista\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF001-S04",
@@ -38,10 +41,11 @@
     "scenario_number": 4,
     "title": "Intento de inicio de sesión con credenciales incorrectas",
     "given_when_then": "**Given (Dado que):**\n- Existe un usuario registrado en el sistema\n\n**When (Cuando):**\n- Ingresa una contraseña o nombre de usuario incorrecto\n\n**Then (Entonces):**\n- El sistema rechaza el acceso\n- Muestra un mensaje de error genérico sin revelar si el fallo fue en usuario o contraseña\n- No genera sesión activa\n\n---",
-    "given": "**Given (Dado que):**\n- Existe un usuario registrado en el sistema",
-    "when": "**When (Cuando):**\n- Ingresa una contraseña o nombre de usuario incorrecto",
-    "then": "**Then (Entonces):**\n- El sistema rechaza el acceso\n- Muestra un mensaje de error genérico sin revelar si el fallo fue en usuario o contraseña\n- No genera sesión activa\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF001-S05",
@@ -49,10 +53,11 @@
     "scenario_number": 5,
     "title": "Inicio de sesión como Administrador fuera del horario laboral",
     "given_when_then": "**Given (Dado que):**\n- El usuario tiene rol \"Administrador/Jefe\"\n- La hora actual es fuera del horario laboral convencional\n\n**When (Cuando):**\n- Ingresa sus credenciales correctas\n\n**Then (Entonces):**\n- El sistema lo autentica sin restricción horaria\n- Lo redirige al dashboard gerencial de solo lectura",
-    "given": "**Given (Dado que):**\n- El usuario tiene rol \"Administrador/Jefe\"\n- La hora actual es fuera del horario laboral convencional",
-    "when": "**When (Cuando):**\n- Ingresa sus credenciales correctas",
-    "then": "**Then (Entonces):**\n- El sistema lo autentica sin restricción horaria\n- Lo redirige al dashboard gerencial de solo lectura",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF002-S01",
@@ -60,10 +65,11 @@
     "scenario_number": 1,
     "title": "Almacenista crea una nueva cuenta de usuario",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Accede al módulo de gestión de credenciales\n- Completa el formulario con nombre de usuario, contraseña temporal y rol asignado\n- Hace clic en \"Crear usuario\"\n\n**Then (Entonces):**\n- El sistema crea la cuenta con un UserID único e irrepetible\n- La cuenta queda activa y asociada al rol seleccionado\n- El evento de creación queda registrado en el log de auditoría con el UserID del Almacenista y el timestamp\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Accede al módulo de gestión de credenciales\n- Completa el formulario con nombre de usuario, contraseña temporal y rol asignado\n- Hace clic en \"Crear usuario\"",
-    "then": "**Then (Entonces):**\n- El sistema crea la cuenta con un UserID único e irrepetible\n- La cuenta queda activa y asociada al rol seleccionado\n- El evento de creación queda registrado en el log de auditoría con el UserID del Almacenista y el timestamp\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF002-S02",
@@ -71,10 +77,11 @@
     "scenario_number": 2,
     "title": "Almacenista modifica la contraseña de un usuario existente",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Existe una cuenta activa en el sistema\n\n**When (Cuando):**\n- Selecciona la cuenta y elige la opción \"Modificar contraseña\"\n- Ingresa la nueva contraseña y confirma la acción\n\n**Then (Entonces):**\n- El sistema actualiza la contraseña de la cuenta seleccionada\n- El cambio queda registrado en el log de auditoría con UserID del Almacenista y timestamp\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Existe una cuenta activa en el sistema",
-    "when": "**When (Cuando):**\n- Selecciona la cuenta y elige la opción \"Modificar contraseña\"\n- Ingresa la nueva contraseña y confirma la acción",
-    "then": "**Then (Entonces):**\n- El sistema actualiza la contraseña de la cuenta seleccionada\n- El cambio queda registrado en el log de auditoría con UserID del Almacenista y timestamp\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF002-S03",
@@ -82,10 +89,11 @@
     "scenario_number": 3,
     "title": "Almacenista deshabilita una cuenta activa",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Existe una cuenta de usuario activa en el sistema\n\n**When (Cuando):**\n- Selecciona la cuenta y elige la opción \"Deshabilitar\"\n- Confirma la acción\n\n**Then (Entonces):**\n- El sistema deshabilita la cuenta inmediatamente\n- Si el usuario tenía una sesión activa, ésta se termina en ese momento\n- El usuario deshabilitado no puede iniciar sesión hasta que el Almacenista reactive la cuenta\n- El evento queda registrado en el log de auditoría\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Existe una cuenta de usuario activa en el sistema",
-    "when": "**When (Cuando):**\n- Selecciona la cuenta y elige la opción \"Deshabilitar\"\n- Confirma la acción",
-    "then": "**Then (Entonces):**\n- El sistema deshabilita la cuenta inmediatamente\n- Si el usuario tenía una sesión activa, ésta se termina en ese momento\n- El usuario deshabilitado no puede iniciar sesión hasta que el Almacenista reactive la cuenta\n- El evento queda registrado en el log de auditoría\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF002-S04",
@@ -93,10 +101,11 @@
     "scenario_number": 4,
     "title": "Auxiliar de Despacho intenta modificar su propio perfil",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\"\n\n**When (Cuando):**\n- Intenta acceder a cualquier opción de edición de credenciales propias o ajenas\n\n**Then (Entonces):**\n- El sistema bloquea la acción\n- Muestra un mensaje indicando que no tiene permisos para realizar esa operación\n- No realiza ningún cambio en el sistema\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\"",
-    "when": "**When (Cuando):**\n- Intenta acceder a cualquier opción de edición de credenciales propias o ajenas",
-    "then": "**Then (Entonces):**\n- El sistema bloquea la acción\n- Muestra un mensaje indicando que no tiene permisos para realizar esa operación\n- No realiza ningún cambio en el sistema\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF002-S05",
@@ -104,10 +113,11 @@
     "scenario_number": 5,
     "title": "Intento de crear una cuenta con un nombre de usuario ya existente",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Ya existe una cuenta con el nombre de usuario \"auxiliar01\" en el sistema\n\n**When (Cuando):**\n- Intenta crear una nueva cuenta con el mismo nombre de usuario \"auxiliar01\"\n\n**Then (Entonces):**\n- El sistema rechaza la creación\n- Muestra un mensaje indicando que el nombre de usuario ya está en uso\n- No genera ninguna cuenta duplicada",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Ya existe una cuenta con el nombre de usuario \"auxiliar01\" en el sistema",
-    "when": "**When (Cuando):**\n- Intenta crear una nueva cuenta con el mismo nombre de usuario \"auxiliar01\"",
-    "then": "**Then (Entonces):**\n- El sistema rechaza la creación\n- Muestra un mensaje indicando que el nombre de usuario ya está en uso\n- No genera ninguna cuenta duplicada",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF003-S01",
@@ -115,21 +125,23 @@
     "scenario_number": 1,
     "title": "Almacenista registra un producto nuevo con todos los atributos obligatorios",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Accede al formulario de creación de producto\n- Completa todos los campos obligatorios: nombre, categoría, subcategoría, código de barras, fecha de vencimiento, peso unitario y punto de reorden\n- Hace clic en \"Guardar producto\"\n\n**Then (Entonces):**\n- El sistema crea el producto con un SKU único\n- Lo registra en el catálogo con stock inicial en cero para cada ubicación\n- El evento de creación queda en el log de auditoría con UserID y timestamp\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Accede al formulario de creación de producto\n- Completa todos los campos obligatorios: nombre, categoría, subcategoría, código de barras, fecha de vencimiento, peso unitario y punto de reorden\n- Hace clic en \"Guardar producto\"",
-    "then": "**Then (Entonces):**\n- El sistema crea el producto con un SKU único\n- Lo registra en el catálogo con stock inicial en cero para cada ubicación\n- El evento de creación queda en el log de auditoría con UserID y timestamp\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF003-S02",
     "rf": "RF003",
     "scenario_number": 2,
     "title": "Registro de producto de marca propia \"Can\"",
-    "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Registra un producto indicando que pertenece a la marca propia \"Can\"\n\n**Then (Entonces):**\n- El sistema asigna automáticamente el prefijo \"CAN-\" al código SKU del producto\n- No permite guardar el producto si el prefijo fue removido manualmente\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Registra un producto indicando que pertenece a la marca propia \"Can\"",
-    "then": "**Then (Entonces):**\n- El sistema asigna automáticamente el prefijo \"CAN-\" al código SKU del producto\n- No permite guardar el producto si el prefijo fue removido manualmente\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Registra un producto indicando que pertenece a la marca propia \"Can\"\n\n**Then (Entonces):**\n- El sistema acepta el SKU proporcionado por el usuario siempre que cumpla el patrón 1–4 letras, un guion y 1–4 dígitos\n- No permite guardar el producto si el SKU no cumple el formato requerido\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF003-S03",
@@ -137,10 +149,11 @@
     "scenario_number": 3,
     "title": "Registro de producto de categoría Electroterapia",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Registra un producto con categoría \"Electroterapia\"\n\n**Then (Entonces):**\n- El sistema habilita y marca como obligatorio el campo \"Número de Serie\"\n- No permite guardar el producto si ese campo está vacío\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Registra un producto con categoría \"Electroterapia\"",
-    "then": "**Then (Entonces):**\n- El sistema habilita y marca como obligatorio el campo \"Número de Serie\"\n- No permite guardar el producto si ese campo está vacío\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF003-S04",
@@ -148,10 +161,11 @@
     "scenario_number": 4,
     "title": "Registro de producto con código de barras como alias de escaneo",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Registra un producto e ingresa un código de barras en el campo correspondiente\n\n**Then (Entonces):**\n- El sistema almacena el código como atributo adicional del producto\n- Lo vincula internamente al SKU sin reemplazarlo\n- Cuando ese código sea escaneado o ingresado manualmente en cualquier módulo, el sistema resuelve la correspondencia al SKU correcto\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Registra un producto e ingresa un código de barras en el campo correspondiente",
-    "then": "**Then (Entonces):**\n- El sistema almacena el código como atributo adicional del producto\n- Lo vincula internamente al SKU sin reemplazarlo\n- Cuando ese código sea escaneado o ingresado manualmente en cualquier módulo, el sistema resuelve la correspondencia al SKU correcto\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF003-S05",
@@ -159,10 +173,11 @@
     "scenario_number": 5,
     "title": "Registro de producto que requiere cadena de frío",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Registra un producto y activa el indicador de \"Cadena de frío\"\n\n**Then (Entonces):**\n- El sistema almacena esa condición especial en la ficha del producto\n- Desplegará una alerta visual persistente en cualquier módulo donde ese producto sea manipulado\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Registra un producto y activa el indicador de \"Cadena de frío\"",
-    "then": "**Then (Entonces):**\n- El sistema almacena esa condición especial en la ficha del producto\n- Desplegará una alerta visual persistente en cualquier módulo donde ese producto sea manipulado\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF003-S06",
@@ -170,10 +185,11 @@
     "scenario_number": 6,
     "title": "Creación de un Combo o Kit con múltiples SKUs",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Existen al menos dos productos registrados en el catálogo\n\n**When (Cuando):**\n- Crea un nuevo ítem de tipo \"Combo\" y asocia dos o más SKUs existentes\n\n**Then (Entonces):**\n- El sistema registra el Combo con un identificador propio\n- Permite despacharlo como una sola unidad de salida\n- Al confirmar un despacho de ese Combo, descuenta el stock de cada SKU componente en sus respectivas ubicaciones\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Existen al menos dos productos registrados en el catálogo",
-    "when": "**When (Cuando):**\n- Crea un nuevo ítem de tipo \"Combo\" y asocia dos o más SKUs existentes",
-    "then": "**Then (Entonces):**\n- El sistema registra el Combo con un identificador propio\n- Permite despacharlo como una sola unidad de salida\n- Al confirmar un despacho de ese Combo, descuenta el stock de cada SKU componente en sus respectivas ubicaciones\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF003-S07",
@@ -181,10 +197,11 @@
     "scenario_number": 7,
     "title": "Intento de guardar un producto sin completar campos obligatorios",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Intenta guardar un producto dejando uno o más campos obligatorios vacíos\n\n**Then (Entonces):**\n- El sistema rechaza el guardado\n- Señala visualmente los campos faltantes\n- No crea ningún registro parcial en el catálogo",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Intenta guardar un producto dejando uno o más campos obligatorios vacíos",
-    "then": "**Then (Entonces):**\n- El sistema rechaza el guardado\n- Señala visualmente los campos faltantes\n- No crea ningún registro parcial en el catálogo",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF004-S01",
@@ -192,10 +209,11 @@
     "scenario_number": 1,
     "title": "Consulta de stock navegando por filtros multinivel",
     "given_when_then": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol\n\n**When (Cuando):**\n- Selecciona una categoría (por ejemplo \"Electroterapia\")\n- Luego selecciona una subcategoría (por ejemplo \"Agujas de Punción Seca\")\n\n**Then (Entonces):**\n- El sistema muestra únicamente los productos que corresponden a esa combinación de categoría y subcategoría\n- Para cada producto despliega el stock disponible en Vitrina, Bodega 1, Bodega 2 y el total consolidado\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol",
-    "when": "**When (Cuando):**\n- Selecciona una categoría (por ejemplo \"Electroterapia\")\n- Luego selecciona una subcategoría (por ejemplo \"Agujas de Punción Seca\")",
-    "then": "**Then (Entonces):**\n- El sistema muestra únicamente los productos que corresponden a esa combinación de categoría y subcategoría\n- Para cada producto despliega el stock disponible en Vitrina, Bodega 1, Bodega 2 y el total consolidado\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF004-S02",
@@ -203,10 +221,11 @@
     "scenario_number": 2,
     "title": "Búsqueda de producto por nombre con autocompletado",
     "given_when_then": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol\n\n**When (Cuando):**\n- Escribe al menos tres caracteres del nombre de un producto en el campo de búsqueda\n\n**Then (Entonces):**\n- El sistema despliega en tiempo real una lista de sugerencias que coinciden con los caracteres ingresados\n- Al seleccionar un producto de la lista, muestra su ficha con el stock por ubicación y el total consolidado\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol",
-    "when": "**When (Cuando):**\n- Escribe al menos tres caracteres del nombre de un producto en el campo de búsqueda",
-    "then": "**Then (Entonces):**\n- El sistema despliega en tiempo real una lista de sugerencias que coinciden con los caracteres ingresados\n- Al seleccionar un producto de la lista, muestra su ficha con el stock por ubicación y el total consolidado\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF004-S03",
@@ -214,10 +233,11 @@
     "scenario_number": 3,
     "title": "Búsqueda de producto por código de barras escaneado",
     "given_when_then": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol\n- Hay un lector de código de barras conectado en modo HID\n\n**When (Cuando):**\n- Escanea el código de barras impreso en el empaque de un producto\n\n**Then (Entonces):**\n- El sistema resuelve el código al SKU interno correspondiente\n- Muestra la ficha del producto con su stock por ubicación y el total consolidado en menos de 2 segundos\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol\n- Hay un lector de código de barras conectado en modo HID",
-    "when": "**When (Cuando):**\n- Escanea el código de barras impreso en el empaque de un producto",
-    "then": "**Then (Entonces):**\n- El sistema resuelve el código al SKU interno correspondiente\n- Muestra la ficha del producto con su stock por ubicación y el total consolidado en menos de 2 segundos\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF004-S04",
@@ -225,10 +245,11 @@
     "scenario_number": 4,
     "title": "Búsqueda de producto por código de barras ingresado manualmente",
     "given_when_then": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol\n- No hay un lector de código de barras disponible\n\n**When (Cuando):**\n- Escribe manualmente el código de barras en el campo de búsqueda\n\n**Then (Entonces):**\n- El sistema resuelve el código al SKU interno correspondiente\n- Muestra la misma ficha y resultado que si hubiera sido escaneado\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol\n- No hay un lector de código de barras disponible",
-    "when": "**When (Cuando):**\n- Escribe manualmente el código de barras en el campo de búsqueda",
-    "then": "**Then (Entonces):**\n- El sistema resuelve el código al SKU interno correspondiente\n- Muestra la misma ficha y resultado que si hubiera sido escaneado\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF004-S05",
@@ -236,10 +257,11 @@
     "scenario_number": 5,
     "title": "Consulta de producto con alerta de cadena de frío",
     "given_when_then": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol\n\n**When (Cuando):**\n- Consulta un producto que tiene activado el indicador de cadena de frío\n\n**Then (Entonces):**\n- El sistema despliega una alerta visual persistente y de alta visibilidad junto a la ficha del producto\n- Recuerda las condiciones especiales de manejo\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol",
-    "when": "**When (Cuando):**\n- Consulta un producto que tiene activado el indicador de cadena de frío",
-    "then": "**Then (Entonces):**\n- El sistema despliega una alerta visual persistente y de alta visibilidad junto a la ficha del producto\n- Recuerda las condiciones especiales de manejo\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF004-S06",
@@ -247,21 +269,155 @@
     "scenario_number": 6,
     "title": "Consulta de producto con alerta de seguridad eléctrica",
     "given_when_then": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol\n\n**When (Cuando):**\n- Consulta un producto de la categoría Electroterapia\n\n**Then (Entonces):**\n- El sistema despliega una advertencia visual sobre los protocolos de manejo seguro aplicables a equipos eléctricos\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol",
-    "when": "**When (Cuando):**\n- Consulta un producto de la categoría Electroterapia",
-    "then": "**Then (Entonces):**\n- El sistema despliega una advertencia visual sobre los protocolos de manejo seguro aplicables a equipos eléctricos\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF004-S07",
     "rf": "RF004",
     "scenario_number": 7,
     "title": "Búsqueda de un producto inexistente en el catálogo",
-    "given_when_then": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol\n\n**When (Cuando):**\n- Realiza una búsqueda por nombre, SKU o código de barras que no corresponde a ningún producto registrado\n\n**Then (Entonces):**\n- El sistema muestra un mensaje claro indicando que no se encontraron resultados para ese criterio de búsqueda\n- No genera ningún error ni interrupción en la interfaz",
-    "given": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol",
-    "when": "**When (Cuando):**\n- Realiza una búsqueda por nombre, SKU o código de barras que no corresponde a ningún producto registrado",
-    "then": "**Then (Entonces):**\n- El sistema muestra un mensaje claro indicando que no se encontraron resultados para ese criterio de búsqueda\n- No genera ningún error ni interrupción en la interfaz",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "given_when_then": "**Given (Dado que):**\n- El usuario está autenticado con cualquier rol\n\n**When (Cuando):**\n- Realiza una búsqueda por nombre, SKU o código de barras que no corresponde a ningún producto registrado\n\n**Then (Entonces):**\n- El sistema muestra un mensaje claro indicando que no se encontraron resultados para ese criterio de búsqueda\n- No genera ningún error ni interrupción en la interfaz\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S08",
+    "rf": "RF004",
+    "scenario_number": 8,
+    "title": "Crear tipo de almacenamiento y asignarlo a una ubicación",
+    "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol Almacenista\n\n**When (Cuando):**\n- Crea un StorageType con code=bodega-grande, name=Bodega Grande y category=warehouse\n- Crea una Location indicando el storage_type_id del paso anterior\n\n**Then (Entonces):**\n- Ambas peticiones retornan HTTP 201\n- La ubicación expone storage_type_code=bodega-grande en su respuesta\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S09",
+    "rf": "RF004",
+    "scenario_number": 9,
+    "title": "Tipo de almacenamiento inactivo rechazado al crear ubicación",
+    "given_when_then": "**Given (Dado que):**\n- Existe un StorageType que fue desactivado por el Almacenista (is_active=False)\n\n**When (Cuando):**\n- El Almacenista intenta crear una ubicación asignando ese storage_type_id\n\n**Then (Entonces):**\n- El sistema retorna HTTP 400 o 422\n- El mensaje de error indica que el tipo de almacenamiento está inactivo y no puede asignarse\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S10",
+    "rf": "RF004",
+    "scenario_number": 10,
+    "title": "Plantilla de almacenamiento aplica defaults al crear ubicación",
+    "given_when_then": "**Given (Dado que):**\n- Existe una StorageTemplate activa con defaults: max_capacity=40, capacity_mode=relative_scale, capacity_level=2\n\n**When (Cuando):**\n- El Almacenista crea una ubicación indicando únicamente el storage_template_id\n\n**Then (Entonces):**\n- El sistema retorna HTTP 201\n- La ubicación hereda max_capacity=40, capacity_mode=relative_scale y capacity_level=2 desde la plantilla\n- El storage_type de la plantilla queda asignado a la ubicación si la plantilla lo tenía configurado\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S11",
+    "rf": "RF004",
+    "scenario_number": 11,
+    "title": "Transición a estado mantenimiento bloquea despacho desde esa ubicación",
+    "given_when_then": "**Given (Dado que):**\n- Existe una ubicación activa con stock disponible de un producto\n\n**When (Cuando):**\n- El Almacenista transiciona la ubicación al estado maintenance via el endpoint de transiciones de estado\n- Luego se intenta registrar un despacho de stock desde esa ubicación\n\n**Then (Entonces):**\n- La transición retorna HTTP 200 con operational_status=maintenance e is_active=true\n- El despacho retorna HTTP 422 con código de error LOCATION_STATE_NOT_ALLOWED\n- El stock de la ubicación no se modifica\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S12",
+    "rf": "RF004",
+    "scenario_number": 12,
+    "title": "Archivar una ubicación fuerza is_active=False",
+    "given_when_then": "**Given (Dado que):**\n- Existe una ubicación activa\n\n**When (Cuando):**\n- El Almacenista transiciona la ubicación al estado archived\n\n**Then (Entonces):**\n- El sistema retorna HTTP 200\n- La respuesta muestra operational_status=archived e is_active=false\n- La ubicación no aparece en listados de ubicaciones activas\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S13",
+    "rf": "RF004",
+    "scenario_number": 13,
+    "title": "Ubicación archivada rechaza entradas de stock",
+    "given_when_then": "**Given (Dado que):**\n- Existe una ubicación con estado archived\n\n**When (Cuando):**\n- Se intenta registrar una entrada de mercancía hacia esa ubicación\n\n**Then (Entonces):**\n- El sistema retorna HTTP 422 con código LOCATION_STATE_NOT_ALLOWED\n- El stock de la ubicación no cambia\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S14",
+    "rf": "RF004",
+    "scenario_number": 14,
+    "title": "Ubicación restringida bloquea despacho pero permite entrada",
+    "given_when_then": "**Given (Dado que):**\n- Existe una ubicación con estado restricted y con stock disponible de un producto\n\n**When (Cuando):**\n- Se intenta registrar un despacho de stock desde esa ubicación (debe fallar)\n- Se intenta registrar una entrada de stock hacia esa ubicación (debe funcionar)\n\n**Then (Entonces):**\n- El despacho retorna HTTP 422 con código LOCATION_STATE_NOT_ALLOWED\n- La entrada retorna HTTP 201 y el stock de la ubicación incrementa correctamente\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S15",
+    "rf": "RF004",
+    "scenario_number": 15,
+    "title": "Capacidad relativa se guarda y se expone en la ubicación y en reportes",
+    "given_when_then": "**Given (Dado que):**\n- El Almacenista va a configurar una ubicación con escala relativa de capacidad\n\n**When (Cuando):**\n- Crea la ubicación con capacity_mode=relative_scale, capacity_level=3 y capacity_score=30\n\n**Then (Entonces):**\n- El sistema retorna HTTP 201 con esos campos en la respuesta\n- El endpoint GET /api/v1/reports/warehouse-utilization/ incluye esa ubicación con capacity_level=3 en by_location\n- La capacidad relativa es informativa y no bloquea movimientos\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S16",
+    "rf": "RF004",
+    "scenario_number": 16,
+    "title": "Filtro de inventario por storage_type_id muestra solo productos de ese tipo",
+    "given_when_then": "**Given (Dado que):**\n- Existen dos tipos de almacenamiento (Tipo A y Tipo B) con ubicaciones y stock de productos distintos en cada uno\n\n**When (Cuando):**\n- Se consulta GET /api/v1/inventory/?storage_type_id=<id_tipo_A>\n\n**Then (Entonces):**\n- Solo aparecen productos que tienen stock en ubicaciones del Tipo A\n- Productos exclusivos del Tipo B no aparecen en la respuesta\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S17",
+    "rf": "RF004",
+    "scenario_number": 17,
+    "title": "Filtro de inventario por estado operativo muestra solo ubicaciones en ese estado",
+    "given_when_then": "**Given (Dado que):**\n- Una ubicación con estado active y una con estado maintenance, ambas con stock del mismo producto\n\n**When (Cuando):**\n- Se consulta GET /api/v1/inventory/?operational_status=maintenance\n\n**Then (Entonces):**\n- Solo aparece el producto con stock en la ubicación en mantenimiento\n- La ubicación activa no influye en los resultados\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF004-S18",
+    "rf": "RF004",
+    "scenario_number": 18,
+    "title": "Reporte de utilización agrupa ubicaciones por tipo de almacenamiento",
+    "given_when_then": "**Given (Dado que):**\n- Existen dos ubicaciones asignadas al mismo StorageType, cada una con stock registrado\n\n**When (Cuando):**\n- Se consulta GET /api/v1/reports/warehouse-utilization/\n\n**Then (Entonces):**\n- La sección by_storage_type contiene un bucket para ese tipo con locations=2 y occupied_units igual a la suma del stock de ambas ubicaciones\n- La sección by_operational_status contiene un bucket correspondiente al estado operativo de esas ubicaciones",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF005-S01",
@@ -269,10 +425,11 @@
     "scenario_number": 1,
     "title": "Recepción exitosa de producto estándar sin discrepancia",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto existe en el catálogo\n- La hora actual está dentro de la franja horaria permitida\n\n**When (Cuando):**\n- Inicia un registro de entrada\n- Selecciona el producto por escaneo de código de barras o búsqueda por nombre\n- Ingresa la cantidad recibida igual a la cantidad facturada\n- Selecciona la ubicación de destino (Vitrina, Bodega 1 o Bodega 2)\n- Confirma la entrada\n\n**Then (Entonces):**\n- El sistema incrementa el stock del producto en la ubicación seleccionada\n- Recalcula el stock total consolidado\n- Genera un movimiento de entrada inmutable con UserID, timestamp, ubicación de destino, cantidad, stock previo y stock resultante\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto existe en el catálogo\n- La hora actual está dentro de la franja horaria permitida",
-    "when": "**When (Cuando):**\n- Inicia un registro de entrada\n- Selecciona el producto por escaneo de código de barras o búsqueda por nombre\n- Ingresa la cantidad recibida igual a la cantidad facturada\n- Selecciona la ubicación de destino (Vitrina, Bodega 1 o Bodega 2)\n- Confirma la entrada",
-    "then": "**Then (Entonces):**\n- El sistema incrementa el stock del producto en la ubicación seleccionada\n- Recalcula el stock total consolidado\n- Genera un movimiento de entrada inmutable con UserID, timestamp, ubicación de destino, cantidad, stock previo y stock resultante\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF005-S02",
@@ -280,10 +437,11 @@
     "scenario_number": 2,
     "title": "Recepción con discrepancia entre cantidad recibida y facturada",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto existe en el catálogo\n\n**When (Cuando):**\n- Ingresa una cantidad recibida diferente a la cantidad facturada o esperada\n- Intenta confirmar la entrada sin registrar una nota de discrepancia\n\n**Then (Entonces):**\n- El sistema bloquea la confirmación\n- Muestra un mensaje indicando que es obligatorio registrar una nota que explique la diferencia\n- No genera ningún movimiento hasta que la nota sea completada\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto existe en el catálogo",
-    "when": "**When (Cuando):**\n- Ingresa una cantidad recibida diferente a la cantidad facturada o esperada\n- Intenta confirmar la entrada sin registrar una nota de discrepancia",
-    "then": "**Then (Entonces):**\n- El sistema bloquea la confirmación\n- Muestra un mensaje indicando que es obligatorio registrar una nota que explique la diferencia\n- No genera ningún movimiento hasta que la nota sea completada\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF005-S03",
@@ -291,10 +449,11 @@
     "scenario_number": 3,
     "title": "Recepción exitosa con discrepancia documentada",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- La cantidad recibida difiere de la facturada\n\n**When (Cuando):**\n- Registra la nota de discrepancia obligatoria\n- Confirma la entrada\n\n**Then (Entonces):**\n- El sistema acepta la operación\n- Genera el movimiento de entrada vinculando la nota de discrepancia al registro\n- El movimiento queda inmutable con todos los atributos de trazabilidad\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- La cantidad recibida difiere de la facturada",
-    "when": "**When (Cuando):**\n- Registra la nota de discrepancia obligatoria\n- Confirma la entrada",
-    "then": "**Then (Entonces):**\n- El sistema acepta la operación\n- Genera el movimiento de entrada vinculando la nota de discrepancia al registro\n- El movimiento queda inmutable con todos los atributos de trazabilidad\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF005-S04",
@@ -302,10 +461,11 @@
     "scenario_number": 4,
     "title": "Recepción de producto de categoría Electroterapia sin número de serie",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto seleccionado pertenece a la categoría \"Electroterapia\"\n\n**When (Cuando):**\n- Completa el formulario de entrada dejando vacío el campo \"Número de Serie\"\n- Intenta confirmar la entrada\n\n**Then (Entonces):**\n- El sistema bloquea la confirmación\n- Muestra un mensaje indicando que el número de serie es obligatorio para productos de Electroterapia\n- No genera ningún movimiento ni actualización de stock\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto seleccionado pertenece a la categoría \"Electroterapia\"",
-    "when": "**When (Cuando):**\n- Completa el formulario de entrada dejando vacío el campo \"Número de Serie\"\n- Intenta confirmar la entrada",
-    "then": "**Then (Entonces):**\n- El sistema bloquea la confirmación\n- Muestra un mensaje indicando que el número de serie es obligatorio para productos de Electroterapia\n- No genera ningún movimiento ni actualización de stock\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF005-S05",
@@ -313,10 +473,11 @@
     "scenario_number": 5,
     "title": "Recepción exitosa de producto de Electroterapia con número de serie",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto pertenece a la categoría \"Electroterapia\"\n\n**When (Cuando):**\n- Ingresa el número de serie de cada unidad recibida\n- Completa los demás campos obligatorios y confirma la entrada\n\n**Then (Entonces):**\n- El sistema registra cada unidad vinculada a su número de serie individual\n- Actualiza el stock en la ubicación de destino seleccionada\n- Genera el movimiento con trazabilidad completa incluyendo los seriales\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto pertenece a la categoría \"Electroterapia\"",
-    "when": "**When (Cuando):**\n- Ingresa el número de serie de cada unidad recibida\n- Completa los demás campos obligatorios y confirma la entrada",
-    "then": "**Then (Entonces):**\n- El sistema registra cada unidad vinculada a su número de serie individual\n- Actualiza el stock en la ubicación de destino seleccionada\n- Genera el movimiento con trazabilidad completa incluyendo los seriales\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF005-S06",
@@ -324,10 +485,11 @@
     "scenario_number": 6,
     "title": "Identificación del producto por código de barras escaneado durante recepción",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- Hay un lector de código de barras conectado en modo HID\n\n**When (Cuando):**\n- Escanea el código de barras del producto a recepcionar\n\n**Then (Entonces):**\n- El sistema resuelve el código al SKU interno\n- Autocompleta el formulario con el nombre, categoría y demás atributos del producto\n- El operario solo debe completar cantidad, ubicación y los campos variables de esa entrada\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- Hay un lector de código de barras conectado en modo HID",
-    "when": "**When (Cuando):**\n- Escanea el código de barras del producto a recepcionar",
-    "then": "**Then (Entonces):**\n- El sistema resuelve el código al SKU interno\n- Autocompleta el formulario con el nombre, categoría y demás atributos del producto\n- El operario solo debe completar cantidad, ubicación y los campos variables de esa entrada\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF005-S07",
@@ -335,10 +497,11 @@
     "scenario_number": 7,
     "title": "Recepción cuando el lector de código de barras no está disponible",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El lector de código de barras no está conectado o no es reconocido\n\n**When (Cuando):**\n- El sistema detecta la ausencia del lector\n\n**Then (Entonces):**\n- Muestra una notificación visible informando que el lector no está disponible\n- Permite continuar el flujo de recepción mediante búsqueda por nombre, ingreso manual del código de barras o ingreso directo del SKU\n- No interrumpe ni bloquea el proceso de entrada bajo ninguna circunstancia",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El lector de código de barras no está conectado o no es reconocido",
-    "when": "**When (Cuando):**\n- El sistema detecta la ausencia del lector",
-    "then": "**Then (Entonces):**\n- Muestra una notificación visible informando que el lector no está disponible\n- Permite continuar el flujo de recepción mediante búsqueda por nombre, ingreso manual del código de barras o ingreso directo del SKU\n- No interrumpe ni bloquea el proceso de entrada bajo ninguna circunstancia",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF006-S01",
@@ -346,21 +509,23 @@
     "scenario_number": 1,
     "title": "Despacho exitoso de venta al por mayor con validación cruzada",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- Existe una orden de despacho con uno o más productos\n- El stock disponible en la ubicación de origen es suficiente\n\n**When (Cuando):**\n- Selecciona el tipo de salida \"Venta al por Mayor\"\n- Registra los datos completos del cliente receptor (nombre o razón social, correo, teléfono, dirección)\n- Escanea o ingresa el código del producto a despachar\n- El código coincide con el SKU de la orden\n- Confirma el despacho\n\n**Then (Entonces):**\n- El sistema descuenta el stock del producto en la ubicación de origen\n- Recalcula el stock total consolidado\n- Genera un movimiento de salida inmutable con UserID, timestamp, tipo de salida, cliente, SKU, cantidad, ubicación de origen, stock previo y stock resultante\n- Genera automáticamente una factura digital en PDF con numeración secuencial que incluye todos los datos del despacho\n- La factura queda almacenada de forma persistente en el historial\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- Existe una orden de despacho con uno o más productos\n- El stock disponible en la ubicación de origen es suficiente",
-    "when": "**When (Cuando):**\n- Selecciona el tipo de salida \"Venta al por Mayor\"\n- Registra los datos completos del cliente receptor (nombre o razón social, correo, teléfono, dirección)\n- Escanea o ingresa el código del producto a despachar\n- El código coincide con el SKU de la orden\n- Confirma el despacho",
-    "then": "**Then (Entonces):**\n- El sistema descuenta el stock del producto en la ubicación de origen\n- Recalcula el stock total consolidado\n- Genera un movimiento de salida inmutable con UserID, timestamp, tipo de salida, cliente, SKU, cantidad, ubicación de origen, stock previo y stock resultante\n- Genera automáticamente una factura digital en PDF con numeración secuencial que incluye todos los datos del despacho\n- La factura queda almacenada de forma persistente en el historial\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF006-S02",
     "rf": "RF006",
     "scenario_number": 2,
     "title": "Validación cruzada falla por código escaneado incorrecto",
-    "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- Existe una orden de despacho para el SKU \"CAN-001\"\n\n**When (Cuando):**\n- Escanea físicamente un producto cuyo código corresponde a un SKU diferente\n\n**Then (Entonces):**\n- El sistema bloquea la confirmación del despacho\n- Muestra un mensaje de error descriptivo indicando que el producto escaneado no corresponde al producto de la orden\n- No genera ningún movimiento ni descuento de stock\n- No genera factura hasta que la validación sea superada\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- Existe una orden de despacho para el SKU \"CAN-001\"",
-    "when": "**When (Cuando):**\n- Escanea físicamente un producto cuyo código corresponde a un SKU diferente",
-    "then": "**Then (Entonces):**\n- El sistema bloquea la confirmación del despacho\n- Muestra un mensaje de error descriptivo indicando que el producto escaneado no corresponde al producto de la orden\n- No genera ningún movimiento ni descuento de stock\n- No genera factura hasta que la validación sea superada\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- Existe una orden de despacho para el SKU \"ELEC-0001\"\n\n**When (Cuando):**\n- Escanea físicamente un producto cuyo código corresponde a un SKU diferente\n\n**Then (Entonces):**\n- El sistema bloquea la confirmación del despacho\n- Muestra un mensaje de error descriptivo indicando que el producto escaneado no corresponde al producto de la orden\n- No genera ningún movimiento ni descuento de stock\n- No genera factura hasta que la validación sea superada\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF006-S03",
@@ -368,10 +533,11 @@
     "scenario_number": 3,
     "title": "Despacho de venta al por menor sin registro obligatorio de cliente",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n\n**When (Cuando):**\n- Selecciona el tipo de salida \"Venta al por Menor\"\n- Completa el formulario sin registrar datos del cliente\n- La validación cruzada del producto es exitosa\n- Confirma el despacho\n\n**Then (Entonces):**\n- El sistema acepta la operación sin exigir datos del cliente\n- Genera el movimiento de salida con trazabilidad completa\n- Genera la factura o remisión digital en PDF\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Selecciona el tipo de salida \"Venta al por Menor\"\n- Completa el formulario sin registrar datos del cliente\n- La validación cruzada del producto es exitosa\n- Confirma el despacho",
-    "then": "**Then (Entonces):**\n- El sistema acepta la operación sin exigir datos del cliente\n- Genera el movimiento de salida con trazabilidad completa\n- Genera la factura o remisión digital en PDF\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF006-S04",
@@ -379,10 +545,11 @@
     "scenario_number": 4,
     "title": "Registro de baja por daño",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n\n**When (Cuando):**\n- Selecciona el tipo de salida \"Daño\"\n- Ingresa el número de unidades afectadas\n- Registra una nota descriptiva del daño detectado\n- Confirma la operación\n\n**Then (Entonces):**\n- El sistema descuenta las unidades del stock en la ubicación correspondiente\n- Registra el movimiento como \"baja por daño\", no como venta\n- La nota descriptiva queda vinculada de forma inmutable al movimiento\n- Genera el documento de remisión en PDF reflejando el tipo de baja\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Selecciona el tipo de salida \"Daño\"\n- Ingresa el número de unidades afectadas\n- Registra una nota descriptiva del daño detectado\n- Confirma la operación",
-    "then": "**Then (Entonces):**\n- El sistema descuenta las unidades del stock en la ubicación correspondiente\n- Registra el movimiento como \"baja por daño\", no como venta\n- La nota descriptiva queda vinculada de forma inmutable al movimiento\n- Genera el documento de remisión en PDF reflejando el tipo de baja\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF006-S05",
@@ -390,10 +557,11 @@
     "scenario_number": 5,
     "title": "Registro de baja por vencimiento",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- Existen productos con alertas de vencimiento activas\n\n**When (Cuando):**\n- Selecciona el tipo de salida \"Vencimiento\"\n- Selecciona el producto y el lote afectado\n- Confirma la operación\n\n**Then (Entonces):**\n- El sistema descuenta las unidades del stock en la ubicación correspondiente\n- Registra el movimiento como \"baja por vencimiento\"\n- Vincula la fecha de vencimiento del lote al registro del movimiento\n- El movimiento queda inmutable con trazabilidad completa\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- Existen productos con alertas de vencimiento activas",
-    "when": "**When (Cuando):**\n- Selecciona el tipo de salida \"Vencimiento\"\n- Selecciona el producto y el lote afectado\n- Confirma la operación",
-    "then": "**Then (Entonces):**\n- El sistema descuenta las unidades del stock en la ubicación correspondiente\n- Registra el movimiento como \"baja por vencimiento\"\n- Vincula la fecha de vencimiento del lote al registro del movimiento\n- El movimiento queda inmutable con trazabilidad completa\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF006-S06",
@@ -401,10 +569,11 @@
     "scenario_number": 6,
     "title": "Advertencia por peso total del despacho excede capacidad del vehículo",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El tipo de salida es \"Venta al por Mayor\"\n- El sistema tiene configurada la capacidad máxima del vehículo de transporte\n\n**When (Cuando):**\n- El peso total calculado de todos los ítems del despacho supera la capacidad máxima configurada\n\n**Then (Entonces):**\n- El sistema emite una advertencia visible al operario indicando que la carga excede la capacidad del vehículo\n- Permite al operario revisar y ajustar el despacho\n- No bloquea la operación de forma definitiva, ya que la decisión final corresponde al operario responsable\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El tipo de salida es \"Venta al por Mayor\"\n- El sistema tiene configurada la capacidad máxima del vehículo de transporte",
-    "when": "**When (Cuando):**\n- El peso total calculado de todos los ítems del despacho supera la capacidad máxima configurada",
-    "then": "**Then (Entonces):**\n- El sistema emite una advertencia visible al operario indicando que la carga excede la capacidad del vehículo\n- Permite al operario revisar y ajustar el despacho\n- No bloquea la operación de forma definitiva, ya que la decisión final corresponde al operario responsable\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF006-S07",
@@ -412,10 +581,11 @@
     "scenario_number": 7,
     "title": "Despacho cuando el lector de código de barras no está disponible",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El lector de código de barras no está conectado o no es reconocido\n\n**When (Cuando):**\n- El sistema detecta la ausencia del lector\n\n**Then (Entonces):**\n- Muestra una notificación visible pero no interrumpe el flujo de despacho\n- Permite al operario identificar el producto ingresando manualmente el código de barras, el SKU, el código serial o buscando por nombre\n- La validación cruzada se ejecuta igualmente usando el valor ingresado",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El lector de código de barras no está conectado o no es reconocido",
-    "when": "**When (Cuando):**\n- El sistema detecta la ausencia del lector",
-    "then": "**Then (Entonces):**\n- Muestra una notificación visible pero no interrumpe el flujo de despacho\n- Permite al operario identificar el producto ingresando manualmente el código de barras, el SKU, el código serial o buscando por nombre\n- La validación cruzada se ejecuta igualmente usando el valor ingresado",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF007-S01",
@@ -423,10 +593,11 @@
     "scenario_number": 1,
     "title": "Traslado exitoso de producto entre ubicaciones con stock suficiente",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto existe en el catálogo\n- La ubicación de origen tiene stock suficiente para cubrir la cantidad a trasladar\n\n**When (Cuando):**\n- Selecciona el producto a trasladar\n- Indica la cantidad, la ubicación de origen y la ubicación de destino\n- Confirma el traslado\n\n**Then (Entonces):**\n- El sistema resta la cantidad indicada del stock en la ubicación de origen\n- Suma esa misma cantidad al stock en la ubicación de destino\n- El stock total global del producto permanece sin cambios\n- Genera un movimiento inmutable con UserID, timestamp, producto, cantidad, ubicación de origen, ubicación de destino, stock previo y stock resultante por ubicación\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto existe en el catálogo\n- La ubicación de origen tiene stock suficiente para cubrir la cantidad a trasladar",
-    "when": "**When (Cuando):**\n- Selecciona el producto a trasladar\n- Indica la cantidad, la ubicación de origen y la ubicación de destino\n- Confirma el traslado",
-    "then": "**Then (Entonces):**\n- El sistema resta la cantidad indicada del stock en la ubicación de origen\n- Suma esa misma cantidad al stock en la ubicación de destino\n- El stock total global del producto permanece sin cambios\n- Genera un movimiento inmutable con UserID, timestamp, producto, cantidad, ubicación de origen, ubicación de destino, stock previo y stock resultante por ubicación\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF007-S02",
@@ -434,10 +605,11 @@
     "scenario_number": 2,
     "title": "Intento de traslado con stock insuficiente en la ubicación de origen",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto tiene 3 unidades disponibles en Bodega 1\n\n**When (Cuando):**\n- Intenta registrar un traslado de 5 unidades desde Bodega 1 hacia cualquier otra ubicación\n\n**Then (Entonces):**\n- El sistema bloquea la operación\n- Muestra un mensaje indicando que el stock disponible en la ubicación de origen es insuficiente\n- No genera ningún movimiento ni modifica el stock en ninguna ubicación\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto tiene 3 unidades disponibles en Bodega 1",
-    "when": "**When (Cuando):**\n- Intenta registrar un traslado de 5 unidades desde Bodega 1 hacia cualquier otra ubicación",
-    "then": "**Then (Entonces):**\n- El sistema bloquea la operación\n- Muestra un mensaje indicando que el stock disponible en la ubicación de origen es insuficiente\n- No genera ningún movimiento ni modifica el stock en ninguna ubicación\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF007-S03",
@@ -445,10 +617,11 @@
     "scenario_number": 3,
     "title": "Intento de traslado hacia la misma ubicación de origen",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n\n**When (Cuando):**\n- Selecciona la misma ubicación como origen y como destino del traslado\n\n**Then (Entonces):**\n- El sistema rechaza la operación\n- Muestra un mensaje indicando que el origen y el destino no pueden ser la misma ubicación\n- No genera ningún movimiento\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Selecciona la misma ubicación como origen y como destino del traslado",
-    "then": "**Then (Entonces):**\n- El sistema rechaza la operación\n- Muestra un mensaje indicando que el origen y el destino no pueden ser la misma ubicación\n- No genera ningún movimiento\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF007-S04",
@@ -456,10 +629,11 @@
     "scenario_number": 4,
     "title": "Auxiliar corrige un traslado dentro de la misma franja horaria activa",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\"\n- Registró un traslado durante la franja horaria activa actual\n- La franja horaria aún no ha cerrado\n\n**When (Cuando):**\n- Detecta un error en el registro y accede a la opción de edición\n- Corrige los datos incorrectos y confirma los cambios\n\n**Then (Entonces):**\n- El sistema permite la corrección\n- Actualiza el registro reflejando los valores corregidos\n- Deja constancia en el log de auditoría de que el registro fue editado, indicando el UserID del auxiliar y el timestamp de la corrección\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\"\n- Registró un traslado durante la franja horaria activa actual\n- La franja horaria aún no ha cerrado",
-    "when": "**When (Cuando):**\n- Detecta un error en el registro y accede a la opción de edición\n- Corrige los datos incorrectos y confirma los cambios",
-    "then": "**Then (Entonces):**\n- El sistema permite la corrección\n- Actualiza el registro reflejando los valores corregidos\n- Deja constancia en el log de auditoría de que el registro fue editado, indicando el UserID del auxiliar y el timestamp de la corrección\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF007-S05",
@@ -467,10 +641,11 @@
     "scenario_number": 5,
     "title": "Auxiliar intenta corregir un traslado después de cerrada la franja horaria",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\"\n- Registró un traslado durante una franja horaria que ya cerró\n\n**When (Cuando):**\n- Intenta acceder a la opción de edición de ese registro\n\n**Then (Entonces):**\n- El sistema bloquea la edición\n- Muestra un mensaje indicando que la ventana de corrección ha cerrado y que cualquier ajuste debe ser solicitado al Almacenista\n- El registro original permanece inmutable",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\"\n- Registró un traslado durante una franja horaria que ya cerró",
-    "when": "**When (Cuando):**\n- Intenta acceder a la opción de edición de ese registro",
-    "then": "**Then (Entonces):**\n- El sistema bloquea la edición\n- Muestra un mensaje indicando que la ventana de corrección ha cerrado y que cualquier ajuste debe ser solicitado al Almacenista\n- El registro original permanece inmutable",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF008-S01",
@@ -478,10 +653,11 @@
     "scenario_number": 1,
     "title": "Registro exitoso de devolución de producto de Electroterapia",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto a devolver pertenece a la categoría \"Electroterapia\" o \"Electrónicos\"\n\n**When (Cuando):**\n- Inicia el registro de devolución\n- Selecciona el producto por SKU o número de serie\n- Registra el motivo declarado por el cliente\n- Registra el estado físico del producto al momento de recibirlo\n- Confirma la devolución\n\n**Then (Entonces):**\n- El sistema genera un log inmutable de la devolución con SKU, número de serie, motivo, estado del producto, UserID del operario y timestamp exacto\n- El producto queda en estado \"Pendiente de revisión\" sin ser reincorporado al stock disponible todavía\n- El Almacenista recibe una notificación de que hay una devolución pendiente de aprobación\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto a devolver pertenece a la categoría \"Electroterapia\" o \"Electrónicos\"",
-    "when": "**When (Cuando):**\n- Inicia el registro de devolución\n- Selecciona el producto por SKU o número de serie\n- Registra el motivo declarado por el cliente\n- Registra el estado físico del producto al momento de recibirlo\n- Confirma la devolución",
-    "then": "**Then (Entonces):**\n- El sistema genera un log inmutable de la devolución con SKU, número de serie, motivo, estado del producto, UserID del operario y timestamp exacto\n- El producto queda en estado \"Pendiente de revisión\" sin ser reincorporado al stock disponible todavía\n- El Almacenista recibe una notificación de que hay una devolución pendiente de aprobación\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF008-S02",
@@ -489,10 +665,11 @@
     "scenario_number": 2,
     "title": "Intento de devolución de producto que no es Electroterapia ni Electrónico",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto seleccionado pertenece a la categoría \"Manoterapia\" o \"Mesas de Fisioterapia\"\n\n**When (Cuando):**\n- Intenta iniciar el registro de una devolución para ese producto\n\n**Then (Entonces):**\n- El sistema bloquea la operación de forma inmediata\n- Muestra un mensaje descriptivo indicando que ese tipo de producto no admite devoluciones según la política de ICM\n- No genera ningún registro ni modifica el stock\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\" o \"Almacenista\"\n- El producto seleccionado pertenece a la categoría \"Manoterapia\" o \"Mesas de Fisioterapia\"",
-    "when": "**When (Cuando):**\n- Intenta iniciar el registro de una devolución para ese producto",
-    "then": "**Then (Entonces):**\n- El sistema bloquea la operación de forma inmediata\n- Muestra un mensaje descriptivo indicando que ese tipo de producto no admite devoluciones según la política de ICM\n- No genera ningún registro ni modifica el stock\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF008-S03",
@@ -500,10 +677,11 @@
     "scenario_number": 3,
     "title": "Almacenista aprueba la reincorporación al stock de un producto devuelto",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Existe una devolución en estado \"Pendiente de revisión\"\n\n**When (Cuando):**\n- Accede al listado de devoluciones pendientes\n- Revisa el log de la devolución incluyendo motivo y estado del producto\n- Aprueba la reincorporación al stock\n- Selecciona la ubicación de destino donde se reincorporará el producto\n\n**Then (Entonces):**\n- El sistema incrementa el stock del producto en la ubicación seleccionada\n- Actualiza el estado de la devolución a \"Reincorporado\"\n- Registra la aprobación en el log con el UserID del Almacenista y timestamp\n- El movimiento de reincorporación queda vinculado al log original de la devolución\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Existe una devolución en estado \"Pendiente de revisión\"",
-    "when": "**When (Cuando):**\n- Accede al listado de devoluciones pendientes\n- Revisa el log de la devolución incluyendo motivo y estado del producto\n- Aprueba la reincorporación al stock\n- Selecciona la ubicación de destino donde se reincorporará el producto",
-    "then": "**Then (Entonces):**\n- El sistema incrementa el stock del producto en la ubicación seleccionada\n- Actualiza el estado de la devolución a \"Reincorporado\"\n- Registra la aprobación en el log con el UserID del Almacenista y timestamp\n- El movimiento de reincorporación queda vinculado al log original de la devolución\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF008-S04",
@@ -511,10 +689,11 @@
     "scenario_number": 4,
     "title": "Almacenista rechaza la reincorporación de un producto devuelto",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Existe una devolución en estado \"Pendiente de revisión\"\n\n**When (Cuando):**\n- Revisa el log de la devolución\n- Determina que el producto no está en condiciones de ser reincorporado\n- Rechaza la reincorporación registrando el motivo del rechazo\n\n**Then (Entonces):**\n- El sistema actualiza el estado de la devolución a \"Rechazada\"\n- No modifica el stock disponible en ninguna ubicación\n- El motivo del rechazo queda vinculado al log original de la devolución\n- El registro completo permanece inmutable para efectos de auditoría\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Existe una devolución en estado \"Pendiente de revisión\"",
-    "when": "**When (Cuando):**\n- Revisa el log de la devolución\n- Determina que el producto no está en condiciones de ser reincorporado\n- Rechaza la reincorporación registrando el motivo del rechazo",
-    "then": "**Then (Entonces):**\n- El sistema actualiza el estado de la devolución a \"Rechazada\"\n- No modifica el stock disponible en ninguna ubicación\n- El motivo del rechazo queda vinculado al log original de la devolución\n- El registro completo permanece inmutable para efectos de auditoría\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF008-S05",
@@ -522,10 +701,11 @@
     "scenario_number": 5,
     "title": "Consulta del historial de devoluciones por el Almacenista",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Accede al historial de devoluciones\n\n**Then (Entonces):**\n- El sistema muestra todas las devoluciones registradas con su estado actual (Pendiente, Reincorporado o Rechazada)\n- Permite filtrar por producto, período, operario o estado\n- Cada registro del historial es de solo lectura e inmutable",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Accede al historial de devoluciones",
-    "then": "**Then (Entonces):**\n- El sistema muestra todas las devoluciones registradas con su estado actual (Pendiente, Reincorporado o Rechazada)\n- Permite filtrar por producto, período, operario o estado\n- Cada registro del historial es de solo lectura e inmutable",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF009-S01",
@@ -533,10 +713,11 @@
     "scenario_number": 1,
     "title": "Almacenista registra un ajuste de inventario con justificación",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Existe una discrepancia entre el stock físico real y el stock registrado en el sistema\n\n**When (Cuando):**\n- Accede al módulo de ajustes de inventario\n- Selecciona el producto y la ubicación donde ocurre la discrepancia\n- Ingresa el nuevo valor de stock correcto\n- Registra una justificación obligatoria explicando la causa de la discrepancia\n- Confirma el ajuste\n\n**Then (Entonces):**\n- El sistema actualiza el stock del producto en la ubicación indicada\n- Genera un log inmutable del ajuste con UserID del Almacenista, timestamp, producto, ubicación, stock previo, stock ajustado, delta de la diferencia y justificación registrada\n- Recalcula el stock total consolidado del producto\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Existe una discrepancia entre el stock físico real y el stock registrado en el sistema",
-    "when": "**When (Cuando):**\n- Accede al módulo de ajustes de inventario\n- Selecciona el producto y la ubicación donde ocurre la discrepancia\n- Ingresa el nuevo valor de stock correcto\n- Registra una justificación obligatoria explicando la causa de la discrepancia\n- Confirma el ajuste",
-    "then": "**Then (Entonces):**\n- El sistema actualiza el stock del producto en la ubicación indicada\n- Genera un log inmutable del ajuste con UserID del Almacenista, timestamp, producto, ubicación, stock previo, stock ajustado, delta de la diferencia y justificación registrada\n- Recalcula el stock total consolidado del producto\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF009-S02",
@@ -544,10 +725,11 @@
     "scenario_number": 2,
     "title": "Intento de registrar un ajuste sin justificación",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Completa el formulario de ajuste dejando vacío el campo de justificación\n- Intenta confirmar el ajuste\n\n**Then (Entonces):**\n- El sistema bloquea la operación\n- Muestra un mensaje indicando que la justificación es un campo obligatorio\n- No modifica el stock ni genera ningún registro\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Completa el formulario de ajuste dejando vacío el campo de justificación\n- Intenta confirmar el ajuste",
-    "then": "**Then (Entonces):**\n- El sistema bloquea la operación\n- Muestra un mensaje indicando que la justificación es un campo obligatorio\n- No modifica el stock ni genera ningún registro\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF009-S03",
@@ -555,10 +737,11 @@
     "scenario_number": 3,
     "title": "Auxiliar de Despacho intenta ejecutar un ajuste formal",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\"\n\n**When (Cuando):**\n- Intenta acceder al módulo de ajustes de inventario\n\n**Then (Entonces):**\n- El sistema bloquea el acceso\n- Muestra un mensaje indicando que esta funcionalidad está reservada exclusivamente para el Almacenista\n- No genera ningún cambio en el sistema\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\"",
-    "when": "**When (Cuando):**\n- Intenta acceder al módulo de ajustes de inventario",
-    "then": "**Then (Entonces):**\n- El sistema bloquea el acceso\n- Muestra un mensaje indicando que esta funcionalidad está reservada exclusivamente para el Almacenista\n- No genera ningún cambio en el sistema\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF009-S04",
@@ -566,10 +749,11 @@
     "scenario_number": 4,
     "title": "Corrección de un ajuste registrado incorrectamente",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Existe un ajuste previo registrado con valores incorrectos\n\n**When (Cuando):**\n- Determina que el ajuste anterior fue erróneo\n- Registra un nuevo ajuste con los valores correctos\n- Proporciona una justificación que referencia el ajuste anterior\n- Confirma el nuevo ajuste\n\n**Then (Entonces):**\n- El sistema registra el nuevo ajuste como un movimiento independiente\n- El ajuste anterior permanece inmutable en el historial\n- Ambos registros quedan vinculados en el log de auditoría\n- El stock refleja el valor correcto según el ajuste más reciente\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Existe un ajuste previo registrado con valores incorrectos",
-    "when": "**When (Cuando):**\n- Determina que el ajuste anterior fue erróneo\n- Registra un nuevo ajuste con los valores correctos\n- Proporciona una justificación que referencia el ajuste anterior\n- Confirma el nuevo ajuste",
-    "then": "**Then (Entonces):**\n- El sistema registra el nuevo ajuste como un movimiento independiente\n- El ajuste anterior permanece inmutable en el historial\n- Ambos registros quedan vinculados en el log de auditoría\n- El stock refleja el valor correcto según el ajuste más reciente\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF009-S05",
@@ -577,10 +761,11 @@
     "scenario_number": 5,
     "title": "Auxiliar corrige su propio movimiento dentro de la franja horaria activa",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\"\n- Registró un movimiento durante la franja horaria activa actual\n- La franja horaria aún no ha cerrado\n\n**When (Cuando):**\n- Detecta el error y accede a la opción de edición del movimiento\n- Corrige los valores incorrectos y confirma el cambio\n\n**Then (Entonces):**\n- El sistema permite la corrección sin requerir intervención del Almacenista\n- Registra en el log de auditoría que el movimiento fue editado con el UserID del auxiliar y el timestamp de la corrección\n- El movimiento corregido refleja los valores actualizados\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\"\n- Registró un movimiento durante la franja horaria activa actual\n- La franja horaria aún no ha cerrado",
-    "when": "**When (Cuando):**\n- Detecta el error y accede a la opción de edición del movimiento\n- Corrige los valores incorrectos y confirma el cambio",
-    "then": "**Then (Entonces):**\n- El sistema permite la corrección sin requerir intervención del Almacenista\n- Registra en el log de auditoría que el movimiento fue editado con el UserID del auxiliar y el timestamp de la corrección\n- El movimiento corregido refleja los valores actualizados\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF009-S06",
@@ -588,10 +773,11 @@
     "scenario_number": 6,
     "title": "Consulta del historial completo de ajustes por el Almacenista",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Accede al historial de ajustes de inventario\n\n**Then (Entonces):**\n- El sistema muestra todos los ajustes registrados en orden cronológico\n- Para cada ajuste despliega el producto, ubicación, stock previo, stock ajustado, delta, justificación, UserID y timestamp\n- Permite filtrar por producto, período o usuario responsable\n- Todos los registros son de solo lectura e inmutables",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Accede al historial de ajustes de inventario",
-    "then": "**Then (Entonces):**\n- El sistema muestra todos los ajustes registrados en orden cronológico\n- Para cada ajuste despliega el producto, ubicación, stock previo, stock ajustado, delta, justificación, UserID y timestamp\n- Permite filtrar por producto, período o usuario responsable\n- Todos los registros son de solo lectura e inmutables",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF010-S01",
@@ -599,21 +785,23 @@
     "scenario_number": 1,
     "title": "Almacenista consulta el reporte de ventas por período",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Accede al módulo de reportes\n- Selecciona el tipo \"Reporte de ventas\"\n- Define un rango de fechas (diario, semanal, mensual o rango personalizado)\n- Aplica el filtro\n\n**Then (Entonces):**\n- El sistema muestra un reporte consolidado de todas las salidas clasificadas como venta dentro del período seleccionado\n- Desglosa los resultados por tipo de salida (Venta al por Mayor, Venta al por Menor)\n- El reporte es de solo lectura y no permite modificaciones\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Accede al módulo de reportes\n- Selecciona el tipo \"Reporte de ventas\"\n- Define un rango de fechas (diario, semanal, mensual o rango personalizado)\n- Aplica el filtro",
-    "then": "**Then (Entonces):**\n- El sistema muestra un reporte consolidado de todas las salidas clasificadas como venta dentro del período seleccionado\n- Desglosa los resultados por tipo de salida (Venta al por Mayor, Venta al por Menor)\n- El reporte es de solo lectura y no permite modificaciones\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF010-S02",
     "rf": "RF010",
     "scenario_number": 2,
-    "title": "Administrador consulta el dashboard de KPIs operativos",
-    "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Administrador/Jefe\"\n\n**When (Cuando):**\n- Accede al dashboard gerencial\n\n**Then (Entonces):**\n- El sistema presenta de forma visual e interactiva los siguientes indicadores:\n  - Índice de rotación de inventario por categoría con gráficos de tendencia\n  - Porcentaje de ocupación por zona de almacenamiento\n  - Nivel de servicio expresado como porcentaje de pedidos despachados completos y a tiempo\n  - Panel de alertas operativas activas (vencimientos, stock mínimo y pedidos pendientes)\n- Ninguno de estos indicadores permite edición desde esta vista\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Administrador/Jefe\"",
-    "when": "**When (Cuando):**\n- Accede al dashboard gerencial",
-    "then": "**Then (Entonces):**\n- El sistema presenta de forma visual e interactiva los siguientes indicadores:\n  - Índice de rotación de inventario por categoría con gráficos de tendencia\n  - Porcentaje de ocupación por zona de almacenamiento\n  - Nivel de servicio expresado como porcentaje de pedidos despachados completos y a tiempo\n  - Panel de alertas operativas activas (vencimientos, stock mínimo y pedidos pendientes)\n- Ninguno de estos indicadores permite edición desde esta vista\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "title": "Almacenista consulta el dashboard de KPIs operativos",
+    "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Accede al dashboard gerencial\n\n**Then (Entonces):**\n- El sistema presenta de forma visual e interactiva los siguientes indicadores:\n  - Índice de rotación de inventario por categoría con gráficos de tendencia\n  - Porcentaje de ocupación por zona de almacenamiento\n  - Nivel de servicio expresado como porcentaje de pedidos despachados completos y a tiempo\n  - Panel de alertas operativas activas (vencimientos, stock mínimo y pedidos pendientes)\n- Ninguno de estos indicadores permite edición desde esta vista\n\n### Scenario 2.1: Almacenista consulta el dashboard operacional por contratos composables\n\n**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Accede a `overview` o a uno de los contratos parciales del dashboard\n\n**Then (Entonces):**\n- El sistema permite consultar métricas, alertas, KPIs y movimientos recientes por separado\n- El contrato `overview` agrega estos bloques sin mezclar lógica de negocio ni exportación\n- El dashboard actúa como read model operacional orientado a UI ejecutiva\n- Las métricas parciales o futuras se presentan con su nivel real de precisión\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF010-S03",
@@ -621,10 +809,11 @@
     "scenario_number": 3,
     "title": "Exportación de reporte en formato Excel o CSV",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\" o \"Administrador/Jefe\"\n- Ha generado un reporte con los filtros deseados\n\n**When (Cuando):**\n- Selecciona la opción de exportar y elige el formato (Excel o CSV)\n\n**Then (Entonces):**\n- El sistema genera el archivo con los datos del reporte en el formato seleccionado\n- Lo pone a disposición del usuario para su descarga inmediata\n- El archivo exportado contiene exactamente los mismos datos visibles en pantalla\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\" o \"Administrador/Jefe\"\n- Ha generado un reporte con los filtros deseados",
-    "when": "**When (Cuando):**\n- Selecciona la opción de exportar y elige el formato (Excel o CSV)",
-    "then": "**Then (Entonces):**\n- El sistema genera el archivo con los datos del reporte en el formato seleccionado\n- Lo pone a disposición del usuario para su descarga inmediata\n- El archivo exportado contiene exactamente los mismos datos visibles en pantalla\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF010-S04",
@@ -632,10 +821,11 @@
     "scenario_number": 4,
     "title": "Consulta del historial de movimientos por operario",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Accede al reporte de historial de movimientos\n- Filtra por un operario específico y un período de tiempo\n\n**Then (Entonces):**\n- El sistema muestra todos los movimientos registrados por ese operario en el período\n- Para cada movimiento despliega tipo de transacción, producto, cantidad, ubicación, timestamp y stock resultante\n- Permite exportar ese historial en Excel o CSV\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Accede al reporte de historial de movimientos\n- Filtra por un operario específico y un período de tiempo",
-    "then": "**Then (Entonces):**\n- El sistema muestra todos los movimientos registrados por ese operario en el período\n- Para cada movimiento despliega tipo de transacción, producto, cantidad, ubicación, timestamp y stock resultante\n- Permite exportar ese historial en Excel o CSV\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF010-S05",
@@ -643,10 +833,11 @@
     "scenario_number": 5,
     "title": "Consulta del reporte de productos próximos a vencer",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\" o \"Administrador/Jefe\"\n\n**When (Cuando):**\n- Accede al reporte de vencimientos\n\n**Then (Entonces):**\n- El sistema lista todos los productos con fecha de vencimiento dentro de los próximos 60 días\n- Los organiza por urgencia, mostrando primero los que vencen más pronto\n- Para cada producto indica SKU, nombre, lote, fecha de vencimiento, stock disponible y ubicación\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\" o \"Administrador/Jefe\"",
-    "when": "**When (Cuando):**\n- Accede al reporte de vencimientos",
-    "then": "**Then (Entonces):**\n- El sistema lista todos los productos con fecha de vencimiento dentro de los próximos 60 días\n- Los organiza por urgencia, mostrando primero los que vencen más pronto\n- Para cada producto indica SKU, nombre, lote, fecha de vencimiento, stock disponible y ubicación\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF010-S06",
@@ -654,10 +845,11 @@
     "scenario_number": 6,
     "title": "Consulta y descarga de factura individual desde el historial",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\" o \"Administrador/Jefe\"\n\n**When (Cuando):**\n- Accede al historial de facturas y remisiones\n- Filtra por período, tipo de salida o cliente\n- Selecciona una factura específica del listado\n\n**Then (Entonces):**\n- El sistema muestra los detalles completos de esa factura\n- Permite su descarga individual en formato PDF\n- El documento descargado es idéntico al generado en el momento del despacho\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\" o \"Administrador/Jefe\"",
-    "when": "**When (Cuando):**\n- Accede al historial de facturas y remisiones\n- Filtra por período, tipo de salida o cliente\n- Selecciona una factura específica del listado",
-    "then": "**Then (Entonces):**\n- El sistema muestra los detalles completos de esa factura\n- Permite su descarga individual en formato PDF\n- El documento descargado es idéntico al generado en el momento del despacho\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF010-S07",
@@ -665,10 +857,11 @@
     "scenario_number": 7,
     "title": "Usuario sin permisos intenta acceder al módulo de reportes",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\"\n\n**When (Cuando):**\n- Intenta acceder al módulo de reportes o al dashboard gerencial\n\n**Then (Entonces):**\n- El sistema bloquea el acceso\n- Muestra un mensaje indicando que no tiene permisos para visualizar esta sección\n- No expone ningún dato operativo ni indicador",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\"",
-    "when": "**When (Cuando):**\n- Intenta acceder al módulo de reportes o al dashboard gerencial",
-    "then": "**Then (Entonces):**\n- El sistema bloquea el acceso\n- Muestra un mensaje indicando que no tiene permisos para visualizar esta sección\n- No expone ningún dato operativo ni indicador",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF011-S01",
@@ -676,10 +869,11 @@
     "scenario_number": 1,
     "title": "Alerta de stock mínimo cuando el inventario cae bajo el punto de reorden",
     "given_when_then": "**Given (Dado que):**\n- Un producto tiene configurado un punto de reorden de 10 unidades\n- El stock total del producto era de 12 unidades\n\n**When (Cuando):**\n- Se confirma un despacho que deja el stock total en 8 unidades\n\n**Then (Entonces):**\n- El sistema emite de forma automática una alerta de stock mínimo visible en el dashboard del Almacenista y del Administrador\n- La alerta indica el SKU, nombre del producto, stock actual y punto de reorden\n- La alerta permanece activa hasta que el stock supere nuevamente el umbral\n- El evento de activación queda registrado en el log con timestamp\n\n---",
-    "given": "**Given (Dado que):**\n- Un producto tiene configurado un punto de reorden de 10 unidades\n- El stock total del producto era de 12 unidades",
-    "when": "**When (Cuando):**\n- Se confirma un despacho que deja el stock total en 8 unidades",
-    "then": "**Then (Entonces):**\n- El sistema emite de forma automática una alerta de stock mínimo visible en el dashboard del Almacenista y del Administrador\n- La alerta indica el SKU, nombre del producto, stock actual y punto de reorden\n- La alerta permanece activa hasta que el stock supere nuevamente el umbral\n- El evento de activación queda registrado en el log con timestamp\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF011-S02",
@@ -687,10 +881,11 @@
     "scenario_number": 2,
     "title": "Alerta de vencimiento próximo a 60 días",
     "given_when_then": "**Given (Dado que):**\n- Existe un lote de producto registrado con fecha de vencimiento\n\n**When (Cuando):**\n- Faltan exactamente 60 días calendario para esa fecha de vencimiento\n\n**Then (Entonces):**\n- El sistema emite automáticamente una alerta de vencimiento visible en el dashboard y en el módulo de inventario\n- La alerta indica SKU, nombre del producto, número de lote, fecha de vencimiento y stock disponible del lote afectado\n- La alerta queda registrada en el log de auditoría con timestamp\n\n---",
-    "given": "**Given (Dado que):**\n- Existe un lote de producto registrado con fecha de vencimiento",
-    "when": "**When (Cuando):**\n- Faltan exactamente 60 días calendario para esa fecha de vencimiento",
-    "then": "**Then (Entonces):**\n- El sistema emite automáticamente una alerta de vencimiento visible en el dashboard y en el módulo de inventario\n- La alerta indica SKU, nombre del producto, número de lote, fecha de vencimiento y stock disponible del lote afectado\n- La alerta queda registrada en el log de auditoría con timestamp\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF011-S03",
@@ -698,10 +893,11 @@
     "scenario_number": 3,
     "title": "Alerta de vencimiento próximo a 30 días",
     "given_when_then": "**Given (Dado que):**\n- Existe una alerta de vencimiento activa a 60 días\n- Han transcurrido 30 días desde su activación\n\n**When (Cuando):**\n- El sistema detecta que ahora faltan 30 días para el vencimiento\n\n**Then (Entonces):**\n- El sistema escala la alerta existente a un nivel de urgencia mayor\n- La alerta actualizada es visualmente diferenciada de la alerta a 60 días\n- El escalamiento queda registrado en el log de auditoría\n\n---",
-    "given": "**Given (Dado que):**\n- Existe una alerta de vencimiento activa a 60 días\n- Han transcurrido 30 días desde su activación",
-    "when": "**When (Cuando):**\n- El sistema detecta que ahora faltan 30 días para el vencimiento",
-    "then": "**Then (Entonces):**\n- El sistema escala la alerta existente a un nivel de urgencia mayor\n- La alerta actualizada es visualmente diferenciada de la alerta a 60 días\n- El escalamiento queda registrado en el log de auditoría\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF011-S04",
@@ -709,10 +905,11 @@
     "scenario_number": 4,
     "title": "Alerta de cadena de frío al registrar movimiento de producto refrigerado",
     "given_when_then": "**Given (Dado que):**\n- Un producto tiene activado el indicador de cadena de frío\n\n**When (Cuando):**\n- Cualquier usuario registra un movimiento que involucra ese producto\n\n**Then (Entonces):**\n- El sistema despliega de forma inmediata una alerta visual persistente y de alta visibilidad en la pantalla activa del usuario\n- El usuario debe reconocer la alerta antes de poder confirmar el movimiento\n- El reconocimiento queda registrado en el log con UserID y timestamp\n\n---",
-    "given": "**Given (Dado que):**\n- Un producto tiene activado el indicador de cadena de frío",
-    "when": "**When (Cuando):**\n- Cualquier usuario registra un movimiento que involucra ese producto",
-    "then": "**Then (Entonces):**\n- El sistema despliega de forma inmediata una alerta visual persistente y de alta visibilidad en la pantalla activa del usuario\n- El usuario debe reconocer la alerta antes de poder confirmar el movimiento\n- El reconocimiento queda registrado en el log con UserID y timestamp\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF011-S05",
@@ -720,10 +917,11 @@
     "scenario_number": 5,
     "title": "Alerta de seguridad eléctrica al registrar movimiento de equipo eléctrico",
     "given_when_then": "**Given (Dado que):**\n- Un producto pertenece a la categoría \"Electroterapia\"\n\n**When (Cuando):**\n- Cualquier usuario registra un movimiento que involucra ese producto\n\n**Then (Entonces):**\n- El sistema despliega una advertencia visual sobre los protocolos de manejo seguro\n- La advertencia es visualmente distinguible de la alerta de cadena de frío\n- El usuario debe reconocer la advertencia antes de confirmar el movimiento\n- El reconocimiento queda registrado en el log con UserID y timestamp\n\n---",
-    "given": "**Given (Dado que):**\n- Un producto pertenece a la categoría \"Electroterapia\"",
-    "when": "**When (Cuando):**\n- Cualquier usuario registra un movimiento que involucra ese producto",
-    "then": "**Then (Entonces):**\n- El sistema despliega una advertencia visual sobre los protocolos de manejo seguro\n- La advertencia es visualmente distinguible de la alerta de cadena de frío\n- El usuario debe reconocer la advertencia antes de confirmar el movimiento\n- El reconocimiento queda registrado en el log con UserID y timestamp\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF011-S06",
@@ -731,10 +929,11 @@
     "scenario_number": 6,
     "title": "Panel de alertas activas en el dashboard",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\" o \"Administrador/Jefe\"\n\n**When (Cuando):**\n- Accede al dashboard principal\n\n**Then (Entonces):**\n- El sistema presenta un panel consolidado con todas las alertas operativas activas, organizadas por tipo y urgencia\n- Cada alerta en el panel es navegable hacia el producto o movimiento que la originó\n- Las alertas a 30 días aparecen por encima de las alertas a 60 días en el panel\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\" o \"Administrador/Jefe\"",
-    "when": "**When (Cuando):**\n- Accede al dashboard principal",
-    "then": "**Then (Entonces):**\n- El sistema presenta un panel consolidado con todas las alertas operativas activas, organizadas por tipo y urgencia\n- Cada alerta en el panel es navegable hacia el producto o movimiento que la originó\n- Las alertas a 30 días aparecen por encima de las alertas a 60 días en el panel\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF011-S07",
@@ -742,10 +941,11 @@
     "scenario_number": 7,
     "title": "Resolución automática de una alerta de stock mínimo",
     "given_when_then": "**Given (Dado que):**\n- Existe una alerta de stock mínimo activa para un producto\n\n**When (Cuando):**\n- Se confirma una entrada de mercancía que eleva el stock total del producto por encima del punto de reorden\n\n**Then (Entonces):**\n- El sistema desactiva automáticamente la alerta de stock mínimo\n- La elimina del panel de alertas activas\n- Deja constancia en el log de auditoría de que la alerta fue resuelta, con el timestamp de resolución y el movimiento de entrada que la originó",
-    "given": "**Given (Dado que):**\n- Existe una alerta de stock mínimo activa para un producto",
-    "when": "**When (Cuando):**\n- Se confirma una entrada de mercancía que eleva el stock total del producto por encima del punto de reorden",
-    "then": "**Then (Entonces):**\n- El sistema desactiva automáticamente la alerta de stock mínimo\n- La elimina del panel de alertas activas\n- Deja constancia en el log de auditoría de que la alerta fue resuelta, con el timestamp de resolución y el movimiento de entrada que la originó",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF012-S01",
@@ -753,10 +953,11 @@
     "scenario_number": 1,
     "title": "El sistema genera automáticamente un registro de auditoría al confirmar cualquier movimiento de inventario",
     "given_when_then": "**Given (Dado que):**\n- Cualquier usuario autenticado confirma una operación que afecta el stock\n\n**When (Cuando):**\n- El sistema procesa y confirma la operación\n\n**Then (Entonces):**\n- El sistema genera de forma automática e inmediata un registro en el log que contiene:\n  - Identificador único del movimiento\n  - Timestamp con fecha y hora exacta\n  - UserID del operario responsable\n  - Tipo de transacción\n  - SKU del producto involucrado\n  - Código serial cuando aplique\n  - Ubicación de origen y destino\n  - Cantidad operada\n  - Stock previo y stock resultante\n  - Nota o justificación cuando la operación lo requiera\n- Ese registro queda inmutable desde el momento de su creación\n\n---",
-    "given": "**Given (Dado que):**\n- Cualquier usuario autenticado confirma una operación que afecta el stock",
-    "when": "**When (Cuando):**\n- El sistema procesa y confirma la operación",
-    "then": "**Then (Entonces):**\n- El sistema genera de forma automática e inmediata un registro en el log que contiene:\n  - Identificador único del movimiento\n  - Timestamp con fecha y hora exacta\n  - UserID del operario responsable\n  - Tipo de transacción\n  - SKU del producto involucrado\n  - Código serial cuando aplique\n  - Ubicación de origen y destino\n  - Cantidad operada\n  - Stock previo y stock resultante\n  - Nota o justificación cuando la operación lo requiera\n- Ese registro queda inmutable desde el momento de su creación\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF012-S02",
@@ -764,10 +965,11 @@
     "scenario_number": 2,
     "title": "El sistema registra en el log los eventos de autenticación",
     "given_when_then": "**Given (Dado que):**\n- Cualquier usuario intenta iniciar o cerrar sesión en el sistema\n\n**When (Cuando):**\n- El intento de autenticación ocurre, sea exitoso o fallido\n\n**Then (Entonces):**\n- El sistema registra en el log el evento con timestamp, UserID o nombre de usuario intentado, resultado del intento (éxito o fallo) y dirección del dispositivo desde donde se realizó el intento\n- Ese registro es inmutable y no puede ser eliminado\n\n---",
-    "given": "**Given (Dado que):**\n- Cualquier usuario intenta iniciar o cerrar sesión en el sistema",
-    "when": "**When (Cuando):**\n- El intento de autenticación ocurre, sea exitoso o fallido",
-    "then": "**Then (Entonces):**\n- El sistema registra en el log el evento con timestamp, UserID o nombre de usuario intentado, resultado del intento (éxito o fallo) y dirección del dispositivo desde donde se realizó el intento\n- Ese registro es inmutable y no puede ser eliminado\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF012-S03",
@@ -775,10 +977,11 @@
     "scenario_number": 3,
     "title": "El sistema registra en el log los eventos de gestión de credenciales",
     "given_when_then": "**Given (Dado que):**\n- El Almacenista crea, modifica o deshabilita una cuenta de usuario\n\n**When (Cuando):**\n- Confirma cualquiera de esas acciones\n\n**Then (Entonces):**\n- El sistema registra en el log el evento con timestamp, UserID del Almacenista que ejecutó la acción, tipo de acción realizada (creación, modificación o deshabilitación) y UserID de la cuenta afectada\n- El registro es inmutable desde su creación\n\n---",
-    "given": "**Given (Dado que):**\n- El Almacenista crea, modifica o deshabilita una cuenta de usuario",
-    "when": "**When (Cuando):**\n- Confirma cualquiera de esas acciones",
-    "then": "**Then (Entonces):**\n- El sistema registra en el log el evento con timestamp, UserID del Almacenista que ejecutó la acción, tipo de acción realizada (creación, modificación o deshabilitación) y UserID de la cuenta afectada\n- El registro es inmutable desde su creación\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF012-S04",
@@ -786,10 +989,11 @@
     "scenario_number": 4,
     "title": "El sistema registra el reconocimiento de alertas de cadena de frío y seguridad eléctrica",
     "given_when_then": "**Given (Dado que):**\n- Un usuario reconoce activamente una alerta de cadena de frío o de seguridad eléctrica antes de confirmar un movimiento\n\n**When (Cuando):**\n- Confirma el reconocimiento de la alerta\n\n**Then (Entonces):**\n- El sistema registra en el log ese reconocimiento con UserID, timestamp, tipo de alerta reconocida y SKU del producto involucrado\n- Ese registro queda vinculado al movimiento que originó la alerta\n\n---",
-    "given": "**Given (Dado que):**\n- Un usuario reconoce activamente una alerta de cadena de frío o de seguridad eléctrica antes de confirmar un movimiento",
-    "when": "**When (Cuando):**\n- Confirma el reconocimiento de la alerta",
-    "then": "**Then (Entonces):**\n- El sistema registra en el log ese reconocimiento con UserID, timestamp, tipo de alerta reconocida y SKU del producto involucrado\n- Ese registro queda vinculado al movimiento que originó la alerta\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF012-S05",
@@ -797,10 +1001,11 @@
     "scenario_number": 5,
     "title": "Almacenista consulta el log completo de auditoría con filtros",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n\n**When (Cuando):**\n- Accede al módulo de auditoría\n- Aplica filtros por período, tipo de operación, operario o producto\n\n**Then (Entonces):**\n- El sistema muestra todos los registros que coinciden con los filtros en orden cronológico\n- Cada registro es de solo lectura, sin opción de edición ni eliminación\n- El Almacenista puede exportar el log filtrado en formato Excel o CSV\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"",
-    "when": "**When (Cuando):**\n- Accede al módulo de auditoría\n- Aplica filtros por período, tipo de operación, operario o producto",
-    "then": "**Then (Entonces):**\n- El sistema muestra todos los registros que coinciden con los filtros en orden cronológico\n- Cada registro es de solo lectura, sin opción de edición ni eliminación\n- El Almacenista puede exportar el log filtrado en formato Excel o CSV\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF012-S06",
@@ -808,10 +1013,11 @@
     "scenario_number": 6,
     "title": "Auxiliar de Despacho intenta acceder al log de auditoría",
     "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\"\n\n**When (Cuando):**\n- Intenta acceder al módulo de auditoría por cualquier vía\n\n**Then (Entonces):**\n- El sistema bloquea el acceso de forma inmediata\n- Muestra un mensaje indicando que no tiene permisos para consultar el log\n- No expone ningún registro del historial\n\n---",
-    "given": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Auxiliar de Despacho\"",
-    "when": "**When (Cuando):**\n- Intenta acceder al módulo de auditoría por cualquier vía",
-    "then": "**Then (Entonces):**\n- El sistema bloquea el acceso de forma inmediata\n- Muestra un mensaje indicando que no tiene permisos para consultar el log\n- No expone ningún registro del historial\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF012-S07",
@@ -819,21 +1025,71 @@
     "scenario_number": 7,
     "title": "El log registra tanto el movimiento original como la corrección del Auxiliar",
     "given_when_then": "**Given (Dado que):**\n- Un Auxiliar de Despacho registró un movimiento durante la franja activa\n- Detecta un error y lo corrige antes de que cierre la franja\n\n**When (Cuando):**\n- Confirma la corrección\n\n**Then (Entonces):**\n- El sistema mantiene el registro original en el log con su timestamp de creación\n- Agrega un segundo registro vinculado al primero indicando que fue corregido, con el UserID del auxiliar y el timestamp exacto de la corrección\n- Ambos registros son inmutables e independientes\n\n---",
-    "given": "**Given (Dado que):**\n- Un Auxiliar de Despacho registró un movimiento durante la franja activa\n- Detecta un error y lo corrige antes de que cierre la franja",
-    "when": "**When (Cuando):**\n- Confirma la corrección",
-    "then": "**Then (Entonces):**\n- El sistema mantiene el registro original en el log con su timestamp de creación\n- Agrega un segundo registro vinculado al primero indicando que fue corregido, con el UserID del auxiliar y el timestamp exacto de la corrección\n- Ambos registros son inmutables e independientes\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RF012-S08",
     "rf": "RF012",
     "scenario_number": 8,
     "title": "Intento de eliminación o modificación de un registro del log",
-    "given_when_then": "**Given (Dado que):**\n- Cualquier usuario autenticado, independientemente de su rol, intenta modificar o eliminar un registro existente en el log\n\n**When (Cuando):**\n- Ejecuta esa acción por cualquier vía disponible en la interfaz\n\n**Then (Entonces):**\n- El sistema rechaza la operación de forma absoluta\n- Muestra un mensaje indicando que los registros de auditoría son inmutables\n- Registra en el propio log el intento fallido de modificación con UserID y timestamp\n\n# **6. Requisitos No Funcionales**\n\nLos requisitos no funcionales (RNF) definen los atributos de calidad que el sistema debe cumplir para ser operativamente viable en el contexto real de ICM. A diferencia de los requisitos funcionales, que describen qué hace el sistema, los requisitos no funcionales describen cómo debe hacerlo: con qué velocidad, con qué nivel de seguridad, con qué grado de disponibilidad. Estos requisitos son transversales a todos los módulos y deben ser considerados desde la fase de diseño arquitectónico, no como consideraciones tardías de optimización.",
-    "given": "**Given (Dado que):**\n- Cualquier usuario autenticado, independientemente de su rol, intenta modificar o eliminar un registro existente en el log",
-    "when": "**When (Cuando):**\n- Ejecuta esa acción por cualquier vía disponible en la interfaz",
-    "then": "**Then (Entonces):**\n- El sistema rechaza la operación de forma absoluta\n- Muestra un mensaje indicando que los registros de auditoría son inmutables\n- Registra en el propio log el intento fallido de modificación con UserID y timestamp\n\n# **6. Requisitos No Funcionales**\n\nLos requisitos no funcionales (RNF) definen los atributos de calidad que el sistema debe cumplir para ser operativamente viable en el contexto real de ICM. A diferencia de los requisitos funcionales, que describen qué hace el sistema, los requisitos no funcionales describen cómo debe hacerlo: con qué velocidad, con qué nivel de seguridad, con qué grado de disponibilidad. Estos requisitos son transversales a todos los módulos y deben ser considerados desde la fase de diseño arquitectónico, no como consideraciones tardías de optimización.",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "given_when_then": "**Given (Dado que):**\n- Cualquier usuario autenticado, independientemente de su rol, intenta modificar o eliminar un registro existente en el log\n\n**When (Cuando):**\n- Ejecuta esa acción por cualquier vía disponible en la interfaz\n\n**Then (Entonces):**\n- El sistema rechaza la operación de forma absoluta\n- Muestra un mensaje indicando que los registros de auditoría son inmutables\n- Registra en el propio log el intento fallido de modificación con UserID y timestamp\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF013-S01",
+    "rf": "RF013",
+    "scenario_number": 1,
+    "title": "Despacho captura precio congelado del producto al momento de la salida",
+    "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\" o \"Auxiliar de Despacho\"\n- Existe un producto con sale_price_retail=10000, tax_rate_pct=19.00 y currency=\"COP\"\n- Hay stock suficiente del producto en la ubicación de origen\n\n**When (Cuando):**\n- Registra un despacho de venta al por menor de 3 unidades del producto y confirma la operación\n\n**Then (Entonces):**\n- El sistema crea un Movement con unit_price=10000, subtotal=30000, tax_amount=5700, total_amount=35700 y price_type=\"retail\"\n- El sistema crea un registro Invoice con los mismos totales consolidados\n- El PDF del comprobante incluye precio unitario, IVA y total\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF013-S02",
+    "rf": "RF013",
+    "scenario_number": 2,
+    "title": "Precio en historial permanece inmutable tras modificar el precio actual del producto",
+    "given_when_then": "**Given (Dado que):**\n- Existe un producto con sale_price_retail=10000\n- Se realizó y confirmó un despacho de venta al por menor; el Movement quedó con unit_price=10000\n\n**When (Cuando):**\n- El Almacenista actualiza el precio del producto a sale_price_retail=20000 mediante PATCH /api/v1/catalog/products/<id>/prices/\n\n**Then (Entonces):**\n- El Movement histórico conserva unit_price=10000 sin alteración\n- La factura descargable sigue mostrando el precio original del despacho\n- El nuevo precio 20000 aplica únicamente a despachos futuros\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF013-S03",
+    "rf": "RF013",
+    "scenario_number": 3,
+    "title": "Actualización de precio genera historial auditado con valor anterior y nuevo",
+    "given_when_then": "**Given (Dado que):**\n- El usuario autenticado tiene rol \"Almacenista\"\n- Existe un producto con sale_price_retail=10000\n\n**When (Cuando):**\n- El Almacenista ejecuta PATCH /api/v1/catalog/products/<id>/prices/ con {\"sale_price_retail\": \"12000\"}\n\n**Then (Entonces):**\n- Se crea un registro en ProductPriceHistory con field_changed=\"sale_price_retail\", old_value=10000, new_value=12000 y changed_by igual al almacenista\n- Si el valor enviado es idéntico al actual, no se crea ningún registro de historial\n- GET /api/v1/catalog/products/<id>/prices/ retorna el historial completo del producto\n- Un usuario con rol distinto a almacenista recibe 403 Forbidden al intentar actualizar precios\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF013-S04",
+    "rf": "RF013",
+    "scenario_number": 4,
+    "title": "Factura comercial reconstruible completamente desde el Movement sin consultar el catálogo actual",
+    "given_when_then": "**Given (Dado que):**\n- Se confirmó un despacho de venta al por mayor con datos del cliente: nombre, correo, teléfono y dirección\n- El producto tenía sale_price_wholesale=9000 y tax_rate_pct=19.00\n\n**When (Cuando):**\n- El administrador o almacenista consulta GET /api/v1/movements/invoices/<number>/ o descarga el PDF\n\n**Then (Entonces):**\n- La respuesta incluye datos del cliente, subtotal, IVA, total y moneda con los valores exactos del momento del despacho\n- El PDF contiene la tabla de líneas con precio unitario, descuento, IVA y total\n- Los valores son correctos aunque el precio del producto haya sido modificado después del despacho\n- Los valores son correctos aunque el producto esté actualmente desactivado\n\n---\n\n# **6. Requisitos No Funcionales**\n\nLos requisitos no funcionales (RNF) definen los atributos de calidad que el sistema debe cumplir para ser operativamente viable en el contexto real de ICM. A diferencia de los requisitos funcionales, que describen qué hace el sistema, los requisitos no funcionales describen cómo debe hacerlo: con qué velocidad, con qué nivel de seguridad, con qué grado de disponibilidad. Estos requisitos son transversales a todos los módulos y deben ser considerados desde la fase de diseño arquitectónico, no como consideraciones tardías de optimización.",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RNF001-S01",
@@ -841,10 +1097,11 @@
     "scenario_number": 1,
     "title": "Operario completa un flujo de despacho sin formación técnica previa",
     "given_when_then": "**Given (Dado que):**\n- Un Auxiliar de Despacho accede al sistema por primera vez tras una inducción operativa básica de no más de 30 minutos\n\n**When (Cuando):**\n- Intenta registrar un despacho estándar de principio a fin\n\n**Then (Entonces):**\n- El operario completa el flujo sin necesidad de consultar documentación técnica ni solicitar asistencia\n- El sistema guía al usuario paso a paso dentro del flujo sin ambigüedad sobre cuál es la siguiente acción requerida\n\n---",
-    "given": "**Given (Dado que):**\n- Un Auxiliar de Despacho accede al sistema por primera vez tras una inducción operativa básica de no más de 30 minutos",
-    "when": "**When (Cuando):**\n- Intenta registrar un despacho estándar de principio a fin",
-    "then": "**Then (Entonces):**\n- El operario completa el flujo sin necesidad de consultar documentación técnica ni solicitar asistencia\n- El sistema guía al usuario paso a paso dentro del flujo sin ambigüedad sobre cuál es la siguiente acción requerida\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "describe el flujo visual y la facilidad de uso de la interfaz; no es verificable con pytest backend",
+      "scope": "frontend-or-e2e"
+    }
   },
   {
     "id": "RNF001-S02",
@@ -852,10 +1109,11 @@
     "scenario_number": 2,
     "title": "La interfaz responde correctamente en dispositivos móviles y tabletas",
     "given_when_then": "**Given (Dado que):**\n- Un operario accede al sistema desde una tableta o un teléfono inteligente\n\n**When (Cuando):**\n- Navega por cualquier módulo disponible para su rol\n\n**Then (Entonces):**\n- Todos los elementos de la interfaz se adaptan al tamaño de pantalla del dispositivo sin pérdida de funcionalidad\n- Los botones y campos son suficientemente grandes para ser operados con precisión táctil\n- Ningún elemento crítico queda oculto o inaccesible en resoluciones móviles\n\n---",
-    "given": "**Given (Dado que):**\n- Un operario accede al sistema desde una tableta o un teléfono inteligente",
-    "when": "**When (Cuando):**\n- Navega por cualquier módulo disponible para su rol",
-    "then": "**Then (Entonces):**\n- Todos los elementos de la interfaz se adaptan al tamaño de pantalla del dispositivo sin pérdida de funcionalidad\n- Los botones y campos son suficientemente grandes para ser operados con precisión táctil\n- Ningún elemento crítico queda oculto o inaccesible en resoluciones móviles\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "depende de responsividad y adaptacion visual en dispositivos moviles/tabletas",
+      "scope": "frontend-or-e2e"
+    }
   },
   {
     "id": "RNF001-S03",
@@ -863,10 +1121,11 @@
     "scenario_number": 3,
     "title": "La búsqueda de productos es igualmente eficiente por cualquier vía",
     "given_when_then": "**Given (Dado que):**\n- Un operario necesita localizar un producto durante la atención a un cliente\n\n**When (Cuando):**\n- Busca el producto ya sea por nombre, SKU o código de barras\n\n**Then (Entonces):**\n- El sistema devuelve resultados relevantes en menos de 2 segundos por cualquiera de las tres vías de búsqueda\n- El operario puede identificar y seleccionar el producto correcto sin navegar por más de dos pantallas desde el punto de búsqueda",
-    "given": "**Given (Dado que):**\n- Un operario necesita localizar un producto durante la atención a un cliente",
-    "when": "**When (Cuando):**\n- Busca el producto ya sea por nombre, SKU o código de barras",
-    "then": "**Then (Entonces):**\n- El sistema devuelve resultados relevantes en menos de 2 segundos por cualquiera de las tres vías de búsqueda\n- El operario puede identificar y seleccionar el producto correcto sin navegar por más de dos pantallas desde el punto de búsqueda",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "depende de tiempos percibidos y navegacion de interfaz, no de una respuesta backend aislada",
+      "scope": "frontend-or-e2e"
+    }
   },
   {
     "id": "RNF002-S01",
@@ -874,10 +1133,11 @@
     "scenario_number": 1,
     "title": "El sistema permanece disponible durante las franjas críticas de operación",
     "given_when_then": "**Given (Dado que):**\n- El sistema está desplegado en el entorno de producción\n\n**When (Cuando):**\n- Un Auxiliar de Despacho intenta acceder al sistema dentro de su franja horaria\n\n**Then (Entonces):**\n- El sistema responde y permite el acceso sin interrupciones\n- Cualquier operación iniciada dentro de la franja puede completarse sin que el sistema la interrumpa por inactividad o caída durante esa ventana\n\n---",
-    "given": "**Given (Dado que):**\n- El sistema está desplegado en el entorno de producción",
-    "when": "**When (Cuando):**\n- Un Auxiliar de Despacho intenta acceder al sistema dentro de su franja horaria",
-    "then": "**Then (Entonces):**\n- El sistema responde y permite el acceso sin interrupciones\n- Cualquier operación iniciada dentro de la franja puede completarse sin que el sistema la interrumpa por inactividad o caída durante esa ventana\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "describe continuidad de servicio y disponibilidad en produccion; requiere verificacion de despliegue/infraestructura",
+      "scope": "frontend-or-e2e"
+    }
   },
   {
     "id": "RNF002-S02",
@@ -885,10 +1145,11 @@
     "scenario_number": 2,
     "title": "El Almacenista puede acceder al sistema en cualquier momento del día",
     "given_when_then": "**Given (Dado que):**\n- El sistema está desplegado en producción\n\n**When (Cuando):**\n- El Almacenista intenta acceder al sistema fuera del horario laboral convencional\n\n**Then (Entonces):**\n- El sistema responde y otorga acceso completo sin restricciones horarias\n- Todas las funcionalidades del rol Almacenista están disponibles\n\n---",
-    "given": "**Given (Dado que):**\n- El sistema está desplegado en producción",
-    "when": "**When (Cuando):**\n- El Almacenista intenta acceder al sistema fuera del horario laboral convencional",
-    "then": "**Then (Entonces):**\n- El sistema responde y otorga acceso completo sin restricciones horarias\n- Todas las funcionalidades del rol Almacenista están disponibles\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "depende de disponibilidad 24/7 en produccion y no de un contrato de API aislado",
+      "scope": "frontend-or-e2e"
+    }
   },
   {
     "id": "RNF002-S03",
@@ -896,10 +1157,11 @@
     "scenario_number": 3,
     "title": "El sistema notifica adecuadamente ante una interrupción no planificada",
     "given_when_then": "**Given (Dado que):**\n- Ocurre una interrupción no planificada del sistema\n\n**When (Cuando):**\n- Un usuario intenta acceder durante esa interrupción\n\n**Then (Entonces):**\n- El sistema muestra un mensaje claro indicando que el servicio no está disponible\n- El mensaje no expone detalles técnicos internos del error al usuario final",
-    "given": "**Given (Dado que):**\n- Ocurre una interrupción no planificada del sistema",
-    "when": "**When (Cuando):**\n- Un usuario intenta acceder durante esa interrupción",
-    "then": "**Then (Entonces):**\n- El sistema muestra un mensaje claro indicando que el servicio no está disponible\n- El mensaje no expone detalles técnicos internos del error al usuario final",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "depende del comportamiento de error y mensajeria en capa de presentacion o gateways",
+      "scope": "frontend-or-e2e"
+    }
   },
   {
     "id": "RNF003-S01",
@@ -907,10 +1169,11 @@
     "scenario_number": 1,
     "title": "Los datos sensibles viajan cifrados entre el cliente y el servidor",
     "given_when_then": "**Given (Dado que):**\n- Cualquier usuario realiza una operación en el sistema que implica transmisión de datos\n\n**When (Cuando):**\n- Esa operación genera tráfico de red entre el frontend y el backend\n\n**Then (Entonces):**\n- Toda la comunicación ocurre exclusivamente sobre HTTPS\n- Ningún dato sensible se transmite en texto plano bajo ninguna circunstancia\n\n---",
-    "given": "**Given (Dado que):**\n- Cualquier usuario realiza una operación en el sistema que implica transmisión de datos",
-    "when": "**When (Cuando):**\n- Esa operación genera tráfico de red entre el frontend y el backend",
-    "then": "**Then (Entonces):**\n- Toda la comunicación ocurre exclusivamente sobre HTTPS\n- Ningún dato sensible se transmite en texto plano bajo ninguna circunstancia\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RNF003-S02",
@@ -918,10 +1181,11 @@
     "scenario_number": 2,
     "title": "Un usuario no puede acceder a funcionalidades fuera de su rol",
     "given_when_then": "**Given (Dado que):**\n- Cualquier usuario está autenticado en el sistema\n\n**When (Cuando):**\n- Intenta acceder a una ruta, vista o endpoint que corresponde a un rol distinto al suyo, ya sea manipulando la URL directamente o mediante cualquier otro mecanismo\n\n**Then (Entonces):**\n- El sistema rechaza la solicitud con un error de autorización\n- No expone ningún dato ni funcionalidad del rol restringido\n- El intento queda registrado en el log de auditoría\n\n---",
-    "given": "**Given (Dado que):**\n- Cualquier usuario está autenticado en el sistema",
-    "when": "**When (Cuando):**\n- Intenta acceder a una ruta, vista o endpoint que corresponde a un rol distinto al suyo, ya sea manipulando la URL directamente o mediante cualquier otro mecanismo",
-    "then": "**Then (Entonces):**\n- El sistema rechaza la solicitud con un error de autorización\n- No expone ningún dato ni funcionalidad del rol restringido\n- El intento queda registrado en el log de auditoría\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RNF003-S03",
@@ -929,10 +1193,11 @@
     "scenario_number": 3,
     "title": "Las contraseñas de los usuarios se almacenan de forma segura",
     "given_when_then": "**Given (Dado que):**\n- El Almacenista crea o modifica la contraseña de cualquier usuario\n\n**When (Cuando):**\n- El sistema procesa y almacena esa contraseña\n\n**Then (Entonces):**\n- La contraseña se almacena en la base de datos usando un algoritmo de hashing seguro con sal (por ejemplo bcrypt)\n- En ningún punto del sistema la contraseña es almacenada ni transmitida en texto plano\n\n---",
-    "given": "**Given (Dado que):**\n- El Almacenista crea o modifica la contraseña de cualquier usuario",
-    "when": "**When (Cuando):**\n- El sistema procesa y almacena esa contraseña",
-    "then": "**Then (Entonces):**\n- La contraseña se almacena en la base de datos usando un algoritmo de hashing seguro con sal (por ejemplo bcrypt)\n- En ningún punto del sistema la contraseña es almacenada ni transmitida en texto plano\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RNF003-S04",
@@ -940,10 +1205,11 @@
     "scenario_number": 4,
     "title": "Ningún usuario puede modificar ni eliminar un registro histórico",
     "given_when_then": "**Given (Dado que):**\n- Cualquier usuario autenticado, independientemente de su rol, intenta modificar o eliminar un registro del log o un movimiento ya confirmado\n\n**When (Cuando):**\n- Ejecuta o intenta ejecutar esa acción\n\n**Then (Entonces):**\n- El sistema rechaza la operación de forma absoluta\n- El registro original permanece intacto e inalterado\n- El intento fallido queda registrado en el log con UserID y timestamp",
-    "given": "**Given (Dado que):**\n- Cualquier usuario autenticado, independientemente de su rol, intenta modificar o eliminar un registro del log o un movimiento ya confirmado",
-    "when": "**When (Cuando):**\n- Ejecuta o intenta ejecutar esa acción",
-    "then": "**Then (Entonces):**\n- El sistema rechaza la operación de forma absoluta\n- El registro original permanece intacto e inalterado\n- El intento fallido queda registrado en el log con UserID y timestamp",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RNF004-S01",
@@ -951,10 +1217,11 @@
     "scenario_number": 1,
     "title": "Consulta de stock de un producto responde dentro del umbral definido",
     "given_when_then": "**Given (Dado que):**\n- El sistema está operando bajo condiciones normales de uso\n- El catálogo contiene entre 220 y 250 productos registrados\n\n**When (Cuando):**\n- Cualquier usuario realiza una consulta de stock por nombre, SKU o código de barras\n\n**Then (Entonces):**\n- El sistema devuelve el resultado con el stock por ubicación y el stock total consolidado en un tiempo no mayor a 2 segundos\n\n---",
-    "given": "**Given (Dado que):**\n- El sistema está operando bajo condiciones normales de uso\n- El catálogo contiene entre 220 y 250 productos registrados",
-    "when": "**When (Cuando):**\n- Cualquier usuario realiza una consulta de stock por nombre, SKU o código de barras",
-    "then": "**Then (Entonces):**\n- El sistema devuelve el resultado con el stock por ubicación y el stock total consolidado en un tiempo no mayor a 2 segundos\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RNF004-S02",
@@ -962,10 +1229,11 @@
     "scenario_number": 2,
     "title": "El registro de un movimiento de inventario se confirma dentro de un tiempo razonable",
     "given_when_then": "**Given (Dado que):**\n- Un operario completa y confirma un movimiento de inventario\n\n**When (Cuando):**\n- El sistema procesa la confirmación\n\n**Then (Entonces):**\n- El sistema actualiza el stock, genera el log de auditoría y muestra la confirmación al usuario en un tiempo no mayor a 3 segundos bajo condiciones normales de uso\n\n---",
-    "given": "**Given (Dado que):**\n- Un operario completa y confirma un movimiento de inventario",
-    "when": "**When (Cuando):**\n- El sistema procesa la confirmación",
-    "then": "**Then (Entonces):**\n- El sistema actualiza el stock, genera el log de auditoría y muestra la confirmación al usuario en un tiempo no mayor a 3 segundos bajo condiciones normales de uso\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RNF004-S03",
@@ -973,10 +1241,11 @@
     "scenario_number": 3,
     "title": "El sistema mantiene el rendimiento bajo uso simultáneo de los tres roles",
     "given_when_then": "**Given (Dado que):**\n- El Almacenista, un Auxiliar de Despacho y el Administrador están usando el sistema de forma simultánea\n\n**When (Cuando):**\n- Cada uno ejecuta operaciones propias de su rol al mismo tiempo\n\n**Then (Entonces):**\n- El tiempo de respuesta de cada operación no se degrada más allá de los umbrales definidos para cada tipo de consulta\n- Ningún usuario experimenta bloqueos ni timeouts durante el uso concurrente normal",
-    "given": "**Given (Dado que):**\n- El Almacenista, un Auxiliar de Despacho y el Administrador están usando el sistema de forma simultánea",
-    "when": "**When (Cuando):**\n- Cada uno ejecuta operaciones propias de su rol al mismo tiempo",
-    "then": "**Then (Entonces):**\n- El tiempo de respuesta de cada operación no se degrada más allá de los umbrales definidos para cada tipo de consulta\n- Ningún usuario experimenta bloqueos ni timeouts durante el uso concurrente normal",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RNF005-S01",
@@ -984,10 +1253,11 @@
     "scenario_number": 1,
     "title": "La arquitectura del sistema separa frontend y backend con APIs REST",
     "given_when_then": "**Given (Dado que):**\n- El sistema está implementado y desplegado\n\n**When (Cuando):**\n- Se analiza la estructura del proyecto en el repositorio\n\n**Then (Entonces):**\n- Existe una separación clara entre el proyecto de frontend y el de backend como unidades independientes\n- Toda la comunicación entre frontend y backend ocurre exclusivamente a través de endpoints REST documentados\n- No existe lógica de negocio embebida directamente en el frontend\n\n---",
-    "given": "**Given (Dado que):**\n- El sistema está implementado y desplegado",
-    "when": "**When (Cuando):**\n- Se analiza la estructura del proyecto en el repositorio",
-    "then": "**Then (Entonces):**\n- Existe una separación clara entre el proyecto de frontend y el de backend como unidades independientes\n- Toda la comunicación entre frontend y backend ocurre exclusivamente a través de endpoints REST documentados\n- No existe lógica de negocio embebida directamente en el frontend\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RNF005-S02",
@@ -995,10 +1265,11 @@
     "scenario_number": 2,
     "title": "Los endpoints del backend están documentados con Swagger",
     "given_when_then": "**Given (Dado que):**\n- El sistema está desplegado en el entorno de producción\n\n**When (Cuando):**\n- Se accede a la ruta de documentación Swagger del backend\n\n**Then (Entonces):**\n- Todos los endpoints disponibles están listados y documentados con su método HTTP, parámetros esperados, cuerpo de la solicitud y estructura de la respuesta\n- La documentación refleja el estado actual del backend sin endpoints faltantes ni documentación desactualizada\n\n---",
-    "given": "**Given (Dado que):**\n- El sistema está desplegado en el entorno de producción",
-    "when": "**When (Cuando):**\n- Se accede a la ruta de documentación Swagger del backend",
-    "then": "**Then (Entonces):**\n- Todos los endpoints disponibles están listados y documentados con su método HTTP, parámetros esperados, cuerpo de la solicitud y estructura de la respuesta\n- La documentación refleja el estado actual del backend sin endpoints faltantes ni documentación desactualizada\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RNF005-S03",
@@ -1006,10 +1277,11 @@
     "scenario_number": 3,
     "title": "El código cumple con los principios SOLID verificables",
     "given_when_then": "**Given (Dado que):**\n- El equipo de Arquitectura de Software I realiza la evaluación formal del Corte 3\n\n**When (Cuando):**\n- Analiza la estructura de clases, servicios y módulos del backend\n\n**Then (Entonces):**\n- Cada clase o componente tiene una única responsabilidad claramente definida (SRP)\n- Es posible extender el comportamiento del sistema sin modificar clases existentes (OCP)\n- El sistema no presenta dependencias directas entre módulos de alto y bajo nivel (DIP)\n- El informe de evaluación no identifica violaciones críticas no justificadas a ninguno de los cinco principios SOLID",
-    "given": "**Given (Dado que):**\n- El equipo de Arquitectura de Software I realiza la evaluación formal del Corte 3",
-    "when": "**When (Cuando):**\n- Analiza la estructura de clases, servicios y módulos del backend",
-    "then": "**Then (Entonces):**\n- Cada clase o componente tiene una única responsabilidad claramente definida (SRP)\n- Es posible extender el comportamiento del sistema sin modificar clases existentes (OCP)\n- El sistema no presenta dependencias directas entre módulos de alto y bajo nivel (DIP)\n- El informe de evaluación no identifica violaciones críticas no justificadas a ninguno de los cinco principios SOLID",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RNF006-S01",
@@ -1017,10 +1289,11 @@
     "scenario_number": 1,
     "title": "El sistema captura datos personales de clientes mayoristas con aviso de privacidad",
     "given_when_then": "**Given (Dado que):**\n- Un operario registra los datos de un cliente mayorista durante un despacho\n\n**When (Cuando):**\n- Completa el formulario con nombre, correo, teléfono y dirección\n\n**Then (Entonces):**\n- El sistema informa al operario, antes de guardar los datos, que esa información será tratada conforme a la política de privacidad de ICM bajo la Ley 1581 de 2012\n- No almacena los datos del cliente sin que ese aviso haya sido presentado en el flujo\n\n---",
-    "given": "**Given (Dado que):**\n- Un operario registra los datos de un cliente mayorista durante un despacho",
-    "when": "**When (Cuando):**\n- Completa el formulario con nombre, correo, teléfono y dirección",
-    "then": "**Then (Entonces):**\n- El sistema informa al operario, antes de guardar los datos, que esa información será tratada conforme a la política de privacidad de ICM bajo la Ley 1581 de 2012\n- No almacena los datos del cliente sin que ese aviso haya sido presentado en el flujo\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RNF006-S02",
@@ -1028,20 +1301,358 @@
     "scenario_number": 2,
     "title": "Los datos personales de clientes no son accesibles para el Auxiliar de Despacho fuera del contexto de su operación",
     "given_when_then": "**Given (Dado que):**\n- El sistema tiene almacenados datos personales de clientes mayoristas\n\n**When (Cuando):**\n- Un Auxiliar de Despacho intenta consultar el historial de clientes fuera del contexto de un despacho activo\n\n**Then (Entonces):**\n- El sistema no expone listados de datos personales de clientes a ese rol\n- El acceso a esa información está restringido al Almacenista y al Administrador dentro del módulo de reportes\n\n---",
-    "given": "**Given (Dado que):**\n- El sistema tiene almacenados datos personales de clientes mayoristas",
-    "when": "**When (Cuando):**\n- Un Auxiliar de Despacho intenta consultar el historial de clientes fuera del contexto de un despacho activo",
-    "then": "**Then (Entonces):**\n- El sistema no expone listados de datos personales de clientes a ese rol\n- El acceso a esa información está restringido al Almacenista y al Administrador dentro del módulo de reportes\n\n---",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   },
   {
     "id": "RNF006-S03",
     "rf": "RNF006",
     "scenario_number": 3,
     "title": "El equipo documenta la autorización de ICM antes de usar datos reales en pruebas",
-    "given_when_then": "**Given (Dado que):**\n- El equipo de desarrollo va a ejecutar pruebas de aceptación usando datos operativos reales de ICM en el Corte 3\n\n**When (Cuando):**\n- Se planifica la fase de pruebas de aceptación\n\n**Then (Entonces):**\n- El equipo debe contar con un documento de autorización expresa firmado por ICM que permita el uso de sus datos operativos en el contexto académico del proyecto\n- Las pruebas con datos reales no deben ejecutarse hasta que esa autorización esté formalmente obtenida\n\n# **7. Resumen de Trazabilidad Requisitos — Módulos**\n\nLa siguiente tabla presenta un resumen de todos los requisitos especificados en este documento, con su módulo de pertenencia y las reglas de negocio que les aplican directamente. Esta tabla constituye el punto de partida para la Matriz de Trazabilidad Requisitos-Pruebas que debe ser elaborada por la asignatura de Pruebas de Software como entregable del Corte 1.\n\n| **ID** | **Nombre** | **Módulo** | **Reglas de Negocio** |\n| --- | --- | --- | --- |\n| RF-001 | Inicio de Sesión con Credenciales Únicas | Autenticación | BR-01, BR-03 |\n| RF-002 | Gestión de Credenciales de Usuario | Autenticación | BR-01, BR-02 |\n| RF-003 | Registro de Producto en el Catálogo (SKU) | Gestión de Inventario | BR-04, BR-11, BR-12, BR-13 |\n| RF-004 | Consulta y Búsqueda de Inventario en Tiempo Real | Gestión de Inventario | BR-11, BR-13 |\n| RF-005 | Recepción de Mercancía | Recepción de Mercancía | BR-04, BR-09, BR-10, BR-11, BR-13 |\n| RF-006 | Despacho y Salidas de Inventario | Despacho y Salidas | BR-08, BR-10, BR-11, BR-13 |\n| RF-007 | Movimientos Internos entre Ubicaciones | Movimientos Internos | BR-06, BR-10, BR-11 |\n| RF-008 | Registro de Devoluciones de Productos | Devoluciones | BR-02, BR-05, BR-10 |\n| RF-009 | Ajustes de Inventario | Ajustes de Inventario | BR-06, BR-07, BR-10, BR-11 |\n| RF-010 | Reportes e Indicadores Operativos | Reportes e Indicadores | BR-10, BR-11, BR-13 |\n| RF-011 | Alertas Proactivas del Sistema | Alertas Proactivas | BR-04, BR-10, BR-11 |\n| RF-012 | Log de Auditoría y Trazabilidad | Auditoría y Trazabilidad | BR-01, BR-06, BR-07, BR-10 |\n| RNF-001 | Usabilidad e Interfaz Intuitiva | Transversal | — |\n| RNF-002 | Disponibilidad del Sistema | Transversal | BR-03 |\n| RNF-003 | Seguridad e Integridad de Datos | Transversal | BR-01, BR-02, BR-10 |\n| RNF-004 | Rendimiento en Consultas y Operaciones | Transversal | — |\n| RNF-005 | Mantenibilidad y Estándares Técnicos | Transversal | — |\n| RNF-006 | Cumplimiento Legal: Ley 1581 de 2012 | Transversal | — |\n\n# **8. Conclusiones**\n\nEl presente documento centraliza la especificación completa de dieciocho requisitos —doce funcionales y seis no funcionales— para el sistema de gestión de inventario y operaciones de Import Corporal Medical. Cada requisito ha sido elaborado a partir de la información recogida durante el proceso de elicitación con los responsables operativos de ICM y alineado con las condiciones académicas del Proyecto Nuclear 3.\n\nLos requisitos funcionales cubren la totalidad de los módulos identificados en la elicitación: autenticación y gestión de credenciales, gestión de inventario, recepción de mercancía, despacho y salidas, movimientos internos, devoluciones, ajustes de inventario, reportes e indicadores, alertas proactivas y auditoría. Los requisitos no funcionales complementan esta especificación con atributos de calidad medibles en usabilidad, disponibilidad, seguridad, rendimiento, mantenibilidad y cumplimiento legal.\n\nLa redacción de los criterios de aceptación en formato Gherkin responde a una decisión deliberada orientada a facilitar el trabajo de la asignatura de Pruebas de Software: cada escenario puede ser convertido directamente en un caso de prueba sin necesidad de reinterpretación, lo que reduce el margen de error entre lo que el sistema debe hacer y lo que efectivamente se verifica en las fases de prueba.\n\nEste documento debe ser considerado un artefacto vivo durante el desarrollo del proyecto: cualquier cambio en los requisitos acordado con el cliente funcional (estudiantes de Ingeniería Industrial) debe quedar registrado mediante una nueva versión del documento, garantizando la trazabilidad de los cambios a lo largo de los tres cortes académicos del período I-2026.\n\n# **9. Referencias Bibliográficas**\n\n* [1] Pressman, R. S. y Maxim, B. R. (2021). Ingeniería del software: Un enfoque práctico (9.ª ed.). McGraw-Hill.\n* [2] Bass, L., Clements, P. y Kazman, R. (2021). Software Architecture in Practice (4.ª ed.). Addison-Wesley.\n* [3] Myers, G. J., Sandler, C. y Badgett, T. (2011). The Art of Software Testing (3.ª ed.). Wiley.\n* [4] Ballou, R. H. (2004). Logística: Administración de la cadena de suministro (5.ª ed.). Pearson Educación.\n* [5] Schwaber, K. y Sutherland, J. (2020). La Guía Scrum. Recuperado de https://scrumguides.org\n* [6] Congreso de Colombia. (2012). Ley 1581 de 2012 — Protección de Datos Personales. Diario Oficial.\n* [7] IEEE. (1998). IEEE Std 830-1998: IEEE Recommended Practice for Software Requirements Specifications. Institute of Electrical and Electronics Engineers.",
-    "given": "**Given (Dado que):**\n- El equipo de desarrollo va a ejecutar pruebas de aceptación usando datos operativos reales de ICM en el Corte 3",
-    "when": "**When (Cuando):**\n- Se planifica la fase de pruebas de aceptación",
-    "then": "**Then (Entonces):**\n- El equipo debe contar con un documento de autorización expresa firmado por ICM que permita el uso de sus datos operativos en el contexto académico del proyecto\n- Las pruebas con datos reales no deben ejecutarse hasta que esa autorización esté formalmente obtenida\n\n# **7. Resumen de Trazabilidad Requisitos — Módulos**\n\nLa siguiente tabla presenta un resumen de todos los requisitos especificados en este documento, con su módulo de pertenencia y las reglas de negocio que les aplican directamente. Esta tabla constituye el punto de partida para la Matriz de Trazabilidad Requisitos-Pruebas que debe ser elaborada por la asignatura de Pruebas de Software como entregable del Corte 1.\n\n| **ID** | **Nombre** | **Módulo** | **Reglas de Negocio** |\n| --- | --- | --- | --- |\n| RF-001 | Inicio de Sesión con Credenciales Únicas | Autenticación | BR-01, BR-03 |\n| RF-002 | Gestión de Credenciales de Usuario | Autenticación | BR-01, BR-02 |\n| RF-003 | Registro de Producto en el Catálogo (SKU) | Gestión de Inventario | BR-04, BR-11, BR-12, BR-13 |\n| RF-004 | Consulta y Búsqueda de Inventario en Tiempo Real | Gestión de Inventario | BR-11, BR-13 |\n| RF-005 | Recepción de Mercancía | Recepción de Mercancía | BR-04, BR-09, BR-10, BR-11, BR-13 |\n| RF-006 | Despacho y Salidas de Inventario | Despacho y Salidas | BR-08, BR-10, BR-11, BR-13 |\n| RF-007 | Movimientos Internos entre Ubicaciones | Movimientos Internos | BR-06, BR-10, BR-11 |\n| RF-008 | Registro de Devoluciones de Productos | Devoluciones | BR-02, BR-05, BR-10 |\n| RF-009 | Ajustes de Inventario | Ajustes de Inventario | BR-06, BR-07, BR-10, BR-11 |\n| RF-010 | Reportes e Indicadores Operativos | Reportes e Indicadores | BR-10, BR-11, BR-13 |\n| RF-011 | Alertas Proactivas del Sistema | Alertas Proactivas | BR-04, BR-10, BR-11 |\n| RF-012 | Log de Auditoría y Trazabilidad | Auditoría y Trazabilidad | BR-01, BR-06, BR-07, BR-10 |\n| RNF-001 | Usabilidad e Interfaz Intuitiva | Transversal | — |\n| RNF-002 | Disponibilidad del Sistema | Transversal | BR-03 |\n| RNF-003 | Seguridad e Integridad de Datos | Transversal | BR-01, BR-02, BR-10 |\n| RNF-004 | Rendimiento en Consultas y Operaciones | Transversal | — |\n| RNF-005 | Mantenibilidad y Estándares Técnicos | Transversal | — |\n| RNF-006 | Cumplimiento Legal: Ley 1581 de 2012 | Transversal | — |\n\n# **8. Conclusiones**\n\nEl presente documento centraliza la especificación completa de dieciocho requisitos —doce funcionales y seis no funcionales— para el sistema de gestión de inventario y operaciones de Import Corporal Medical. Cada requisito ha sido elaborado a partir de la información recogida durante el proceso de elicitación con los responsables operativos de ICM y alineado con las condiciones académicas del Proyecto Nuclear 3.\n\nLos requisitos funcionales cubren la totalidad de los módulos identificados en la elicitación: autenticación y gestión de credenciales, gestión de inventario, recepción de mercancía, despacho y salidas, movimientos internos, devoluciones, ajustes de inventario, reportes e indicadores, alertas proactivas y auditoría. Los requisitos no funcionales complementan esta especificación con atributos de calidad medibles en usabilidad, disponibilidad, seguridad, rendimiento, mantenibilidad y cumplimiento legal.\n\nLa redacción de los criterios de aceptación en formato Gherkin responde a una decisión deliberada orientada a facilitar el trabajo de la asignatura de Pruebas de Software: cada escenario puede ser convertido directamente en un caso de prueba sin necesidad de reinterpretación, lo que reduce el margen de error entre lo que el sistema debe hacer y lo que efectivamente se verifica en las fases de prueba.\n\nEste documento debe ser considerado un artefacto vivo durante el desarrollo del proyecto: cualquier cambio en los requisitos acordado con el cliente funcional (estudiantes de Ingeniería Industrial) debe quedar registrado mediante una nueva versión del documento, garantizando la trazabilidad de los cambios a lo largo de los tres cortes académicos del período I-2026.\n\n# **9. Referencias Bibliográficas**\n\n* [1] Pressman, R. S. y Maxim, B. R. (2021). Ingeniería del software: Un enfoque práctico (9.ª ed.). McGraw-Hill.\n* [2] Bass, L., Clements, P. y Kazman, R. (2021). Software Architecture in Practice (4.ª ed.). Addison-Wesley.\n* [3] Myers, G. J., Sandler, C. y Badgett, T. (2011). The Art of Software Testing (3.ª ed.). Wiley.\n* [4] Ballou, R. H. (2004). Logística: Administración de la cadena de suministro (5.ª ed.). Pearson Educación.\n* [5] Schwaber, K. y Sutherland, J. (2020). La Guía Scrum. Recuperado de https://scrumguides.org\n* [6] Congreso de Colombia. (2012). Ley 1581 de 2012 — Protección de Datos Personales. Diario Oficial.\n* [7] IEEE. (1998). IEEE Std 830-1998: IEEE Recommended Practice for Software Requirements Specifications. Institute of Electrical and Electronics Engineers.",
-    "source": "docs/ERS_ICM_Requisitos.md"
+    "given_when_then": "**Given (Dado que):**\n- El equipo de desarrollo va a ejecutar pruebas de aceptación usando datos operativos reales de ICM en el Corte 3\n\n**When (Cuando):**\n- Se planifica la fase de pruebas de aceptación\n\n**Then (Entonces):**\n- El equipo debe contar con un documento de autorización expresa firmado por ICM que permita el uso de sus datos operativos en el contexto académico del proyecto\n- Las pruebas con datos reales no deben ejecutarse hasta que esa autorización esté formalmente obtenida\n\n# **7. Resumen de Trazabilidad Requisitos — Módulos**\n\nLa siguiente tabla presenta un resumen de todos los requisitos especificados en este documento, con su módulo de pertenencia y las reglas de negocio que les aplican directamente. Esta tabla constituye el punto de partida para la Matriz de Trazabilidad Requisitos-Pruebas que debe ser elaborada por la asignatura de Pruebas de Software como entregable del Corte 1.\n\n| **ID** | **Nombre** | **Módulo** | **Reglas de Negocio** |\n| --- | --- | --- | --- |\n| RF-001 | Inicio de Sesión con Credenciales Únicas | Autenticación | BR-01, BR-03 |\n| RF-002 | Gestión de Credenciales de Usuario | Autenticación | BR-01, BR-02 |\n| RF-003 | Registro de Producto en el Catálogo (SKU) | Gestión de Inventario | BR-04, BR-11, BR-12, BR-13 |\n| RF-004 | Consulta y Búsqueda de Inventario en Tiempo Real | Gestión de Inventario | BR-11, BR-13, BR-14, BR-15 |\n| RF-005 | Recepción de Mercancía | Recepción de Mercancía | BR-04, BR-09, BR-10, BR-11, BR-13, BR-14 |\n| RF-006 | Despacho y Salidas de Inventario | Despacho y Salidas | BR-08, BR-10, BR-11, BR-13, BR-14 |\n| RF-007 | Movimientos Internos entre Ubicaciones | Movimientos Internos | BR-06, BR-10, BR-11, BR-14 |\n| RF-008 | Registro de Devoluciones de Productos | Devoluciones | BR-02, BR-05, BR-10, BR-14 |\n| RF-009 | Ajustes de Inventario | Ajustes de Inventario | BR-06, BR-07, BR-10, BR-11, BR-14 |\n| RF-010 | Reportes e Indicadores Operativos | Reportes e Indicadores | BR-10, BR-11, BR-13 |\n| RF-011 | Alertas Proactivas del Sistema | Alertas Proactivas | BR-04, BR-10, BR-11 |\n| RF-012 | Log de Auditoría y Trazabilidad | Auditoría y Trazabilidad | BR-01, BR-06, BR-07, BR-10 |\n| RF-013 | Precios y Facturación Comercial | Precios y Facturación | BR-13, BR-16, BR-17 |\n| RNF-001 | Usabilidad e Interfaz Intuitiva | Transversal | — |\n| RNF-002 | Disponibilidad del Sistema | Transversal | BR-03 |\n| RNF-003 | Seguridad e Integridad de Datos | Transversal | BR-01, BR-02, BR-10 |\n| RNF-004 | Rendimiento en Consultas y Operaciones | Transversal | — |\n| RNF-005 | Mantenibilidad y Estándares Técnicos | Transversal | — |\n| RNF-006 | Cumplimiento Legal: Ley 1581 de 2012 | Transversal | — |\n\n# **8. Conclusiones**\n\nEl presente documento centraliza la especificación completa de dieciocho requisitos —doce funcionales y seis no funcionales— para el sistema de gestión de inventario y operaciones de Import Corporal Medical. Cada requisito ha sido elaborado a partir de la información recogida durante el proceso de elicitación con los responsables operativos de ICM y alineado con las condiciones académicas del Proyecto Nuclear 3.\n\nLos requisitos funcionales cubren la totalidad de los módulos identificados en la elicitación: autenticación y gestión de credenciales, gestión de inventario, recepción de mercancía, despacho y salidas, movimientos internos, devoluciones, ajustes de inventario, reportes e indicadores, alertas proactivas y auditoría. Los requisitos no funcionales complementan esta especificación con atributos de calidad medibles en usabilidad, disponibilidad, seguridad, rendimiento, mantenibilidad y cumplimiento legal.\n\nLa redacción de los criterios de aceptación en formato Gherkin responde a una decisión deliberada orientada a facilitar el trabajo de la asignatura de Pruebas de Software: cada escenario puede ser convertido directamente en un caso de prueba sin necesidad de reinterpretación, lo que reduce el margen de error entre lo que el sistema debe hacer y lo que efectivamente se verifica en las fases de prueba.\n\nEste documento debe ser considerado un artefacto vivo durante el desarrollo del proyecto: cualquier cambio en los requisitos acordado con el cliente funcional (estudiantes de Ingeniería Industrial) debe quedar registrado mediante una nueva versión del documento, garantizando la trazabilidad de los cambios a lo largo de los tres cortes académicos del período I-2026.\n\n# **9. Referencias Bibliográficas**\n\n* [1] Pressman, R. S. y Maxim, B. R. (2021). Ingeniería del software: Un enfoque práctico (9.ª ed.). McGraw-Hill.\n* [2] Bass, L., Clements, P. y Kazman, R. (2021). Software Architecture in Practice (4.ª ed.). Addison-Wesley.\n* [3] Myers, G. J., Sandler, C. y Badgett, T. (2011). The Art of Software Testing (3.ª ed.). Wiley.\n* [4] Ballou, R. H. (2004). Logística: Administración de la cadena de suministro (5.ª ed.). Pearson Educación.\n* [5] Schwaber, K. y Sutherland, J. (2020). La Guía Scrum. Recuperado de https://scrumguides.org\n* [6] Congreso de Colombia. (2012). Ley 1581 de 2012 — Protección de Datos Personales. Diario Oficial.\n* [7] IEEE. (1998). IEEE Std 830-1998: IEEE Recommended Practice for Software Requirements Specifications. Institute of Electrical and Electronics Engineers.\n\n---\n\n# **Anexo A: Módulo de Compras y Abastecimiento (RF-019 a RF-025)**\n\n*Versión 1.1 — Junio 2026. Estos requisitos amplían el alcance del ERS original para cubrir el ciclo completo de abastecimiento: Proveedor → Orden de Compra → Recepción → Movimiento de Entrada → Inventario. Su implementación no modifica ningún requisito existente (RF-001 a RF-013).*\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF019-S01",
+    "rf": "RF019",
+    "scenario_number": 1,
+    "title": "Creación de proveedor con NIT único",
+    "given_when_then": "**Given (Dado que):**\n- El Almacenista está autenticado en el sistema\n- No existe ningún proveedor con NIT \"900123456-1\"\n\n**When (Cuando):**\n- Envía POST /api/v1/purchasing/suppliers/ con nombre_comercial, razon_social y nit=\"900123456-1\"\n\n**Then (Entonces):**\n- El sistema crea el proveedor con estado is_active=True\n- Retorna HTTP 201 con los datos del proveedor incluyendo su UUID\n- Queda registrado un evento SUPPLIER_CREATED en el log de auditoría\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF019-S02",
+    "rf": "RF019",
+    "scenario_number": 2,
+    "title": "Intento de crear proveedor con NIT duplicado",
+    "given_when_then": "**Given (Dado que):**\n- Ya existe un proveedor con nit=\"900123456-1\"\n\n**When (Cuando):**\n- El Almacenista intenta crear otro proveedor con el mismo NIT\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- El log de auditoría no registra ningún evento SUPPLIER_CREATED\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF019-S03",
+    "rf": "RF019",
+    "scenario_number": 3,
+    "title": "Desactivación de proveedor",
+    "given_when_then": "**Given (Dado que):**\n- Existe un proveedor activo con OC en estado PENDIENTE\n\n**When (Cuando):**\n- El Almacenista desactiva el proveedor\n\n**Then (Entonces):**\n- El proveedor queda con is_active=False\n- Las OC existentes en estado PENDIENTE no se cancelan automáticamente\n- Nuevas OC con ese proveedor son rechazadas por el sistema\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF019-S04",
+    "rf": "RF019",
+    "scenario_number": 4,
+    "title": "Solo el Almacenista puede gestionar proveedores",
+    "given_when_then": "**Given (Dado que):**\n- Un usuario con rol Auxiliar de Despacho o Administrador está autenticado\n\n**When (Cuando):**\n- Intenta crear, actualizar o desactivar un proveedor\n\n**Then (Entonces):**\n- El sistema responde con HTTP 403 (Forbidden)\n- No se realiza ningún cambio en la base de datos\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF020-S01",
+    "rf": "RF020",
+    "scenario_number": 1,
+    "title": "Creación de OC en estado BORRADOR",
+    "given_when_then": "**Given (Dado que):**\n- El Almacenista está autenticado\n- Existe un proveedor activo y un producto en el catálogo\n\n**When (Cuando):**\n- Envía POST /api/v1/purchasing/purchase-orders/ con supplier_id y un ítem con product_id, quantity_ordered=10, unit_cost=15000\n\n**Then (Entonces):**\n- El sistema crea la OC con status=\"borrador\" y número OC-XXXX único\n- Retorna HTTP 201 con la OC y sus ítems\n- El log de auditoría registra PURCHASE_ORDER_CREATED\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF020-S02",
+    "rf": "RF020",
+    "scenario_number": 2,
+    "title": "Confirmación de OC (BORRADOR → PENDIENTE)",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC en estado BORRADOR con al menos un ítem\n\n**When (Cuando):**\n- El Almacenista confirma la OC mediante POST /api/v1/purchasing/purchase-orders/{id}/confirm/\n\n**Then (Entonces):**\n- La OC pasa a estado PENDIENTE\n- El campo confirmed_by queda registrado con el UserID del ejecutor\n- El log de auditoría registra PURCHASE_ORDER_CONFIRMED\n- La OC ya no puede ser editada (intentos de PATCH retornan HTTP 422)\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF020-S03",
+    "rf": "RF020",
+    "scenario_number": 3,
+    "title": "Cancelación de OC sin recepciones confirmadas",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC en estado BORRADOR o PENDIENTE sin recepciones confirmadas\n\n**When (Cuando):**\n- El Almacenista cancela la OC con una razón de cancelación\n\n**Then (Entonces):**\n- La OC pasa a estado CANCELADA con la razón registrada\n- El log de auditoría registra PURCHASE_ORDER_CANCELLED\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF020-S04",
+    "rf": "RF020",
+    "scenario_number": 4,
+    "title": "Intento de cancelar OC con recepciones confirmadas",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC en estado PENDIENTE con al menos una recepción en estado CONFIRMADA\n\n**When (Cuando):**\n- El Almacenista intenta cancelar la OC\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 409 (Conflict)\n- La OC permanece en su estado actual sin cambios\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF020-S05",
+    "rf": "RF020",
+    "scenario_number": 5,
+    "title": "Cancelación sin razón explícita es rechazada",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC cancelable\n\n**When (Cuando):**\n- El Almacenista intenta cancelar la OC sin proporcionar una razón (campo reason vacío)\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- La OC no cambia de estado\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF021-S01",
+    "rf": "RF021",
+    "scenario_number": 1,
+    "title": "Recepción parcial de una OC",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC en estado PENDIENTE con un ítem de 20 unidades y 0 recibidas\n\n**When (Cuando):**\n- El Almacenista crea una recepción con 10 unidades para ese ítem en una ubicación activa\n\n**Then (Entonces):**\n- El sistema crea la recepción en estado BORRADOR\n- El log de auditoría registra RECEPTION_CREATED\n- La OC sigue en estado PENDIENTE (no cambia hasta confirmar la recepción)\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF021-S02",
+    "rf": "RF021",
+    "scenario_number": 2,
+    "title": "Recepción que supera la cantidad pendiente es rechazada",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC con un ítem de 5 unidades ordenadas y 3 ya recibidas (2 pendientes)\n\n**When (Cuando):**\n- El Almacenista intenta crear una recepción con 5 unidades para ese ítem\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- No se crea ninguna recepción\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF021-S03",
+    "rf": "RF021",
+    "scenario_number": 3,
+    "title": "No se puede crear recepción para OC en BORRADOR",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC en estado BORRADOR (no confirmada aún)\n\n**When (Cuando):**\n- El Almacenista intenta crear una recepción asociada a ella\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- No se crea ninguna recepción\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF021-S04",
+    "rf": "RF021",
+    "scenario_number": 4,
+    "title": "Recepción avanzada por lote y ubicación se crea correctamente",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC en estado PENDIENTE con un ítem de 10 unidades y 0 recibidas\n- Existen dos ubicaciones válidas y dos lotes válidos para el mismo producto\n\n**When (Cuando):**\n- El Almacenista crea una recepción en modo avanzado distribuyendo las 10 unidades en múltiples porciones\n- Cada porción indica ubicación, cantidad, código de lote y fecha de vencimiento\n\n**Then (Entonces):**\n- El sistema crea la recepción en estado BORRADOR\n- El sistema guarda las distribuciones asociadas al ítem de recepción\n- La suma de las cantidades distribuidas coincide con la cantidad total del ítem\n- La OC permanece en estado PENDIENTE hasta la confirmación\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF021-S05",
+    "rf": "RF021",
+    "scenario_number": 5,
+    "title": "Recepción avanzada rechaza distribuciones cuya suma no coincide",
+    "given_when_then": "**Given (Dado que):**\n- Existe una OC en estado PENDIENTE con un ítem de 10 unidades\n- El Almacenista prepara una distribución avanzada que suma menos o más de 10 unidades\n\n**When (Cuando):**\n- Intenta crear la recepción con esa distribución inconsistente\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- No se crea ninguna recepción\n- No se crean distribuciones parciales\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF022-S01",
+    "rf": "RF022",
+    "scenario_number": 1,
+    "title": "Confirmación exitosa genera Movements y actualiza stock",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción en BORRADOR con 10 unidades de un producto en una ubicación activa\n\n**When (Cuando):**\n- El Almacenista confirma la recepción\n\n**Then (Entonces):**\n- El sistema crea un Movement de tipo ENTRADA con quantity=10 en la ubicación de destino\n- El StockByLocation para ese producto en esa ubicación incrementa en 10\n- El Movement.unit_cost queda registrado con el valor de PurchaseOrderItem.unit_cost\n- La recepción pasa a estado CONFIRMADA\n- El log de auditoría registra RECEPTION_CONFIRMED\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF022-S02",
+    "rf": "RF022",
+    "scenario_number": 2,
+    "title": "Recepción completa marca la OC como COMPLETADA",
+    "given_when_then": "**Given (Dado que):**\n- Una OC tiene un ítem de 10 unidades con 0 recibidas\n- Existe una recepción en BORRADOR con los 10 ítems\n\n**When (Cuando):**\n- El Almacenista confirma la recepción\n\n**Then (Entonces):**\n- La OC pasa a estado COMPLETADA\n- No es posible crear nuevas recepciones para esa OC\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF022-S03",
+    "rf": "RF022",
+    "scenario_number": 3,
+    "title": "Recepción parcial marca la OC como PARCIALMENTE_RECIBIDA",
+    "given_when_then": "**Given (Dado que):**\n- Una OC tiene un ítem de 20 unidades con 0 recibidas\n- Existe una recepción en BORRADOR con 12 de esas 20 unidades\n\n**When (Cuando):**\n- El Almacenista confirma la recepción\n\n**Then (Entonces):**\n- La OC pasa a estado PARCIALMENTE_RECIBIDA\n- Es posible crear nuevas recepciones para recibir las 8 unidades restantes\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF022-S04",
+    "rf": "RF022",
+    "scenario_number": 4,
+    "title": "Error en generación de Movement revierte toda la recepción",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción en BORRADOR con múltiples ítems\n\n**When (Cuando):**\n- Durante la confirmación, la generación del Movement falla para cualquiera de los ítems\n\n**Then (Entonces):**\n- Ningún Movement es creado (rollback total)\n- El StockByLocation no es modificado\n- La recepción permanece en estado BORRADOR\n- La OC no cambia de estado\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF022-S05",
+    "rf": "RF022",
+    "scenario_number": 5,
+    "title": "Discrepancia sin nota es rechazada",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción en BORRADOR donde un ítem tiene quantity_received diferente a quantity_ordered\n- El campo discrepancy_note está vacío para ese ítem\n\n**When (Cuando):**\n- El Almacenista intenta confirmar la recepción\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- La recepción permanece en BORRADOR sin cambios en el stock\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF022-S06",
+    "rf": "RF022",
+    "scenario_number": 6,
+    "title": "Confirmación de recepción avanzada genera un Movement por porción",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción en BORRADOR con un ítem distribuido en múltiples porciones\n- Cada porción especifica ubicación, lote, fecha de vencimiento y cantidad\n\n**When (Cuando):**\n- El Almacenista confirma la recepción\n\n**Then (Entonces):**\n- El sistema genera un Movement de entrada por cada porción distribuida\n- Cada Movement conserva el producto, lote, fecha de vencimiento, ubicación y cantidad correspondiente\n- El stock se incrementa de forma independiente en cada ubicación destino\n- La recepción pasa a estado CONFIRMADA\n- El log de auditoría registra RECEPTION_CONFIRMED\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF022-S07",
+    "rf": "RF022",
+    "scenario_number": 7,
+    "title": "Confirmación de recepción avanzada con suma inconsistente es rechazada",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción en BORRADOR con distribuciones cuya suma no coincide con la cantidad del ítem\n\n**When (Cuando):**\n- El Almacenista intenta confirmar la recepción\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- Ningún Movement es creado\n- La recepción permanece en BORRADOR\n- El stock no cambia\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF023-S01",
+    "rf": "RF023",
+    "scenario_number": 1,
+    "title": "Cancelación exitosa de recepción en BORRADOR",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción en estado BORRADOR\n\n**When (Cuando):**\n- El Almacenista cancela la recepción\n\n**Then (Entonces):**\n- La recepción pasa a estado CANCELADA\n- No se generan Movements ni cambios en el stock\n- El log de auditoría registra RECEPTION_CANCELLED\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF023-S02",
+    "rf": "RF023",
+    "scenario_number": 2,
+    "title": "No se puede cancelar una recepción CONFIRMADA",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción en estado CONFIRMADA\n\n**When (Cuando):**\n- El Almacenista intenta cancelar la recepción\n\n**Then (Entonces):**\n- El sistema rechaza la operación con HTTP 422\n- La recepción permanece CONFIRMADA, los Movements y el stock no se alteran\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF024-S01",
+    "rf": "RF024",
+    "scenario_number": 1,
+    "title": "Desde un Movement de ENTRADA se puede trazar la OC de origen",
+    "given_when_then": "**Given (Dado que):**\n- Existe una recepción confirmada que generó Movements de ENTRADA\n\n**When (Cuando):**\n- El Almacenista consulta el detalle de la recepción\n\n**Then (Entonces):**\n- La respuesta incluye los IDs de los Movements generados por cada ítem\n- Es posible navegar de ReceptionItem → Movement → StockByLocation\n- Es posible navegar de ReceptionItem → PurchaseOrderItem → PurchaseOrder → Supplier\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF024-S02",
+    "rf": "RF024",
+    "scenario_number": 2,
+    "title": "El log de auditoría muestra todos los eventos del ciclo completo",
+    "given_when_then": "**Given (Dado que):**\n- Se completó un ciclo: crear proveedor → crear OC → confirmar OC → crear recepción → confirmar recepción\n\n**When (Cuando):**\n- El Almacenista consulta el log de auditoría\n\n**Then (Entonces):**\n- El log contiene eventos: SUPPLIER_CREATED, PURCHASE_ORDER_CREATED, PURCHASE_ORDER_CONFIRMED, RECEPTION_CREATED, RECEPTION_CONFIRMED, MOVEMENT_CREATED\n- Todos los eventos están asociados al UserID del ejecutor y tienen timestamp exacto\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF025-S01",
+    "rf": "RF025",
+    "scenario_number": 1,
+    "title": "Almacenista tiene acceso completo al módulo de compras",
+    "given_when_then": "**Given (Dado que):**\n- Un usuario con rol Almacenista está autenticado dentro de su horario operativo\n\n**When (Cuando):**\n- Realiza operaciones de lectura (GET) y escritura (POST, PATCH) en cualquier endpoint del módulo de compras\n\n**Then (Entonces):**\n- El sistema procesa todas las solicitudes con HTTP 200 o 201 según corresponda\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF025-S02",
+    "rf": "RF025",
+    "scenario_number": 2,
+    "title": "Administrador tiene acceso de solo lectura al módulo de compras",
+    "given_when_then": "**Given (Dado que):**\n- Un usuario con rol Administrador está autenticado\n\n**When (Cuando):**\n- Realiza una consulta GET sobre proveedores, OC o recepciones\n\n**Then (Entonces):**\n- El sistema retorna HTTP 200 con los datos solicitados\n\n**And (Y cuando):**\n- Intenta crear, modificar o confirmar cualquier entidad del módulo de compras\n\n**Then (Entonces):**\n- El sistema retorna HTTP 403 (Forbidden)\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
+  },
+  {
+    "id": "RF025-S03",
+    "rf": "RF025",
+    "scenario_number": 3,
+    "title": "Auxiliar de Despacho no tiene acceso al módulo de compras",
+    "given_when_then": "**Given (Dado que):**\n- Un usuario con rol Auxiliar de Despacho está autenticado\n\n**When (Cuando):**\n- Intenta acceder a cualquier endpoint del módulo de compras (GET o POST)\n\n**Then (Entonces):**\n- El sistema retorna HTTP 403 (Forbidden) para todas las operaciones\n\n---",
+    "source": "docs/requisitos/ERS_ICM_Requisitos.md",
+    "automation_scope": {
+      "reason": "",
+      "scope": "backend"
+    }
   }
 ]

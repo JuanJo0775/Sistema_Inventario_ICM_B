@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-from uuid import UUID
-
 from rest_framework import serializers
 
-from apps.catalog.models import (Category, ComboItem, Product, ProductCombo,
-                                 Subcategory)
+from apps.catalog.models import Brand, Category, ComboItem, Product, ProductCombo
+from shared.utils.barcode import build_product_barcode_payload
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -20,19 +18,33 @@ class CategorySerializer(serializers.ModelSerializer):
             "requires_serial_number",
             "is_returnable",
             "description",
+            "is_active",
+            "deleted_at",
             "created_at",
             "updated_at",
         )
+        read_only_fields = ("deleted_at",)
 
 
-class SubcategorySerializer(serializers.ModelSerializer):
+class BrandSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Subcategory
-        fields = ("id", "category", "name", "slug", "created_at", "updated_at")
+        model = Brand
+        fields = (
+            "id",
+            "name",
+            "slug",
+            "description",
+            "is_active",
+            "deleted_at",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = ("deleted_at",)
 
 
 class ProductSerializer(serializers.ModelSerializer):
     category_slug = serializers.CharField(source="category.slug", read_only=True)
+    barcode_type = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -42,19 +54,108 @@ class ProductSerializer(serializers.ModelSerializer):
             "name",
             "category",
             "category_slug",
-            "subcategory",
+            "brand",
             "barcode",
+            "barcode_type",
             "brand",
             "expiration_date",
+            "requires_expiration",
             "weight_grams",
             "requires_cold_chain",
             "is_active",
+            "deleted_at",
             "notes",
             "reorder_point",
+            "unit_cost",
+            "sale_price_retail",
+            "sale_price_wholesale",
+            "tax_rate_pct",
+            "currency",
             "created_at",
             "updated_at",
         )
-        read_only_fields = ("id", "created_at", "updated_at", "category_slug")
+        read_only_fields = (
+            "id",
+            "deleted_at",
+            "created_at",
+            "updated_at",
+            "category_slug",
+            "barcode_type",
+            # Precio: solo se modifica via PATCH /products/<id>/prices/ (BR-17)
+            "unit_cost",
+            "sale_price_retail",
+            "sale_price_wholesale",
+            "tax_rate_pct",
+            "currency",
+        )
+
+    def get_barcode_type(self, obj: Product) -> str | None:
+        return "Code128" if obj.barcode else None
+
+
+class ProductDetailSerializer(ProductSerializer):
+    barcode_svg = serializers.SerializerMethodField()
+    barcode_svg_data_uri = serializers.SerializerMethodField()
+    barcode_payload = serializers.SerializerMethodField()
+
+    class Meta(ProductSerializer.Meta):
+        fields = tuple(ProductSerializer.Meta.fields) + (  # type: ignore[assignment]
+            "barcode_svg",
+            "barcode_svg_data_uri",
+            "barcode_payload",
+        )
+
+    def get_barcode_payload(self, obj: Product) -> dict[str, str] | None:
+        if not obj.barcode:
+            return None
+        payload = self._get_cached_barcode_payload(obj)
+        return {
+            "type": payload["type"],
+            "value": payload["value"],
+        }
+
+    def get_barcode_svg(self, obj: Product) -> str | None:
+        if not obj.barcode:
+            return None
+        return self._get_cached_barcode_payload(obj)["svg"]
+
+    def get_barcode_svg_data_uri(self, obj: Product) -> str | None:
+        if not obj.barcode:
+            return None
+        return self._get_cached_barcode_payload(obj)["svg_data_uri"]
+
+    def _get_cached_barcode_payload(self, obj: Product) -> dict[str, str]:
+        cache_attr = "_barcode_payload_cache"
+        payload = getattr(obj, cache_attr, None)
+        if payload is None:
+            payload = build_product_barcode_payload(obj.barcode)
+            setattr(obj, cache_attr, payload)
+        return payload
+
+
+class ProductBarcodeSerializer(serializers.Serializer):
+    product_id = serializers.UUIDField()
+    sku = serializers.CharField()
+    name = serializers.CharField()
+    barcode = serializers.CharField()
+    barcode_type = serializers.CharField()
+    barcode_svg = serializers.CharField()
+    barcode_svg_data_uri = serializers.CharField()
+    render_format = serializers.CharField()
+
+    @classmethod
+    def from_product(cls, product: Product) -> dict[str, str]:
+        payload = build_product_barcode_payload(product.barcode)
+        return {
+            "product_id": str(product.id),
+            "sku": product.sku,
+            "name": product.name,
+            "barcode": payload["value"],
+            "barcode_type": payload["type"],
+            "barcode_svg": payload["svg"],
+            "barcode_svg_data_uri": payload["svg_data_uri"],
+            "render_format": "svg",
+        }
 
 
 class ProductUpdateSerializer(serializers.Serializer):
@@ -63,10 +164,9 @@ class ProductUpdateSerializer(serializers.Serializer):
     name = serializers.CharField(required=False)
     sku = serializers.CharField(required=False)
     category_id = serializers.UUIDField(required=False)
-    subcategory_id = serializers.UUIDField(required=False, allow_null=True)
-    barcode = serializers.CharField(required=False, allow_blank=True, allow_null=True)
-    brand = serializers.CharField(required=False, allow_blank=True)
+    brand_id = serializers.UUIDField(required=False, allow_null=True)
     requires_cold_chain = serializers.BooleanField(required=False)
+    requires_expiration = serializers.BooleanField(required=False)
     expiration_date = serializers.DateField(required=False, allow_null=True)
     weight_grams = serializers.IntegerField(
         required=False, allow_null=True, min_value=0
@@ -75,15 +175,23 @@ class ProductUpdateSerializer(serializers.Serializer):
     reorder_point = serializers.IntegerField(required=False, min_value=0)
     is_active = serializers.BooleanField(required=False)
 
+    def validate_sku(self, value: str) -> str:
+        sku = (value or "").strip()
+        qs = Product.objects.filter(sku__iexact=sku)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError(f"El SKU '{sku}' ya existe.")
+        return sku
+
 
 class ProductCreateSerializer(serializers.Serializer):
     sku = serializers.CharField()
     name = serializers.CharField()
     category_id = serializers.UUIDField()
-    subcategory_id = serializers.UUIDField(required=False, allow_null=True)
-    barcode = serializers.CharField(required=False, allow_blank=True, allow_null=True)
-    brand = serializers.CharField(default="Can")
+    brand_id = serializers.UUIDField(required=False, allow_null=True)
     requires_cold_chain = serializers.BooleanField(default=False)
+    requires_expiration = serializers.BooleanField(default=False)
     expiration_date = serializers.DateField(required=False, allow_null=True)
     expiry_date = serializers.DateField(required=False, allow_null=True)
     weight_grams = serializers.IntegerField(
@@ -92,6 +200,12 @@ class ProductCreateSerializer(serializers.Serializer):
     notes = serializers.CharField(required=False, allow_blank=True, default="")
     reorder_point = serializers.IntegerField(required=False, default=0, min_value=0)
     is_active = serializers.BooleanField(required=False, default=True)
+
+    def validate_sku(self, value: str) -> str:
+        sku = (value or "").strip()
+        if Product.objects.filter(sku__iexact=sku).exists():
+            raise serializers.ValidationError(f"El SKU '{sku}' ya existe.")
+        return sku
 
 
 class ComboItemSerializer(serializers.ModelSerializer):
@@ -109,10 +223,23 @@ class ComboSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "sku",
-            "is_active",
+            "deleted_at",
             "components",
+            "price_strategy",
+            "fixed_price_retail",
+            "fixed_price_wholesale",
             "created_at",
             "updated_at",
+        )
+        read_only_fields = (
+            "id",
+            "deleted_at",
+            "created_at",
+            "updated_at",
+            # Precio de combo: se gestiona via ComboCreateSerializer / ComboUpdateSerializer
+            "price_strategy",
+            "fixed_price_retail",
+            "fixed_price_wholesale",
         )
 
 
@@ -132,29 +259,34 @@ class ResolveIdentifierQuerySerializer(serializers.Serializer):
         return attrs
 
 
+class ComboCreateItemSerializer(serializers.Serializer):
+    product_id = serializers.UUIDField(help_text="UUID del producto")
+    quantity = serializers.IntegerField(
+        default=1, min_value=1, help_text="Cantidad del producto en el combo"
+    )
+
+
 class ComboCreateSerializer(serializers.Serializer):
     name = serializers.CharField()
     sku = serializers.CharField()
-    is_active = serializers.BooleanField(required=False, default=True)
-    items = serializers.ListField(
-        child=serializers.DictField(),
-        allow_empty=False,
+    items = ComboCreateItemSerializer(many=True, allow_empty=False)
+    price_strategy = serializers.ChoiceField(
+        choices=["derived", "fixed"], required=False, default="derived"
+    )
+    fixed_price_retail = serializers.DecimalField(
+        max_digits=12, decimal_places=4, required=False, allow_null=True, min_value=0
+    )
+    fixed_price_wholesale = serializers.DecimalField(
+        max_digits=12, decimal_places=4, required=False, allow_null=True, min_value=0
     )
 
-    def validate_items(self, value: list) -> list:
-        out = []
-        for row in value:
-            pid = row.get("product_id")
-            if not pid:
-                raise serializers.ValidationError("Cada ítem requiere product_id.")
-            try:
-                uid = UUID(str(pid))
-            except ValueError as exc:
-                raise serializers.ValidationError(
-                    "product_id debe ser UUID válido."
-                ) from exc
-            out.append({"product_id": uid, "quantity": int(row.get("quantity", 1))})
-        return out
+    def validate_sku(self, value: str) -> str:
+        sku = (value or "").strip()
+        if ProductCombo.objects.filter(sku__iexact=sku).exists():
+            raise serializers.ValidationError(
+                f"El SKU '{sku}' ya existe en otro combo."
+            )
+        return sku
 
 
 class CategoryCreateSerializer(serializers.Serializer):
@@ -162,3 +294,104 @@ class CategoryCreateSerializer(serializers.Serializer):
     description = serializers.CharField(required=False, allow_blank=True, default="")
     requires_serial_number = serializers.BooleanField(required=False, default=False)
     is_returnable = serializers.BooleanField(required=False, default=False)
+
+
+class CategoryUpdateSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False)
+    description = serializers.CharField(required=False, allow_blank=True)
+    requires_serial_number = serializers.BooleanField(required=False)
+    is_returnable = serializers.BooleanField(required=False)
+    is_active = serializers.BooleanField(required=False)
+
+
+class BrandCreateSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    description = serializers.CharField(required=False, allow_blank=True, default="")
+
+
+class BrandUpdateSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False)
+    description = serializers.CharField(required=False, allow_blank=True)
+    is_active = serializers.BooleanField(required=False)
+
+
+class ComboUpdateItemSerializer(serializers.Serializer):
+    product_id = serializers.UUIDField()
+    quantity = serializers.IntegerField(default=1, min_value=1)
+
+
+class ComboUpdateSerializer(serializers.Serializer):
+    """Campos editables de un combo. is_active no se acepta; usar DELETE/restore."""
+
+    name = serializers.CharField(required=False)
+    sku = serializers.CharField(required=False)
+    items = ComboUpdateItemSerializer(many=True, required=False)
+    price_strategy = serializers.ChoiceField(
+        choices=["derived", "fixed"], required=False
+    )
+    fixed_price_retail = serializers.DecimalField(
+        max_digits=12, decimal_places=4, required=False, allow_null=True, min_value=0
+    )
+    fixed_price_wholesale = serializers.DecimalField(
+        max_digits=12, decimal_places=4, required=False, allow_null=True, min_value=0
+    )
+
+    def validate_sku(self, value: str) -> str:
+        sku = (value or "").strip()
+        qs = ProductCombo.objects.filter(sku__iexact=sku)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError(
+                f"El SKU '{sku}' ya existe en otro combo."
+            )
+        return sku
+
+
+class ProductPriceUpdateSerializer(serializers.Serializer):
+    """Actualización parcial de precios de un producto (solo almacenista)."""
+
+    unit_cost = serializers.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        required=False,
+        allow_null=True,
+        min_value=0,
+    )
+    sale_price_retail = serializers.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        required=False,
+        allow_null=True,
+        min_value=0,
+    )
+    sale_price_wholesale = serializers.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        required=False,
+        allow_null=True,
+        min_value=0,
+    )
+    tax_rate_pct = serializers.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        required=False,
+        allow_null=True,
+        min_value=0,
+        max_value=100,
+    )
+    currency = serializers.CharField(max_length=3, required=False)
+
+
+class ProductPriceHistorySerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    field_changed = serializers.CharField()
+    old_value = serializers.DecimalField(
+        max_digits=12, decimal_places=4, allow_null=True
+    )
+    new_value = serializers.DecimalField(
+        max_digits=12, decimal_places=4, allow_null=True
+    )
+    currency = serializers.CharField()
+    changed_by = serializers.UUIDField(source="changed_by_id")
+    created_at = serializers.DateTimeField()

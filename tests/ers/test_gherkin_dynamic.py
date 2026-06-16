@@ -12,11 +12,27 @@ from pathlib import Path
 
 import pytest
 
-from tests.ers.gherkin_impl import run_gherkin_scenario
+from tests.ers.impl import IMPLEMENTATIONS, run_gherkin_scenario
+from tests.ers.impl._dispatcher import _OUT_OF_SCOPE, _PENDING
 
 _ROOT = Path(__file__).resolve().parents[2]
 _SCENARIOS_PATH = _ROOT / "docs" / "test" / "gherkin_scenarios.json"
 SCENARIOS: list[dict] = json.loads(_SCENARIOS_PATH.read_text(encoding="utf-8"))
+
+# Validación en tiempo de colección: ningún escenario backend puede quedar sin registrar.
+_ALL_REGISTERED = set(IMPLEMENTATIONS) | set(_OUT_OF_SCOPE) | set(_PENDING)
+_backend_ids = {
+    sc["id"]
+    for sc in SCENARIOS
+    if sc.get("automation_scope", {}).get("scope") == "backend"
+}
+_unregistered = _backend_ids - _ALL_REGISTERED
+if _unregistered:
+    raise RuntimeError(
+        f"Escenarios backend sin registro en IMPLEMENTATIONS, gherkin_pending.json "
+        f"ni gherkin_out_of_scope.json: {sorted(_unregistered)}\n"
+        f"Añadir implementación o declarar como pendiente."
+    )
 
 
 def _make_test(sid: str, title: str):

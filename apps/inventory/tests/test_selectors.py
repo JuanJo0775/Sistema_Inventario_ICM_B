@@ -3,8 +3,10 @@ from __future__ import annotations
 import pytest
 from django.db import IntegrityError
 
-from apps.inventory.selectors import (get_stock_by_product,
-                                      search_products_duration_seconds)
+from apps.inventory.selectors import (
+    get_stock_by_product,
+    search_products_duration_seconds,
+)
 from apps.movements.services import register_entry
 from tests.factories import ManoCategoryFactory, ProductFactory
 
@@ -44,7 +46,7 @@ def test_search_products_performance_under_2s(db, almacenista_user):
     for i in range(50):
         ProductFactory(
             category=cat,
-            sku=f"CAN-PERF-{i:04d}",
+            sku=f"PERF-{i:04d}",
             name=f"Producto perf {i}",
         )
     _, elapsed = search_products_duration_seconds("perf")

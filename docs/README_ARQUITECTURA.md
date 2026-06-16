@@ -2,6 +2,10 @@
 
 Este documento describe la arquitectura tecnica del backend, con foco en decisiones de diseno, desacoplamiento, reglas de consistencia de inventario, calidad de codigo y criterios operativos (Docker, testing, seguridad y rendimiento).
 
+Para operacion CI/CD (gates, despliegue, promociones, backups y rollback), consultar tambien:
+
+- [docs/CI/README_CICD.md](CI/README_CICD.md)
+
 ## 1. Objetivo Arquitectonico
 
 Construir un backend mantenible y trazable para inventario y operaciones logisticas, donde:
@@ -21,9 +25,12 @@ El proyecto usa un monolito modular con apps Django por dominio:
 - catalog
 - inventory
 - movements
+- dashboard
 - reports
 - alerts
 - audit
+- purchasing
+- webhooks
 
 Beneficios:
 
@@ -44,6 +51,10 @@ En cada app se mantiene esta estructura:
 - **permissions.py**: reglas de acceso de DRF. Control de autorización por rol.
 
 **Principio CRÍTICO**: La lógica de negocio NUNCA debe estar en models, serializers, o views. Eso es responsabilidad de services.py.
+
+> Documentación detallada de esta separación y los principios que la sustentan:
+> - [Patrones de diseño aplicados](architecture/design-patterns.md) — Service Layer, Selector/Query Object, Template Method, Strategy, Observer, Facade, etc.
+> - [Principios SOLID en el proyecto](architecture/solid-principles.md) — evidencia de código y oportunidades de mejora por principio.
 
 ### 2.3 Integracion frontend-backend via API REST
 
@@ -68,12 +79,25 @@ Contrato tecnico base de comunicacion:
 Dominios de API esperados:
 
 - `/api/v1/auth/` autenticacion y gestion de usuarios
-- `/api/v1/catalog/` productos, categorias, subcategorias y resolucion de identificadores
+- `/api/v1/catalog/` productos, categorias, marcas, combos y precios
 - `/api/v1/inventory/` stock por ubicacion y busqueda
-- `/api/v1/movements/` entradas, salidas, traslados, devoluciones y ajustes
-- `/api/v1/reports/` indicadores y reportes de solo lectura
+- `/api/v1/movements/` entradas, salidas, traslados, devoluciones, ajustes y facturas
+- `/api/v1/dashboard/` read model operacional orientado a UI ejecutiva
+- `/api/v1/reports/` indicadores, reportes operativos y reportes financieros
 - `/api/v1/alerts/` alertas operativas activas
 - `/api/v1/audit/` trazabilidad historica (solo lectura autorizada)
+- `/api/v1/purchasing/` proveedores, órdenes de compra y recepciones
+- `/api/v1/webhooks/` suscripcion y entrega de eventos externos
+
+Endpoints de precios y facturacion agregados:
+
+- `PATCH /api/v1/catalog/products/<id>/prices/` actualizar precios (unit_cost, sale_price_retail, sale_price_wholesale, tax_rate_pct, currency)
+- `GET  /api/v1/catalog/products/<id>/prices/` historial inmutable de cambios de precio
+- `GET  /api/v1/movements/invoices/<number>/` detalle de factura con totales consolidados
+- `GET  /api/v1/movements/invoices/<number>/pdf/` descarga del PDF enriquecido
+- `GET  /api/v1/reports/revenue-summary/` revenue total por tipo de venta en el periodo
+- `GET  /api/v1/reports/margin-by-product/` margen bruto por SKU
+- `GET  /api/v1/reports/sales-by-customer/` ventas agrupadas por cliente (venta mayor)
 
 Objetivo de esta decision:
 
@@ -86,133 +110,360 @@ Objetivo de esta decision:
 Estructura de Directorios del Proyecto:
 
 
-```
+```text
 icm_backend/
-├── config/                     # Configuración central del proyecto Django
-│   ├── __init__.py
-│   ├── settings/
-│   │   ├── __init__.py
-│   │   ├── base.py             # Configuración base compartida
-│   │   ├── development.py      # Sobreescrituras para desarrollo local
-│   │   └── production.py       # Sobreescrituras para producción
-│   ├── urls.py                 # URL root con inclusión por módulo
-│   ├── wsgi.py
-│   └── asgi.py
-├── apps/                       # Todas las Django apps del dominio aquí
-│   ├── __init__.py
-│   ├── authentication/         # RF-001, RF-002 — JWT, RBAC, restricción horaria
-│   │   ├── __init__.py
-│   │   ├── models.py
-│   │   ├── serializers.py
-│   │   ├── views.py
-│   │   ├── urls.py
-│   │   ├── services.py
-│   │   ├── selectors.py
-│   │   ├── permissions.py
-│   │   ├── exceptions.py
-│   │   ├── signals.py
-│   │   ├── admin.py
-│   │   └── tests/
-│   │       ├── __init__.py
-│   │       ├── test_models.py
-│   │       ├── test_services.py
-│   │       └── test_views.py
-│   ├── catalog/                # RF-003 — Productos, SKUs, categorías, combos/kits
-│   │   ├── __init__.py
-│   │   ├── models.py
-│   │   ├── serializers.py
-│   │   ├── views.py
-│   │   ├── urls.py
-│   │   ├── services.py
-│   │   ├── selectors.py
-│   │   ├── permissions.py
-│   │   ├── admin.py
-│   │   └── tests/
-│   ├── inventory/              # RF-004 — Consulta de stock en tiempo real
-│   │   ├── __init__.py
-│   │   ├── models.py
-│   │   ├── serializers.py
-│   │   ├── views.py
-│   │   ├── urls.py
-│   │   ├── services.py
-│   │   ├── selectors.py
-│   │   ├── permissions.py
-│   │   ├── admin.py
-│   │   └── tests/
-│   ├── movements/              # RF-005 a RF-009 — Ledger central (NÚCLEO)
-│   │   ├── __init__.py
-│   │   ├── models.py
-│   │   ├── serializers.py
-│   │   ├── views.py
-│   │   ├── urls.py
-│   │   ├── services.py         # ⭐ Lógica crítica aquí
-│   │   ├── selectors.py
-│   │   ├── permissions.py
-│   │   ├── exceptions.py
-│   │   ├── admin.py
-│   │   └── tests/
-│   ├── reports/                # RF-010 — Reportes e indicadores operativos
-│   │   ├── __init__.py
-│   │   ├── models.py
-│   │   ├── serializers.py
-│   │   ├── views.py
-│   │   ├── urls.py
-│   │   ├── selectors.py        # Solo lectura
-│   │   ├── permissions.py
-│   │   ├── admin.py
-│   │   └── tests/
-│   ├── alerts/                 # RF-011 — Alertas proactivas del sistema
-│   │   ├── __init__.py
-│   │   ├── models.py
-│   │   ├── serializers.py
-│   │   ├── views.py
-│   │   ├── urls.py
-│   │   ├── services.py
-│   │   ├── permissions.py
-│   │   ├── admin.py
-│   │   └── tests/
-│   └── audit/                  # RF-012 — Log de auditoría y trazabilidad
-│       ├── __init__.py
-│       ├── models.py
-│       ├── serializers.py
-│       ├── views.py
-│       ├── urls.py
-│       ├── services.py
-│       ├── selectors.py
-│       ├── permissions.py
-│       ├── admin.py
-│       └── tests/
-├── shared/                     # Código compartido entre apps (sin lógica de dominio)
-│   ├── __init__.py
-│   ├── models.py               # BaseModel con created_at, updated_at, etc.
-│   ├── permissions.py          # Permisos RBAC base
-│   ├── exceptions.py           # Excepciones base del sistema
-│   ├── mixins.py               # Mixins reutilizables para views
-│   ├── pagination.py           # Configuración de paginación
-│   └── utils/
-│       ├── __init__.py
-│       └── validators.py       # Validadores reutilizables
-├── tests/                      # Tests de integración cross-módulo
-│   ├── __init__.py
-│   └── conftest.py             # Fixtures compartidas de pytest
-├── manage.py
-├── requirements/
+├── apps/                                                       # Dominios Django del backend
+│   ├── authentication/                                         # Autenticación JWT, RBAC, gestión de usuarios y recuperación de contraseña
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_password.py                                # Flujo completo de cambio y recuperación de contraseña
+│   │   │   ├── test_permissions_api.py                         # Cobertura de permisos por rol y endpoint
+│   │   │   ├── test_permissions_reorganization.py              # Cobertura de reorganización de permisos
+│   │   │   ├── test_services.py                                # Política de acceso y restricciones de rol
+│   │   │   ├── test_user_enable.py                             # Ciclo de vida: deshabilitar y rehabilitar usuarios
+│   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── management/
+│   │   │   └── commands/                                       # Comandos administrativos del módulo
+│   │   │       └── create_almacenista.py                       # Comando Django para automatización operativa
+│   │   ├── models.py                                           # User (UUID, role, RBAC), UserSchedule, TemporaryAccessPermit, PasswordResetToken
+│   │   ├── serializers.py                                      # UserSerializer (created_by_username, is_active read-only), password serializers
+│   │   ├── views.py                                            # 17 endpoints: JWT, CRUD usuarios, horarios, permisos temporales, change/forgot/reset-password
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Autenticación JWT, RBAC, gestión de usuarios, change_own_password, forgot/reset-password
+│   │   ├── selectors.py                                        # get_all_users (filtros role/search/inactive), check_user_access, get_user_by_id
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   ├── exceptions.py                                       # Excepciones de dominio y validación
+│   │   ├── signals.py                                          # Sincronización de eventos de identidad
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
+│   ├── catalog/                                                # Catálogo, SKUs definidos por usuario y validación de productos
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_combo_pricing.py                           # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_new_endpoints.py                           # Cobertura crítica del módulo
+│   │   │   ├── test_product_pricing.py                         # Cobertura crítica del módulo
+│   │   │   ├── test_services.py                                # Cobertura crítica del módulo
+│   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Catálogo, SKU definido por usuario y validación de producto
+│   │   ├── selectors.py                                        # Consultas de lectura y agregaciones del módulo
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   ├── exceptions.py                                       # Excepciones de dominio y validación
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
+│   ├── inventory/                                              # Consulta de stock en tiempo real
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_admin.py                                   # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_commands.py                                # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_location_threshold.py                      # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_models.py                                  # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_new_endpoints.py                           # Cobertura crítica del módulo
+│   │   │   ├── test_selectors.py                               # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_storage_templates.py                       # Cobertura crítica del módulo
+│   │   │   ├── test_storage_types.py                           # Cobertura crítica del módulo
+│   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── management/
+│   │   │   └── commands/                                       # Comandos administrativos del módulo
+│   │   │       └── verify_stock_integrity.py                   # Comando Django para automatización operativa
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Reglas de negocio del ledger y actualización transaccional del stock
+│   │   ├── selectors.py                                        # Lecturas de stock por ubicación
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   ├── exceptions.py                                       # Excepciones de dominio y validación
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
+│   ├── movements/                                              # Ledger inmutable y consistencia de inventario
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_combo_dispatch.py                          # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_dispatch_pricing.py                        # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_invoice.py                                 # Cobertura crítica del módulo
+│   │   │   ├── test_location_state_parametrized.py             # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_pricing_optional.py                        # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
+│   │   │   └── test_views.py                                   # Reglas de negocio y transacciones del dominio
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Ledger inmutable, atomicidad y actualización del stock derivado
+│   │   ├── selectors.py                                        # Lecturas del ledger y del stock derivado
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   ├── exceptions.py                                       # Errores de inventario y consistencia
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
+│   ├── reports/                                                # Reportes e indicadores operativos
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_exports.py                                 # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_financial_reports.py                       # Cobertura crítica del módulo
+│   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_selectors.py                               # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_services.py                                # Cobertura crítica del módulo
+│   │   │   └── test_views.py                                   # Reglas de negocio y transacciones del dominio
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Reglas de negocio y transacciones del dominio
+│   │   ├── selectors.py                                        # Consultas agregadas para reportes y KPIs
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
+│   ├── alerts/                                                 # Alertas operativas y monitoreo preventivo
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_commands.py                                # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_detail_resolve.py                          # Cobertura crítica del módulo
+│   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_new_alert_types.py                         # Reglas de negocio y transacciones del dominio
+│   │   │   ├── test_polling.py                                 # Cobertura crítica del módulo
+│   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
+│   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── management/
+│   │   │   └── commands/                                       # Comandos administrativos del módulo
+│   │   │       └── scan_alerts.py                              # Comando Django para automatización operativa
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Generación de alertas operativas
+│   │   ├── selectors.py                                        # Consultas de lectura y agregaciones del módulo
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
+│   ├── audit/                                                  # Trazabilidad e histórico de eventos
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── test_archive_command.py                         # Cobertura crítica del módulo
+│   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
+│   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── management/
+│   │   │   └── commands/                                       # Comandos administrativos del módulo
+│   │   │       └── archive_old_audit_logs.py                   # Comando Django para automatización operativa
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Trazabilidad e inmutabilidad de eventos
+│   │   ├── selectors.py                                        # Consultas de auditoría
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
+│   ├── dashboard/                                              # Aplicación Django detectada automáticamente
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   └── test_views.py                                   # Reglas de negocio y transacciones del dominio
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   └── services.py                                         # Reglas de negocio y transacciones del dominio
+│   ├── purchasing/                                             # Aplicación Django detectada automáticamente
+│   │   ├── tests/                                              # Pruebas del subdominio
+│   │   │   ├── factories.py                                    # Factories de datos de prueba
+│   │   │   ├── test_models.py                                  # Cobertura crítica del módulo
+│   │   │   ├── test_selectors.py                               # Consultas de lectura sin efectos secundarios
+│   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
+│   │   │   └── test_views.py                                   # Cobertura crítica del módulo
+│   │   ├── models.py                                           # Entidades y constraints de persistencia
+│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│   │   ├── services.py                                         # Reglas de negocio del ledger y actualización transaccional del stock
+│   │   ├── selectors.py                                        # Consultas de lectura y agregaciones del módulo
+│   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
+│   │   ├── exceptions.py                                       # Excepciones de dominio y validación
+│   │   └── admin.py                                            # Registro administrativo y soporte operacional
+│   └── webhooks/                                               # Aplicación Django detectada automáticamente
+│       ├── tests/                                              # Pruebas del subdominio
+│       │   ├── test_commands.py                                # Cobertura crítica del módulo
+│       │   ├── test_endpoint_put.py                            # Reglas de negocio y transacciones del dominio
+│       │   ├── test_services.py                                # Cobertura crítica del módulo
+│       │   └── test_views.py                                   # Cobertura crítica del módulo
+│       ├── management/
+│       │   └── commands/                                       # Comandos administrativos del módulo
+│       │       └── deliver_webhooks.py                         # Comando Django para automatización operativa
+│       ├── models.py                                           # Entidades y constraints de persistencia
+│       ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
+│       ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
+│       ├── urls.py                                             # Ruteo HTTP y composición de endpoints
+│       ├── services.py                                         # Reglas de negocio y transacciones del dominio
+│       └── admin.py                                            # Registro administrativo y soporte operacional
+├── config/                                                     # Configuración central del proyecto Django
+│   ├── settings/                                               # Configuración compartida y sobreescrituras por entorno
+│   │   ├── base.py                                             # Configuración base compartida
+│   │   ├── development.py                                      # Sobreescrituras para desarrollo local
+│   │   ├── production.py                                       # Sobreescrituras para producción
+│   │   └── test.py                                             # Configuración aislada para la suite de pruebas
+│   ├── urls.py                                                 # Composición de rutas y puntos de entrada HTTP
+│   ├── wsgi.py                                                 # Punto de entrada WSGI
+│   └── asgi.py                                                 # Punto de entrada ASGI
+├── docker/                                                     # Infraestructura de contenedores y arranque
+│   ├── Dockerfile                                              # Imagen base del contenedor de despliegue
+│   └── entrypoint.sh                                           # Inicialización del contenedor y arranque
+├── docs/                                                       # Documentación técnica viva del proyecto
+│   ├── README_ARQUITECTURA.md                                  # Documento vivo de arquitectura
+│   ├── api/                                                    # Contratos OpenAPI, seguridad y permisos
+│   │   ├── README_API.md                                       # Especificación de la API: endpoints, contratos y estándares
+│   │   ├── README_MATRIZ_PERMISOS.md                           # Matriz de permisos por rol para todos los endpoints
+│   │   └── REFERENCIA_ENDPOINTS.md                             # Referencia completa de endpoints con ejemplos request/response
+│   ├── requisitos/                                             # Requisitos funcionales y contexto de negocio
+│   │   ├── ERS_ICM_Requisitos.md                               # Documento técnico relevante
+│   │   └── ICM_Informe_Elicitacion_v2_plus.docx.md             # Documento técnico relevante
+│   ├── test/                                                   # Trazabilidad y documentación de pruebas
+│   │   ├── README_TEST.md                                      # Documento técnico relevante
+│   │   ├── TRAZABILIDAD_ERS_GHERKIN.md                         # Documento técnico relevante
+│   │   ├── gherkin_scenarios.json                              # Documento técnico relevante
+│   │   ├── gherkin_out_of_scope.json                           # Documento técnico relevante
+│   │   ├── all_unit.md                                         # Documento técnico relevante
+│   │   ├── all_integration.md                                  # Documento técnico relevante
+│   │   ├── all_scenarios.md                                    # Documento técnico relevante
+│   │   ├── unit/
+│   │   │   └── index.md                                        # Documento técnico relevante
+│   │   ├── integration/                                        # Pruebas HTTP/API de integración
+│   │   │   └── index.md                                        # Documento técnico relevante
+│   │   └── scenarios/
+│   │       └── index.md                                        # Documento técnico relevante
+│   ├── calidad_restricciones/                                  # Atributos de calidad y restricciones
+│   │   ├── README_ATRIBUTOS_CALIDAD.md                         # Documento técnico relevante
+│   │   ├── README_RESTRICCIONES.md                             # Documento técnico relevante
+│   │   └── INFORME_COMPLETITUD_PRINCIPIOS_Y_CALIDAD.md         # Documento técnico relevante
+│   ├── architecture/                                           # Síntesis arquitectónica: drivers, Utility Tree, ADRs, patrones y SOLID
+│   │   ├── architecture_drivers.md                             # Drivers arquitectónicos priorizados
+│   │   ├── utility_tree.md                                     # Utility Tree con escenarios y trade-offs
+│   │   ├── architectural_constraints.md                        # Restricciones arquitectónicas y riesgos
+│   │   ├── adr_relationships.md                                # Trazabilidad entre drivers y ADRs
+│   │   ├── design-patterns.md                                  # Catálogo de patrones de diseño aplicados (10 patrones documentados)
+│   │   └── solid-principles.md                                 # Análisis SOLID con evidencia de código y oportunidades de mejora
+│   ├── guias/                                                  # Guías operativas del proyecto
+│   │   ├── ENV_GUIDE.md                                        # Guía completa de variables de entorno
+│   │   └── SEED_DB.md                                          # Guía de carga de datos semilla
+│   ├── CI/                                                     # Runbook operativo de CI/CD
+│   │   └── README_CICD.md                                      # Runbook CI/CD: pipelines, despliegue, backups y rollback
+│   ├── docker/                                                 # Documento arquitectónico relevante
+│   │   └── README_DOCKER.md                                    # Documento técnico relevante
+│   ├── evidence/                                               # Documento arquitectónico relevante
+│   │   └── README.md                                           # Documento técnico relevante
+│   ├── system_behavior/                                        # Documento arquitectónico relevante
+│   │   ├── alerts/                                             # Alertas operativas y monitoreo preventivo
+│   │   │   └── README_ALERTS.md                                # Documento técnico relevante
+│   │   ├── audit/                                              # Trazabilidad e histórico de eventos
+│   │   │   └── README_AUDIT.md                                 # Documento técnico relevante
+│   │   ├── auth/
+│   │   │   └── README_AUTH.md                                  # Documento técnico relevante
+│   │   ├── catalog/                                            # Catálogo, SKUs definidos por usuario y validación de productos
+│   │   │   ├── README_CATALOG.md                               # Documento técnico relevante
+│   │   │   └── README_PRODUCT_SERIAL.md                        # Documento técnico relevante
+│   │   ├── dashboard/                                          # Aplicación Django detectada automáticamente
+│   │   │   └── README_DASHBOARD.md                             # Documento técnico relevante
+│   │   ├── inventory/                                          # Consulta de stock en tiempo real
+│   │   │   └── README_INVENTORY.md                             # Documento técnico relevante
+│   │   ├── movements/                                          # Ledger inmutable y consistencia de inventario
+│   │   │   └── README_MOVEMENTS.md                             # Documento técnico relevante
+│   │   ├── pricing/                                            # Documento arquitectónico relevante
+│   │   │   ├── Plan Arquitectura de Precios y Facturación — Sistema Inventario ICM.md  # Documento técnico relevante
+│   │   │   └── README_PRECIOS_FACTURACION.md                   # Documento técnico relevante
+│   │   ├── purchasing/                                         # Aplicación Django detectada automáticamente
+│   │   │   └── README_PURCHASING.md                            # Documento técnico relevante
+│   │   ├── reports/                                            # Reportes e indicadores operativos
+│   │   │   └── README_REPORTS.md                               # Documento técnico relevante
+│   │   ├── storage/                                            # Documento arquitectónico relevante
+│   │   │   ├── README_LOCATION_STATES.md                       # Documento técnico relevante
+│   │   │   ├── README_STORAGE_DOMAIN.md                        # Documento técnico relevante
+│   │   │   └── README_STORAGE_TYPES.md                         # Documento técnico relevante
+│   │   ├── webhooks/                                           # Aplicación Django detectada automáticamente
+│   │   │   └── README_WEBHOOKS.md                              # Documento técnico relevante
+│   │   └── index.md                                            # Documento técnico relevante
+│   └── GUIA_ONBOARDING.md                                      # Documento técnico relevante
+├── requirements/                                               # Dependencias por entorno
 │   ├── base.txt
 │   ├── development.txt
 │   └── production.txt
-├── docker/
-│   ├── Dockerfile
-│   └── entrypoint.sh           # Script de inicialización del contenedor
-├── docker-compose.yml
-├── docker-compose.prod.yml
-├── .env.example                # Plantilla de variables de entorno
-├── .env                        # Variables reales (en .gitignore)
-├── .gitignore
-├── pytest.ini
-└── README.md
+├── scripts/                                                    # Automatizaciones reutilizables del repositorio
+│   ├── README_SCRIPTS.md                                       # Índice y contexto de las automatizaciones
+│   ├── parse_ers_gherkin.py                                    # Generador de escenarios ERS/Gherkin
+│   ├── generate_docs/                                          # Generadores compartidos de documentación
+│   │   ├── __main__.py                                         # Entry point oficial: python -m scripts.generate_docs
+│   │   └── utils.py                                            # Pipeline compartido: descubrimiento, renderizado y escritura
+│   ├── perf/
+│   │   └── locustfile.py
+│   ├── security/
+│   │   └── run_security_scan.py
+│   ├── seed_db/
+│   │   ├── clean.py                                            # Limpieza de la base de datos del seed
+│   │   ├── config.py                                           # Datos estáticos del seed unificado
+│   │   ├── env.py
+│   │   ├── run.py                                              # Punto de entrada ejecutable
+│   │   └── seeder.py                                           # Lógica principal del seed
+│   └── _verify_neon.py
+├── shared/                                                     # Código transversal reutilizable
+│   ├── models.py                                               # BaseModel y metadatos comunes
+│   ├── permissions.py                                          # Permisos base y reutilizables
+│   ├── exceptions.py                                           # Excepciones tipadas del sistema
+│   ├── mixins.py                                               # Mixins transversales para vistas
+│   ├── pagination.py                                           # Paginación reutilizable
+│   ├── openapi.py                                              # Tags OpenAPI y contratos compartidos
+│   ├── email_service.py                                        # Servicio de email desacoplado (porta-adaptador SMTP)
+│   ├── utils/                                                  # Utilidades transversales
+│   │   └── validators.py                                       # Validadores reutilizables
+│   ├── audit.py
+│   ├── exporters.py
+│   ├── location_validators.py
+│   ├── logging_formatters.py
+│   ├── media_views.py
+│   └── operating_hours.py
+├── tests/                                                      # Tests de integración cross-módulo
+│   ├── factories.py                                            # Factories de datos de prueba
+│   ├── ers/                                                    # Suite Gherkin dinámica alineada al ERS
+│   │   └── test_gherkin_dynamic.py                             # Escenarios Gherkin y trazabilidad al ERS
+│   ├── integration/                                            # Pruebas HTTP/API de integración
+│   │   ├── test_api_integration.py                             # Pruebas de integración HTTP/API
+│   │   ├── test_cross_domain.py                                # Pruebas de integración HTTP/API
+│   │   ├── test_movements_integration.py                       # Pruebas de integración HTTP/API
+│   │   └── test_smoke_endpoints.py                             # Pruebas de integración HTTP/API
+│   ├── concurrency/
+│   │   ├── test_concurrent_movements.py                        # Cobertura crítica del módulo
+│   │   ├── test_concurrent_receptions.py                       # Cobertura crítica del módulo
+│   │   └── test_concurrent_transfers.py                        # Cobertura crítica del módulo
+│   ├── scripts/                                                # Automatizaciones reutilizables del repositorio
+│   │   ├── test_generate_docs.py                               # Cobertura crítica del módulo
+│   │   ├── test_generate_project_structure.py                  # Cobertura crítica del módulo
+│   │   ├── test_parse_ers_gherkin.py                           # Cobertura crítica del módulo
+│   │   ├── test_perf_locustfile.py                             # Cobertura crítica del módulo
+│   │   ├── test_run_security_scan.py                           # Cobertura crítica del módulo
+│   │   └── test_seed_db.py                                     # Cobertura crítica del módulo
+│   └── shared/                                                 # Código transversal reutilizable
+│       ├── test_db_utils.py                                    # Cobertura crítica del módulo
+│       └── test_location_validators.py                         # Cobertura crítica del módulo
+├── docker-compose.prod.yml                                     # Orquestación de producción
+├── docker-compose.yml                                          # Orquestación local del stack
+├── manage.py                                                   # Punto de entrada de comandos Django
+├── pytest.ini                                                  # Configuración de pytest
+├── README.md                                                   # Resumen general del repositorio
+└── schema.yml                                                  # Esquema OpenAPI consolidado
 ```
 
 Principio clave: shared contiene componentes transversales reutilizables, no logica de dominio especifica.
+
+### 2.4 Modelos Transversales: SoftDeleteModel y Utilidades de BD
+
+`shared/models.py` provee dos clases abstractas base:
+
+- **`BaseModel`**: Aporta `id` (UUID), `created_at` y `updated_at`. Usada por entidades mutables.
+- **`SoftDeleteModel`**: Aporta `deleted_at` (DateTime, nullable). Responsabilidad exclusiva: existencia lógica del registro. NO debe usarse para controlar reglas de negocio (asignación, disponibilidad). Métodos:
+  - `soft_delete()` — marca `deleted_at = now()`
+  - `restore()` — limpia `deleted_at = None`
+  - `is_deleted` (property) — `True` si `deleted_at IS NOT NULL`
+
+**Modelos que heredan `SoftDeleteModel`**:
+
+| App | Modelos |
+|-----|---------|
+| catalog | `Category`, `Brand`, `Product`, `ProductCombo` |
+| inventory | `StorageType`, `StorageTemplate`, `Location` |
+| purchasing | `Supplier` |
+| webhooks | `WebhookEndpoint` |
+
+`shared/utils/db.py` provee:
+
+- **`get_for_update_or_404(queryset, *, pk, detail=None)`**: Obtiene un objeto con `select_for_update()` o lanza `ResourceNotFoundError` (HTTP 404). Uso típico dentro de servicios `@transaction.atomic` para evitar `try/except` repetitivos.
 
 ---
 
@@ -303,6 +554,31 @@ GET /api/v1/movements/ auxiliar a 10:00 → 200 OK
 
 ---
 
+#### Flujo de recuperación de contraseña (RF-001)
+
+El módulo de autenticación implementa un flujo completo de tres pasos:
+
+1. **`POST /api/v1/auth/forgot-password/`** (público) — el usuario introduce su email. El backend crea un `PasswordResetToken` (raw token en email, SHA-256 en BD), invalida tokens previos no usados y envía el link `{FRONTEND_URL}/reset-password?token=<raw>` por SMTP. La respuesta es **siempre 200** (anti-enumeración).
+2. **Frontend** — redirige al usuario al formulario de nueva contraseña con el token de la URL.
+3. **`POST /api/v1/auth/reset-password/`** (público) — valida el token (un solo uso, expira en `PASSWORD_RESET_TOKEN_EXPIRY_MINUTES` minutos), cambia la contraseña y blacklistea todos los tokens JWT activos del usuario.
+
+También existe **`POST /api/v1/auth/change-password/`** (autenticado) para el cambio self-service sin pasar por email.
+
+**Invariantes de seguridad**:
+- El raw token nunca se almacena en la BD (solo el hash SHA-256).
+- Los tokens previos no usados se invalidan al solicitar uno nuevo.
+- `select_for_update()` previene doble-uso concurrente del mismo token.
+- El cambio o reset de contraseña siempre blacklistea todas las sesiones activas del usuario.
+- `shared/email_service.py` actúa como porta-adaptador: en tests usa `locmem.EmailBackend`, en dev/prod usa SMTP.
+
+**Variables de entorno relevantes**:
+- `FRONTEND_URL` — URL base del frontend para construir el link del email.
+- `PASSWORD_RESET_TOKEN_EXPIRY_MINUTES` — minutos de validez del token (default 10).
+- `EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_PORT` — configuración SMTP.
+- Ver `docs/guias/ENV_GUIDE.md` para referencia completa.
+
+---
+
 ### 3.1.2 Gestión de Catálogo y Productos
 
 #### BR-04: Requisito de Número de Serie en Productos de Electroterapia
@@ -314,6 +590,7 @@ GET /api/v1/movements/ auxiliar a 10:00 → 200 OK
 - Para categoría Electroterapia: `requires_serial_number = True`.
 - `movements.services.register_entry()`: si `product.category.requires_serial_number == True` y `serial_number is None`, lanza `SerialNumberRequiredError`.
 - `movements.services.register_dispatch()`: idem validación.
+- `purchasing.services.confirm_reception()` propaga `serial_number` desde `ReceptionItem.serial_number` (o `ReceptionItemAllocation.serial_number` si hay allocaciones) a `movements.services.register_entry()`.
 - El campo `serial_number` en `Movement` es obligatorio en estos casos.
 
 **Verificación en tests**:
@@ -333,25 +610,24 @@ register_entry(product=manoterapia_product, serial_number=None) → Movement cre
 
 ---
 
-#### BR-12: Prefijo de SKU (Marca Can)
+#### BR-12: Formato de SKU definido por el usuario
 
-**Descripción**: Los productos con marca propia "Can" deben llevar un prefijo obligatorio `CAN-` en su SKU para identificación uniforme y control de inventario.
+**Descripción**: El SKU lo define el usuario y debe seguir el patrón 1–4 letras, un guion y 1–4 dígitos (por ejemplo `PRD-0001`, `A-1` o `ELEC-123`). No se exige un prefijo obligatorio para la marca propia.
 
 **Implementación**:
-- Validador en `catalog.models.Product.sku` o en `catalog.services.create_product()`.
-- Si `product.brand == 'Can'` y `not product.sku.startswith('CAN-')`: lanza `InvalidSKUFormatError`.
-- El prefijo es verificado en la admisión de productos al catálogo.
+- Validación en `shared.utils.validators.validate_sku_format` y aplicable desde `catalog.models.Product` y `catalog.services.create_product()`.
+- Si el SKU no cumple el patrón definido: lanza `InvalidSKUFormatError` o `ValueError` según el contexto.
 
 **Verificación en tests**:
 ```python
-# Debe fallar: producto Can sin prefijo
+# Debe fallar: SKU con formato inválido (sin guion)
 create_product(sku="ELECTRO001", brand="Can") → InvalidSKUFormatError
 
-# Debe pasar: producto Can con prefijo
-create_product(sku="CAN-ELECTRO001", brand="Can") → Product created
+# Debe pasar: SKU con formato válido
+create_product(sku="ELEC-0001", brand="Can") → Product created
 
-# Debe pasar: producto de otra marca sin necesidad de prefijo
-create_product(sku="ELECTRO001", brand="OtraMarca") → Product created
+# Debe pasar: producto de otra marca con formato válido
+create_product(sku="OTR-1", brand="OtraMarca") → Product created
 ```
 
 **Referencia**: RF-003
@@ -468,17 +744,17 @@ Si **no coinciden**, el despacho es **rechazado** con excepción `CrossValidatio
 **Verificación en tests**:
 ```python
 # Escenario: auxiliar intenta despachar producto erróneo
-order_sku = "CAN-ELECTRO001"  # esperado
-scanned_code = "CAN-ELECTRO002"  # escaneado (producto similar)
+order_sku = "ELEC-0001"  # esperado
+scanned_code = "ELEC-0002"  # escaneado (producto similar)
 
 register_dispatch(user=auxiliar, product_id=..., location_id=1, quantity=10,
                   movement_type='SALIDA_VENTA_MAYOR', scanned_code=scanned_code, 
                   order_sku=order_sku)
-→ CrossValidationFailedError: Producto escaneado (CAN-ELECTRO002) no coincide con SKU de orden (CAN-ELECTRO001)
+→ CrossValidationFailedError: Producto escaneado (ELEC-0002) no coincide con SKU de orden (ELEC-0001)
 
 # Escenario correcto
-order_sku = "CAN-ELECTRO001"
-scanned_code = "CAN-ELECTRO001"
+order_sku = "ELEC-0001"
+scanned_code = "ELEC-0001"
 
 register_dispatch(user=auxiliar, product_id=..., location_id=1, quantity=10,
                   movement_type='SALIDA_VENTA_MAYOR', scanned_code=scanned_code, 
@@ -641,6 +917,209 @@ assert product.sku in pdf_content
 
 ---
 
+#### BR-14: Estado Operativo de Ubicación Restringe Movimientos
+
+**Descripción**: El estado operativo de una ubicación (`OperationalStatus`) determina qué operaciones de stock puede ejecutar. Las ubicaciones en estado `archived` o `blocked` no admiten ningún movimiento. Las en estado `maintenance` o `restricted` no pueden operar como origen de despachos, traslados ni ajustes reductores, pero sí pueden recibir stock como destino. Solo el Almacenista puede cambiar el estado operativo.
+
+**Matriz de elegibilidad**:
+
+| Estado | Entrada (destino) | Despacho (origen) | Traslado destino | Devolución (destino) |
+|--------|:-----------------:|:-----------------:|:----------------:|:--------------------:|
+| active | ✅ | ✅ | ✅ | ✅ |
+| maintenance | ✅ | ❌ | ✅ | ✅ |
+| restricted | ✅ | ❌ | ✅ | ✅ |
+| blocked | ❌ | ❌ | ❌ | ❌ |
+| archived | ❌ | ❌ | ❌ | ❌ |
+
+**Implementación**:
+- `inventory.models.Location.OperationalStatus` — enum con los cinco estados.
+- `movements.services._ensure_location_allows_origin` — gate para operaciones de salida.
+- `movements.services._ensure_location_allows_destination` — gate para operaciones de entrada.
+- `shared.exceptions.LocationStateNotAllowedError` — excepción de dominio (HTTP 422).
+
+**Referencia**: RF-004, RF-005, RF-006, RF-007, RF-008, RF-009
+
+---
+
+#### BR-15: Tipo de Almacenamiento Activo como Requisito de Asignación
+
+**Descripción**: Un `StorageType` con `is_active=False` no puede asignarse a nuevas ubicaciones ni reasignarse a las existentes. La desactivación es soft (el tipo permanece en BD para no romper FKs existentes). Solo el Almacenista puede crear, modificar o desactivar tipos de almacenamiento.
+
+**Implementación**:
+- `inventory.services.create_location` — valida `storage_type.is_active` antes de asignar.
+- `inventory.services.update_location` — igual validación al cambiar `storage_type_id`.
+- `shared.exceptions.DomainValidationError` — lanzada con mensaje descriptivo (HTTP 422).
+
+**Referencia**: RF-004
+
+---
+
+#### BR-16: Precio Congelado en Despacho
+
+**Descripción**: Al confirmar un despacho de venta, el sistema captura el precio unitario de venta, el costo unitario, la tasa de IVA, el descuento y el total calculado en el registro de movimiento de forma permanente. Ninguna modificación posterior al precio del producto en el catálogo puede alterar los campos financieros de un Movement ya creado.
+
+**Implementación**:
+- `movements.services._resolve_price_snapshot(product, quantity, movement_type)` — resuelve el precio correcto según el tipo de salida:
+  - `SALIDA_VENTA_MENOR` → `product.sale_price_retail`
+  - `SALIDA_VENTA_MAYOR` → `product.sale_price_wholesale`
+  - `SALIDA_DANO` / `SALIDA_VENCIMIENTO` → `product.unit_cost`
+- El resultado se pasa a `Movement.objects.create(**price_snapshot)` dentro de la misma transacción atómica.
+- Si el producto no tiene precio configurado, todos los campos quedan en `null` y el despacho continúa normalmente.
+- Los campos financieros en `Movement` son nullable para compatibilidad con movimientos históricos anteriores a esta regla.
+
+**Campos en Movement afectados**:
+
+```
+unit_price      — Precio unitario de venta congelado
+unit_cost       — Costo unitario congelado
+discount_pct    — Porcentaje de descuento aplicado
+discount_amount — Monto de descuento
+subtotal        — unit_price × quantity
+tax_rate_pct    — Tasa IVA congelada
+tax_amount      — IVA calculado
+total_amount    — Total final a cobrar
+currency        — Moneda ISO 4217
+price_type      — "retail" | "wholesale" | "cost" | "combo"
+customer_snapshot — JSON con datos del cliente (ventas mayores)
+```
+
+**Verificación en tests**:
+```python
+# Debe pasar: precio congelado permanece intacto
+m = register_dispatch(user, product.id, ..., MovementType.SALIDA_VENTA_MENOR)
+update_product_prices(user, product.id, sale_price_retail=Decimal("99999"))
+m.refresh_from_db()
+assert m.unit_price == Decimal("10000")  # precio original
+
+# Debe pasar: producto sin precio no bloquea el despacho
+m = register_dispatch(user, producto_sin_precio.id, ...)
+assert m.unit_price is None
+assert m.total_amount is None
+```
+
+**Referencia**: RF-NEW-05, RF-006, ADR-013
+
+---
+
+#### BR-17: Historial Auditado de Cambios de Precio
+
+**Descripción**: Toda actualización de precio de un producto (unit_cost, sale_price_retail, sale_price_wholesale o tax_rate_pct) debe registrarse de forma inmutable en `ProductPriceHistory`, identificando el campo modificado, el valor anterior, el valor nuevo, el usuario que realizó el cambio y la fecha/hora exacta. Si el valor enviado es idéntico al actual, no se registra nada.
+
+**Implementación**:
+- `catalog.services.update_product_prices(user, product_id, **price_fields)` — única función autorizada para cambiar precios.
+- Por cada campo que realmente cambie, crea una fila en `ProductPriceHistory` vía `bulk_create`.
+- Lanza `AuditEventType.PRODUCT_PRICE_UPDATED` en `AuditLog` con los campos modificados.
+- Solo usuarios con `role == "almacenista"` pueden ejecutar esta función; los demás reciben `UnauthorizedCredentialManagementError`.
+- El endpoint `PATCH /api/v1/catalog/products/<id>/prices/` es el único punto de acceso HTTP autorizado.
+
+**Verificación en tests**:
+```python
+# Debe crear historial con old/new value
+update_product_prices(almacenista, product.id, sale_price_retail=Decimal("12000"))
+h = ProductPriceHistory.objects.get(product=product, field_changed="sale_price_retail")
+assert h.old_value == Decimal("10000")
+assert h.new_value == Decimal("12000")
+assert h.changed_by == almacenista
+
+# Valor idéntico: NO debe crear historial
+update_product_prices(almacenista, product.id, sale_price_retail=Decimal("10000"))  # mismo valor
+assert ProductPriceHistory.objects.filter(product=product).count() == 0
+
+# Debe rechazar rol no autorizado
+with pytest.raises(UnauthorizedCredentialManagementError):
+    update_product_prices(auxiliar, product.id, sale_price_retail=Decimal("9000"))
+```
+
+**Referencia**: RF-NEW-05, RF-003, ADR-013
+
+---
+
+#### BR-18: NIT Único por Proveedor
+
+**Descripción**: El NIT (Número de Identificación Tributaria) de un proveedor es único en todo el sistema. No pueden existir dos proveedores con el mismo NIT, independientemente de si están activos o inactivos.
+
+**Implementación**:
+- `Supplier.nit = CharField(unique=True)` — constraint a nivel de base de datos.
+- `purchasing.services.create_supplier()` lanza `SupplierNITDuplicateError` si el NIT ya existe (verificación previa al insert para mensaje de error claro).
+
+**Verificación en tests**:
+```python
+SupplierFactory(nit="900000001-1")
+with pytest.raises(SupplierNITDuplicateError):
+    create_supplier(user, {"nombre_comercial": "Otro", "nit": "900000001-1"})
+```
+
+**Referencia**: RF-019, ADR-014
+
+---
+
+#### BR-19: Estado de OC controla operaciones permitidas
+
+**Descripción**: Las Órdenes de Compra siguen un ciclo de vida estricto. El estado determina qué operaciones son posibles:
+- `BORRADOR`: editable, cancelable, no acepta recepciones.
+- `PENDIENTE` / `PARCIALMENTE_RECIBIDA`: inmutable en contenido, acepta recepciones, cancelable solo si no hay recepciones confirmadas.
+- `COMPLETADA` / `CANCELADA`: completamente inmutable, no acepta ninguna operación.
+
+Solo las recepciones pueden crearse para OC en estado `PENDIENTE` o `PARCIALMENTE_RECIBIDA`.
+
+**Implementación**:
+- `PurchaseOrder.is_editable` (property): True solo en BORRADOR.
+- `PurchaseOrder.is_receivable` (property): True en PENDIENTE y PARCIALMENTE_RECIBIDA.
+- `purchasing.services.update_purchase_order()` lanza `PurchaseOrderImmutableError` si no es BORRADOR.
+- `purchasing.services.create_reception()` lanza `PONotReceivableError` si la OC no está en estado receivable.
+
+**Verificación en tests**:
+```python
+po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
+with pytest.raises(PurchaseOrderImmutableError):
+    update_purchase_order(user, po.id, {"notes": "x"})
+```
+
+**Referencia**: RF-020, RF-021, ADR-014
+
+---
+
+#### BR-20: Cancelación de OC requiere ausencia de recepciones confirmadas
+
+**Descripción**: Una Orden de Compra no puede cancelarse si tiene al menos una recepción en estado `CONFIRMADA`. La cancelación solo es posible si todas las recepciones asociadas están en `BORRADOR` o `CANCELADA`.
+
+**Implementación**:
+- `purchasing.services.cancel_purchase_order()` verifica `reception.status == CONFIRMADA` antes de proceder.
+- Lanza `POHasConfirmedReceptionsError` (HTTP 409) si existe alguna.
+
+**Verificación en tests**:
+```python
+po = PurchaseOrderFactory(status=PurchaseOrderStatus.PENDIENTE)
+ReceptionFactory(purchase_order=po, status=ReceptionStatus.CONFIRMADA)
+with pytest.raises(POHasConfirmedReceptionsError):
+    cancel_purchase_order(user, po.id, reason="Motivo")
+```
+
+**Referencia**: RF-020, ADR-014
+
+---
+
+#### BR-21: Costo de Compra Congelado en Movement al Confirmar Recepción
+
+**Descripción**: Al confirmar una recepción, el `unit_cost` acordado con el proveedor en el ítem de la Orden de Compra (`PurchaseOrderItem.unit_cost`) queda registrado de forma inmutable en el campo `Movement.unit_cost` del movimiento de entrada generado. Este valor no cambia aunque el precio de catálogo del producto se actualice posteriormente.
+
+**Implementación**:
+- `purchasing.services.confirm_reception()` pasa `unit_cost=poi.unit_cost` a `movements.services.register_entry()`.
+- `movements.services.register_entry()` acepta parámetro opcional `unit_cost=None` (backward-compatible con entradas sin OC).
+- `Movement.unit_cost` es nullable — los movimientos de entrada sin OC asociada mantienen `None`.
+
+**Verificación en tests**:
+```python
+poi = PurchaseOrderItemFactory(unit_cost="12500.5000")
+confirm_reception(user, reception.id)
+movement = Movement.objects.get(product=poi.product, movement_type=MovementType.ENTRADA)
+assert movement.unit_cost == Decimal("12500.5000")
+```
+
+**Referencia**: RF-022, ADR-013, ADR-014
+
+---
+
 ### 3.1.4 Auditoría y Reportes
 
 #### Reglas de Auditoría Derivadas de BR-10
@@ -677,8 +1156,16 @@ assert product.sku in pdf_content
 | BR-09 | Nota Discrepancia Recepción | Movements | `register_entry` exige nota si qty != qty_facturada | Tests: discrepancia sin nota rechazada |
 | BR-10 | Inmutabilidad Ledger | Movements/Audit | SIN PUT/PATCH/DELETE en viewsets + guardas de permisos | Tests: intento PUT rechazado con 405/403 |
 | BR-11 | Stock por Ubicación + Ledger | Inventory | `StockByLocation` + `Movement` atómico + `reconstruct_stock_from_ledger` | Tests: sincronización y reconstrucción correcta |
-| BR-12 | Prefijo CAN | Catalog | Validador en `Product.sku` | Tests: rechazo "ELECTRO001", aceptación "CAN-ELECTRO001" |
+| BR-12 | SKU patrón | Catalog | Validador en `Product.sku` (`validate_sku_format`) | Tests: rechazo "ELECTRO001", aceptación "ELEC-0001" |
 | BR-13 | Factura PDF + Numeración | Movements | `generate_invoice_pdf` + secuencia atómica | Tests: PDF existe, numeración correcta |
+| BR-14 | Estado Operativo de Ubicación | Inventory/Movements | `_ensure_location_allows_origin` + `_ensure_location_allows_destination` en `movements/services.py`; `Location.OperationalStatus` en `inventory/models.py` | Tests: archived/blocked bloquean todo, maintenance/restricted bloquean origen |
+| BR-15 | StorageType Activo como Requisito | Inventory | Validación en `create_location`/`update_location`; `StorageType.is_active` | Tests: tipo inactivo rechazado en asignación |
+| BR-16 | Precio Congelado en Despacho | Movements/Pricing | `_resolve_price_snapshot()` en `movements/services.py`; campos `unit_price`, `subtotal`, `total_amount` en `Movement` (nullable, inmutables post-creación) | Tests: `test_price_snapshot_immutable_after_product_price_change`; cambio de precio no altera Movement histórico |
+| BR-17 | Historial Auditado de Precios | Catalog/Pricing | `update_product_prices()` en `catalog/services.py` crea fila en `ProductPriceHistory` por cada campo modificado | Tests: `test_update_price_creates_history_record`; valor idéntico no genera registro |
+| BR-18 | NIT Único por Proveedor | Purchasing | `Supplier.nit = CharField(unique=True)` + `SupplierNITDuplicateError` en `purchasing/services.py` | Tests: `test_create_supplier_duplicate_nit_raises` |
+| BR-19 | Estado de OC Controla Operaciones | Purchasing | `PurchaseOrder.is_editable`, `is_receivable` (properties) + guardas en `purchasing/services.py` | Tests: `test_confirm_already_pendiente_raises`, `test_create_reception_po_not_receivable_raises` |
+| BR-20 | Cancelación de OC Requiere Sin Recepciones Confirmadas | Purchasing | `cancel_purchase_order()` verifica `ReceptionStatus.CONFIRMADA` → `POHasConfirmedReceptionsError` (HTTP 409) | Tests: `test_cancel_po_with_confirmed_reception_raises` |
+| BR-21 | Costo de Compra Congelado en Movement | Purchasing/Movements | `register_entry(unit_cost=poi.unit_cost)` en `purchasing/services.confirm_reception()` | Tests: `test_confirm_reception_unit_cost_flows_to_movement` |
 
 ---
 
@@ -843,19 +1330,35 @@ def register_entry(user, product_id, location_id, quantity, serial_number=None,
 
 ### 4.5 Ubicaciones de Almacenamiento
 
-El sistema soporta tres ubicaciones físicas:
+El sistema soporta ubicaciones físicas con estado operativo (BR-14):
 
 ```python
-class Location(Model):
-    code = CharField(unique=True)  # 'VITRINA', 'BODEGA_1', 'BODEGA_2'
-    description = CharField()
-    is_retail = BooleanField(default=False)  # Vitrina = True, Bodegas = False
+class Location(BaseModel):
+    class OperationalStatus(models.TextChoices):
+        ACTIVE = "active", "Activa"
+        MAINTENANCE = "maintenance", "Mantenimiento"
+        RESTRICTED = "restricted", "Restringida"
+        BLOCKED = "blocked", "Bloqueada"
+        ARCHIVED = "archived", "Archivada"
+
+    code = SlugField(max_length=100, unique=True)  # auto-generado desde name
+    name = CharField(max_length=100)
+    description = TextField(blank=True)
+    is_retail = BooleanField(default=False)
+    max_capacity = PositiveIntegerField(null=True, blank=True)
+    operational_status = CharField(
+        max_length=20, choices=OperationalStatus.choices,
+        default=OperationalStatus.ACTIVE, db_index=True
+    )
+    storage_type = ForeignKey(StorageType, null=True, on_delete=PROTECT)
+    storage_template = ForeignKey(StorageTemplate, null=True, on_delete=SET_NULL)
 ```
 
 Las ubicaciones definen:
 - Dónde se ejecutan las operaciones (vitrina vs. mayorista).
 - Cómo se consolida el stock total.
 - Reglas de visibilidad en reportes.
+- BR-14: el `operational_status` determina qué operaciones de stock son elegibles.
 
 ---
 
@@ -1028,7 +1531,7 @@ def custom_exception_handler(exc, context):
 ```python
 # tests/factories.py
 class ProductFactory(factory.django.DjangoModelFactory):
-    sku = factory.Sequence(lambda n: f"CAN-PROD{n:04d}")
+    sku = factory.Sequence(lambda n: f"PRD-{n%9999+1:04d}")
     category = factory.SubFactory(CategoryFactory)
     
     class Meta:
@@ -1149,6 +1652,11 @@ SIMPLE_JWT = {
 
 **Regla**: Solo almacenista puede crear/modificar/deshabilitar usuarios.
 
+**Seguridad de contraseñas**:
+- El modelo de usuario hereda de `AbstractUser`, por lo que el campo `password` y su manejo seguro ya vienen provistos por Django.
+- La creación y el cambio de contraseña usan `set_password()`, así que la contraseña nunca se persiste en texto plano.
+- En desarrollo y producción se conserva el hashing seguro de Django; en la suite de pruebas se usa un hasher más liviano solo para acelerar la ejecución.
+
 **Implementación**:
 ```python
 # apps/authentication/services.py
@@ -1234,6 +1742,29 @@ def register_dispatch(user, ..., customer_data=None):
                 "Debe reconocer aviso de privacidad para despacho mayorista"
             )
 ```
+
+### 8.6 Seguridad de Datos y Superficie de Exposición
+
+La seguridad en ICM no depende de una sola capa; se aplica de forma transversal en autenticación, autorización, persistencia y auditoría.
+
+**Controles principales**:
+- Autenticación sin sesiones de servidor: el acceso a la API usa JWT con `Bearer`.
+- Contraseñas almacenadas solo como hash seguro administrado por Django.
+- Permisos por rol en backend y validaciones adicionales por caso de uso.
+- Tokens `refresh` revocables mediante blacklist al cerrar sesión o deshabilitar usuarios.
+- Respuestas de autenticación y perfil sin exponer el campo `password`.
+- Auditoría de eventos sensibles como login, logout, creación de usuarios, cambios de credenciales y deshabilitación de cuentas.
+- Uso de consultas y serializers controlados para evitar exponer campos no previstos en el contrato.
+
+**Datos sensibles**:
+- Los datos personales se manejan bajo el principio de mínimo privilegio.
+- Los reportes y consultas deben devolver solo lo necesario para el contexto funcional.
+- Cuando un flujo requiere datos personales de cliente, la validación de consentimiento o aviso de privacidad se realiza en la capa de servicio.
+
+**Notas operativas**:
+- En local y producción se recomienda transporte cifrado a nivel de infraestructura o proxy inverso.
+- La política de hashing de contraseñas no debe redefinirse para debilitar la seguridad fuera de pruebas.
+- La suite de pruebas puede usar hashers más rápidos, pero eso no cambia el comportamiento del sistema en ejecución real.
 
 **Consultas con control de acceso**:
 ```python
@@ -1410,13 +1941,13 @@ version: '3.9'
 
 services:
   db:
-    image: postgres:15-alpine
+    image: postgres:18-alpine
     environment:
       POSTGRES_DB: icm_db
       POSTGRES_USER: icm_user
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U icm_user"]
       interval: 10s
@@ -1528,6 +2059,16 @@ REDIS_URL=redis://redis:6379/0
 - HTTPS: Forzado
 - Security headers: Aplicados
 
+### 10.5 Restricción actual de empaquetado de producción
+
+La imagen de produccion no es equivalente a la de desarrollo: `docker-compose.prod.yml` arranca `gunicorn`, pero `docker/Dockerfile` instala solo `requirements/base.txt`. Como `gunicorn` vive en `requirements/production.txt`, cualquier despliegue productivo debe incorporar esa dependencia o una capa equivalente antes del arranque.
+
+Impacto:
+
+- No se debe asumir que la imagen base sirva para produccion sin una construccion adicional.
+- Si cambian las dependencias de runtime, el Dockerfile y los requirements deben mantenerse sincronizados.
+- La validacion de despliegue requiere revisar el binario de arranque, no solo la compilacion de Django.
+
 ---
 
 ## 11. Testing y Aseguramiento de Calidad
@@ -1536,18 +2077,21 @@ La arquitectura modular facilita testing en múltiples niveles.
 
 ### 11.1 Estrategia de Pruebas
 
-**Unitarias** (60% cobertura):
+Distribución actual de la suite (~846 tests):
+
+**Unitarias** (603 tests en apps, 81 en scripts/shared):
 - Servicios: Lógica de dominio aislada.
 - Validadores y excepciones.
+- Modelos, selectores, comandos de gestión.
 
-**Integración** (25% cobertura):
+**Integración** (23 tests HTTP/API):
 - Endpoints API + autenticación + permisos.
 - Flujos completos de movimientos.
+- Pruebas cross-module y smoke.
 
-**Consistencia** (15% cobertura):
-- Invariantes de inventario (BR-11).
-- Restricciones de rol (BR-01, BR-02, BR-03).
-- Inmutabilidad de ledger (BR-10).
+**Gherkin / ERS** (138 scenarios):
+- Escenarios dinámicos alineados al ERS.
+- Trazabilidad viva en `docs/test/TRAZABILIDAD_ERS_GHERKIN.md`.
 
 ### 11.2 Casos Críticos de Testing
 
@@ -1567,12 +2111,18 @@ Estos tests **deben** pasar siempre:
 
 ### 11.3 Herramientas y Configuración
 
-```python
+```ini
 # pytest.ini
 [pytest]
 DJANGO_SETTINGS_MODULE = config.settings.test
 python_files = test_*.py
-addopts = --cov=apps --cov-report=html --tb=short
+python_classes = Test*
+python_functions = test_*
+addopts = -v --tb=short --import-mode=importlib
+norecursedirs = .venv node_modules .git .tox tests/performance
+filterwarnings = ignore::DeprecationWarning
+markers =
+    slow: tests lentos que ejecutan el seeder o el cleaner completos
 
 # Run: pytest
 # Run with coverage: pytest --cov
@@ -1584,9 +2134,20 @@ addopts = --cov=apps --cov-report=html --tb=short
 - `pytest-cov`: Cobertura.
 - `freeze-gun`: Mocking de tiempo (para BR-03, BR-06).
 
-### 11.4 CI/CD (GitHub Actions - Preparación)
+### 11.4 Restricción actual de fidelidad de pruebas
 
-`.github/workflows/tests.yml`:
+La configuracion de pruebas usa `config.settings.test`, que ejecuta la suite sobre SQLite in-memory y desactiva `DEFAULT_THROTTLE_CLASSES`. Esto acelera la ejecucion y reduce friccion local, pero no reproduce la semantica de PostgreSQL ni valida throttling de produccion.
+
+Impacto:
+
+- Las pruebas automatizadas no ejercitan `select_for_update()` ni bloqueos reales de PostgreSQL.
+- Los limites de peticiones se validan a nivel logico, no con el throttler activo.
+- Los tests de alerts que usan threads (`test_commands.py`, `test_detail_resolve.py`, `test_new_alert_types.py`, `test_polling.py`, `test_services.py`) fallan en SQLite local con `DatabaseError: DatabaseWrapper objects created in a thread can only be used in that same thread`. En CI se ejecutan contra PostgreSQL sin este problema.
+- Para concurrencia real o limites de produccion, hacen falta pruebas especificas contra PostgreSQL.
+
+### 11.5 CI/CD (GitHub Actions - Preparación)
+
+`.github/workflows/ci.yml`:
 
 ```yaml
 name: Tests
@@ -1598,7 +2159,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:15
+        image: postgres:18
         env:
           POSTGRES_PASSWORD: postgres
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -1619,7 +2180,7 @@ jobs:
 
 ### 12.1 Estilo de Código
 
-- **PEP 8**: `black` (formateador), `isort` (imports), `flake8` (linter).
+- **PEP 8**: `ruff` (formateador + linter + imports, reemplaza a black, isort y flake8).
 - **Type hints**: Obligatorios en `services.py` y `selectors.py`.
 
 ```python
@@ -1687,7 +2248,7 @@ Todos los `created_at`, `updated_at` se almacenan en UTC:
 ```python
 # settings/base.py
 USE_TZ = True
-TIME_ZONE = 'UTC'
+TIME_ZONE = config("APP_TIMEZONE", default="America/Bogota")
 
 # Conversión a zona local: solo en serialización
 class MovementSerializer(Serializer):
@@ -1758,6 +2319,7 @@ Acceso: `GET /api/v1/docs/` → Swagger UI.
 - [ ] Toda la lógica de negocio está en `services.py`.
 - [ ] Todas las consultas complejas están en `selectors.py`.
 - [ ] No existen imports cruzados de `models.py` entre apps (salvo justificación explícita).
+- [ ] `SoftDeleteModel` usado exclusivamente para existencia lógica (`deleted_at`); `is_active` para disponibilidad/reglas de negocio.
 
 ### Reglas de Negocio Críticas
 
@@ -1772,13 +2334,19 @@ Acceso: `GET /api/v1/docs/` → Swagger UI.
 - [ ] BR-09: Nota obligatoria si hay discrepancia en recepción.
 - [ ] BR-10: **Movimientos e AuditLog son inmutables** (sin PUT/PATCH/DELETE).
 - [ ] BR-11: Stock derivado sincronizado + reconstruible desde ledger.
-- [ ] BR-12: SKU con prefijo CAN- validado.
-- [ ] BR-13: Facturas numeradas secuencialmente + PDF generado.
+- [ ] BR-12: SKU validado contra el patrón 1–4 letras, guion, 1–4 dígitos.
+- [ ] BR-13: Facturas numeradas secuencialmente + PDF generado (ahora incluye precio, IVA y total).
+- [ ] BR-14: Estado operativo de ubicación validado antes de cada movimiento (archived/blocked rechazan todo, maintenance/restricted rechazan origen).
+- [ ] BR-15: StorageType inactivo rechazado al asignar a ubicaciones nuevas o existentes.
+- [ ] BR-16: Precio congelado en el Movement al momento del despacho; inmutable post-creación.
+- [ ] BR-17: Cada cambio de precio registra fila inmutable en ProductPriceHistory con old_value, new_value y changed_by.
+- [ ] **Soft Delete**: Catalog (Category, Brand, Product, ProductCombo), Inventory (StorageType, StorageTemplate, Location), Purchasing (Supplier), Webhooks (WebhookEndpoint) heredan `SoftDeleteModel`.
 
 ### Transacciones y Consistencia
 
 - [ ] Todas las operaciones de `services.py` que alteren stock tienen `@transaction.atomic`.
 - [ ] Uso de `select_for_update()` en lecturas que precedan actualizaciones (prevención de race conditions).
+- [ ] Uso de `get_for_update_or_404()` para obtener objetos con lock en servicios transaccionales (evita try/except repetitivos).
 - [ ] Stock negativo imposible (constraint CHECK en BD).
 - [ ] No hay Stock actualizado sin Movement creado en la misma transacción.
 
@@ -1829,22 +2397,36 @@ Esta arquitectura prepara el sistema para:
 
 No se adopta microservicios en esta fase para evitar complejidad operacional innecesaria.
 
+Documentacion complementaria de este analisis:
+
+- [docs/calidad_restricciones/README_RESTRICCIONES.md](calidad_restricciones/README_RESTRICCIONES.md)
+- [docs/calidad_restricciones/README_ATRIBUTOS_CALIDAD.md](calidad_restricciones/README_ATRIBUTOS_CALIDAD.md)
+- [docs/architecture/architecture_drivers.md](architecture_drivers.md)
+- [docs/architecture/utility_tree.md](utility_tree.md)
+- [docs/architecture/architectural_constraints.md](architectural_constraints.md)
+- [docs/architecture/adr_relationships.md](adr_relationships.md)
+
 ## 15. Matriz de Trazabilidad Completa (RF -> Arquitectura)
 
 | Requisito | Modulo funcional | Componentes tecnicos principales | Reglas de negocio asociadas |
 | --- | --- | --- | --- |
-| RF-001 | Autenticacion | `apps/authentication/views.py`, `apps/authentication/services.py`, `shared/permissions.py` | BR-01, BR-03 |
+| RF-001 | Autenticacion y recuperacion de contrasena | `apps/authentication/views.py`, `apps/authentication/services.py`, `shared/permissions.py`, `shared/email_service.py` | BR-01, BR-03 |
 | RF-002 | Credenciales | `apps/authentication/services.py`, `apps/authentication/views.py`, `apps/audit/services.py` | BR-01, BR-02 |
-| RF-003 | Catalogo | `apps/catalog/models.py`, `apps/catalog/services.py`, `apps/catalog/views.py` | BR-04, BR-12, BR-13 |
-| RF-004 | Consulta inventario | `apps/inventory/selectors.py`, `apps/inventory/views.py`, `apps/inventory/models.py` | BR-11, BR-13 |
-| RF-005 | Recepcion (entradas) | `apps/movements/services.py::register_entry`, `apps/movements/views.py`, `apps/inventory/models.py` | BR-04, BR-09, BR-10, BR-11, BR-13 |
-| RF-006 | Despacho/salidas | `apps/movements/services.py::register_dispatch`, `apps/catalog/services.py`, `apps/movements/models.py` | BR-08, BR-10, BR-11, BR-13 |
-| RF-007 | Traslados internos | `apps/movements/services.py::register_internal_transfer`, `apps/inventory/models.py` | BR-06, BR-10, BR-11 |
-| RF-008 | Devoluciones | `apps/movements/services.py::register_return`, `apps/movements/services.py::approve_return` | BR-02, BR-05, BR-10 |
-| RF-009 | Ajustes | `apps/movements/services.py::register_adjustment`, `apps/movements/services.py::correct_movement_within_window` | BR-06, BR-07, BR-10, BR-11 |
+| RF-003 | Catalogo | `apps/catalog/models.py`, `apps/catalog/services.py`, `apps/catalog/views.py` | BR-04, BR-12, BR-13, BR-17 |
+| RF-004 | Consulta inventario | `apps/inventory/selectors.py`, `apps/inventory/views.py`, `apps/inventory/models.py` | BR-11, BR-13, BR-14, BR-15 |
+| RF-005 | Recepcion (entradas) | `apps/movements/services.py::register_entry`, `apps/movements/views.py`, `apps/inventory/models.py` | BR-04, BR-09, BR-10, BR-11, BR-13, BR-14 |
+| RF-006 | Despacho/salidas | `apps/movements/services.py::register_dispatch`, `apps/catalog/services.py`, `apps/movements/models.py` | BR-08, BR-10, BR-11, BR-13, BR-14, BR-16 |
+| RF-007 | Traslados internos | `apps/movements/services.py::register_internal_transfer`, `apps/inventory/models.py` | BR-06, BR-10, BR-11, BR-14 |
+| RF-008 | Devoluciones | `apps/movements/services.py::register_return`, `apps/movements/services.py::approve_return` | BR-02, BR-05, BR-10, BR-14 |
+| RF-009 | Ajustes | `apps/movements/services.py::register_adjustment`, `apps/movements/services.py::correct_movement_within_window` | BR-06, BR-07, BR-10, BR-11, BR-14 |
 | RF-010 | Reportes/KPI | `apps/reports/selectors.py`, `apps/reports/views.py` | BR-10, BR-11, BR-13 |
 | RF-011 | Alertas | `apps/alerts/services.py`, `apps/alerts/models.py` | BR-04, BR-10, BR-11 |
 | RF-012 | Auditoria | `apps/audit/models.py`, `apps/audit/services.py`, `apps/audit/views.py` | BR-01, BR-06, BR-07, BR-10 |
+| RF-NEW-01 | Exportacion CSV/XLSX | `shared/exporters.py`, `apps/reports/views.py`, `apps/inventory/views.py`, `apps/alerts/views.py` | RF-010 |
+| RF-NEW-02 | Umbrales de stock por ubicacion | `apps/inventory/models.py::StockByLocation.location_reorder_point`, `apps/alerts/services.py::check_and_create_minimum_stock_alert` | RF-011, BR-11 |
+| RF-NEW-03 | Webhooks (notificacion externa) | `apps/webhooks/models.py`, `apps/webhooks/services.py`, `apps/webhooks/management/commands/deliver_webhooks.py` | RF-011 |
+| RF-NEW-04 | Polling de alertas | `apps/alerts/views.py::AlertPollView`, `GET /api/v1/alerts/poll/` | RF-011 |
+| RF-NEW-05 | Precios y facturacion comercial | `apps/catalog/models.py::ProductPriceHistory`, `apps/movements/models.py::Invoice`, `apps/movements/services.py::_resolve_price_snapshot`, `apps/reports/selectors.py::sales_revenue_summary` | BR-13, BR-16, BR-17 |
 
 ## 16. Matriz de Trazabilidad Completa (BR -> Implementacion)
 
@@ -1861,8 +2443,12 @@ No se adopta microservicios en esta fase para evitar complejidad operacional inn
 | BR-09 Nota de discrepancia recepcion | `register_entry` exige nota cuando qty recibida != facturada | Tests de discrepancia sin nota |
 | BR-10 Inmutabilidad de log | Sin PUT/DELETE de movimientos/auditoria + guardas de inmutabilidad en modelos | Tests de intentos de modificacion |
 | BR-11 Stock por ubicacion | `StockByLocation` + traslados sin cambio global + ledger como fuente de verdad | Tests de consolidado y reconstruccion |
-| BR-12 Prefijo CAN | Validadores y reglas en `catalog/services.py` y `catalog/models.py` | Tests de SKU invalido |
+| BR-12 SKU definido por usuario | Validadores y reglas en `catalog/services.py` y `catalog/models.py` | Tests de SKU inválido |
 | BR-13 Barcode alias + factura PDF | `resolve_identifier`, flujo fallback manual, numeracion secuencial y PDF en despacho | Tests de identificacion y facturacion |
+| BR-14 Estado operativo de ubicacion | `_ensure_location_allows_origin` + `_ensure_location_allows_destination` en `movements/services.py` | Tests de estados archived, blocked, maintenance, restricted |
+| BR-15 StorageType activo como requisito | Validacion en `create_location`/`update_location`; `StorageType.is_active` | Tests de tipo inactivo rechazado |
+| BR-16 Precio congelado en despacho | `_resolve_price_snapshot()` en `movements/services.py` captura precio al momento del despacho; el campo es inmutable | Tests de inmutabilidad: cambiar precio del producto no altera movimientos historicos |
+| BR-17 Trazabilidad de cambios de precio | `update_product_prices()` en `catalog/services.py` registra cada cambio en `ProductPriceHistory` antes de guardar | Tests de historial: un cambio genera exactamente una fila por campo modificado |
 
 ## 17. Matriz de Trazabilidad Completa (RNF -> Decisiones tecnicas)
 

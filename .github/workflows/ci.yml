@@ -1,0 +1,476 @@
+name: CI
+
+on:
+  push:
+    branches: [staging, main]
+  pull_request:
+    branches: [staging, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Pipeline de CI — Sistema Inventario ICM
+#
+# Jobs y orden:
+#
+#   quality ──► unit_tests ──► integration_tests ──► scenarios ──► concurrency_tests ──► load_test
+#                                          │
+#                                          └──► seed_db_tests (solo PR, dentro de integración)
+#
+# ─────────────────────────────────────────────────────────────────────────────
+
+jobs:
+
+  # ── 1. Quality gate ────────────────────────────────────────────────────────
+  # Formato, seguridad estática, migraciones y documentación de tests.
+  # Corre rápido sin base de datos — falla pronto si hay un problema básico.
+  # ──────────────────────────────────────────────────────────────────────────
+  quality:
+    name: "Quality — lint · format · docs · migrations"
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements/development.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements/development.txt
+
+      - name: Linting + Formatting — ruff
+        run: ruff check apps/ shared/
+
+      - name: Format check — ruff format
+        run: ruff format --check apps/ shared/
+
+      - name: SAST — semgrep
+        run: python scripts/security/run_security_scan.py --ci
+
+      - name: SAST — bandit
+        run: bandit -r apps shared -ll
+
+      - name: Supply-chain — pip-audit
+        run: pip-audit --progress=off
+
+      - name: Migrations up-to-date
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Test documentation in sync
+        run: python -m scripts.generate_docs --check
+
+      - name: Type checking — mypy
+        run: mypy apps/ shared/ --ignore-missing-imports --no-error-summary
+
+
+  # ── 2. Tests unitarios — SQLite, sin base de datos externa ────────────────
+  # Pruebas rápidas de servicios y vistas. No necesitan Postgres.
+  # ──────────────────────────────────────────────────────────────────────────
+  unit_tests:
+    name: "Unit tests (SQLite)"
+    runs-on: ubuntu-latest
+    needs: quality
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements/development.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements/development.txt
+
+      - name: Run unit tests
+        run: |
+          pytest apps/ -q \
+            --ignore=tests \
+            --junitxml=junit-unit.xml \
+            --cov=apps \
+            --cov-report=xml:coverage-unit.xml \
+            --cov-report=term-missing \
+            --cov-fail-under=85
+
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: unit-results
+          path: |
+            junit-unit.xml
+            coverage-unit.xml
+
+
+  # ── 2b. Integración de scripts y tests raíz ───────────────────────────────
+  # Cubre los tests del directorio tests/ que no viven en apps/ ni en suites
+  # especializadas. Aquí van validadores, generadores y tests de integración
+  # livianos del repo. El seed_db lento queda como subflujo PR-only.
+  # ──────────────────────────────────────────────────────────────────────────
+  integration_tests:
+    name: "Integration tests (scripts + root)"
+    runs-on: ubuntu-latest
+    needs: unit_tests
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements/development.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements/development.txt
+
+      - name: Run integration tests
+        run: |
+          pytest tests/integration tests/scripts tests/shared tests/test_service_sla.py -q \
+            --ignore=tests/scripts/test_perf_locustfile.py \
+            --junitxml=junit-integration-tests.xml \
+            --cov=apps \
+            --cov-report=xml:coverage-integration-tests.xml
+
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: integration-tests-results
+          path: |
+            junit-integration-tests.xml
+            coverage-integration-tests.xml
+
+
+  # ── 3. Escenarios ERS/Gherkin — Postgres ──────────────────────────────────
+  # Escenarios del ERS (RF001–RF025, RNF003–RNF006).
+  # Requiere Postgres porque algunos escenarios verifican comportamiento
+  # transaccional real (SELECT FOR UPDATE, constraints, etc.).
+  # ──────────────────────────────────────────────────────────────────────────
+  scenarios:
+    name: "Scenarios (Postgres)"
+    runs-on: ubuntu-latest
+    needs: integration_tests
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: icm_test
+          POSTGRES_USER: icm
+          POSTGRES_PASSWORD: icm_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U icm"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+      DATABASE_URL: postgres://icm:icm_pass@localhost:5432/icm_test
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements/development.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements/development.txt
+
+      - name: Run migrations
+        run: python manage.py migrate --noinput
+
+      - name: Run integration tests
+        run: |
+          pytest tests/ers -q \
+            --junitxml=junit-gherkin.xml \
+            --cov=apps \
+            --cov-report=xml:coverage-gherkin.xml
+
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: scenarios-results
+          path: |
+            junit-gherkin.xml
+            coverage-gherkin.xml
+
+
+  # ── 3b. Seed DB lento — solo pull requests ────────────────────────────────
+  # Ejecuta el seed end-to-end completo. Se restringe a PR para no penalizar
+  # los pushes frecuentes, pero sigue entrando al CI antes del merge.
+  # ──────────────────────────────────────────────────────────────────────────
+  seed_db_tests:
+    name: "Seed DB tests (PR only)"
+    runs-on: ubuntu-latest
+    needs: integration_tests
+    if: github.event_name == 'pull_request'
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: icm_test
+          POSTGRES_USER: icm
+          POSTGRES_PASSWORD: icm_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U icm"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+      DATABASE_URL: postgres://icm:icm_pass@localhost:5432/icm_test
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements/development.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements/development.txt
+
+      - name: Run migrations
+        run: python manage.py migrate --noinput
+
+      - name: Run seed DB tests
+        run: |
+          pytest tests/scripts/test_seed_db.py -q \
+            --junitxml=junit-seed-db.xml
+
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: seed-db-results
+          path: junit-seed-db.xml
+
+
+  # ── 4. Concurrencia — Postgres + SELECT FOR UPDATE ────────────────────────
+  # Verifica que movimientos concurrentes no producen stock negativo.
+  # Solo tiene sentido en Postgres (SQLite no garantiza semántica de bloqueo).
+  # ──────────────────────────────────────────────────────────────────────────
+  concurrency_tests:
+    name: "Concurrency tests (Postgres)"
+    runs-on: ubuntu-latest
+    needs: scenarios
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: icm_test
+          POSTGRES_USER: icm
+          POSTGRES_PASSWORD: icm_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U icm"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+      DATABASE_URL: postgres://icm:icm_pass@localhost:5432/icm_test
+      RUN_CONCURRENCY_TESTS: "1"
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements/development.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements/development.txt
+
+      - name: Run migrations
+        run: python manage.py migrate --noinput
+
+      - name: Run concurrency tests
+        run: |
+          pytest tests/concurrency -v \
+            --junitxml=junit-concurrency.xml
+
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: concurrency-results
+          path: junit-concurrency.xml
+
+
+  # ── 5. Load test — Locust contra servidor vivo ────────────────────────────
+  # Simula 10 usuarios concurrentes durante 30 s y reporta throughput / latencia.
+  # No bloquea el merge — es informativo.
+  # ──────────────────────────────────────────────────────────────────────────
+  load_test:
+    name: "Load test (Locust)"
+    runs-on: ubuntu-latest
+    needs: concurrency_tests
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: icm_test
+          POSTGRES_USER: icm
+          POSTGRES_PASSWORD: icm_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U icm"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.loadtest
+      DATABASE_URL: postgres://icm:icm_pass@localhost:5432/icm_test
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements/development.txt
+
+      - name: Install dependencies (includes locust)
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements/development.txt
+
+      - name: Run migrations and seed test user
+        run: |
+          python manage.py migrate --noinput
+          python manage.py shell -c "
+          from datetime import timedelta
+          from django.contrib.auth import get_user_model
+          from django.utils import timezone
+          from apps.authentication.models import UserRole, TemporaryAccessPermit
+          User = get_user_model()
+
+          almacenista, _ = User.objects.get_or_create(
+              username='almacenista',
+              defaults={'email': 'almacenista@icm.local', 'role': UserRole.ALMACENISTA},
+          )
+          if not almacenista.password:
+              almacenista.set_password('testpass123')
+              almacenista.save()
+
+          auxiliar, _ = User.objects.get_or_create(
+              username='auxiliar',
+              defaults={'email': 'auxiliar@icm.local', 'role': UserRole.AUXILIAR_DESPACHO},
+          )
+          if not auxiliar.password:
+              auxiliar.set_password('testpass123')
+              auxiliar.save()
+
+          now = timezone.now()
+          if not TemporaryAccessPermit.objects.filter(user=auxiliar, allow_24_7=True, is_active=True).exists():
+              TemporaryAccessPermit.objects.create(
+                  user=auxiliar,
+                  start_datetime=now - timedelta(hours=1),
+                  end_datetime=now + timedelta(hours=2),
+                  allow_24_7=True,
+                  reason='CI load test',
+                  granted_by=almacenista,
+              )
+          print('Users ready.')
+          "
+
+      - name: Start Django server
+        run: |
+          python manage.py runserver 0.0.0.0:8000 --noreload &
+          echo $! > .server.pid
+          echo "Waiting for server..."
+          for i in $(seq 1 30); do
+            curl -s http://localhost:8000/api/v1/auth/login/ > /dev/null && echo "Server is up." && break || sleep 1
+          done
+
+      - name: Run Locust load test
+        run: |
+          locust -f tests/performance/locustfile.py \
+            --headless \
+            -H http://localhost:8000 \
+            -u 10 -r 2 \
+            --run-time 30s \
+            --only-summary \
+            --csv=locust-results
+
+      - name: Check load test SLAs (informativo)
+        continue-on-error: true
+        run: |
+          python -c "
+          import csv, pathlib, sys
+          stats_file = next(pathlib.Path('.').glob('locust-results_stats.csv'), None)
+          if not stats_file:
+              print('No Locust stats CSV found — skipping SLA check.')
+              sys.exit(0)
+          failures = []
+          with open(stats_file) as f:
+              for row in csv.DictReader(f):
+                  name = row.get('Name', '')
+                  if name in ('Aggregated', ''):
+                      continue
+                  fail_pct = float(row.get('Failure Count', 0) or 0) / max(float(row.get('Request Count', 1) or 1), 1) * 100
+                  p95 = float(row.get('95%', 0) or 0)
+                  if fail_pct > 1.0:
+                      failures.append(f'  FAIL ratio {fail_pct:.1f}% > 1% for: {name}')
+                  if p95 > 500:
+                      failures.append(f'  p95={p95:.0f}ms > 500ms for: {name}')
+          if failures:
+              print('SLA violations (informativo — no bloquea merge):')
+              for f in failures:
+                  print(f)
+          else:
+              print('All SLAs passed.')
+          "
+
+      - name: Stop Django server
+        if: always()
+        run: kill $(cat .server.pid) 2>/dev/null || true
+
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: locust-results
+          path: locust-results_*.csv

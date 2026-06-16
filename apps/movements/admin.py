@@ -9,6 +9,7 @@ class MovementAdmin(admin.ModelAdmin):
         "id",
         "movement_type",
         "product",
+        "lot",
         "quantity",
         "executed_by",
         "created_at",

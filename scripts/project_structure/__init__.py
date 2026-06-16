@@ -1,0 +1,1 @@
+"""Project structure generator package."""

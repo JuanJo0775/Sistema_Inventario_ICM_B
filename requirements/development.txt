@@ -1,5 +1,22 @@
 -r base.txt
 
-# Development-only tools
+# Development Tools
 django-debug-toolbar==4.2.0
 
+# Performance testing tools
+locust>=2.20
+
+# Testing
+pytest==9.0.3
+pytest-django==4.7.0
+pytest-cov==4.1.0
+factory-boy==3.3.0
+faker==20.1.0
+
+# Code Quality
+ruff==0.9.0
+semgrep>=1.166.0
+bandit>=1.9.0
+pip-audit>=2.10.0
+mypy==1.10.0
+django-stubs>=5.2.8

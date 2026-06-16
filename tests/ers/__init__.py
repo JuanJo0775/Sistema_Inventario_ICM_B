@@ -1,1 +1,1 @@
-"""Suite Gherkin alineada al ERS (`docs/ERS_ICM_Requisitos.md`)."""
+"""Suite Gherkin alineada al ERS (`docs/requisitos/ERS_ICM_Requisitos.md`)."""

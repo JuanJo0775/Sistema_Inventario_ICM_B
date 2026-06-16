@@ -2,10 +2,23 @@
 
 from django.urls import path
 
-from apps.authentication.views import (HealthCheckView, ICMTokenObtainPairView,
-                                       ICMTokenRefreshView, LogoutView, MeView,
-                                       UserDetailView, UserDisableView,
-                                       UserListCreateView)
+from apps.authentication.views import (
+    ChangePasswordView,
+    ForgotPasswordView,
+    HealthCheckView,
+    ICMTokenObtainPairView,
+    ICMTokenRefreshView,
+    LogoutView,
+    MeView,
+    ResetPasswordView,
+    TemporaryPermitRevokeView,
+    UserDetailView,
+    UserDisableView,
+    UserEnableView,
+    UserListCreateView,
+    UserScheduleDetailView,
+    UserTemporaryPermitListCreateView,
+)
 
 urlpatterns = [
     path("health/", HealthCheckView.as_view(), name="auth-health"),
@@ -18,4 +31,23 @@ urlpatterns = [
     path(
         "users/<uuid:pk>/disable/", UserDisableView.as_view(), name="auth-user-disable"
     ),
+    path("users/<uuid:pk>/enable/", UserEnableView.as_view(), name="auth-user-enable"),
+    path(
+        "users/<uuid:pk>/schedule/",
+        UserScheduleDetailView.as_view(),
+        name="auth-user-schedule",
+    ),
+    path(
+        "users/<uuid:pk>/temporary-permits/",
+        UserTemporaryPermitListCreateView.as_view(),
+        name="auth-user-temporary-permits",
+    ),
+    path(
+        "temporary-permits/<uuid:pk>/revoke/",
+        TemporaryPermitRevokeView.as_view(),
+        name="auth-temporary-permit-revoke",
+    ),
+    path("change-password/", ChangePasswordView.as_view(), name="auth-change-password"),
+    path("forgot-password/", ForgotPasswordView.as_view(), name="auth-forgot-password"),
+    path("reset-password/", ResetPasswordView.as_view(), name="auth-reset-password"),
 ]

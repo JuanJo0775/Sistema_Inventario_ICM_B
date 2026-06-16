@@ -1,14 +1,27 @@
 from django.urls import path
 
-from apps.movements.views import (AdjustmentCorrectView,
-                                  AdjustmentListCreateView, DispatchDetailView,
-                                  DispatchInvoiceDownloadView,
-                                  DispatchListCreateView, EntryDetailView,
-                                  EntryListCreateView, MovementCorrectionView,
-                                  MovementDetailView, MovementListView,
-                                  ReturnListCreateView, TransferListCreateView)
+from apps.movements.views import (
+    AdjustmentCorrectView,
+    AdjustmentListCreateView,
+    ComboDispatchView,
+    DispatchDetailView,
+    DispatchInvoiceDownloadView,
+    DispatchListCreateView,
+    EntryDetailView,
+    EntryListCreateView,
+    InvoiceDetailView,
+    InvoicePDFDownloadView,
+    MovementCorrectionView,
+    MovementDetailView,
+    MovementListView,
+    ReturnListCreateView,
+    TransferListCreateView,
+)
 
 urlpatterns = [
+    path(
+        "combo-dispatch/", ComboDispatchView.as_view(), name="movements-combo-dispatch"
+    ),
     path("entries/", EntryListCreateView.as_view(), name="movements-entries"),
     path(
         "entries/<uuid:pk>/", EntryDetailView.as_view(), name="movements-entry-detail"
@@ -38,6 +51,16 @@ urlpatterns = [
         "<uuid:pk>/corrections/",
         MovementCorrectionView.as_view(),
         name="movements-corrections",
+    ),
+    path(
+        "invoices/<str:number>/",
+        InvoiceDetailView.as_view(),
+        name="movements-invoice-detail",
+    ),
+    path(
+        "invoices/<str:number>/pdf/",
+        InvoicePDFDownloadView.as_view(),
+        name="movements-invoice-pdf",
     ),
     path("<uuid:pk>/", MovementDetailView.as_view(), name="movements-detail"),
     path("", MovementListView.as_view(), name="movements-list"),

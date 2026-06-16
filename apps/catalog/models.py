@@ -1,16 +1,14 @@
 """Catálogo de productos (RF-003, BR-04, BR-05, BR-12, BR-13)."""
 
-from __future__ import annotations
-
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from shared.models import BaseModel
-from shared.utils.validators import (normalize_sku, validate_can_sku,
-                                     validate_sku_format)
+from shared.models import BaseModel, SoftDeleteModel
+from shared.utils.validators import normalize_sku, validate_sku_format
 
 
-class Category(BaseModel):
+class Category(BaseModel, SoftDeleteModel):
     """
     Macrocategoría del catálogo ICM (RF-003).
 
@@ -29,6 +27,7 @@ class Category(BaseModel):
         help_text="BR-05: categoría admite devoluciones (Electroterapia / electrónicos).",
     )
     description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = "Categoría"
@@ -39,37 +38,29 @@ class Category(BaseModel):
         return self.name
 
 
-class Subcategory(BaseModel):
-    """Subcategoría ligada a una macrocategoría (RF-003)."""
+class Brand(BaseModel, SoftDeleteModel):
+    """Marca independiente (sin relación con Category). Un producto tiene una marca opcional,
+    pero los productos de una misma marca pueden estar en distintas categorías."""
 
-    name = models.CharField(max_length=128)
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.CASCADE,
-        related_name="subcategories",
-    )
-    slug = models.SlugField(max_length=128)
+    name = models.CharField(max_length=128, unique=True)
+    slug = models.SlugField(max_length=128, unique=True)
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
-        verbose_name = "Subcategoría"
-        verbose_name_plural = "Subcategorías"
-        ordering = ("category_id", "name")
-        constraints = [
-            models.UniqueConstraint(
-                fields=("category", "slug"), name="uniq_subcategory_slug_per_category"
-            ),
-        ]
-        unique_together = ("category", "name")
+        verbose_name = "Marca"
+        verbose_name_plural = "Marcas"
+        ordering = ("name",)
 
     def __str__(self) -> str:
-        return f"{self.category.name} / {self.name}"
+        return self.name
 
 
-class Product(BaseModel):
+class Product(BaseModel, SoftDeleteModel):
     """
     Producto/SKU central del dominio (RF-003, BR-12, BR-13).
 
-    # BR-12: prefijo CAN- para marca propia; validado en catalog/services.py::create_product.
+    # BR-12: SKU definido por usuario; formato validado por shared.utils.validators.validate_sku_format.
     `barcode`: alias de escaneo (BR-13).
     `expiration_date`: base para alertas RF-011 a 30/60 días.
     """
@@ -88,21 +79,59 @@ class Product(BaseModel):
         on_delete=models.PROTECT,
         related_name="products",
     )
-    subcategory = models.ForeignKey(
-        Subcategory,
+    brand = models.ForeignKey(
+        Brand,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         related_name="products",
     )
-    brand = models.CharField(max_length=100, default="Can")
     expiration_date = models.DateField(null=True, blank=True)
+    requires_expiration = models.BooleanField(
+        default=False,
+        help_text="True si el producto requiere control de vencimiento por lote.",
+    )
     weight_grams = models.PositiveIntegerField(null=True, blank=True)
     requires_cold_chain = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     notes = models.TextField(blank=True)
     # RF-011 / ERS: umbral global para alerta de stock bajo (no sustituye lógica en services).
     reorder_point = models.PositiveIntegerField(default=0)
+
+    # --- Precios (nullable para compatibilidad con productos existentes) ---
+    unit_cost = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Costo de adquisición por unidad (COGS).",
+    )
+    sale_price_retail = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Precio de venta al por menor (vitrina).",
+    )
+    sale_price_wholesale = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Precio de venta al por mayor.",
+    )
+    tax_rate_pct = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Tasa de IVA aplicable (ej: 19.00 para 19%).",
+    )
+    currency = models.CharField(
+        max_length=3,
+        default="COP",
+        help_text="Moneda ISO 4217 (COP por defecto).",
+    )
 
     class Meta:
         verbose_name = "Producto"
@@ -115,19 +144,12 @@ class Product(BaseModel):
         ]
 
     def clean(self) -> None:
-        """
-        RF-003, BR-12 — Validación SKU marca Can (prefijo CAN-) y formato seguro.
-
-        Criterios alineados a `docs/ERS_ICM_Requisitos.md` (RF-003, BR-12) e informe de elicitación
-        (marca Can, prefijo CAN-). Se ejecuta en Admin y ModelForm; la API sigue validando en
-        `catalog.services`.
-        """
+        """BR-12 — Valida formato de SKU (Admin y ModelForm). La API valida en catalog.services."""
         sku = normalize_sku(self.sku or "")
         if not sku:
             raise ValidationError({"sku": "El SKU es obligatorio."})
         try:
             validate_sku_format(sku)
-            validate_can_sku(sku, brand=self.brand)
         except ValueError as exc:
             raise ValidationError({"sku": str(exc)}) from exc
 
@@ -135,14 +157,131 @@ class Product(BaseModel):
         return f"{self.sku} — {self.name}"
 
 
-class ProductCombo(BaseModel):
+class Lot(BaseModel):
+    """
+    Lote de inventario asociado a un producto.
+
+    Se usa para trazabilidad de partidas con fechas de vencimiento distintas.
+    """
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.PROTECT,
+        related_name="lots",
+    )
+    code = models.CharField(max_length=100)
+    expiration_date = models.DateField()
+
+    class Meta:
+        verbose_name = "Lote"
+        verbose_name_plural = "Lotes"
+        ordering = ("expiration_date", "code")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("product", "code"), name="uniq_lot_code_per_product"
+            ),
+        ]
+        indexes = [
+            models.Index(fields=("product", "expiration_date")),
+            models.Index(fields=("code",)),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.product.sku} / {self.code}"
+
+
+class ProductSerial(BaseModel):
+    """
+    Unidad serializada individual (BR-04).
+
+    Se crea en la entrada y se referencia por ID en movimientos posteriores,
+    análogo a como Lot se referencia por `lot_id`.
+    """
+
+    class Status(models.TextChoices):
+        AVAILABLE = "available", "Disponible"
+        DISPATCHED = "dispatched", "Despachado"
+        DAMAGED = "damaged", "Dañado"
+        ADJUSTED = "adjusted", "Ajustado"
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.PROTECT,
+        related_name="serials",
+    )
+    serial_number = models.CharField(max_length=100)
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.AVAILABLE,
+    )
+    current_location = models.ForeignKey(
+        "inventory.Location",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="product_serials",
+    )
+    last_movement = models.ForeignKey(
+        "movements.Movement",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="product_serial_records",
+    )
+
+    class Meta:
+        verbose_name = "Serial de producto"
+        verbose_name_plural = "Seriales de producto"
+        constraints = [
+            models.UniqueConstraint(
+                fields=("product", "serial_number"),
+                name="uniq_product_serial_per_product",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=("product", "status")),
+            models.Index(fields=("current_location", "status")),
+        ]
+        ordering = ("created_at",)
+
+    def __str__(self) -> str:
+        return f"{self.product.sku} / {self.serial_number} ({self.status})"
+
+
+class ProductCombo(BaseModel, SoftDeleteModel):
     """Kit o combo: varios SKUs bajo un identificador (RF-003)."""
+
+    class PriceStrategy(models.TextChoices):
+        DERIVED = "derived", "Derivado de componentes"
+        FIXED = "fixed", "Precio fijo del combo"
 
     name = models.CharField(max_length=255)
     sku = models.CharField(max_length=100, unique=True)
-    is_active = models.BooleanField(default=True)
     products = models.ManyToManyField(
         Product, through="ComboItem", related_name="product_combos"
+    )
+
+    # --- Pricing del combo ---
+    price_strategy = models.CharField(
+        max_length=20,
+        choices=PriceStrategy.choices,
+        default=PriceStrategy.DERIVED,
+        help_text="derived: suma de precios de componentes. fixed: precio fijo del combo.",
+    )
+    fixed_price_retail = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Precio fijo al por menor del combo (si price_strategy=fixed).",
+    )
+    fixed_price_wholesale = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Precio fijo al por mayor del combo (si price_strategy=fixed).",
     )
 
     class Meta:
@@ -180,3 +319,53 @@ class ComboItem(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.combo.sku} × {self.product.sku} ({self.quantity})"
+
+
+class ProductPriceHistory(BaseModel):
+    """
+    Historial inmutable de cambios de precio por producto.
+
+    Cada vez que se actualiza unit_cost, sale_price_retail, sale_price_wholesale
+    o tax_rate_pct se registra una fila aquí para trazabilidad contable.
+    """
+
+    PRICE_FIELDS = (
+        "unit_cost",
+        "sale_price_retail",
+        "sale_price_wholesale",
+        "tax_rate_pct",
+        "currency",
+    )
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.PROTECT,
+        related_name="price_history",
+    )
+    changed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="price_changes",
+    )
+    field_changed = models.CharField(
+        max_length=64,
+        help_text="Nombre del campo de precio modificado.",
+    )
+    old_value = models.DecimalField(
+        max_digits=12, decimal_places=4, null=True, blank=True
+    )
+    new_value = models.DecimalField(
+        max_digits=12, decimal_places=4, null=True, blank=True
+    )
+    currency = models.CharField(max_length=3, default="COP")
+
+    class Meta:
+        verbose_name = "Historial de precio"
+        verbose_name_plural = "Historial de precios"
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=("product", "field_changed", "created_at")),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.product.sku} / {self.field_changed}: {self.old_value} → {self.new_value}"

@@ -58,6 +58,13 @@ Usar nomenclatura clara y consistente:
 * Asegurar sincronización entre local y remoto.
 * No dejar ramas relevantes solo en local.
 
+### Pull Requests
+* Abrir un PR cuando el cambio lógico esté completo, la rama ya esté publicada y los tests relevantes hayan pasado.
+* Usar un PR por cambio funcional o refactor relevante; evitar agrupar temas no relacionados.
+* Elegir como base la rama principal de integración del flujo actual del repositorio y como head la rama publicada del trabajo.
+* Antes de crear el PR, revisar si ya existe uno abierto para la misma rama o tema y reutilizarlo si corresponde.
+* Describir en el PR qué cambió, por qué cambió y cómo se validó, con referencia al alcance afectado.
+
 ### Integración
 * Integrar las ramas secundarias hacia la rama principal de trabajo.
 * Mantener la rama principal:
@@ -71,3 +78,34 @@ Usar nomenclatura clara y consistente:
 * Ramas bien organizadas y coherentes
 * Ramas publicadas en remoto
 * Historial limpio, entendible y mantenible
+
+### Sincronización con reglas de agentes
+Antes de modificar reglas de negocio, APIs o tests, consulta la guía de agentes y asistentes de código para asegurar consistencia de políticas y referencias:
+
+-- Instrucción canonical para agentes: [`.github/instructions/Agents.instructions.md`](.github/instructions/Agents.instructions.md)
+-- Documento legible en la raíz: [AGENTS.md](AGENTS.md)
+-- Runbook operativo CI/CD: [docs/CI/README_CICD.md](../../docs/CI/README_CICD.md)
+
+Mantén estas guías sincronizadas: cuando actualices políticas que afecten el flujo de trabajo (nomenclatura de ramas, convención de commits, pruebas obligatorias), actualiza ambos archivos y referencia los RF/BR/RNF afectados en la descripción del PR.
+
+## Anexo: regeneración obligatoria de documentación al cambiar tests o estructura
+
+Cuando un cambio afecta a los tests o a la estructura del proyecto, el autor del cambio debe regenerar y commitear la documentación correspondiente **antes** de hacer `push`.
+
+- Si modificas tests o escenarios Gherkin (`tests/`, `tests/ers/`, `apps/*/tests/`) ejecuta:
+
+```bash
+python scripts/parse_ers_gherkin.py
+```
+
+    Esto actualiza la documentación de pruebas y la matriz de trazabilidad. Incluir los archivos generados en el mismo commit.
+
+- Si modificas la estructura del proyecto (mover/renombrar apps, añadir/quitar carpetas top-level) ejecuta:
+
+```bash
+python scripts/project_structure/generate_project_structure.py
+```
+
+    Esto actualiza `docs/README_ARQUITECTURA.md` y otros artefactos relacionados. Incluir los archivos generados en el mismo commit.
+
+En la descripción del PR: indicar qué scripts se ejecutaron para regenerar documentación y confirmar que los artefactos generados están incluidos en el cambio. Si la documentación no está sincronizada, el PR debe solicitar corrección antes de merge.

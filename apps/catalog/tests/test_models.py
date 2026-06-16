@@ -14,20 +14,14 @@ def test_category_slug_unique():
 
 
 @pytest.mark.django_db
-def test_product_full_clean_requires_can_prefix_for_can_brand():
-    """
-    RF-003, BR-12 — Prefijo CAN- en SKU (catálogo / Admin).
-
-    Criterio ERS (Gherkin implícito en RF-003 / reglas BR-12): productos marca Can deben usar CAN-.
-    Ver `docs/ERS_ICM_Requisitos.md` sección RF-003 y tabla de trazabilidad BR-12.
-    """
+def test_product_full_clean_rejects_invalid_sku_format():
+    """RF-003, BR-12 — Rechaza SKUs que no cumplen el patrón 1–4 letras, guion, 1–4 dígitos."""
     cat = CategoryFactory()
     p = Product(
-        sku="ELECTRO-001",
+        sku="ELECTRO001",  # formato inválido (falta guion)
         name="Ejemplo",
         category=cat,
-        subcategory=None,
-        brand="Can",
+        brand=None,
     )
-    with pytest.raises(ValidationError, match="CAN-"):
+    with pytest.raises(ValidationError, match="Formato SKU inválido"):
         p.full_clean()

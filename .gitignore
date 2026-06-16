@@ -20,8 +20,6 @@ staticfiles/
 static/
 *.pot
 
-# Docker
-.dockerignore
 
 # Coverage / pytest
 .coverage
@@ -31,10 +29,15 @@ htmlcov/
 */migrations/*
 !*/migrations/__init__.py
 
-# Env
+# Env — archivos reales con secretos (ignorados)
 .env
-.env.*
+.env.development
+.env.production
+
+# Env — templates públicos (versionados)
 !.env.example
+!.env.development.example
+!.env.production.example
 
 # Pytest
 .pytest_cache/
@@ -42,3 +45,20 @@ htmlcov/
 # IDEs
 .vscode/
 .idea/
+
+# Claude Code
+CLAUDE.md
+.claude/
+
+# Graphify
+graphify-out/
+.graphifyignore
+
+# Personal guides (local use only)
+docs/guias/GRAPHIFY_GUIDE.md
+
+# Security scan reports
+scripts/security/reports/
+
+# Windows artifacts
+nul

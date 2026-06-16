@@ -1,11 +1,37 @@
 from django.contrib import admin
 
-from apps.inventory.models import Location, StockByLocation
+from apps.inventory.models import (
+    Location,
+    StockByLocation,
+    StorageTemplate,
+    StorageType,
+)
+
+
+@admin.register(StorageType)
+class StorageTypeAdmin(admin.ModelAdmin):
+    list_display = ("code", "name", "category", "default_is_retail", "is_active")
+    list_filter = ("category", "default_is_retail", "is_active", "is_system")
 
 
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
-    list_display = ("code", "name", "is_retail", "is_active")
+    list_display = (
+        "code",
+        "name",
+        "storage_type",
+        "operational_status",
+        "is_retail",
+        "is_active",
+        "deleted_at",
+    )
+    list_filter = ("operational_status", "is_retail", "is_active", "deleted_at")
+
+
+@admin.register(StorageTemplate)
+class StorageTemplateAdmin(admin.ModelAdmin):
+    list_display = ("code", "name", "storage_type", "is_active", "sort_order")
+    list_filter = ("is_active", "is_system")
 
 
 @admin.register(StockByLocation)

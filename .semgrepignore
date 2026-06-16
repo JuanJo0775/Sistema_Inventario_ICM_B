@@ -1,0 +1,64 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Tests and test artifacts
+tests/
+*/tests/*
+*.test.py
+
+# Django migrations
+*/migrations/*
+!*/migrations/__init__.py
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+*.egg
+
+# IDE configs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# CI configs
+.github/
+
+# Documentation
+docs/
+*.md
+
+# Coverage
+htmlcov/
+.coverage
+
+# Static files
+static/
+staticfiles/
+media/
+
+# Docker
+docker/
+docker-compose*.yml
+Dockerfile*
+
+# Graphify artifacts
+graphify-out/
+
+# Generated reports
+reporte_seguridad.txt
+*.xml
+*.csv

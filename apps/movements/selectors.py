@@ -14,6 +14,7 @@ from apps.movements.models import Movement, MovementType
 def _movement_base_qs() -> QuerySet[Movement]:
     return Movement.objects.select_related(
         "product",
+        "lot",
         "product__category",
         "executed_by",
         "origin_location",

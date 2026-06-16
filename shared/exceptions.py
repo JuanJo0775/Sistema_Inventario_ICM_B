@@ -10,7 +10,7 @@ class ICMBaseException(Exception):
 
     default_message = "Error del sistema ICM"
     default_code = "ICM_ERROR"
-    status_code = status.HTTP_400_BAD_REQUEST
+    status_code: int = status.HTTP_400_BAD_REQUEST
 
     def __init__(
         self, message: str | None = None, *, detail: dict | None = None
@@ -109,9 +109,9 @@ class ProductNotReturnableError(ReturnNotAllowedError):
 
 
 class InvalidSKUFormatError(DomainValidationError):
-    """BR-12: SKU inválido para marca Can (prefijo CAN-)."""
+    """BR-12: Formato de SKU inválido según la nueva política (usuario definido)."""
 
-    default_message = "El SKU debe usar el prefijo CAN- para productos de marca Can."
+    default_message = "Formato SKU inválido. Debe ser 1-4 letras, guion, 1-4 dígitos."
     default_code = "INVALID_SKU_FORMAT"
 
 
@@ -131,6 +131,27 @@ class AlertAcknowledgementRequiredError(DomainValidationError):
         "Debe reconocer las alertas operativas antes de confirmar el movimiento."
     )
     default_code = "ALERT_ACKNOWLEDGEMENT_REQUIRED"
+
+
+class LotCodeRequiredError(DomainValidationError):
+    """RF-011 / lote: falta código de lote en un producto que lo requiere."""
+
+    default_message = "El producto requiere código de lote."
+    default_code = "LOT_CODE_REQUIRED"
+
+
+class LotExpirationDateRequiredError(DomainValidationError):
+    """RF-011 / lote: falta fecha de vencimiento para un producto que lo requiere."""
+
+    default_message = "El producto requiere fecha de vencimiento por lote."
+    default_code = "LOT_EXPIRATION_DATE_REQUIRED"
+
+
+class LotMismatchError(DomainValidationError):
+    """RF-011 / lote: la fecha ingresada no coincide con el lote existente."""
+
+    default_message = "La fecha de vencimiento no coincide con un lote existente."
+    default_code = "LOT_MISMATCH"
 
 
 class InventoryError(ICMBaseException):
@@ -155,6 +176,23 @@ class StockMismatchError(InventoryError):
         "El stock derivado no coincide con la reconstrucción desde el ledger."
     )
     default_code = "STOCK_MISMATCH"
+
+
+class LocationStateNotAllowedError(DomainValidationError):
+    """BR-14: Ubicación en estado operativo no elegible para el movimiento solicitado."""
+
+    default_message = (
+        "La ubicación no está habilitada por su estado operativo para esta operación."
+    )
+    default_code = "LOCATION_STATE_NOT_ALLOWED"
+
+
+class ResourceNotFoundError(ICMBaseException):
+    """Recurso solicitado no encontrado (404)."""
+
+    default_message = "El recurso solicitado no existe."
+    default_code = "NOT_FOUND"
+    status_code = status.HTTP_404_NOT_FOUND
 
 
 class ImmutableRecordError(ICMBaseException):

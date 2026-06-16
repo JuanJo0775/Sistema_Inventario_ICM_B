@@ -2,14 +2,37 @@
 
 from __future__ import annotations
 
+import os
 from datetime import timedelta
 from pathlib import Path
 
-from decouple import config
+import dj_database_url
+from decouple import Config, RepositoryEnv
 
 from shared.openapi import SPECTACULAR_SETTINGS as SPECTACULAR_SETTINGS_ICM
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# --- Cargar archivo .env según DJANGO_SETTINGS_MODULE ---
+_settings_module = os.environ.get("DJANGO_SETTINGS_MODULE", "")
+if "production" in _settings_module:
+    _env_file = BASE_DIR / ".env.production"
+elif "development" in _settings_module:
+    _env_file = BASE_DIR / ".env.development"
+else:
+    _env_file = BASE_DIR / ".env"
+
+# Fallback genérico: si el archivo específico no existe, intentar .env raíz.
+# Si tampoco existe (CI, Docker sin volumen), leer directamente de os.environ.
+if not _env_file.exists():
+    _env_file = BASE_DIR / ".env"
+
+if _env_file.exists():
+    config = Config(RepositoryEnv(str(_env_file)))
+else:
+    from decouple import AutoConfig  # noqa: PLC0415
+
+    config = AutoConfig(search_path=str(BASE_DIR))
 
 SECRET_KEY = config(
     "DJANGO_SECRET_KEY", default="insecure-dev-key-change-in-production"
@@ -38,9 +61,12 @@ INSTALLED_APPS = [
     "apps.catalog",
     "apps.inventory",
     "apps.movements",
+    "apps.purchasing",
+    "apps.dashboard",
     "apps.reports",
     "apps.alerts",
     "apps.audit",
+    "apps.webhooks",
 ]
 
 MIDDLEWARE = [
@@ -100,17 +126,34 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 INVOICE_SEQUENCE_PREFIX = config("INVOICE_SEQUENCE_PREFIX", default="ICM")
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME", default="icm_db"),
-        "USER": config("DB_USER", default="icm_user"),
-        "PASSWORD": config("DB_PASSWORD", default="icm_password"),
-        "HOST": config("DB_HOST", default="localhost"),
-        "PORT": config("DB_PORT", default="5432"),
-        "CONN_MAX_AGE": 600,
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="noreply@icm.local")
+FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:3000")
+PASSWORD_RESET_TOKEN_EXPIRY_MINUTES = config(
+    "PASSWORD_RESET_TOKEN_EXPIRY_MINUTES", default=10, cast=int
+)
+
+DB_PROVIDER = config("DB_PROVIDER", default="local")
+
+if DB_PROVIDER == "neon":
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=config("DATABASE_URL"),
+            conn_max_age=600,
+            ssl_require=True,
+        ),
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": config("DB_NAME", default="icm_db"),
+            "USER": config("DB_USER", default="icm_user"),
+            "PASSWORD": config("DB_PASSWORD", default="icm_password"),
+            "HOST": config("DB_HOST", default="localhost"),
+            "PORT": config("DB_PORT", default="5432"),
+            "CONN_MAX_AGE": 600,
+        }
+    }
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -132,10 +175,13 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_CLASSES": (
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
     ),
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "100/hour",
+        "anon": "60/hour",
         "user": "1000/hour",
+        "login": "10/minute",  # usado en endpoints de autenticación (JWT obtain/refresh)
+        "password_reset": "5/hour",
     },
 }
 
@@ -154,6 +200,14 @@ SIMPLE_JWT = {
     "ALGORITHM": "HS256",
     "SIGNING_KEY": SECRET_KEY,
 }
+
+# --- Email SMTP (Gmail) ---
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = False

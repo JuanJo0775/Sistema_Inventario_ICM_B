@@ -1,12 +1,11 @@
 """Ledger central de movimientos (RF-005–RF-009, BR-10, BR-11, BR-13)."""
 
-from __future__ import annotations
-
 import uuid
 
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 
 
 class MovementType(models.TextChoices):
@@ -18,6 +17,7 @@ class MovementType(models.TextChoices):
     TRASLADO = "TRASLADO", "Traslado interno"
     AJUSTE = "AJUSTE", "Ajuste"
     DEVOLUCION = "DEVOLUCION", "Devolución"
+    SALIDA_COMBO = "SALIDA_COMBO", "Salida por combo"
 
 
 class Movement(models.Model):
@@ -32,6 +32,13 @@ class Movement(models.Model):
 
     product = models.ForeignKey(
         "catalog.Product",
+        on_delete=models.PROTECT,
+        related_name="movements",
+    )
+    lot = models.ForeignKey(
+        "catalog.Lot",
+        null=True,
+        blank=True,
         on_delete=models.PROTECT,
         related_name="movements",
     )
@@ -69,6 +76,82 @@ class Movement(models.Model):
         upload_to="invoices/%Y/%m/", null=True, blank=True
     )  # BR-13
 
+    # --- Snapshot de precio congelado al momento del despacho ---
+    # Todos nullable: movimientos históricos quedan sin precio (documentado por diseño).
+    unit_price = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Precio unitario de venta congelado al momento del despacho.",
+    )
+    unit_cost = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Costo unitario congelado al momento del despacho.",
+    )
+    discount_pct = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Porcentaje de descuento aplicado (0-100).",
+    )
+    discount_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Monto de descuento calculado.",
+    )
+    subtotal = models.DecimalField(
+        max_digits=14,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="unit_price × quantity.",
+    )
+    tax_rate_pct = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Tasa de IVA congelada al momento del despacho.",
+    )
+    tax_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Monto de IVA calculado sobre la base imponible.",
+    )
+    total_amount = models.DecimalField(
+        max_digits=14,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Total a cobrar: subtotal - discount_amount + tax_amount.",
+    )
+    currency = models.CharField(
+        max_length=3,
+        null=True,
+        blank=True,
+        help_text="Moneda ISO 4217 del despacho.",
+    )
+    price_type = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        help_text="Tipo de precio: retail | wholesale | cost | combo.",
+    )
+    customer_snapshot = models.JSONField(
+        null=True,
+        blank=True,
+        help_text="Datos del cliente al momento del despacho (R-02).",
+    )
+
     executed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
@@ -94,6 +177,10 @@ class Movement(models.Model):
             models.Index(fields=("origin_location", "created_at")),
             models.Index(fields=("destination_location", "created_at")),
             models.Index(fields=("invoice_number",)),
+            models.Index(fields=("lot",), name="movements_movement_lot_idx"),
+            models.Index(fields=("product", "lot"), name="movements_mov_prod_lot_idx"),
+            models.Index(fields=("product", "origin_location")),
+            models.Index(fields=("product", "destination_location")),
         ]
         constraints = [
             models.UniqueConstraint(
@@ -122,3 +209,48 @@ class InvoiceCounter(models.Model):
 
     def __str__(self) -> str:
         return f"ICM last={self.last_number}"
+
+
+class Invoice(models.Model):
+    """
+    Encabezado de factura comercial — agrupa uno o varios Movements bajo un número de comprobante.
+
+    Permite reconstruir el documento comercial completo sin depender de datos mutables del producto.
+    """
+
+    number = models.CharField(max_length=20, unique=True, help_text="Número ICM-XXXX.")
+    movements = models.ManyToManyField(
+        Movement,
+        related_name="invoices",
+        blank=True,
+    )
+    customer_name = models.CharField(max_length=255, blank=True)
+    customer_email = models.EmailField(blank=True)
+    customer_phone = models.CharField(max_length=50, blank=True)
+    customer_address = models.TextField(blank=True)
+
+    subtotal = models.DecimalField(max_digits=14, decimal_places=4, default=0)
+    discount_total = models.DecimalField(max_digits=12, decimal_places=4, default=0)
+    tax_total = models.DecimalField(max_digits=12, decimal_places=4, default=0)
+    total_amount = models.DecimalField(max_digits=14, decimal_places=4, default=0)
+    currency = models.CharField(max_length=3, default="COP")
+
+    pdf = models.FileField(upload_to="invoices/%Y/%m/", null=True, blank=True)
+    issued_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="invoices_issued",
+    )
+    issued_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = "Factura"
+        verbose_name_plural = "Facturas"
+        ordering = ("-issued_at",)
+        indexes = [
+            models.Index(fields=("number",)),
+            models.Index(fields=("issued_at",)),
+        ]
+
+    def __str__(self) -> str:
+        return f"Factura {self.number}"

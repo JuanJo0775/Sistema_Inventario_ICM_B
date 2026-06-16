@@ -1,0 +1,24 @@
+Bandit SAST summary (scan run: apps + shared)
+
+Run started: 2026-05-29
+
+Test results:
+        No issues identified.
+
+Code scanned:
+        Total lines of code: 9575
+        Total lines skipped (#nosec): 0
+
+Run metrics:
+        Total issues (by severity):
+                Undefined: 0
+                Low: 174
+                Medium: 0
+                High: 0
+        Total issues (by confidence):
+                Undefined: 0
+                Low: 0
+                Medium: 2
+                High: 172
+
+Notes: Scan executed locally via project's Python virtualenv using `bandit -r apps shared -ll`.

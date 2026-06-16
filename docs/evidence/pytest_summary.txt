@@ -1,0 +1,5 @@
+Pytest summary (task `pytest:all`)
+
+171 passed, 7 skipped in 5.04s
+
+Full test run executed via VS Code task `pytest -q` on branch `staging`.

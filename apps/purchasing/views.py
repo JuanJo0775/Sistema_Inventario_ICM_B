@@ -1,0 +1,569 @@
+"""Endpoints REST del módulo de compras."""
+
+from __future__ import annotations
+
+from uuid import UUID
+
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from shared.openapi import TAG_PURCHASING, standard_error_responses
+from shared.pagination import ICMPageNumberPagination
+from shared.permissions import IsAlmacenista, IsWithinOperatingHours
+
+from . import selectors, services
+from .permissions import IsPurchasingViewer
+from .serializers import (
+    POCancelSerializer,
+    PurchaseOrderCreateSerializer,
+    PurchaseOrderSerializer,
+    PurchaseOrderUpdateSerializer,
+    ReceptionConfirmSerializer,
+    ReceptionCreateSerializer,
+    ReceptionSerializer,
+    SupplierSerializer,
+    SupplierWriteSerializer,
+)
+
+_PERMS_OPERATOR = [IsAuthenticated, IsWithinOperatingHours, IsAlmacenista]
+_PERMS_VIEWER = [IsAuthenticated, IsWithinOperatingHours, IsPurchasingViewer]
+
+
+# ---------------------------------------------------------------------------
+# Supplier views
+# ---------------------------------------------------------------------------
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class SupplierListCreateView(APIView):
+    pagination_class = ICMPageNumberPagination
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [p() for p in _PERMS_VIEWER]
+        return [p() for p in _PERMS_OPERATOR]
+
+    @extend_schema(
+        summary="Listar proveedores",
+        description=(
+            "Lista proveedores no archivados (deleted_at=null) por defecto. "
+            "Filtros disponibles: ?is_active=true/false para activos/pausados. "
+            "?include_archived=true para incluir archivados (soft-deleted)."
+        ),
+        parameters=[
+            OpenApiParameter(
+                name="is_active",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Filtra por disponibilidad: true=activos, false=pausados.",
+            ),
+            OpenApiParameter(
+                name="include_archived",
+                type=bool,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Si true, incluye proveedores archivados (deleted_at != null).",
+            ),
+        ],
+        responses={200: SupplierSerializer(many=True)},
+    )
+    def get(self, request):
+        is_active_param = request.query_params.get("is_active")
+        include_archived = request.query_params.get("include_archived", "").lower() in (
+            "1",
+            "true",
+            "yes",
+        )
+        is_active = None
+        if is_active_param is not None:
+            is_active = is_active_param.lower() in ("true", "1", "yes")
+        qs = selectors.get_suppliers(
+            is_active=is_active, include_archived=include_archived
+        )
+
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(qs, request)
+        if page is not None:
+            return paginator.get_paginated_response(
+                SupplierSerializer(page, many=True).data
+            )
+        return Response(SupplierSerializer(qs, many=True).data)
+
+    @extend_schema(
+        summary="Crear proveedor",
+        request=SupplierWriteSerializer,
+        responses={
+            201: SupplierSerializer,
+            **standard_error_responses(include_422=True),
+        },
+    )
+    def post(self, request):
+        serializer = SupplierWriteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        supplier = services.create_supplier(
+            request.user, serializer.validated_data, request=request
+        )
+        return Response(
+            SupplierSerializer(supplier).data, status=status.HTTP_201_CREATED
+        )
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class SupplierDetailView(APIView):
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [p() for p in _PERMS_VIEWER]
+        return [p() for p in _PERMS_OPERATOR]
+
+    @extend_schema(summary="Detalle de proveedor", responses={200: SupplierSerializer})
+    def get(self, request, pk: UUID):
+        supplier = selectors.get_supplier(pk)
+        return Response(SupplierSerializer(supplier).data)
+
+    @extend_schema(
+        summary="Actualizar proveedor (completo)",
+        request=SupplierWriteSerializer,
+        responses={
+            200: SupplierSerializer,
+            **standard_error_responses(include_422=True),
+        },
+    )
+    def put(self, request, pk: UUID):
+        serializer = SupplierWriteSerializer(data=request.data, partial=False)
+        serializer.is_valid(raise_exception=True)
+        supplier = services.update_supplier(
+            request.user, pk, serializer.validated_data, request=request
+        )
+        return Response(SupplierSerializer(supplier).data)
+
+    @extend_schema(
+        summary="Actualizar proveedor (parcial)",
+        request=SupplierWriteSerializer,
+        responses={
+            200: SupplierSerializer,
+            **standard_error_responses(include_422=True),
+        },
+    )
+    def patch(self, request, pk: UUID):
+        serializer = SupplierWriteSerializer(data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        supplier = services.update_supplier(
+            request.user, pk, serializer.validated_data, request=request
+        )
+        return Response(SupplierSerializer(supplier).data)
+
+    @extend_schema(
+        summary="Eliminar lógicamente proveedor (soft delete)",
+        description=(
+            "Marca el proveedor como eliminado lógicamente (deleted_at=now). "
+            "Deja de estar disponible para nuevas OC y se excluye de listados por defecto. "
+            "Para restaurar, use POST /suppliers/{id}/restore/."
+        ),
+        responses={204: None, **standard_error_responses(include_404=True)},
+    )
+    def delete(self, request, pk: UUID):
+        services.soft_delete_supplier(request.user, pk, request=request)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class SupplierRestoreView(APIView):
+    """POST — Restaura un proveedor previamente archivado (soft delete)."""
+
+    permission_classes = _PERMS_OPERATOR
+
+    @extend_schema(
+        summary="Restaurar proveedor archivado",
+        description=(
+            "Restaura un proveedor previamente eliminado lógicamente. "
+            "Limpia deleted_at y reactiva is_active=True. "
+            "Use POST /suppliers/{id}/enable/ para solo reactivar sin restaurar del archivo."
+        ),
+        responses={
+            200: SupplierSerializer,
+            **standard_error_responses(include_404=True),
+        },
+    )
+    def post(self, request, pk: UUID):
+        supplier = services.restore_supplier(request.user, pk, request=request)
+        return Response(SupplierSerializer(supplier).data)
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class SupplierDisableView(APIView):
+    """POST — Desactiva un proveedor para nuevas OC (pausa temporal, sin archivar)."""
+
+    permission_classes = _PERMS_OPERATOR
+
+    @extend_schema(
+        summary="Desactivar proveedor para nuevas OC",
+        description=(
+            "Pausa el proveedor temporalmente (is_active=False). "
+            "El proveedor sigue existiendo y su historial se conserva. "
+            "No archiva el proveedor — para eso use DELETE /suppliers/{id}/."
+        ),
+        responses={
+            200: SupplierSerializer,
+            **standard_error_responses(include_404=True, include_409=True),
+        },
+    )
+    def post(self, request, pk: UUID):
+        try:
+            services.disable_supplier(request.user, pk, request=request)
+        except ValueError as e:
+            return Response(
+                {"error": "CONFLICT", "message": str(e), "detail": {}},
+                status=status.HTTP_409_CONFLICT,
+            )
+        supplier = selectors.get_supplier(pk)
+        return Response(SupplierSerializer(supplier).data)
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class SupplierEnableView(APIView):
+    """POST — Reactiva un proveedor pausado (is_active=True, sin restaurar del archivo)."""
+
+    permission_classes = _PERMS_OPERATOR
+
+    @extend_schema(
+        summary="Reactivar proveedor para nuevas OC",
+        description=(
+            "Reactiva un proveedor previamente pausado (is_active=True). "
+            "Solo funciona si el proveedor no está archivado. "
+            "Para restaurar un proveedor archivado use POST /suppliers/{id}/restore/."
+        ),
+        responses={
+            200: SupplierSerializer,
+            **standard_error_responses(include_404=True, include_409=True),
+        },
+    )
+    def post(self, request, pk: UUID):
+        try:
+            supplier = services.enable_supplier(request.user, pk, request=request)
+        except ValueError as e:
+            return Response(
+                {"error": "CONFLICT", "message": str(e), "detail": {}},
+                status=status.HTTP_409_CONFLICT,
+            )
+        return Response(SupplierSerializer(supplier).data)
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class SupplierDeactivateView(APIView):
+    """POST — Alias legacy: desactiva proveedor para nuevas OC (= /disable/)."""
+
+    permission_classes = _PERMS_OPERATOR
+
+    @extend_schema(
+        summary="Desactivar proveedor (legacy alias de /disable/)",
+        description="Alias de POST /suppliers/{id}/disable/. Usa /disable/ en código nuevo.",
+        responses={
+            200: SupplierSerializer,
+            **standard_error_responses(include_404=True, include_409=True),
+        },
+    )
+    def post(self, request, pk: UUID):
+        services.disable_supplier(request.user, pk, request=request)
+        supplier = selectors.get_supplier(pk)
+        return Response(SupplierSerializer(supplier).data)
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class SupplierActivateView(APIView):
+    """POST — Alias legacy: reactiva proveedor (= /enable/)."""
+
+    permission_classes = _PERMS_OPERATOR
+
+    @extend_schema(
+        summary="Reactivar proveedor (legacy alias de /enable/)",
+        description="Alias de POST /suppliers/{id}/enable/. Usa /enable/ en código nuevo.",
+        responses={
+            200: SupplierSerializer,
+            **standard_error_responses(include_404=True, include_409=True),
+        },
+    )
+    def post(self, request, pk: UUID):
+        supplier = services.enable_supplier(request.user, pk, request=request)
+        return Response(SupplierSerializer(supplier).data)
+
+
+# ---------------------------------------------------------------------------
+# PurchaseOrder views
+# ---------------------------------------------------------------------------
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class PurchaseOrderListCreateView(APIView):
+    pagination_class = ICMPageNumberPagination
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [p() for p in _PERMS_VIEWER]
+        return [p() for p in _PERMS_OPERATOR]
+
+    @extend_schema(
+        summary="Listar órdenes de compra",
+        responses={200: PurchaseOrderSerializer(many=True)},
+    )
+    def get(self, request):
+        qs = selectors.get_purchase_orders(
+            status=request.query_params.get("status"),
+            supplier_id=request.query_params.get("supplier_id"),
+        )
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(qs, request)
+        if page is not None:
+            return paginator.get_paginated_response(
+                PurchaseOrderSerializer(page, many=True).data
+            )
+        return Response(PurchaseOrderSerializer(qs, many=True).data)
+
+    @extend_schema(
+        summary="Crear orden de compra",
+        request=PurchaseOrderCreateSerializer,
+        responses={
+            201: PurchaseOrderSerializer,
+            **standard_error_responses(include_422=True),
+        },
+    )
+    def post(self, request):
+        serializer = PurchaseOrderCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        po = services.create_purchase_order(
+            request.user, serializer.validated_data, request=request
+        )
+        return Response(
+            PurchaseOrderSerializer(selectors.get_purchase_order(po.id)).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class PurchaseOrderDetailView(APIView):
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [p() for p in _PERMS_VIEWER]
+        return [p() for p in _PERMS_OPERATOR]
+
+    @extend_schema(summary="Detalle de OC", responses={200: PurchaseOrderSerializer})
+    def get(self, request, pk: UUID):
+        po = selectors.get_purchase_order(pk)
+        return Response(PurchaseOrderSerializer(po).data)
+
+    @extend_schema(
+        summary="Actualizar OC (completo, solo BORRADOR)",
+        request=PurchaseOrderUpdateSerializer,
+        responses={
+            200: PurchaseOrderSerializer,
+            **standard_error_responses(include_405=True, include_422=True),
+        },
+    )
+    def put(self, request, pk: UUID):
+        serializer = PurchaseOrderUpdateSerializer(data=request.data, partial=False)
+        serializer.is_valid(raise_exception=True)
+        po = services.update_purchase_order(
+            request.user, pk, serializer.validated_data, request=request
+        )
+        return Response(
+            PurchaseOrderSerializer(selectors.get_purchase_order(po.id)).data
+        )
+
+    @extend_schema(
+        summary="Actualizar OC (parcial, solo BORRADOR)",
+        request=PurchaseOrderUpdateSerializer,
+        responses={
+            200: PurchaseOrderSerializer,
+            **standard_error_responses(include_405=True, include_422=True),
+        },
+    )
+    def patch(self, request, pk: UUID):
+        serializer = PurchaseOrderUpdateSerializer(data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        po = services.update_purchase_order(
+            request.user, pk, serializer.validated_data, request=request
+        )
+        return Response(
+            PurchaseOrderSerializer(selectors.get_purchase_order(po.id)).data
+        )
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class PurchaseOrderConfirmView(APIView):
+    permission_classes = _PERMS_OPERATOR
+
+    @extend_schema(
+        summary="Confirmar OC (BORRADOR → PENDIENTE)",
+        responses={
+            200: PurchaseOrderSerializer,
+            **standard_error_responses(include_422=True),
+        },
+    )
+    def post(self, request, pk: UUID):
+        po = services.confirm_purchase_order(request.user, pk, request=request)
+        return Response(
+            PurchaseOrderSerializer(selectors.get_purchase_order(po.id)).data
+        )
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class PurchaseOrderCancelView(APIView):
+    permission_classes = _PERMS_OPERATOR
+
+    @extend_schema(
+        summary="Cancelar OC",
+        request=POCancelSerializer,
+        responses={
+            200: PurchaseOrderSerializer,
+            **standard_error_responses(include_409=True, include_422=True),
+        },
+    )
+    def post(self, request, pk: UUID):
+        serializer = POCancelSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        po = services.cancel_purchase_order(
+            request.user, pk, serializer.validated_data["reason"], request=request
+        )
+        return Response(
+            PurchaseOrderSerializer(selectors.get_purchase_order(po.id)).data
+        )
+
+
+# ---------------------------------------------------------------------------
+# Reception views
+# ---------------------------------------------------------------------------
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class ReceptionListCreateView(APIView):
+    pagination_class = ICMPageNumberPagination
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [p() for p in _PERMS_VIEWER]
+        return [p() for p in _PERMS_OPERATOR]
+
+    @extend_schema(
+        summary="Listar recepciones",
+        responses={200: ReceptionSerializer(many=True)},
+    )
+    def get(self, request):
+        qs = selectors.get_receptions(
+            po_id=request.query_params.get("po_id"),
+            status=request.query_params.get("status"),
+        )
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(qs, request)
+        if page is not None:
+            return paginator.get_paginated_response(
+                ReceptionSerializer(page, many=True).data
+            )
+        return Response(ReceptionSerializer(qs, many=True).data)
+
+    @extend_schema(
+        summary="Crear recepción en BORRADOR",
+        request=ReceptionCreateSerializer,
+        responses={
+            201: ReceptionSerializer,
+            **standard_error_responses(include_409=True, include_422=True),
+        },
+    )
+    def post(self, request):
+        serializer = ReceptionCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        reception = services.create_reception(
+            request.user,
+            data["po_id"],
+            {
+                "destination_location_id": data["destination_location_id"],
+                "notes": data.get("notes", ""),
+                "items": [
+                    {
+                        "purchase_order_item_id": item["purchase_order_item_id"],
+                        "quantity_received": item["quantity_received"],
+                        "lot_code": item.get("lot_code", ""),
+                        "lot_expiration_date": item.get("lot_expiration_date"),
+                        "discrepancy_note": item.get("discrepancy_note", ""),
+                        "serial_number": item.get("serial_number"),
+                        "allocations": [
+                            {
+                                "location_id": allocation["location_id"],
+                                "quantity_received": allocation["quantity_received"],
+                                "lot_code": allocation.get("lot_code", ""),
+                                "lot_expiration_date": allocation.get(
+                                    "lot_expiration_date"
+                                ),
+                                "serial_number": allocation.get("serial_number"),
+                            }
+                            for allocation in item.get("allocations", [])
+                        ],
+                    }
+                    for item in data.get("items", [])
+                ],
+            },
+            request=request,
+        )
+        return Response(
+            ReceptionSerializer(selectors.get_reception(reception.id)).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class ReceptionDetailView(APIView):
+    permission_classes = _PERMS_VIEWER
+
+    @extend_schema(summary="Detalle de recepción", responses={200: ReceptionSerializer})
+    def get(self, request, pk: UUID):
+        reception = selectors.get_reception(pk)
+        return Response(ReceptionSerializer(reception).data)
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class ReceptionConfirmView(APIView):
+    permission_classes = _PERMS_OPERATOR
+
+    @extend_schema(
+        summary="Confirmar recepción (genera Movements de ENTRADA)",
+        request=ReceptionConfirmSerializer,
+        responses={
+            200: ReceptionSerializer,
+            **standard_error_responses(
+                include_405=True, include_409=True, include_422=True
+            ),
+        },
+    )
+    def post(self, request, pk: UUID):
+        ser = ReceptionConfirmSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        reception = services.confirm_reception(
+            request.user,
+            pk,
+            request=request,
+            cold_chain_acknowledged=d.get("cold_chain_acknowledged", False),
+            electrical_safety_acknowledged=d.get(
+                "electrical_safety_acknowledged", False
+            ),
+        )
+        return Response(ReceptionSerializer(selectors.get_reception(reception.id)).data)
+
+
+@extend_schema(tags=[TAG_PURCHASING])
+class ReceptionCancelView(APIView):
+    permission_classes = _PERMS_OPERATOR
+
+    @extend_schema(
+        summary="Cancelar recepción (solo BORRADOR)",
+        responses={
+            200: ReceptionSerializer,
+            **standard_error_responses(include_405=True),
+        },
+    )
+    def post(self, request, pk: UUID):
+        reception = services.cancel_reception(request.user, pk, request=request)
+        return Response(ReceptionSerializer(selectors.get_reception(reception.id)).data)
