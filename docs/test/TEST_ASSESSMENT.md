@@ -33,7 +33,7 @@
 
 El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas alto** para un sistema backend Django de dominio médico-logístico. La suite de pruebas cubre los contratos funcionales del ERS mediante escenarios Gherkin trazables 1:1, con cobertura técnica adicional de servicios, vistas, concurrencia y carga.
 
-**Ejecución validada 2026-06-16:** 935 tests collected (pytest --collect-only). Desglose: 620 app-level + 138 Gherkin + 19 integración + 95 scripts/shared/SLA + 32 integración extendida + 5 project_structure/parse_ERS + 2 performance + 4 concurrencia = 935 tests. Skips legítimos: 7 Gherkin (6 frontend/E2E + 1 WeasyPrint), 4 concurrencia (requieren PostgreSQL + `RUN_CONCURRENCY_TESTS=1`). Cobertura mantenida en ~91%.
+**Ejecución validada 2026-06-16:** 941 tests collected (pytest --collect-only). Desglose: 685 app-level + 138 Gherkin + 19 integración + 95 scripts/shared/SLA + 4 concurrencia = 941 tests. Skips legítimos: 7 Gherkin (6 frontend/E2E + 1 WeasyPrint), 4 concurrencia (requieren PostgreSQL + `RUN_CONCURRENCY_TESTS=1`). Cobertura mantenida en ~91%.
 
 ### Principales fortalezas
 
@@ -67,7 +67,7 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | Calidad estática | **10 / 10** | **ruff/mypy/bandit/semgrep todos bloqueantes** |
 | Cobertura funcional | 10 / 10 | 132 escenarios backend 100% implementados |
 | Cobertura técnica | 9 / 10 | 91% exacto (12709 stmts, 11606 cubiertos); 71 pytest.raises (app-level), 80 mocks/patches, 13 parametrize |
-| Scripts / Herramientas | 9 / 10 | 92 tests scripts/shared/SLA (40 security scan + 12 generate_docs + 8 shared + 9 seed_db + 4 SLA + 3 project_structure + 3 perf_locustfile + 2 parse_ers_gherkin + 13 seed_db integration) |
+| Scripts / Herramientas | 9 / 10 | 95 tests scripts/shared/SLA (40 security scan + 12 generate_docs + 10 shared + 9 seed_db + 4 SLA + 3 project_structure + 3 perf_locustfile + 2 parse_ers_gherkin + 12 seed_db integration) |
 
 **Puntaje consolidado: 9.4 / 10** 
 
@@ -146,12 +146,11 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | `webhooks` | 25 | — | — | — | **83%** (344 stmts, 59 perdidos) |
 | `dashboard` | 17 | — | — | — | **97%** (232 stmts, 8 perdidos) |
 | `shared` (excepciones) | — (indirectos) | 13 (RNF003-RNF006) | — | — | — (cubierto indirectamente) |
-| **Subtotal app-level** | **620** | **132** | **3 archivos** | **4 archivos** | **91%** (12709 stmts, 11606 cubiertos, 1103 perdidos) |
-| **Integración extendida** | — | — | — | 32 | — |
+| **Subtotal app-level** | **685** | **132** | **3 archivos** | **4 archivos** | **91%** (12709 stmts, 11606 cubiertos, 1103 perdidos) |
+| **Integración extendida** | — | — | — | 19 | — |
 | **Scripts / Auxiliares** | — | — | — | 95 | — |
-| **Project structure / parse ERS** | — | — | — | 5 | — |
-| **Performance (Locust)** | — | — | — | 2 | — |
-| **TOTAL suite (pytest collect)** | **935** | **138** | **4** | **135** | **91%** (12709 stmts, 11606 cubiertos, 1103 perdidos) |
+| **Concurrencia** | — | — | — | 4 | — |
+| **TOTAL suite (pytest collect)** | **941** | **138** | **4** | **118** | **91%** (12709 stmts, 11606 cubiertos, 1103 perdidos) |
 
 ### 3.2 Por tipo de prueba y dominio funcional
 
