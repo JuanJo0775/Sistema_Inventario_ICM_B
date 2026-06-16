@@ -18,7 +18,6 @@ TAG_REPORTS = "reports"
 TAG_ALERTS = "alerts"
 TAG_AUDIT = "audit"
 TAG_WEBHOOKS = "webhooks"
-TAG_BILLING = "billing"
 
 from typing import Any  # noqa: E402
 
@@ -169,10 +168,6 @@ Para probar los endpoints, haga clic en el botón **Authorize**, use el esquema 
         {
             "name": TAG_WEBHOOKS,
             "description": "Webhook endpoints and delivery management (almacenista only — IsAlmacenista).",
-        },
-        {
-            "name": TAG_BILLING,
-            "description": "Commercial billing: multi-product invoices, void, stats and company config.",
         },
     ],
     # Botón "Authorize" en Swagger UI y componente de Error Uniforme

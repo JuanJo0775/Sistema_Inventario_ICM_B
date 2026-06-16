@@ -413,25 +413,6 @@ Leyenda:
 | Historial de entregas | Leer | `GET /api/v1/webhooks/deliveries/` | Denegado | Permitido | Denegado | Denegado | Denegado | Solo almacenista |
 | Estadisticas | Leer | `GET /api/v1/webhooks/stats/` | Denegado | Permitido | Denegado | Denegado | Denegado | Conteos pending/delivered/failed; solo almacenista |
 
-### 11.10 Facturación Comercial — NUEVO
-
-> `almacenista` tiene acceso completo. `auxiliar_despacho` puede crear facturas (dentro de horario operativo). `administrador` tiene solo lectura sobre facturas, estadísticas y configuración. Los tipos de factura son `retail` (venta menor) y `wholesale` (venta mayor).
-
-| Recurso | Accion | Endpoint | Admin | Supervisor | Operador | Cliente | Invitado | Observaciones |
-|---|---|---|---|---|---|---|---|---|
-| Facturas | Listar | `GET /api/v1/billing/invoices/` | Permitido | Permitido | Denegado | Denegado | Denegado | `IsAlmacenistaOrAdministrador` |
-| Facturas | Crear | `POST /api/v1/billing/invoices/` | Denegado | Permitido | Permitido* | Denegado | Denegado | `IsAlmacenistaOrAuxiliar + IsWithinOperatingHours`; *auxiliar solo en franja horaria |
-| Factura | Detalle | `GET /api/v1/billing/invoices/<uuid:pk>/` | Permitido | Permitido | Denegado | Denegado | Denegado | `IsAlmacenistaOrAdministrador` |
-| Factura | Anular | `POST /api/v1/billing/invoices/<uuid:pk>/void/` | Denegado | Permitido | Denegado | Denegado | Denegado | `IsAlmacenista`; revierte stock automáticamente |
-| Estadísticas | Leer | `GET /api/v1/billing/invoices/stats/` | Permitido | Permitido | Denegado | Denegado | Denegado | `IsAlmacenistaOrAdministrador`; totales del día y del mes |
-| Config. empresa | Leer | `GET /api/v1/billing/config/company/` | Permitido | Permitido | Denegado | Denegado | Denegado | `IsAlmacenistaOrAdministrador`; datos fiscales DIAN |
-| Config. empresa | Actualizar | `PUT /api/v1/billing/config/company/` | Denegado | Permitido | Denegado | Denegado | Denegado | `IsAlmacenista`; singleton pk=1 |
-
-**Errores específicos del módulo:**
-- `409 INVOICE_ALREADY_VOIDED` — intento de anular factura ya anulada.
-- `409 INSUFFICIENT_STOCK` — stock insuficiente al crear factura.
-- `403` — rol sin permiso (auxiliar en void, administrador en create/void/config-PUT).
-
 ## 12. Acciones especiales no expuestas como endpoint publico
 
 El codigo define eventos de auditoria y reglas de negocio que sugieren acciones como aprobar o rechazar devoluciones, pero no se encontraron rutas HTTP publicas dedicadas a esas acciones en las apps revisadas.
@@ -563,8 +544,6 @@ Todas las modificaciones a los permisos de acceso horario generan registros inmu
 - [Audit views](../../apps/audit/views.py)
 - [Purchasing views](../../apps/purchasing/views.py)
 - [Purchasing services](../../apps/purchasing/services.py)
-- [Billing views](../../apps/billing/views.py)
-- [Billing services](../../apps/billing/services.py)
 
 ## 18. Módulo de Compras (Purchasing)
 
@@ -627,49 +606,3 @@ Todos los eventos generan registros en `AuditLog`:
 ### 18.5 Extensión futura: rol Comprador
 
 El módulo está diseñado para soportar un rol `comprador` en el futuro (ADR-014). La clase `IsPurchasingOperator` en `apps/purchasing/permissions.py` actualmente valida solo `almacenista`. Para agregar el rol: (1) agregar el valor a `RoleChoices` en `authentication/models.py`, (2) actualizar `IsPurchasingOperator.has_permission()`, (3) crear migración de authentication. No se requieren cambios en servicios ni modelos.
-
-## 19. Módulo de Facturación Comercial (Billing)
-
-El módulo de facturación comercial gestiona el ciclo completo Carrito → Factura multi-producto → PDF → Anulación con reversión de stock.
-
-### 19.1 Principio de segregación de responsabilidades
-
-- **Almacenista**: acceso total — crear facturas, anular, configurar empresa, ver estadísticas.
-- **Auxiliar de despacho**: puede crear facturas dentro de la franja horaria operativa (BR-03). No puede anular ni ver estadísticas.
-- **Administrador**: solo lectura — puede listar/detallar facturas, ver estadísticas y consultar la configuración de empresa. No puede crear ni anular.
-- **Invariante crítica**: la anulación de una factura genera movimientos compensatorios `ANULACION` por cada ítem, revertiendo el stock via `register_entry()`. Nunca modifica `StockByLocation` directamente.
-
-### 19.2 Permisos por endpoint
-
-| Recurso | Acción | Endpoint | Supervisor (almacenista) | Admin (lectura) | Operador (auxiliar) |
-|---|---|---|---|---|---|
-| Facturas | Listar | `GET /api/v1/billing/invoices/` | ✅ | ✅ | ❌ |
-| Facturas | Crear | `POST /api/v1/billing/invoices/` | ✅ | ❌ | ✅ (horario) |
-| Factura | Detalle | `GET /api/v1/billing/invoices/<id>/` | ✅ | ✅ | ❌ |
-| Factura | Anular | `POST /api/v1/billing/invoices/<id>/void/` | ✅ | ❌ | ❌ |
-| Estadísticas | Leer | `GET /api/v1/billing/invoices/stats/` | ✅ | ✅ | ❌ |
-| Config. empresa | Leer | `GET /api/v1/billing/config/company/` | ✅ | ✅ | ❌ |
-| Config. empresa | Actualizar | `PUT /api/v1/billing/config/company/` | ✅ | ❌ | ❌ |
-
-### 19.3 Flujo de creación de factura
-
-1. `POST /billing/invoices/` con carrito de ítems (`invoice_type`, `location_id`, `customer`, `items[]`).
-2. `create_multi_dispatch_invoice()` genera un `invoice_number` único (formato `ICM-NNNN`).
-3. Por cada ítem llama a `register_dispatch()` con `skip_invoice_creation=True` y `external_invoice_number`.
-4. Crea el objeto `Invoice` vinculando todos los `Movement` generados.
-5. Retorna el detalle de la factura con totales consolidados.
-
-### 19.4 Flujo de anulación
-
-1. `POST /billing/invoices/<id>/void/` con `{"reason": "..."}` (mínimo 5 chars).
-2. `void_invoice()` valida que la factura no esté ya anulada (`InvoiceAlreadyVoidedError → 409`).
-3. Por cada Movement de salida, crea un Movement `ANULACION` que repone el stock.
-4. Marca la factura con `is_voided=True`, `void_reason`, `voided_at`, `voided_by`.
-5. Registra `AuditEventType.INVOICE_VOIDED`.
-
-### 19.5 Auditoría del módulo
-
-Todos los eventos relevantes generan registros en `AuditLog`:
-
-- `INVOICE_VOIDED` — cuando se anula una factura (incluye `invoice_id`, `reason`, `voided_by`).
-- `COMPANY_INFO_UPDATED` — cuando se actualiza la configuración fiscal de empresa.

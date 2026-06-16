@@ -226,7 +226,6 @@ class ComboSerializer(serializers.ModelSerializer):
             "sku",
             "deleted_at",
             "components",
-            "available_quantity",
             "price_strategy",
             "fixed_price_retail",
             "fixed_price_wholesale",
@@ -238,27 +237,11 @@ class ComboSerializer(serializers.ModelSerializer):
             "deleted_at",
             "created_at",
             "updated_at",
-            "available_quantity",
             # Precio de combo: se gestiona via ComboCreateSerializer / ComboUpdateSerializer
             "price_strategy",
             "fixed_price_retail",
             "fixed_price_wholesale",
         )
-
-    def get_available_quantity(self, obj):
-        items = obj.combo_items.all()
-        if not items:
-            return 0
-
-        min_available = None
-        for item in items:
-            stock_records = item.product.stock_by_location.all()
-            total_stock = sum(s.current_stock for s in stock_records)
-            possible = total_stock // item.quantity
-            if min_available is None or possible < min_available:
-                min_available = possible
-
-        return min_available or 0
 
 
 class ResolveIdentifierQuerySerializer(serializers.Serializer):

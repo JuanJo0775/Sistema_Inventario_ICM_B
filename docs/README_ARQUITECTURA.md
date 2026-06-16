@@ -248,15 +248,6 @@ icm_backend/
 │   │   ├── selectors.py                                        # Consultas de auditoría
 │   │   ├── permissions.py                                      # Política de acceso y restricciones de rol
 │   │   └── admin.py                                            # Registro administrativo y soporte operacional
-│   ├── billing/                                                # Aplicación Django detectada automáticamente
-│   │   ├── tests/                                              # Pruebas del subdominio
-│   │   │   ├── test_services.py                                # Reglas de negocio y transacciones del dominio
-│   │   │   └── test_views.py                                   # Cobertura crítica del módulo
-│   │   ├── models.py                                           # Entidades y constraints de persistencia
-│   │   ├── serializers.py                                      # Validación y adaptación del contrato de entrada/salida
-│   │   ├── views.py                                            # Endpoints HTTP del módulo y orquestación de requests
-│   │   ├── urls.py                                             # Ruteo HTTP y composición de endpoints
-│   │   └── services.py                                         # Reglas de negocio del ledger y actualización transaccional del stock
 │   ├── dashboard/                                              # Aplicación Django detectada automáticamente
 │   │   ├── tests/                                              # Pruebas del subdominio
 │   │   │   └── test_views.py                                   # Reglas de negocio y transacciones del dominio
@@ -334,11 +325,13 @@ icm_backend/
 │   │   ├── README_ATRIBUTOS_CALIDAD.md                         # Documento técnico relevante
 │   │   ├── README_RESTRICCIONES.md                             # Documento técnico relevante
 │   │   └── INFORME_COMPLETITUD_PRINCIPIOS_Y_CALIDAD.md         # Documento técnico relevante
-│   ├── architecture/                                           # Síntesis arquitectónica: drivers, Utility Tree y ADRs
+│   ├── architecture/                                           # Síntesis arquitectónica: drivers, Utility Tree, ADRs, patrones y SOLID
 │   │   ├── architecture_drivers.md                             # Drivers arquitectónicos priorizados
 │   │   ├── utility_tree.md                                     # Utility Tree con escenarios y trade-offs
 │   │   ├── architectural_constraints.md                        # Restricciones arquitectónicas y riesgos
-│   │   └── adr_relationships.md                                # Trazabilidad entre drivers y ADRs
+│   │   ├── adr_relationships.md                                # Trazabilidad entre drivers y ADRs
+│   │   ├── design-patterns.md                                  # Catálogo de patrones de diseño aplicados (10 patrones documentados)
+│   │   └── solid-principles.md                                 # Análisis SOLID con evidencia de código y oportunidades de mejora
 │   ├── guias/                                                  # Guías operativas del proyecto
 │   │   ├── ENV_GUIDE.md                                        # Guía completa de variables de entorno
 │   │   └── SEED_DB.md                                          # Guía de carga de datos semilla
