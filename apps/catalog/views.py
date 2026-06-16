@@ -356,7 +356,9 @@ class ProductDetailView(generics.RetrieveUpdateAPIView):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
-        ser = ProductUpdateSerializer(data=request.data, partial=partial)
+        ser = ProductUpdateSerializer(
+            instance=instance, data=request.data, partial=partial
+        )
         ser.is_valid(raise_exception=True)
         payload = {k: v for k, v in ser.validated_data.items()}
         product = update_product(request.user, instance.pk, payload, request=request)
@@ -878,7 +880,8 @@ class ComboDetailView(APIView):
         return Response(ComboSerializer(self._get_combo(pk)).data)
 
     def put(self, request, pk):
-        ser = ComboUpdateSerializer(data=request.data)
+        combo = self._get_combo(pk)
+        ser = ComboUpdateSerializer(instance=combo, data=request.data)
         ser.is_valid(raise_exception=True)
         try:
             combo = update_combo(request.user, pk, ser.validated_data, request=request)
@@ -887,7 +890,8 @@ class ComboDetailView(APIView):
         return Response(ComboSerializer(combo).data)
 
     def patch(self, request, pk):
-        ser = ComboUpdateSerializer(data=request.data, partial=True)
+        combo = self._get_combo(pk)
+        ser = ComboUpdateSerializer(instance=combo, data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
         try:
             combo = update_combo(request.user, pk, ser.validated_data, request=request)
