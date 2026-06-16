@@ -8,18 +8,47 @@ from apps.movements.models import Invoice, Movement
 
 
 class InvoiceItemInputSerializer(serializers.Serializer):
-    """Un ítem del carrito al crear una factura multi-producto."""
+    """
+    Un ítem del carrito al crear una factura multi-producto.
 
-    product_id = serializers.UUIDField(help_text="UUID del producto a despachar.")
-    quantity = serializers.IntegerField(min_value=1, help_text="Cantidad a despachar.")
+    RF-006, RF-003 — Cada ítem es un producto individual (`product_id`) o un
+    combo (`combo_id`), nunca ambos. El carrito permite mezclar ítems de
+    ambos tipos en la misma factura.
+    """
+
+    product_id = serializers.UUIDField(
+        required=False,
+        allow_null=True,
+        default=None,
+        help_text="UUID del producto a despachar. Excluyente con `combo_id`.",
+    )
+    combo_id = serializers.UUIDField(
+        required=False,
+        allow_null=True,
+        default=None,
+        help_text="UUID del combo a despachar. Excluyente con `product_id`.",
+    )
+    quantity = serializers.IntegerField(
+        min_value=1,
+        help_text="Cantidad a despachar (para combos, número de combos completos).",
+    )
     discount_pct = serializers.DecimalField(
         max_digits=5,
         decimal_places=2,
         required=False,
         allow_null=True,
         default=None,
-        help_text="Porcentaje de descuento (0-100). Opcional.",
+        help_text="Porcentaje de descuento (0-100). Solo aplica a productos individuales.",
     )
+
+    def validate(self, attrs: dict) -> dict:
+        has_product = bool(attrs.get("product_id"))
+        has_combo = bool(attrs.get("combo_id"))
+        if has_product == has_combo:
+            raise serializers.ValidationError(
+                "Cada ítem debe tener exactamente uno de `product_id` o `combo_id`."
+            )
+        return attrs
 
 
 class CustomerDataInputSerializer(serializers.Serializer):
