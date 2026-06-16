@@ -5393,7 +5393,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_get_company_info_creates_default -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 583)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 579)
 
 
 ---
@@ -5429,7 +5429,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_invoice_stats_excludes_voided -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 558)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 554)
 
 
 ---
@@ -5465,7 +5465,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_invoice_stats_today -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 539)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 535)
 
 
 ---
@@ -5537,7 +5537,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_multi_dispatch_cold_chain_product_succeeds_when_acknowledged -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 203)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 201)
 
 
 ---
@@ -5573,7 +5573,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_multi_dispatch_combo_quantity_dispatches_combo_multiple_times -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 306)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 302)
 
 
 ---
@@ -5645,7 +5645,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_multi_dispatch_each_item_shares_same_invoice_number -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 384)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 380)
 
 
 ---
@@ -5753,7 +5753,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_multi_dispatch_insufficient_stock_raises -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 242)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 238)
 
 
 ---
@@ -5789,7 +5789,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_multi_dispatch_invalid_type_raises -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 230)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 226)
 
 
 ---
@@ -5825,7 +5825,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_multi_dispatch_mixes_combo_and_individual_product_in_one_invoice -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 269)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 265)
 
 
 ---
@@ -5897,7 +5897,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_multi_dispatch_unknown_combo_raises_does_not_exist -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 327)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 323)
 
 
 ---
@@ -5969,7 +5969,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_update_company_info -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 590)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 586)
 
 
 ---
@@ -6005,7 +6005,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_void_invoice_creates_anulacion_movements -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 468)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 464)
 
 
 ---
@@ -6041,7 +6041,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_void_invoice_logs_audit -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 513)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 509)
 
 
 ---
@@ -6077,7 +6077,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_void_invoice_marks_as_voided -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 416)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 412)
 
 
 ---
@@ -6113,7 +6113,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_void_invoice_restores_stock -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 439)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 435)
 
 
 ---
@@ -6149,7 +6149,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_void_invoice_twice_raises_409_conflict -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 491)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 487)
 
 
 ---
@@ -6185,7 +6185,7 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest apps/billing/tests/test_services.py::test_void_invoice_with_mixed_combo_and_product_restores_all_stock -v
 ```
 
-Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 345)
+Código fuente: [apps/billing/tests/test_services.py](../../apps/billing/tests/test_services.py) (aprox. línea 341)
 
 
 ---
