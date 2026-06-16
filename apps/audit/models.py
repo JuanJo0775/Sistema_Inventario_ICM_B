@@ -90,6 +90,8 @@ class AuditEventType(models.TextChoices):
         "Intento de modificación sobre registro inmutable",
     )
     INVOICE_GENERATED = "INVOICE_GENERATED", "Factura generada"
+    INVOICE_VOIDED = "INVOICE_VOIDED", "Factura anulada"
+    COMPANY_INFO_UPDATED = "COMPANY_INFO_UPDATED", "Datos de empresa actualizados"
     DISPATCH_WITH_PRICE_COMPLETED = (
         "DISPATCH_WITH_PRICE_COMPLETED",
         "Despacho con precio completado",

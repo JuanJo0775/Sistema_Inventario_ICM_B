@@ -160,6 +160,10 @@ class Seeder:
         self._section("Fase 23 -- Webhooks de ejemplo")
         self._ensure_webhooks()
 
+        # --- Fases finales siempre idempotentes ---
+        self._section("Fase 24 -- Datos fiscales de empresa (CompanyInfo)")
+        self._ensure_company_info()
+
         self._title("SEED completado")
         self._build_result(result, locations)
         return result
@@ -1375,6 +1379,34 @@ class Seeder:
             if created:
                 done += 1
         self._ok(f"Webhooks: {done} creados")
+
+    # =========================================================================
+    # Fase 24: Datos fiscales de la empresa (CompanyInfo)
+    # =========================================================================
+
+    def _ensure_company_info(self) -> None:
+        """Crea/actualiza el singleton CompanyInfo con datos fiscales ICM."""
+        from apps.billing.models import CompanyInfo
+
+        info, created = CompanyInfo.objects.get_or_create(
+            pk=1,
+            defaults={
+                "company_name": "Import Corporal Medical S.A.S",
+                "nit": "901.234.567-8",
+                "address": "Cra 45 # 23-12, Bogotá D.C., Colombia",
+                "phone": "+57 1 555 1234",
+                "email": "contabilidad@icm.com.co",
+                "dian_resolution": "Resolución DIAN No. 18760000001 del 15-Ene-2024",
+                "dian_range_from": 1,
+                "dian_range_to": 10000,
+                "invoice_series": "ICM",
+                "invoice_footer": "Import Corporal Medical S.A.S — NIT 901.234.567-8 — Régimen Común",
+            },
+        )
+        if created:
+            self._ok(f"  + CompanyInfo: {info.company_name} (NIT {info.nit})")
+        else:
+            self._ok(f"  · CompanyInfo existente: {info.company_name}")
 
     # =========================================================================
     # Helpers de compras (OC -> Recepcion)

@@ -17,6 +17,7 @@ class MovementType(models.TextChoices):
     AJUSTE = "AJUSTE", "Ajuste"
     DEVOLUCION = "DEVOLUCION", "Devolución"
     SALIDA_COMBO = "SALIDA_COMBO", "Salida por combo"
+    ANULACION = "ANULACION", "Anulación de factura"
 
 
 class Movement(models.Model):
@@ -217,10 +218,26 @@ class Invoice(models.Model):
         related_name="invoices",
         blank=True,
     )
+
+    class InvoiceType(models.TextChoices):
+        RETAIL = "retail", "Venta menor (retail)"
+        WHOLESALE = "wholesale", "Venta mayor (wholesale)"
+
     customer_name = models.CharField(max_length=255, blank=True)
+    customer_id_number = models.CharField(
+        max_length=50, blank=True, help_text="NIT/CC del cliente."
+    )
     customer_email = models.EmailField(blank=True)
     customer_phone = models.CharField(max_length=50, blank=True)
     customer_address = models.TextField(blank=True)
+
+    invoice_type = models.CharField(
+        max_length=20,
+        choices=InvoiceType.choices,
+        null=True,
+        blank=True,
+        help_text="Tipo de venta: retail o wholesale.",
+    )
 
     subtotal = models.DecimalField(max_digits=14, decimal_places=4, default=0)
     discount_total = models.DecimalField(max_digits=12, decimal_places=4, default=0)
@@ -235,6 +252,19 @@ class Invoice(models.Model):
         related_name="invoices_issued",
     )
     issued_at = models.DateTimeField(default=timezone.now)
+
+    is_voided = models.BooleanField(
+        default=False, help_text="True si la factura fue anulada."
+    )
+    void_reason = models.TextField(blank=True, help_text="Motivo de anulación.")
+    voided_at = models.DateTimeField(null=True, blank=True)
+    voided_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="invoices_voided",
+    )
 
     class Meta:
         verbose_name = "Factura"

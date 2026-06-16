@@ -784,12 +784,21 @@ def register_dispatch(
         )
 
     # Prepare invoice and PDF once for the whole dispatch
-    invoice_number = external_invoice_number or generate_invoice_number()
-    pdf_file = _try_build_invoice_pdf(
-        invoice_number=invoice_number,
-        product=product,
-        quantity=quantity,
-        movement_type=movement_type,
+    invoice_number = (
+        external_invoice_number
+        if external_invoice_number
+        else generate_invoice_number()
+    )
+    # Skip per-movement PDF in bulk mode (caller generates enriched Invoice PDF at the end)
+    pdf_file = (
+        None
+        if skip_invoice_creation
+        else _try_build_invoice_pdf(
+            invoice_number=invoice_number,
+            product=product,
+            quantity=quantity,
+            movement_type=movement_type,
+        )
     )
 
     movements_created: list[Movement] = []
