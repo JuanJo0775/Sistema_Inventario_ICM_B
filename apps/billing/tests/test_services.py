@@ -204,8 +204,9 @@ def test_multi_dispatch_combo_quantity_dispatches_combo_multiple_times(
 def test_multi_dispatch_unknown_combo_raises_does_not_exist(
     almacenista_user, sample_locations
 ):
-    from apps.catalog.models import ProductCombo
     from uuid import uuid4
+
+    from apps.catalog.models import ProductCombo
 
     with pytest.raises(ProductCombo.DoesNotExist):
         create_multi_dispatch_invoice(
@@ -245,9 +246,7 @@ def test_void_invoice_with_mixed_combo_and_product_restores_all_stock(
     void_invoice(invoice.pk, user=almacenista_user, reason="Anulación mixta")
 
     assert (
-        StockByLocation.objects.get(
-            product=combo_component, location=loc
-        ).current_stock
+        StockByLocation.objects.get(product=combo_component, location=loc).current_stock
         == 10
     )
     assert (

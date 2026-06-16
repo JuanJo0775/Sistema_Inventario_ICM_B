@@ -170,9 +170,7 @@ class InvoiceListCreateView(generics.GenericAPIView):
                 customer_data=d["customer"],
                 items=d["items"],
                 note=d.get("note") or None,
-                privacy_notice_acknowledged=d.get(
-                    "privacy_notice_acknowledged", False
-                ),
+                privacy_notice_acknowledged=d.get("privacy_notice_acknowledged", False),
             )
         except ProductCombo.DoesNotExist:
             return Response(
