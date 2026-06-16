@@ -1082,9 +1082,7 @@ def register_internal_transfer(
     selected_lot: Lot | None = None
     if getattr(product, "requires_expiration", False):
         if lot_id is None:
-            raise LotSelectionRequiredError(
-                detail={"product_id": str(product_id)}
-            )
+            raise LotSelectionRequiredError(detail={"product_id": str(product_id)})
         selected_lot = get_for_update_or_404(
             Lot.objects.filter(product_id=product_id), pk=lot_id
         )
@@ -1237,8 +1235,10 @@ def register_return(
 
     selected_lot: Lot | None = None
     if getattr(product, "requires_expiration", False):
-        effective_lot_id = lot_id if lot_id is not None else (
-            related.lot_id if related is not None else None
+        effective_lot_id = (
+            lot_id
+            if lot_id is not None
+            else (related.lot_id if related is not None else None)
         )
         if effective_lot_id is None:
             raise LotSelectionRequiredError(detail={"product_id": str(product_id)})
@@ -1361,9 +1361,7 @@ def register_adjustment(
             # Stock "aparecido" en el conteo: debe asignarse a un lote
             # existente, igual que una entrada normal.
             if lot_id is None:
-                raise LotSelectionRequiredError(
-                    detail={"product_id": str(product_id)}
-                )
+                raise LotSelectionRequiredError(detail={"product_id": str(product_id)})
             selected_lot = get_for_update_or_404(
                 Lot.objects.filter(product_id=product_id), pk=lot_id
             )

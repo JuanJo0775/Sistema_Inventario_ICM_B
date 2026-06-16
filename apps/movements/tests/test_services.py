@@ -175,9 +175,7 @@ def test_dispatch_expiring_product_with_untracked_stock_at_location(
     assert isinstance(movements, list)
     assert movements[0].lot_id is None
     assert movements[0].quantity == 1
-    assert (
-        StockByLocation.objects.get(product=product, location=loc).current_stock == 3
-    )
+    assert StockByLocation.objects.get(product=product, location=loc).current_stock == 3
 
 
 @pytest.mark.django_db
@@ -278,9 +276,7 @@ def test_return_requires_lot_for_expiring_product_without_related_movement(
 
 
 @pytest.mark.django_db
-def test_return_inherits_lot_from_related_movement(
-    almacenista_user, sample_locations
-):
+def test_return_inherits_lot_from_related_movement(almacenista_user, sample_locations):
     """Si la devolución referencia el despacho original (related_movement_id)
     y no se envía lot_id explícito, hereda el lote de ese movimiento en vez
     de exigir que el cliente lo reenvíe."""
