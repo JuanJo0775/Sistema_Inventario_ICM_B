@@ -612,7 +612,14 @@ def stage_load_test(sr: StageResult, out: Path) -> None:
     server_log = open(server_log_path, "w", encoding="utf-8")
     server_env = {**os.environ, **env}
     server_proc = subprocess.Popen(
-        [str(PYTHON), "manage.py", "runserver", "0.0.0.0:8000", "--noreload"],
+        [
+            str(PYTHON),
+            "manage.py",
+            "runserver",
+            "0.0.0.0:8000",
+            "--noreload",
+            "--settings=config.settings.loadtest",
+        ],
         stdout=server_log,
         stderr=server_log,
         env=server_env,
