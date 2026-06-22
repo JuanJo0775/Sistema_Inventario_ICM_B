@@ -1,7 +1,7 @@
 """Verificación de conexión Neon y estado del seed para producción."""
 import os, sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings.development"
 
 import django
