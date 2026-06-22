@@ -125,6 +125,12 @@ Replica el workflow de GitHub Actions (`.github/workflows/ci.yml`) en tu máquin
 | 7 | `concurrency_tests` | `pytest tests/concurrency/` — SELECT FOR UPDATE, stock | Sí |
 | 8 | `load_test` | Locust 12 usuarios / 3 spawns por segundo / 45 segundos | Sí |
 
+### Nota sobre `runserver` y `--settings`
+
+`manage.py runserver` **siempre** fuerza `config.settings.development` (PostgreSQL local), ignorando `DJANGO_SETTINGS_MODULE` del entorno. Esto evita que un entorno residual de pytest deje SQLite como DB por accidente.
+
+El stage `load_test` de `ci_local` invoca `runserver` con `--settings=config.settings.loadtest` explícitamente para usar la DB Docker del contenedor (puerto 15432). **Cualquier script o orquestador que necesite un settings distinto al de desarrollo debe pasar `--settings=` al llamar `runserver`.**
+
 ### Ejemplos de uso
 
 ```bash

@@ -120,6 +120,20 @@ python scripts/security/run_security_scan.py --list             # listar herrami
 - Crear `.env` en raíz con variables clave (o pasarlas al entorno) usando `.env.example` como plantilla.
 - `python-decouple` usa defaults en `config/settings/base.py` si no se define la variable.
 
+### Resolución de `DJANGO_SETTINGS_MODULE`
+
+`manage.py` resuelve el settings module de la siguiente forma:
+
+| Comando | Settings que usa | DB |
+|---------|-----------------|-----|
+| `python manage.py runserver` | Siempre `config.settings.development` | PostgreSQL local (.env.development) |
+| `python manage.py runserver --settings=config.settings.loadtest` | El que se pase explícitamente | PostgreSQL Docker (puerto 15432) |
+| `python manage.py migrate` / `shell` / otros | `DJANGO_SETTINGS_MODULE` del entorno, o `development` si no está |
+
+**Regla:** `runserver` **siempre** fuerza `config.settings.development` sin importar `DJANGO_SETTINGS_MODULE` del entorno. Esto garantiza que `python manage.py runserver` nunca use SQLite por accidente (por ejemplo, si pytest dejó `DJANGO_SETTINGS_MODULE=config.settings.test` en el shell).
+
+Orquestadores como `ci_local` deben pasar `--settings=` explícitamente al invocar `runserver` para usar un módulo distinto al de desarrollo.
+
 ## Dominio breve
 
 - **ICM**: inventario insumos médicos; SKU definido por el usuario siguiendo el patrón 1–4 letras, un guion y 1–4 dígitos (ej: AB-1234).
