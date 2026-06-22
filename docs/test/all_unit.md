@@ -24046,3 +24046,1119 @@ Código fuente: [apps/webhooks/tests/test_views.py](../../apps/webhooks/tests/te
 
 ---
 
+<!-- file: UNIT-0669.md -->
+**Código:** UNIT-0669
+
+# test_administrador_cannot_post_catalog_product
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA01BrokenAccessControl::test_administrador_cannot_post_catalog_product`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA01BrokenAccessControl::test_administrador_cannot_post_catalog_product -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 73)
+
+
+---
+
+<!-- file: UNIT-0670.md -->
+**Código:** UNIT-0670
+
+# test_administrador_cannot_post_entry
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA01BrokenAccessControl::test_administrador_cannot_post_entry`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA01BrokenAccessControl::test_administrador_cannot_post_entry -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 85)
+
+
+---
+
+<!-- file: UNIT-0671.md -->
+**Código:** UNIT-0671
+
+# test_auxiliar_cannot_access_audit_logs
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA01BrokenAccessControl::test_auxiliar_cannot_access_audit_logs`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA01BrokenAccessControl::test_auxiliar_cannot_access_audit_logs -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 67)
+
+
+---
+
+<!-- file: UNIT-0672.md -->
+**Código:** UNIT-0672
+
+# test_auxiliar_cannot_disable_another_user
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA01BrokenAccessControl::test_auxiliar_cannot_disable_another_user`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA01BrokenAccessControl::test_auxiliar_cannot_disable_another_user -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 57)
+
+
+---
+
+<!-- file: UNIT-0673.md -->
+**Código:** UNIT-0673
+
+# test_auxiliar_cannot_list_users
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA01BrokenAccessControl::test_auxiliar_cannot_list_users`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA01BrokenAccessControl::test_auxiliar_cannot_list_users -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 51)
+
+
+---
+
+<!-- file: UNIT-0674.md -->
+**Código:** UNIT-0674
+
+# test_idor_auxiliar_cannot_read_other_user_detail
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA01BrokenAccessControl::test_idor_auxiliar_cannot_read_other_user_detail`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA01BrokenAccessControl::test_idor_auxiliar_cannot_read_other_user_detail -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 99)
+
+
+---
+
+<!-- file: UNIT-0675.md -->
+**Código:** UNIT-0675
+
+# test_idor_unauthenticated_movement_detail_returns_401
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA01BrokenAccessControl::test_idor_unauthenticated_movement_detail_returns_401`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA01BrokenAccessControl::test_idor_unauthenticated_movement_detail_returns_401 -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 110)
+
+
+---
+
+<!-- file: UNIT-0676.md -->
+**Código:** UNIT-0676
+
+# test_unauthenticated_post_entry_returns_401
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA01BrokenAccessControl::test_unauthenticated_post_entry_returns_401`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA01BrokenAccessControl::test_unauthenticated_post_entry_returns_401 -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 129)
+
+
+---
+
+<!-- file: UNIT-0677.md -->
+**Código:** UNIT-0677
+
+# test_unauthenticated_request_returns_401
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA01BrokenAccessControl::test_unauthenticated_request_returns_401`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA01BrokenAccessControl::test_unauthenticated_request_returns_401 -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 44)
+
+
+---
+
+<!-- file: UNIT-0678.md -->
+**Código:** UNIT-0678
+
+# test_access_token_has_expiry_claim
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA02CryptographicFailures::test_access_token_has_expiry_claim`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA02CryptographicFailures::test_access_token_has_expiry_claim -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 169)
+
+
+---
+
+<!-- file: UNIT-0679.md -->
+**Código:** UNIT-0679
+
+# test_login_response_does_not_expose_password
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA02CryptographicFailures::test_login_response_does_not_expose_password`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA02CryptographicFailures::test_login_response_does_not_expose_password -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 146)
+
+
+---
+
+<!-- file: UNIT-0680.md -->
+**Código:** UNIT-0680
+
+# test_me_endpoint_does_not_expose_password
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA02CryptographicFailures::test_me_endpoint_does_not_expose_password`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA02CryptographicFailures::test_me_endpoint_does_not_expose_password -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 159)
+
+
+---
+
+<!-- file: UNIT-0681.md -->
+**Código:** UNIT-0681
+
+# test_user_list_does_not_expose_password
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA02CryptographicFailures::test_user_list_does_not_expose_password`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA02CryptographicFailures::test_user_list_does_not_expose_password -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 184)
+
+
+---
+
+<!-- file: UNIT-0682.md -->
+**Código:** UNIT-0682
+
+# test_sql_injection_in_login_password_does_not_cause_500
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA03Injection::test_sql_injection_in_login_password_does_not_cause_500`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA03Injection::test_sql_injection_in_login_password_does_not_cause_500 -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 224)
+
+
+---
+
+<!-- file: UNIT-0683.md -->
+**Código:** UNIT-0683
+
+# test_sql_injection_in_login_username_does_not_cause_500
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA03Injection::test_sql_injection_in_login_username_does_not_cause_500`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA03Injection::test_sql_injection_in_login_username_does_not_cause_500 -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 210)
+
+
+---
+
+<!-- file: UNIT-0684.md -->
+**Código:** UNIT-0684
+
+# test_sql_injection_in_search_query_does_not_cause_500
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA03Injection::test_sql_injection_in_search_query_does_not_cause_500`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA03Injection::test_sql_injection_in_search_query_does_not_cause_500 -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 236)
+
+
+---
+
+<!-- file: UNIT-0685.md -->
+**Código:** UNIT-0685
+
+# test_xss_payload_in_search_returns_json_not_html
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA03Injection::test_xss_payload_in_search_returns_json_not_html`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA03Injection::test_xss_payload_in_search_returns_json_not_html -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 246)
+
+
+---
+
+<!-- file: UNIT-0686.md -->
+**Código:** UNIT-0686
+
+# test_api_endpoint_error_uses_json_content_type
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA05SecurityMisconfiguration::test_api_endpoint_error_uses_json_content_type`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA05SecurityMisconfiguration::test_api_endpoint_error_uses_json_content_type -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 277)
+
+
+---
+
+<!-- file: UNIT-0687.md -->
+**Código:** UNIT-0687
+
+# test_health_endpoint_is_public
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA05SecurityMisconfiguration::test_health_endpoint_is_public`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA05SecurityMisconfiguration::test_health_endpoint_is_public -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 272)
+
+
+---
+
+<!-- file: UNIT-0688.md -->
+**Código:** UNIT-0688
+
+# test_no_server_error_on_malformed_json_body
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA05SecurityMisconfiguration::test_no_server_error_on_malformed_json_body`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA05SecurityMisconfiguration::test_no_server_error_on_malformed_json_body -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 294)
+
+
+---
+
+<!-- file: UNIT-0689.md -->
+**Código:** UNIT-0689
+
+# test_nonexistent_api_path_returns_404
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA05SecurityMisconfiguration::test_nonexistent_api_path_returns_404`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA05SecurityMisconfiguration::test_nonexistent_api_path_returns_404 -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 267)
+
+
+---
+
+<!-- file: UNIT-0690.md -->
+**Código:** UNIT-0690
+
+# test_schema_endpoint_accessible_in_test_mode
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA05SecurityMisconfiguration::test_schema_endpoint_accessible_in_test_mode`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA05SecurityMisconfiguration::test_schema_endpoint_accessible_in_test_mode -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 288)
+
+
+---
+
+<!-- file: UNIT-0691.md -->
+**Código:** UNIT-0691
+
+# test_empty_bearer_token_returns_401
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA07AuthenticationFailures::test_empty_bearer_token_returns_401`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA07AuthenticationFailures::test_empty_bearer_token_returns_401 -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 364)
+
+
+---
+
+<!-- file: UNIT-0692.md -->
+**Código:** UNIT-0692
+
+# test_empty_credentials_returns_400
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA07AuthenticationFailures::test_empty_credentials_returns_400`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA07AuthenticationFailures::test_empty_credentials_returns_400 -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 334)
+
+
+---
+
+<!-- file: UNIT-0693.md -->
+**Código:** UNIT-0693
+
+# test_inactive_user_cannot_authenticate
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA07AuthenticationFailures::test_inactive_user_cannot_authenticate`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA07AuthenticationFailures::test_inactive_user_cannot_authenticate -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 391)
+
+
+---
+
+<!-- file: UNIT-0694.md -->
+**Código:** UNIT-0694
+
+# test_missing_authorization_header_returns_401
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA07AuthenticationFailures::test_missing_authorization_header_returns_401`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA07AuthenticationFailures::test_missing_authorization_header_returns_401 -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 370)
+
+
+---
+
+<!-- file: UNIT-0695.md -->
+**Código:** UNIT-0695
+
+# test_nonexistent_user_returns_401
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA07AuthenticationFailures::test_nonexistent_user_returns_401`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA07AuthenticationFailures::test_nonexistent_user_returns_401 -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 325)
+
+
+---
+
+<!-- file: UNIT-0696.md -->
+**Código:** UNIT-0696
+
+# test_random_string_as_bearer_token_returns_401
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA07AuthenticationFailures::test_random_string_as_bearer_token_returns_401`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA07AuthenticationFailures::test_random_string_as_bearer_token_returns_401 -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 358)
+
+
+---
+
+<!-- file: UNIT-0697.md -->
+**Código:** UNIT-0697
+
+# test_refresh_token_cannot_access_protected_endpoints
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA07AuthenticationFailures::test_refresh_token_cannot_access_protected_endpoints`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA07AuthenticationFailures::test_refresh_token_cannot_access_protected_endpoints -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 375)
+
+
+---
+
+<!-- file: UNIT-0698.md -->
+**Código:** UNIT-0698
+
+# test_tampered_jwt_returns_401
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA07AuthenticationFailures::test_tampered_jwt_returns_401`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA07AuthenticationFailures::test_tampered_jwt_returns_401 -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 343)
+
+
+---
+
+<!-- file: UNIT-0699.md -->
+**Código:** UNIT-0699
+
+# test_wrong_password_returns_401
+
+## Nombre del test
+
+`tests/security/test_owasp.py::TestA07AuthenticationFailures::test_wrong_password_returns_401`
+
+## Propósito
+
+Prueba unitaria del backend ICM.
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/security/test_owasp.py::TestA07AuthenticationFailures::test_wrong_password_returns_401 -v
+```
+
+Código fuente: [tests/security/test_owasp.py](../../tests/security/test_owasp.py) (aprox. línea 316)
+
+
+---
+

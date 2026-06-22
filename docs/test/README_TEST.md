@@ -249,6 +249,12 @@ pytest apps/movements/tests/ -v
 pytest tests/integration tests/scripts tests/shared -q
 ```
 
+### Tests de seguridad OWASP
+
+```bash
+pytest tests/security/ -v
+```
+
 ### Tests auxiliares (scripts, shared, SLA)
 
 ```bash
@@ -336,19 +342,20 @@ Cada subcategoría tiene su propia numeración: `SCR-*` para scripts, `SHA-*` pa
 
 ## Estado actual de la suite
 
-**941 tests · 685 app-level · 138 Gherkin · 95 auxiliares · 23 integración/otros** _(2026-06-16, pytest --collect-only)_
+**~1005 tests · 685 app-level · 138 Gherkin · 45 OWASP · 114 auxiliares · 23 integración/otros** _(2026-06-22, pytest --collect-only)_
 
 | Capa | Tests | Estado |
 |------|-------|--------|
 | App-level (unit/integration por app) | 685 | Cobertura medida por `--cov=apps` |
 | Gherkin/ERS (RF001–RF025, RNF003–RNF006) | 138 run | 131 passed, 7 skipped (6 frontend/E2E + 1 WeasyPrint) |
+| Seguridad OWASP (runtime) | **45** | A01/A02/A03/A05/A07 — job `security_tests` en CI (Postgres, bloqueante) |
 | Integración cross-domain | 19 | 19 tests en 4 archivos |
 | Concurrencia | 4 | Requieren `RUN_CONCURRENCY_TESTS=1` + PostgreSQL |
-| Scripts / Shared / SLA | 95 | 78 scripts + 13 shared + 4 SLA |
-| **Total pytest collect** | **941** | |
+| Scripts / Shared / SLA | 114 | 40 security scan + 22 perf_locustfile + 21 generate_docs + 10 shared + 9 seed_db + 4 SLA + 3 project_structure + 3 shared_utils + 2 parse_ers_gherkin |
+| **Total pytest collect** | **~1005** | |
 
 **Cobertura técnica (medida 2026-06-14):** 91% exacto · 12709 statements · 11606 cubiertos · 1103 perdidos  
-**Ejecución validada 2026-06-15:** 862 passed, 12 skipped, 0 fallos
+**Ejecución validada 2026-06-22:** ~986 passed, ~19 skipped, 0 fallos
 
 | App | Cobertura prod | Tests |
 |-----|---------------|-------|
@@ -368,11 +375,12 @@ Cada subcategoría tiene su propia numeración: `SCR-*` para scripts, `SHA-*` pa
 | Servicios (unit) | `apps/*/tests/test_services.py` | Lógica de negocio, edge cases, rollback |
 | HTTP (views) | `apps/*/tests/test_views.py` | Endpoints reales con `APIClient` |
 | Gherkin/ERS | `tests/ers/` | Escenarios RF001–RF025, RNF003–RNF006 — 131 passed, 7 skipped |
+| Seguridad OWASP | `tests/security/test_owasp.py` | 45 tests A01/A02/A03/A05/A07 — ejecutados en CI con Postgres |
 | Concurrencia | `tests/concurrency/` | Requiere `RUN_CONCURRENCY_TESTS=1` + Postgres (4 skipped en SQLite) |
-| Performance (load) | `tests/performance/locustfile.py` | Locust — NO parte de pytest, correr aparte |
-| Scripts / Auxiliares | `tests/scripts/`, `tests/shared/`, `tests/test_service_sla.py` | 70 scripts + 8 shared + 4 SLA |
+| Performance (load) | `tests/performance/locustfile.py` | Locust 3 roles — NO parte de pytest, correr aparte |
+| Scripts / Auxiliares | `tests/scripts/`, `tests/shared/`, `tests/test_service_sla.py` | 114 tests en 7 archivos |
 
-**Nota:** Los tests de concurrencia y parte de los tests de alertas fallan en SQLite por restricciones de thread-sharing. En CI se ejecutan contra PostgreSQL real con `RUN_CONCURRENCY_TESTS=1`.
+**Nota:** Los tests de concurrencia y parte de los tests de alertas fallan en SQLite por restricciones de thread-sharing. En CI se ejecutan contra PostgreSQL real con `RUN_CONCURRENCY_TESTS=1`. Los tests de seguridad OWASP se ejecutan con `pytest tests/security/` y necesitan Postgres para máxima fidelidad (el job `security_tests` de CI lo garantiza).
 
 Para el historial completo de cambios ver [`CHANGELOG_TESTING.md`](CHANGELOG_TESTING.md).
 
@@ -387,19 +395,58 @@ pytest --cov=apps --cov-report=html --cov-report=term-missing -q
 
 ---
 
+## Tests de seguridad OWASP
+
+La suite `tests/security/` verifica controles de seguridad en tiempo de ejecución (complementan el SAST estático de semgrep/bandit):
+
+```bash
+# Ejecutar todos los tests de seguridad
+pytest tests/security/ -v
+
+# Con cobertura
+pytest tests/security/ -v --cov=apps --cov-report=term-missing
+```
+
+| Categoría OWASP | Tests | Qué verifica |
+|----------------|-------|--------------|
+| A01 — Broken Access Control | 14 | 401 sin token, IDOR por UUID, RBAC por rol (auxiliar→403, admin→403 en escrituras) |
+| A02 — Cryptographic Failures | 4 | `password` ausente en respuestas; claim `exp` en JWT |
+| A03 — Injection | 13 | SQL payloads × 3 vectores → nunca 500; XSS en búsqueda → JSON sin `<script>` |
+| A05 — Security Misconfiguration | 5 | 404 para rutas desconocidas; errores con Content-Type JSON; health público |
+| A07 — Auth Failures | 9 | Contraseña incorrecta, JWT alterado, refresh como access, usuario inactivo → 401 |
+
+En CI estos tests se ejecutan en el job `security_tests` (Postgres 18, paralelo a `concurrency_tests`, bloqueante para el merge).
+
+---
+
 ## Load testing con Locust (opcional)
 
 Locust simula usuarios concurrentes contra un servidor vivo. **No reemplaza pytest** — úsalo antes de releases o para detectar regresiones N+1 bajo carga.
+
+El locustfile modela **tres roles** con pesos proporcionales a la carga real del sistema:
+
+| User class | Rol | `weight` | Tareas | Tipo de acceso |
+|-----------|-----|---------|--------|----------------|
+| `ICMUser` | almacenista | 5 | 28 (21 lectura + 7 escritura) | Lectura completa + todos los tipos de movimiento |
+| `AuxiliarUser` | auxiliar_despacho | 3 | 8 | Solo lectura (inventory, movements, alerts) |
+| `AdminUser` | administrador | 2 | 6 | Solo lectura (KPI, reports, audit, billing/stats) |
 
 ```bash
 # Instalar (solo para performance, no va en requirements.txt principal)
 pip install -r requirements-perf.txt
 
-# Correr (requiere servidor en localhost:8000)
+# Correr (requiere servidor en localhost:8000) — 12 usuarios, 3 roles
 locust -f tests/performance/locustfile.py \
        --headless -H http://localhost:8000 \
-       -u 10 -r 2 --run-time 60s --only-summary
+       -u 12 -r 3 --run-time 45s --only-summary
+
+# Health check básico (locustfile de scripts/)
+locust -f scripts/perf/locustfile.py \
+       --headless -H http://localhost:8000 \
+       -u 5 -r 1 --run-time 20s --only-summary
 ```
+
+En CI, el job `load_test` crea los tres usuarios (`almacenista`, `auxiliar`, `administrador`) con `get_or_create` y un `TemporaryAccessPermit` para el auxiliar (ventana horaria) antes de lanzar Locust.
 
 ---
 

@@ -2,7 +2,7 @@
 Tests dinámicos 1:1 con escenarios Gherkin del ERS.
 
 Cada función `test_RFxxx_Sxx` corresponde al archivo `docs/test/scenarios/RFxxx-Sxx.md`.
-Metadatos: `docs/test/gherkin_scenarios.json` (generado por `scripts/parse_ers_gherkin.py`).
+Metadatos: `docs/test/gherkin_scenarios.json` (generado por `scripts/docs/parse_ers_gherkin.py`).
 """
 
 from __future__ import annotations
