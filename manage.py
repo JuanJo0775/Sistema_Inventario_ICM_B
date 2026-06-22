@@ -140,6 +140,9 @@ def main():
 
     if _from_cli:
         _settings_mod = _from_cli
+    elif "runserver" in sys.argv:
+        # runserver siempre usa development; ignora lo que haya en el entorno
+        _settings_mod = "config.settings.development"
     else:
         _settings_mod = (
             os.environ.get("DJANGO_SETTINGS_MODULE") or "config.settings.development"
