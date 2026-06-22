@@ -95,7 +95,7 @@ Cuando un cambio afecta a los tests o a la estructura del proyecto, el autor del
 - Si modificas tests o escenarios Gherkin (`tests/`, `tests/ers/`, `apps/*/tests/`) ejecuta:
 
 ```bash
-python scripts/parse_ers_gherkin.py
+python scripts/docs/parse_ers_gherkin.py
 ```
 
     Esto actualiza la documentación de pruebas y la matriz de trazabilidad. Incluir los archivos generados en el mismo commit.

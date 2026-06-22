@@ -61,5 +61,8 @@ docs/guias/GRAPHIFY_GUIDE.md
 # Security scan reports
 scripts/security/reports/
 
+# CI local runner output (logs, JUnit, coverage)
+ci-local-out/
+
 # Windows artifacts
 nul
