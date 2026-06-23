@@ -488,7 +488,7 @@ jobs:
 
       - name: Start Django server
         run: |
-          python manage.py runserver 0.0.0.0:8000 --noreload &
+          python manage.py runserver 0.0.0.0:8000 --noreload --settings=config.settings.loadtest &
           echo $! > .server.pid
           echo "Waiting for server..."
           for i in $(seq 1 30); do
