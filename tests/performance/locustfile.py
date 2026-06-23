@@ -30,7 +30,7 @@ def _safe_results(data):
     if isinstance(data, list):
         return data
     if isinstance(data, dict):
-        return data.get("results") or data
+        return data.get("results", [])
     return []
 
 
@@ -442,7 +442,11 @@ class AdminUser(HttpUser):
 
     @task(2)
     def get_movements_summary(self):
-        self.client.get("/api/v1/reports/movements/summary/", headers=self._auth())
+        self.client.get(
+            "/api/v1/reports/movements/summary/",
+            params={"start": "2025-01-01", "end": "2025-12-31"},
+            headers=self._auth(),
+        )
 
     @task(1)
     def get_inventory_full(self):
