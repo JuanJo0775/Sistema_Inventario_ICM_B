@@ -140,6 +140,10 @@ def main():
 
     if _from_cli:
         _settings_mod = _from_cli
+    elif "runserver" in sys.argv:
+        # runserver siempre usa development (PostgreSQL via .env.development).
+        # ci_local y otros orquestadores deben pasar --settings explícitamente.
+        _settings_mod = "config.settings.development"
     else:
         _settings_mod = (
             os.environ.get("DJANGO_SETTINGS_MODULE") or "config.settings.development"

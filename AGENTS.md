@@ -120,6 +120,20 @@ python scripts/security/run_security_scan.py --list             # listar herrami
 - Crear `.env` en raíz con variables clave (o pasarlas al entorno) usando `.env.example` como plantilla.
 - `python-decouple` usa defaults en `config/settings/base.py` si no se define la variable.
 
+### Resolución de `DJANGO_SETTINGS_MODULE`
+
+`manage.py` resuelve el settings module de la siguiente forma:
+
+| Comando | Settings que usa | DB |
+|---------|-----------------|-----|
+| `python manage.py runserver` | Siempre `config.settings.development` | PostgreSQL local (.env.development) |
+| `python manage.py runserver --settings=config.settings.loadtest` | El que se pase explícitamente | PostgreSQL Docker (puerto 15432) |
+| `python manage.py migrate` / `shell` / otros | `DJANGO_SETTINGS_MODULE` del entorno, o `development` si no está |
+
+**Regla:** `runserver` **siempre** fuerza `config.settings.development` sin importar `DJANGO_SETTINGS_MODULE` del entorno. Esto garantiza que `python manage.py runserver` nunca use SQLite por accidente (por ejemplo, si pytest dejó `DJANGO_SETTINGS_MODULE=config.settings.test` en el shell).
+
+Orquestadores como `ci_local` deben pasar `--settings=` explícitamente al invocar `runserver` para usar un módulo distinto al de desarrollo.
+
 ## Dominio breve
 
 - **ICM**: inventario insumos médicos; SKU definido por el usuario siguiendo el patrón 1–4 letras, un guion y 1–4 dígitos (ej: AB-1234).
@@ -217,7 +231,7 @@ python -m scripts.generate_docs
 - También disponible (legacy alias, mismo efecto):
 
 ```bash
-python scripts/parse_ers_gherkin.py
+python scripts/docs/parse_ers_gherkin.py
 ```
 
 - Para regenerar solo una categoría específica:
@@ -243,7 +257,7 @@ python scripts/project_structure/generate_project_structure.py
 
 Checklist rápido antes de `git push` cuando tocas tests o estructura:
 
-- Ejecutaste `python -m scripts.generate_docs` (o `python scripts/parse_ers_gherkin.py`) si cambiaste tests/gherkin
+- Ejecutaste `python -m scripts.generate_docs` (o `python scripts/docs/parse_ers_gherkin.py`) si cambiaste tests/gherkin
 - Ejecutaste `python scripts/project_structure/generate_project_structure.py` si cambiaste la estructura del repo
 - Añadiste los archivos generados al `git add` y están incluidos en el mismo commit
 - En la descripción del PR listaste explícitamente los comandos usados para regenerar la documentación

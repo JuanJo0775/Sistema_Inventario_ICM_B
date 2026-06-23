@@ -13,6 +13,7 @@ import argparse
 import ast
 import json
 import re
+import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -117,8 +118,13 @@ DOCS_ORDER = [
 SCRIPTS_ORDER = [
     "README_SCRIPTS.md",
     "project_structure",
-    "parse_ers_gherkin.py",
+    "docs",
     "generate_docs",
+    "db_neo",
+    "ci_local",
+    "perf",
+    "security",
+    "seed_db",
 ]
 REQUIREMENTS_ORDER = ["base.txt", "development.txt", "production.txt"]
 DOCKER_ORDER = ["Dockerfile", "entrypoint.sh"]
@@ -1497,6 +1503,8 @@ def build_external_config(config: TreeConfig, external: dict) -> TreeConfig:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(
         description="Genera la estructura del proyecto y sincroniza el README arquitectónico."
     )

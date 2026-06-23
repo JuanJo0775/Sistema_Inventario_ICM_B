@@ -6,10 +6,12 @@ Usage (requires a running server and `pip install locust`):
            --headless -H http://localhost:8000 \
            -u 10 -r 2 --run-time 60s --only-summary
 
-Two user classes model the roles:
-- ICMUser (almacenista): reads across all modules + writes (entries, dispatches,
-  transfers, adjustments, returns, product creation, purchase orders).
+Three user classes model the system roles:
+- ICMUser (almacenista, weight=5): reads across all modules + writes (entries, dispatches,
+  transfers, adjustments, returns, billing, product creation, purchase orders).
+  28 tasks (21 read + 7 write).
 - AuxiliarUser (auxiliar_despacho): read-only browse across permitted modules.
+- AdminUser (administrador): read-only access to reports, KPI, audit, and billing.
 
 Write tasks are no-ops when no product/location/supplier is cached.
 In CI the seeds create default locations — products and suppliers are created
@@ -28,13 +30,18 @@ def _safe_results(data):
     if isinstance(data, list):
         return data
     if isinstance(data, dict):
-        return data.get("results") or data
+        return data.get("results", [])
     return []
 
 
 class ICMUser(HttpUser):
-    """Simula un almacenista con acceso completo de lectura y escritura."""
+    """Simula un almacenista con acceso completo de lectura y escritura.
 
+    weight=5 refleja que el almacenista es el rol principal del sistema:
+    el mayor número de usuarios concurrentes corresponde a este perfil.
+    """
+
+    weight = 5
     wait_time = between(0.5, 2)
     token: str = ""
     _product_id: str = ""
@@ -153,10 +160,6 @@ class ICMUser(HttpUser):
     @task(1)
     def get_locations(self):
         self.client.get("/api/v1/inventory/locations/", headers=self._auth())
-
-    @task(1)
-    def get_storage_types(self):
-        self.client.get("/api/v1/inventory/storage-types/", headers=self._auth())
 
     # ── Read: Movements ──────────────────────────────────────────────────────
 
@@ -325,10 +328,31 @@ class ICMUser(HttpUser):
             name="/api/v1/purchasing/purchase-orders/ [write]",
         )
 
+    # ── Read: Billing ────────────────────────────────────────────────────────
+
+    @task(1)
+    def get_billing_invoices(self):
+        self.client.get("/api/v1/billing/invoices/", headers=self._auth())
+
+    @task(1)
+    def get_billing_stats(self):
+        self.client.get("/api/v1/billing/invoices/stats/", headers=self._auth())
+
+    # ── Read: Storage ────────────────────────────────────────────────────────
+
+    @task(1)
+    def get_storage_types(self):
+        self.client.get("/api/v1/inventory/storage-types/", headers=self._auth())
+
+    @task(1)
+    def get_storage_templates(self):
+        self.client.get("/api/v1/inventory/storage-templates/", headers=self._auth())
+
 
 class AuxiliarUser(HttpUser):
     """Simula un auxiliar de despacho — solo tareas de lectura."""
 
+    weight = 3
     wait_time = between(1, 3)
     token: str = ""
 
@@ -379,3 +403,51 @@ class AuxiliarUser(HttpUser):
     @task(1)
     def get_alerts_poll(self):
         self.client.get("/api/v1/alerts/poll/", headers=self._auth())
+
+
+class AdminUser(HttpUser):
+    """Simula un administrador — solo lectura de reportes, KPI, auditoría y facturación."""
+
+    weight = 2
+    wait_time = between(2, 5)
+    token: str = ""
+
+    def _auth(self) -> dict:
+        return {"Authorization": f"Bearer {self.token}"}
+
+    def on_start(self):
+        r = self.client.post(
+            "/api/v1/auth/login/",
+            json={"username": "administrador", "password": "testpass123"},
+        )
+        if r.status_code == 200:
+            data = r.json()
+            self.token = data.get("access", "") if isinstance(data, dict) else ""
+
+    @task(4)
+    def get_kpi(self):
+        self.client.get("/api/v1/reports/kpi/", headers=self._auth())
+
+    @task(3)
+    def get_inventory_summary(self):
+        self.client.get("/api/v1/reports/inventory/summary/", headers=self._auth())
+
+    @task(2)
+    def get_audit_logs(self):
+        self.client.get("/api/v1/audit/", headers=self._auth())
+
+    @task(2)
+    def get_billing_stats(self):
+        self.client.get("/api/v1/billing/invoices/stats/", headers=self._auth())
+
+    @task(2)
+    def get_movements_summary(self):
+        self.client.get(
+            "/api/v1/reports/movements/summary/",
+            params={"start": "2025-01-01", "end": "2025-12-31"},
+            headers=self._auth(),
+        )
+
+    @task(1)
+    def get_inventory_full(self):
+        self.client.get("/api/v1/inventory/", headers=self._auth())

@@ -385,7 +385,12 @@ icm_backend/
 │   └── production.txt
 ├── scripts/                                                    # Automatizaciones reutilizables del repositorio
 │   ├── README_SCRIPTS.md                                       # Índice y contexto de las automatizaciones
-│   ├── parse_ers_gherkin.py                                    # Generador de escenarios ERS/Gherkin
+│   ├── ci_local/
+│   │   └── ci_local.py                                         # Pipeline CI local con Docker (replica ci.yml)
+│   ├── db_neo/
+│   │   └── _verify_neon.py                                     # Verificación de conexión Neon y estado del seed
+│   ├── docs/
+│   │   └── parse_ers_gherkin.py                                # Alias legacy: genera solo escenarios Gherkin
 │   ├── generate_docs/                                          # Generadores compartidos de documentación
 │   │   ├── __main__.py                                         # Entry point oficial: python -m scripts.generate_docs
 │   │   └── utils.py                                            # Pipeline compartido: descubrimiento, renderizado y escritura
@@ -399,7 +404,6 @@ icm_backend/
 │   │   ├── env.py
 │   │   ├── run.py                                              # Punto de entrada ejecutable
 │   │   └── seeder.py                                           # Lógica principal del seed
-│   └── _verify_neon.py
 ├── shared/                                                     # Código transversal reutilizable
 │   ├── models.py                                               # BaseModel y metadatos comunes
 │   ├── permissions.py                                          # Permisos base y reutilizables

@@ -613,6 +613,402 @@ Código fuente: [tests/scripts/test_parse_ers_gherkin.py](../../tests/scripts/te
 <!-- file: scripts/SCR-0018.md -->
 **Código:** SCR-0018
 
+# test_has_auth_helper
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestAdminUser::test_has_auth_helper`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestAdminUser::test_has_auth_helper -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 99)
+
+
+---
+
+<!-- file: scripts/SCR-0019.md -->
+**Código:** SCR-0019
+
+# test_has_on_start
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestAdminUser::test_has_on_start`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestAdminUser::test_has_on_start -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 96)
+
+
+---
+
+<!-- file: scripts/SCR-0020.md -->
+**Código:** SCR-0020
+
+# test_has_tasks
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestAdminUser::test_has_tasks`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestAdminUser::test_has_tasks -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 92)
+
+
+---
+
+<!-- file: scripts/SCR-0021.md -->
+**Código:** SCR-0021
+
+# test_has_wait_time
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestAdminUser::test_has_wait_time`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestAdminUser::test_has_wait_time -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 89)
+
+
+---
+
+<!-- file: scripts/SCR-0022.md -->
+**Código:** SCR-0022
+
+# test_imports_cleanly
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestAdminUser::test_imports_cleanly`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestAdminUser::test_imports_cleanly -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 86)
+
+
+---
+
+<!-- file: scripts/SCR-0023.md -->
+**Código:** SCR-0023
+
+# test_wait_time_is_callable
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestAdminUser::test_wait_time_is_callable`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestAdminUser::test_wait_time_is_callable -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 102)
+
+
+---
+
+<!-- file: scripts/SCR-0024.md -->
+**Código:** SCR-0024
+
+# test_has_auth_helper
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestAuxiliarUser::test_has_auth_helper`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestAuxiliarUser::test_has_auth_helper -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 79)
+
+
+---
+
+<!-- file: scripts/SCR-0025.md -->
+**Código:** SCR-0025
+
+# test_has_on_start
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestAuxiliarUser::test_has_on_start`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestAuxiliarUser::test_has_on_start -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 76)
+
+
+---
+
+<!-- file: scripts/SCR-0026.md -->
+**Código:** SCR-0026
+
+# test_has_tasks
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestAuxiliarUser::test_has_tasks`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestAuxiliarUser::test_has_tasks -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 72)
+
+
+---
+
+<!-- file: scripts/SCR-0027.md -->
+**Código:** SCR-0027
+
+# test_has_wait_time
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestAuxiliarUser::test_has_wait_time`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestAuxiliarUser::test_has_wait_time -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 69)
+
+
+---
+
+<!-- file: scripts/SCR-0028.md -->
+**Código:** SCR-0028
+
+# test_imports_cleanly
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestAuxiliarUser::test_imports_cleanly`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestAuxiliarUser::test_imports_cleanly -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 66)
+
+
+---
+
+<!-- file: scripts/SCR-0029.md -->
+**Código:** SCR-0029
+
 # test_has_wait_time
 
 ## Nombre del test
@@ -641,13 +1037,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/scripts/test_perf_locustfile.py::TestHealthCheckUser::test_has_wait_time -v
 ```
 
-Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 26)
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 30)
 
 
 ---
 
-<!-- file: scripts/SCR-0019.md -->
-**Código:** SCR-0019
+<!-- file: scripts/SCR-0030.md -->
+**Código:** SCR-0030
 
 # test_imports_cleanly
 
@@ -677,13 +1073,13 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/scripts/test_perf_locustfile.py::TestHealthCheckUser::test_imports_cleanly -v
 ```
 
-Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 18)
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 23)
 
 
 ---
 
-<!-- file: scripts/SCR-0020.md -->
-**Código:** SCR-0020
+<!-- file: scripts/SCR-0031.md -->
+**Código:** SCR-0031
 
 # test_tasks_defined
 
@@ -713,13 +1109,301 @@ Aserciones del test (assert); ver código en la línea indicada abajo.
 pytest tests/scripts/test_perf_locustfile.py::TestHealthCheckUser::test_tasks_defined -v
 ```
 
-Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 21)
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 26)
 
 
 ---
 
-<!-- file: scripts/SCR-0021.md -->
-**Código:** SCR-0021
+<!-- file: scripts/SCR-0032.md -->
+**Código:** SCR-0032
+
+# test_has_auth_helper
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestICMUser::test_has_auth_helper`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestICMUser::test_has_auth_helper -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 53)
+
+
+---
+
+<!-- file: scripts/SCR-0033.md -->
+**Código:** SCR-0033
+
+# test_has_create_product_helper
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestICMUser::test_has_create_product_helper`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestICMUser::test_has_create_product_helper -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 56)
+
+
+---
+
+<!-- file: scripts/SCR-0034.md -->
+**Código:** SCR-0034
+
+# test_has_create_supplier_helper
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestICMUser::test_has_create_supplier_helper`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestICMUser::test_has_create_supplier_helper -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 59)
+
+
+---
+
+<!-- file: scripts/SCR-0035.md -->
+**Código:** SCR-0035
+
+# test_has_on_start
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestICMUser::test_has_on_start`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestICMUser::test_has_on_start -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 47)
+
+
+---
+
+<!-- file: scripts/SCR-0036.md -->
+**Código:** SCR-0036
+
+# test_has_tasks
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestICMUser::test_has_tasks`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestICMUser::test_has_tasks -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 43)
+
+
+---
+
+<!-- file: scripts/SCR-0037.md -->
+**Código:** SCR-0037
+
+# test_has_token_attribute
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestICMUser::test_has_token_attribute`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestICMUser::test_has_token_attribute -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 50)
+
+
+---
+
+<!-- file: scripts/SCR-0038.md -->
+**Código:** SCR-0038
+
+# test_has_wait_time
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestICMUser::test_has_wait_time`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestICMUser::test_has_wait_time -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 40)
+
+
+---
+
+<!-- file: scripts/SCR-0039.md -->
+**Código:** SCR-0039
+
+# test_imports_cleanly
+
+## Nombre del test
+
+`tests/scripts/test_perf_locustfile.py::TestICMUser::test_imports_cleanly`
+
+## Propósito
+
+Prueba auxiliar de herramientas del repositorio (scripts, utilidades compartidas o SLA de rendimiento).
+
+## Requisito o caso de negocio asociado
+
+Ver docstring del test y módulo; trazabilidad RF/BR en docs/test/TRAZABILIDAD_ERS_GHERKIN.md cuando aplique.
+
+## Inputs
+
+Fixtures pytest (conftest.py, tests/factories.py) y datos creados en el propio test. Ver implementación.
+
+## Resultado esperado
+
+Aserciones del test (assert); ver código en la línea indicada abajo.
+
+## Link directo al test
+
+```bash
+pytest tests/scripts/test_perf_locustfile.py::TestICMUser::test_imports_cleanly -v
+```
+
+Código fuente: [tests/scripts/test_perf_locustfile.py](../../tests/scripts/test_perf_locustfile.py) (aprox. línea 37)
+
+
+---
+
+<!-- file: scripts/SCR-0040.md -->
+**Código:** SCR-0040
 
 # test_ci_flag
 
@@ -754,8 +1438,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0022.md -->
-**Código:** SCR-0022
+<!-- file: scripts/SCR-0041.md -->
+**Código:** SCR-0041
 
 # test_default_ci_is_false
 
@@ -790,8 +1474,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0023.md -->
-**Código:** SCR-0023
+<!-- file: scripts/SCR-0042.md -->
+**Código:** SCR-0042
 
 # test_default_dry_run_is_false
 
@@ -826,8 +1510,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0024.md -->
-**Código:** SCR-0024
+<!-- file: scripts/SCR-0043.md -->
+**Código:** SCR-0043
 
 # test_default_list_is_false
 
@@ -862,8 +1546,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0025.md -->
-**Código:** SCR-0025
+<!-- file: scripts/SCR-0044.md -->
+**Código:** SCR-0044
 
 # test_default_only_is_empty
 
@@ -898,8 +1582,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0026.md -->
-**Código:** SCR-0026
+<!-- file: scripts/SCR-0045.md -->
+**Código:** SCR-0045
 
 # test_default_output_path
 
@@ -934,8 +1618,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0027.md -->
-**Código:** SCR-0027
+<!-- file: scripts/SCR-0046.md -->
+**Código:** SCR-0046
 
 # test_default_skip_is_empty
 
@@ -970,8 +1654,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0028.md -->
-**Código:** SCR-0028
+<!-- file: scripts/SCR-0047.md -->
+**Código:** SCR-0047
 
 # test_dry_run_flag
 
@@ -1006,8 +1690,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0029.md -->
-**Código:** SCR-0029
+<!-- file: scripts/SCR-0048.md -->
+**Código:** SCR-0048
 
 # test_list_flag
 
@@ -1042,8 +1726,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0030.md -->
-**Código:** SCR-0030
+<!-- file: scripts/SCR-0049.md -->
+**Código:** SCR-0049
 
 # test_only_and_skip_parsed_together
 
@@ -1078,8 +1762,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0031.md -->
-**Código:** SCR-0031
+<!-- file: scripts/SCR-0050.md -->
+**Código:** SCR-0050
 
 # test_only_flag
 
@@ -1114,8 +1798,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0032.md -->
-**Código:** SCR-0032
+<!-- file: scripts/SCR-0051.md -->
+**Código:** SCR-0051
 
 # test_output_custom
 
@@ -1150,8 +1834,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0033.md -->
-**Código:** SCR-0033
+<!-- file: scripts/SCR-0052.md -->
+**Código:** SCR-0052
 
 # test_skip_flag
 
@@ -1186,8 +1870,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0034.md -->
-**Código:** SCR-0034
+<!-- file: scripts/SCR-0053.md -->
+**Código:** SCR-0053
 
 # test_empty_only_returns_all
 
@@ -1222,8 +1906,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0035.md -->
-**Código:** SCR-0035
+<!-- file: scripts/SCR-0054.md -->
+**Código:** SCR-0054
 
 # test_only_and_skip_both_empty_returns_all
 
@@ -1258,8 +1942,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0036.md -->
-**Código:** SCR-0036
+<!-- file: scripts/SCR-0055.md -->
+**Código:** SCR-0055
 
 # test_only_returns_matching_tools
 
@@ -1294,8 +1978,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0037.md -->
-**Código:** SCR-0037
+<!-- file: scripts/SCR-0056.md -->
+**Código:** SCR-0056
 
 # test_only_selects_multiple_tools
 
@@ -1330,8 +2014,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0038.md -->
-**Código:** SCR-0038
+<!-- file: scripts/SCR-0057.md -->
+**Código:** SCR-0057
 
 # test_only_selects_specific_tool
 
@@ -1366,8 +2050,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0039.md -->
-**Código:** SCR-0039
+<!-- file: scripts/SCR-0058.md -->
+**Código:** SCR-0058
 
 # test_skip_excludes_tool
 
@@ -1402,8 +2086,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0040.md -->
-**Código:** SCR-0040
+<!-- file: scripts/SCR-0059.md -->
+**Código:** SCR-0059
 
 # test_skip_multiple_tools
 
@@ -1438,8 +2122,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0041.md -->
-**Código:** SCR-0041
+<!-- file: scripts/SCR-0060.md -->
+**Código:** SCR-0060
 
 # test_unknown_only_raises_system_exit
 
@@ -1474,8 +2158,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0042.md -->
-**Código:** SCR-0042
+<!-- file: scripts/SCR-0061.md -->
+**Código:** SCR-0061
 
 # test_unknown_skip_raises_system_exit
 
@@ -1510,8 +2194,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0043.md -->
-**Código:** SCR-0043
+<!-- file: scripts/SCR-0062.md -->
+**Código:** SCR-0062
 
 # test_ci_flag_applies_ci_flags
 
@@ -1546,8 +2230,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0044.md -->
-**Código:** SCR-0044
+<!-- file: scripts/SCR-0063.md -->
+**Código:** SCR-0063
 
 # test_ci_flag_no_ci_flags_unchanged
 
@@ -1582,8 +2266,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0045.md -->
-**Código:** SCR-0045
+<!-- file: scripts/SCR-0064.md -->
+**Código:** SCR-0064
 
 # test_dry_run_never_executes
 
@@ -1618,8 +2302,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0046.md -->
-**Código:** SCR-0046
+<!-- file: scripts/SCR-0065.md -->
+**Código:** SCR-0065
 
 # test_dry_run_returns_ok_and_command
 
@@ -1654,8 +2338,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0047.md -->
-**Código:** SCR-0047
+<!-- file: scripts/SCR-0066.md -->
+**Código:** SCR-0066
 
 # test_file_not_found_returns_fail
 
@@ -1690,8 +2374,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0048.md -->
-**Código:** SCR-0048
+<!-- file: scripts/SCR-0067.md -->
+**Código:** SCR-0067
 
 # test_ascii_punctuation_passes
 
@@ -1726,8 +2410,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0049.md -->
-**Código:** SCR-0049
+<!-- file: scripts/SCR-0068.md -->
+**Código:** SCR-0068
 
 # test_empty_string
 
@@ -1762,8 +2446,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0050.md -->
-**Código:** SCR-0050
+<!-- file: scripts/SCR-0069.md -->
+**Código:** SCR-0069
 
 # test_plain_text_passes_through
 
@@ -1798,8 +2482,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0051.md -->
-**Código:** SCR-0051
+<!-- file: scripts/SCR-0070.md -->
+**Código:** SCR-0070
 
 # test_unicode_box_chars_stripped
 
@@ -1834,8 +2518,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0052.md -->
-**Código:** SCR-0052
+<!-- file: scripts/SCR-0071.md -->
+**Código:** SCR-0071
 
 # test_unicode_checkmark_stripped
 
@@ -1870,8 +2554,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0053.md -->
-**Código:** SCR-0053
+<!-- file: scripts/SCR-0072.md -->
+**Código:** SCR-0072
 
 # test_unicode_xmark_stripped
 
@@ -1906,8 +2590,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0054.md -->
-**Código:** SCR-0054
+<!-- file: scripts/SCR-0073.md -->
+**Código:** SCR-0073
 
 # test_all_tools_defined
 
@@ -1942,8 +2626,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0055.md -->
-**Código:** SCR-0055
+<!-- file: scripts/SCR-0074.md -->
+**Código:** SCR-0074
 
 # test_bandit_cmd
 
@@ -1978,8 +2662,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0056.md -->
-**Código:** SCR-0056
+<!-- file: scripts/SCR-0075.md -->
+**Código:** SCR-0075
 
 # test_each_tool_has_required_keys
 
@@ -2014,8 +2698,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0057.md -->
-**Código:** SCR-0057
+<!-- file: scripts/SCR-0076.md -->
+**Código:** SCR-0076
 
 # test_mypy_cmd
 
@@ -2050,8 +2734,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0058.md -->
-**Código:** SCR-0058
+<!-- file: scripts/SCR-0077.md -->
+**Código:** SCR-0077
 
 # test_ruff_lint_cmd
 
@@ -2086,8 +2770,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0059.md -->
-**Código:** SCR-0059
+<!-- file: scripts/SCR-0078.md -->
+**Código:** SCR-0078
 
 # test_semgrep_has_ci_flags
 
@@ -2122,8 +2806,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0060.md -->
-**Código:** SCR-0060
+<!-- file: scripts/SCR-0079.md -->
+**Código:** SCR-0079
 
 # test_tool_names_are_unique
 
@@ -2158,8 +2842,8 @@ Código fuente: [tests/scripts/test_run_security_scan.py](../../tests/scripts/te
 
 ---
 
-<!-- file: scripts/SCR-0061.md -->
-**Código:** SCR-0061
+<!-- file: scripts/SCR-0080.md -->
+**Código:** SCR-0080
 
 # test_all_category_slugs_declared
 
@@ -2194,8 +2878,8 @@ Código fuente: [tests/scripts/test_seed_db.py](../../tests/scripts/test_seed_db
 
 ---
 
-<!-- file: scripts/SCR-0062.md -->
-**Código:** SCR-0062
+<!-- file: scripts/SCR-0081.md -->
+**Código:** SCR-0081
 
 # test_all_product_skus_valid_format
 
@@ -2230,8 +2914,8 @@ Código fuente: [tests/scripts/test_seed_db.py](../../tests/scripts/test_seed_db
 
 ---
 
-<!-- file: scripts/SCR-0063.md -->
-**Código:** SCR-0063
+<!-- file: scripts/SCR-0082.md -->
+**Código:** SCR-0082
 
 # test_combo_items_reference_known_skus
 
@@ -2266,8 +2950,8 @@ Código fuente: [tests/scripts/test_seed_db.py](../../tests/scripts/test_seed_db
 
 ---
 
-<!-- file: scripts/SCR-0064.md -->
-**Código:** SCR-0064
+<!-- file: scripts/SCR-0083.md -->
+**Código:** SCR-0083
 
 # test_electroterapia_requires_serial
 
@@ -2302,8 +2986,8 @@ Código fuente: [tests/scripts/test_seed_db.py](../../tests/scripts/test_seed_db
 
 ---
 
-<!-- file: scripts/SCR-0065.md -->
-**Código:** SCR-0065
+<!-- file: scripts/SCR-0084.md -->
+**Código:** SCR-0084
 
 # test_expiration_products_have_valid_skus
 
@@ -2338,8 +3022,8 @@ Código fuente: [tests/scripts/test_seed_db.py](../../tests/scripts/test_seed_db
 
 ---
 
-<!-- file: scripts/SCR-0066.md -->
-**Código:** SCR-0066
+<!-- file: scripts/SCR-0085.md -->
+**Código:** SCR-0085
 
 # test_no_duplicate_product_skus
 
@@ -2374,8 +3058,8 @@ Código fuente: [tests/scripts/test_seed_db.py](../../tests/scripts/test_seed_db
 
 ---
 
-<!-- file: scripts/SCR-0067.md -->
-**Código:** SCR-0067
+<!-- file: scripts/SCR-0086.md -->
+**Código:** SCR-0086
 
 # test_clean_removes_seed_data_preserves_base
 
@@ -2410,8 +3094,8 @@ Código fuente: [tests/scripts/test_seed_db.py](../../tests/scripts/test_seed_db
 
 ---
 
-<!-- file: scripts/SCR-0068.md -->
-**Código:** SCR-0068
+<!-- file: scripts/SCR-0087.md -->
+**Código:** SCR-0087
 
 # test_seed_creates_catalog_and_movements
 
@@ -2446,8 +3130,8 @@ Código fuente: [tests/scripts/test_seed_db.py](../../tests/scripts/test_seed_db
 
 ---
 
-<!-- file: scripts/SCR-0069.md -->
-**Código:** SCR-0069
+<!-- file: scripts/SCR-0088.md -->
+**Código:** SCR-0088
 
 # test_seed_is_idempotent
 

@@ -2,7 +2,7 @@
 ## Sistema Inventario ICM — Backend Django
 
 **Fecha de emisión:** 2026-06-10  
-**Última actualización:** 2026-06-15 (v5.0)  
+**Última actualización:** 2026-06-22 (v6.0)  
 **Rama analizada:** `staging`  
 **Rama de producción:** `main`  
 **Ruta del proyecto:** `c:\Users\JUAN JOSE\PycharmProjects\Sistema_Inventario_ICM`  
@@ -15,7 +15,7 @@
 | 2026-06-10 | 1.0 | Informe inicial |
 | 2026-06-11 | 1.1 | Actualización post-refactor: locustfile reescrito con 2 roles y cobertura multi-módulo; CI seed mejorado con TemporaryAccessPermit para auxiliar en load test; field names de payloads alineados con serializers reales |
 | 2026-06-11 | 1.2 | Auditoría ICM: implementación del plan AUDIT_REMEDIATION_PLAN.md — 7 nuevos AuditEventType, cobertura de auditoría elevada de 47% a 74% bruta / 100% ajustada, 26 puntos de log_event() añadidos, 4 tests nuevos para update_purchase_order, +16 aserciones de auditoría en tests existentes |
-| 2026-06-11 | 1.3 | Scripts / Herramientas elevado de 8 a 9: nuevos tests para `scripts/parse_ers_gherkin.py` (2 tests, alias y propagación) y `scripts/perf/locustfile.py` (3 tests, importación y estructura). `import_catalog` reemplazado por `seed_db` (ya testeado). |
+| 2026-06-11 | 1.3 | Scripts / Herramientas elevado de 8 a 9: nuevos tests para `scripts/docs/parse_ers_gherkin.py` (2 tests, alias y propagación) y `scripts/perf/locustfile.py` (3 tests, importación y estructura). `import_catalog` reemplazado por `seed_db` (ya testeado). |
 | 2026-06-11 | 1.3b | Calidad estática elevado de 8 a 9: bandit y mypy ahora bloqueantes en CI (removidos `continue-on-error: true` y `|| true`). `mypy.ini` extendido de 4 a 9 módulos con `disallow_untyped_defs = True`. |
 | 2026-06-12 | 1.4 | **Validación de ejecución real** (2026-06-12): 758 tests pasan (559 app-level + 19 integración + 131 Gherkin + 35 scripts/aux + 10 shared + 4 concurrencia skippeados en SQLite). 7 escenarios Gherkin skippeados (fuera de alcance frontend RNF001/RNF002). 3 tests de integración seed con timeout/DB thread-sharing (solo en ejecución combinada). Corregido test RF003-S02 (brand_id UUID vs string). Pipeline CI verificado: quality → unit → integration → scenarios → concurrency → load_test. Cobertura app-level: alerts 57, audit 15, auth 84, catalog 84, dashboard 17, inventory 44, movements 99, purchasing 88, reports 46, webhooks 25 = 559 tests. |
 | 2026-06-12 | 1.5 | **Bug fix: acknowledgment flags en confirm_reception** (2026-06-12): `ReceptionConfirmView` ahora acepta `cold_chain_acknowledged` / `electrical_safety_acknowledged` en el body y los reenvía a `register_entry()`. 5 nuevos tests unitarios (purchasing services): electro sin ack → error, electro con ack → OK, cold chain sin ack → error, cold chain con ack → OK, allocs con ack → OK. Cobertura app-level actualizada: purchasing 93, total 564. |
@@ -23,6 +23,7 @@
 | 2026-06-13 | 2.0 | **Auditoría integral y actualización del informe** (2026-06-13): verificación exhaustiva de cada afirmación contra código real. Correcciones: app-level test files 55→56 (auth 7 files), pytest.raises 65→71 app-level, mock/patch refs 78→80, django_db markers 460→457, noqa/type:ignore 21→26, select_for_update 112→66, mypy strict modules 9→10, ICMUser Locust tasks 26→25 (total 33), unit doc files 547→548. Scores validados y mantenidos. |
 | 2026-06-14 | 3.0 | **Actualización con datos reales de ejecución** (2026-06-14): ejecución completa de pytest con cobertura real. Total suite: 856 passed, 12 skipped, 0 fallos. App-level creció de 564→614 tests (alerts 57→61, catalog 84→124, inventory 44→45, purchasing 93→98). Cobertura total medida: 91% exacto (12709 stmts, 11606 cubiertos, 1103 perdidos). Cobertura por módulo (prod, sin tests/migrations): alerts 87%, audit 87%, auth 88%, catalog 84%, dashboard 97%, inventory 74%, movements 87%, purchasing 93%, reports 85%, webhooks 83%. Django actualizado de 4.2→5.2.15 (compatible con `condition=` en `CheckConstraint`). pip actualizado 26.1→26.1.2 (PYSEC-2026-196 resuelto). Columna "Cobertura estimada" → "Cobertura exacta (prod)" con valores medidos. |
 | 2026-06-15 | 5.0 | **Actualización de conteos reales** (2026-06-15): purchasing creció de 98 a 103 tests (5 nuevos). App-level total: 620 tests. Suite global: 862 passed, 12 skipped. Correcciones de lint (ruff/format) en 13 archivos; eliminadas variables muertas en `alerts/services.py`; `contextlib.suppress` en `audit/views.py`; noqa en settings. |
+| 2026-06-22 | 6.0 | **Suite de seguridad OWASP + AdminUser Locust + security_tests CI** (2026-06-22): nuevo módulo `tests/security/test_owasp.py` con 45 tests que cubren A01 (Broken Access Control — IDOR, RBAC, 6 endpoints parametrizados), A02 (Cryptographic Failures — sin `password` en respuestas, claim `exp` en JWT), A03 (Injection — 4 payloads SQL × 3 endpoints, XSS → sin 500), A05 (Security Misconfiguration — 404s, health público, JSON en errores) y A07 (Auth Failures — wrong pwd, token alterado, refresh como access, usuario inactivo). `tests/performance/locustfile.py` extendido con `AdminUser` (`weight=2`, 6 tareas de solo lectura: KPI, summary, audit, billing/stats, movements/summary, inventory) y pesos explícitos ICMUser `weight=5` / AuxiliarUser `weight=3` (almacenista es rol principal). ICMUser ampliado con billing (`/billing/invoices/`, `/billing/invoices/stats/`) y storage templates. `tests/scripts/test_perf_locustfile.py` extendido de 3 a 22 tests (TestICMUser + TestAuxiliarUser + TestAdminUser añadidos). CI: nuevo job `security_tests` (Postgres, paralelo a `concurrency_tests`, ambos after `scenarios`); `load_test` ahora depends `[concurrency_tests, security_tests]`; seed de usuario `administrador` en load test; Locust actualizado a 12 usuarios / ramp 3/s / 45 s. Total suite: **~1005 tests** (~986 passed + ~19 skipped). |
 | 2026-06-14 | 4.0 | **Soft delete masivo + refactor** (2026-06-14): implementación de `SoftDeleteModel` (`shared/models.py`) en Catalog (Category, Brand, Product, ProductCombo), Inventory (StorageType, StorageTemplate, Location), Purchasing (Supplier) y Webhooks (WebhookEndpoint). Nuevo utility `get_for_update_or_404()` en `shared/utils/db.py`. Nuevos 30+ `AuditEventType` para soft delete y disponibilidad. Migraciones añadidas para todos los dominios. App-level tests ajustados: 603 tests (consolidación por soft delete). Documentación de system_behavior actualizada con soft delete en todos los módulos. |
 
 ---
@@ -33,16 +34,17 @@
 
 El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas alto** para un sistema backend Django de dominio médico-logístico. La suite de pruebas cubre los contratos funcionales del ERS mediante escenarios Gherkin trazables 1:1, con cobertura técnica adicional de servicios, vistas, concurrencia y carga.
 
-**Ejecución validada 2026-06-16:** 941 tests collected (pytest --collect-only). Desglose: 685 app-level + 138 Gherkin + 19 integración + 95 scripts/shared/SLA + 4 concurrencia = 941 tests. Skips legítimos: 7 Gherkin (6 frontend/E2E + 1 WeasyPrint), 4 concurrencia (requieren PostgreSQL + `RUN_CONCURRENCY_TESTS=1`). Cobertura mantenida en ~91%.
+**Ejecución validada 2026-06-22:** ~1005 tests collected (pytest --collect-only). Desglose: 685 app-level + 138 Gherkin + 45 seguridad OWASP + 19 integración + 114 scripts/shared/SLA + 4 concurrencia = ~1005 tests. Skips legítimos: 7 Gherkin (6 frontend/E2E + 1 WeasyPrint), 4 concurrencia (requieren PostgreSQL + `RUN_CONCURRENCY_TESTS=1`). Cobertura mantenida en ~91%.
 
 ### Principales fortalezas
 
 - **Cobertura Gherkin al 100 %:** los 132 escenarios de backend definidos en el ERS tienen implementaciones registradas y activas. Ningún escenario backend queda sin automatizar.
 - **Auditoría completa al 100% ajustado:** implementación del plan AUDIT_REMEDIATION_PLAN.md — 7 nuevos `AuditEventType`, cobertura elevada de 47% a 74% bruta / 100% ajustada, 26 puntos de `log_event()` añadidos en servicios, vistas y comandos batch sin nuevas capas ni cambios de esquema.
-- **Pipeline CI/CD de 6 etapas** con separación progresiva de confianza (calidad estática → unitarios → integración → escenarios Postgres → concurrencia → carga), con barreras de fallo en cascada.
+- **Pipeline CI/CD de 8 jobs** con separación progresiva de confianza y paralelismo (calidad estática → unitarios → integración → escenarios Postgres → [seguridad OWASP ∥ concurrencia] → carga), con barreras de fallo en cascada y job `security_tests` bloqueante.
 - **Cobertura de invariantes críticas:** inmutabilidad de movimientos, stock no negativo, serial obligatorio para Electroterapia, validación cruzada de despacho, franjas horarias de auxiliar, consistencia de ledger — todos cubiertos por pruebas.
 - **Pruebas de concurrencia reales** sobre PostgreSQL con `SELECT FOR UPDATE`, probando la resistencia a race conditions en stock.
-- **Pruebas de carga integradas** en CI con Locust (10 usuarios, 30 s, 2 roles), modelando tráfico mixto lectura/escritura con cobertura de 19 endpoints de lectura y 7 operaciones de escritura (entradas, despachos, traslados, ajustes, devoluciones, órdenes de compra).
+- **Suite de seguridad OWASP (45 tests):** cobertura dinámica de runtime para las categorías más relevantes del OWASP Top 10 — A01 (control de acceso, IDOR, RBAC), A02 (no exposición de contraseñas, expiración JWT), A03 (inyección SQL y XSS), A05 (configuración segura) y A07 (fallos de autenticación). Ejecutada en CI contra PostgreSQL real como job `security_tests` independiente.
+- **Pruebas de carga integradas** en CI con Locust (12 usuarios, 45 s, **3 roles** con pesos 5:3:2 — almacenista/auxiliar/administrador), modelando tráfico mixto lectura/escritura con cobertura de 25+ endpoints incluyendo billing y storage templates.
 - **Jerarquía de excepciones de dominio tipada** (`ICMBaseException`) con 71 usos de `pytest.raises` en app-level (76 total incluyendo tests auxiliares), cubriendo rutas de error.
 - **Documentación autogenerada y verificada en CI** (`scripts/generate_docs --check`), garantizando sincronía entre escenarios ERS, fichas y metadatos.
 - **Factory-boy** para datos de prueba reproducibles, con factories especializadas (`ElectroCategoryFactory`, `ProductFactory`).
@@ -58,16 +60,17 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 
 | Dimensión | Puntaje | Nota |
 |-----------|---------|------|
-| Unit Testing | 9 / 10 | 620 tests app-level (alerts 61, audit 15, auth 84, catalog 125, dashboard 17, inventory 45, movements 99, purchasing 103, reports 46, webhooks 25) — 935 total collected |
+| Unit Testing | 9 / 10 | 620 tests app-level (alerts 61, audit 15, auth 84, catalog 125, dashboard 17, inventory 45, movements 99, purchasing 103, reports 46, webhooks 25) |
 | Integration Testing | 9 / 10 | 19 tests integración pasan |
 | BDD / Gherkin | 10 / 10 | 131 passed, 1 skipped (WeasyPrint), 6 skipped (frontend) |
-| Performance Testing | 10 / 10 | Locust 2 roles, 33 tareas, 8 módulos |
+| Security Testing (OWASP) | **10 / 10** | **45 tests** — A01 (IDOR+RBAC), A02 (JWT+passwords), A03 (SQL injection+XSS), A05 (misconfig), A07 (auth failures); job `security_tests` en CI con Postgres |
+| Performance Testing | 10 / 10 | Locust **3 roles** (ICMUser w=5, AuxiliarUser w=3, AdminUser w=2), billing+storage endpoints, 12 usuarios, 45 s |
 | Concurrency Testing | 9 / 10 | 4 tests (requieren PostgreSQL, skip en SQLite) |
-| CI/CD | **9.5 / 10** | 7 jobs, **ruff/bandit/mypy/semgrep bloqueantes**, pip-audit informativo, cobertura 91% medida |
+| CI/CD | **10 / 10** | **8 jobs**, `security_tests` paralelo a `concurrency_tests`, ruff/bandit/mypy/semgrep bloqueantes, cobertura 91% medida |
 | Calidad estática | **10 / 10** | **ruff/mypy/bandit/semgrep todos bloqueantes** |
 | Cobertura funcional | 10 / 10 | 132 escenarios backend 100% implementados |
 | Cobertura técnica | 9 / 10 | 91% exacto (12709 stmts, 11606 cubiertos); 71 pytest.raises (app-level), 80 mocks/patches, 13 parametrize |
-| Scripts / Herramientas | 9 / 10 | 95 tests scripts/shared/SLA (40 security scan + 12 generate_docs + 10 shared + 9 seed_db + 4 SLA + 3 project_structure + 3 perf_locustfile + 2 parse_ers_gherkin + 12 seed_db integration) |
+| Scripts / Herramientas | 9 / 10 | 114 tests scripts/shared/SLA (40 security scan + 22 perf_locustfile + 21 generate_docs + 10 shared + 9 seed_db + 4 SLA + 3 project_structure + 3 shared_utils + 2 parse_ers_gherkin) |
 
 **Puntaje consolidado: 9.4 / 10** 
 
@@ -84,7 +87,8 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | Escenarios ERS/Gherkin — runner dinámico | `tests/ers/test_gherkin_dynamic.py` | 1 archivo | Genera 138 tests en tiempo de colección (132 backend: 131 passed + 1 skipped WeasyPrint, 6 frontend skippeados) |
 | Tests de integración general | `tests/integration/` | 3 archivos | API, movimientos FEFO, smoke endpoints |
 | Tests de concurrencia | `tests/concurrency/` | 3 archivos | `test_concurrent_movements.py`, `test_concurrent_receptions.py`, `test_concurrent_transfers.py` |
-| Tests de rendimiento (Locust) | `tests/performance/locustfile.py` | 1 archivo | ICMUser (25 tareas) + AuxiliarUser (8 tareas) — 2 roles, 33 tareas total |
+| Tests de seguridad OWASP | `tests/security/test_owasp.py` | 1 archivo | 45 tests — A01/A02/A03/A05/A07; ejecutados contra Postgres en CI |
+| Tests de rendimiento (Locust) | `tests/performance/locustfile.py` | 1 archivo | ICMUser (w=5, 28 tareas) + AuxiliarUser (w=3, 8 tareas) + AdminUser (w=2, 6 tareas) — 3 roles, 42 tareas total |
 | Tests de scripts auxiliares | `tests/scripts/` (6 archivos) + `tests/shared/` (1 archivo) | 7 archivos | Scripts, validadores y generadores |
 | Tests de seed end-to-end | `tests/scripts/test_seed_db.py` | 1 archivo | Solo en PR (postgres) |
 | Script de carga alternativo | `scripts/perf/locustfile.py` | 1 archivo | HealthCheckUser básico |
@@ -148,9 +152,10 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | `shared` (excepciones) | — (indirectos) | 13 (RNF003-RNF006) | — | — | — (cubierto indirectamente) |
 | **Subtotal app-level** | **685** | **132** | **3 archivos** | **4 archivos** | **91%** (12709 stmts, 11606 cubiertos, 1103 perdidos) |
 | **Integración extendida** | — | — | — | 19 | — |
-| **Scripts / Auxiliares** | — | — | — | 95 | — |
+| **Seguridad OWASP** | — | — | — | 45 | — |
+| **Scripts / Auxiliares** | — | — | — | 114 | — |
 | **Concurrencia** | — | — | — | 4 | — |
-| **TOTAL suite (pytest collect)** | **941** | **138** | **4** | **118** | **91%** (12709 stmts, 11606 cubiertos, 1103 perdidos) |
+| **TOTAL suite (pytest collect)** | **~1005** | **138** | **4** | **182** | **91%** (12709 stmts, 11606 cubiertos, 1103 perdidos) |
 
 ### 3.2 Por tipo de prueba y dominio funcional
 
@@ -176,6 +181,7 @@ El proyecto Sistema Inventario ICM presenta un **estado de madurez de pruebas al
 | Webhooks / notificaciones | ✓ | — | — | — | — |
 | Dashboard overview | ✓ | — | — | — | ✓ (lectura) |
 | Seguridad / privacidad (RNF) | — | — | ✓ | — | — |
+| Seguridad OWASP (runtime) | — | **✓ (45 tests)** | — | — | — |
 | Rendimiento / throttle (RNF) | — | — | ✓ | — | ✓ |
 
 ---
@@ -418,10 +424,10 @@ Scripts de automatización con validaciones propias.
 | Script | Propósito | ¿Tiene tests? | Ejecución 2026-06-14 |
 |--------|-----------|--------------|---------------------|
 | `scripts/generate_docs/` | Pipeline de generación de documentación de tests | Sí — `tests/scripts/test_generate_docs.py` (21 tests) | 21 passed |
-| `scripts/parse_ers_gherkin.py` | Thin wrapper que delega a generate_docs con --only gherkin | Sí — `tests/scripts/test_parse_ers_gherkin.py` (2 tests) | 2 passed |
+| `scripts/docs/parse_ers_gherkin.py` | Thin wrapper que delega a generate_docs con --only gherkin | Sí — `tests/scripts/test_parse_ers_gherkin.py` (2 tests) | 2 passed |
 | `scripts/project_structure/generate_project_structure.py` | Regenera árbol de estructura en docs | Sí — `tests/scripts/test_generate_project_structure.py` (3 tests) | 3 passed |
 | `scripts/seed_db/` | Seed unificado del sistema (reemplazó a import_catalog) | Sí — `tests/scripts/test_seed_db.py` (9 tests: 6 config + 3 integración) | 9 passed |
-| `scripts/perf/locustfile.py` | Locust básico para salud (rol HealthCheckUser) | Sí — `tests/scripts/test_perf_locustfile.py` (3 tests) | 3 passed |
+| `scripts/perf/locustfile.py` | Locust básico para salud (rol HealthCheckUser) | Sí — `tests/scripts/test_perf_locustfile.py` (22 tests: HealthCheckUser+ICMUser+AuxiliarUser+AdminUser) | 22 passed |
 | `scripts/security/run_security_scan.py` | Escaneo integral calidad+seguridad (ruff, semgrep, bandit, pip-audit, mypy); soporta `--only/--skip/--ci/--list/--dry-run` | Sí — `tests/scripts/test_run_security_scan.py` (40 tests: ToolsConfig, Sanitize, RunTool, ResolveTools, Parser) | 40 passed |
 | `tests/shared/test_location_validators.py` | Validadores de ubicación | Sí — 10 tests parametrizados | 10 passed |
 | `tests/test_service_sla.py` | SLA assertions de servicios críticos | Sí — 4 tests | 4 passed |
@@ -449,7 +455,7 @@ Scripts de automatización con validaciones propias.
 
 #### Calificación: **9 / 10**
 
-Todos los scripts en `scripts/` cuentan con pruebas automatizadas. La cobertura incluye seed, generación de documentación, wrapper de Gherkin y el locustfile manual. La brecha anterior de `import_catalog` fue eliminada al reemplazarlo por `seed_db` (ya testeado).
+Todos los scripts en `scripts/` cuentan con pruebas automatizadas. El test del locustfile de performance pasó de 3 a 22 tests cubriendo los tres user classes (ICMUser, AuxiliarUser, AdminUser). La brecha anterior de `import_catalog` fue eliminada al reemplazarlo por `seed_db` (ya testeado).
 
 ---
 
@@ -457,7 +463,7 @@ Todos los scripts en `scripts/` cuentan con pruebas automatizadas. La cobertura 
 
 #### Descripción
 
-Tests de carga usando Locust, integrados en CI como job final informativo. El locustfile fue reescrito en su totalidad para cubrir 2 roles (almacenista y auxiliar_despacho) con tráfico multi-módulo, incluyendo operaciones de escritura en todos los tipos de movimiento y compras.
+Tests de carga usando Locust, integrados en CI como job final informativo. El locustfile modela **3 roles** del sistema con pesos proporcionales a la carga real: `ICMUser` (almacenista, `weight=5` — rol principal con lectura y escritura completa), `AuxiliarUser` (auxiliar_despacho, `weight=3` — solo lectura) y `AdminUser` (administrador, `weight=2` — solo lectura de reportes y auditoría).
 
 #### Rutas relevantes
 
@@ -467,7 +473,7 @@ scripts/perf/locustfile.py
 config/settings/loadtest.py
 ```
 
-#### Escenarios modelados — ICMUser (almacenista, 5 usuarios, 25 tareas)
+#### Escenarios modelados — ICMUser (almacenista, weight=5, 29 tareas)
 
 | Categoría | Tarea | Peso | Endpoint | Tipo |
 |-----------|-------|------|----------|------|
@@ -496,8 +502,12 @@ config/settings/loadtest.py
 | Movements | `post_adjustment` | 1 | `POST /api/v1/movements/adjustments/` | Escritura |
 | Movements | `post_return` | 1 | `POST /api/v1/movements/returns/` | Escritura |
 | Purchasing | `post_purchase_order` | 1 | `POST /api/v1/purchasing/purchase-orders/` | Escritura |
+| Billing | `get_billing_invoices` | 1 | `GET /api/v1/billing/invoices/` | Lectura |
+| Billing | `get_billing_stats` | 1 | `GET /api/v1/billing/invoices/stats/` | Lectura |
+| Storage | `get_storage_types` | 1 | `GET /api/v1/inventory/storage-types/` | Lectura |
+| Storage | `get_storage_templates` | 1 | `GET /api/v1/inventory/storage-templates/` | Lectura |
 
-#### Escenarios modelados — AuxiliarUser (auxiliar_despacho, 5 usuarios)
+#### Escenarios modelados — AuxiliarUser (auxiliar_despacho, weight=3)
 
 | Tarea | Peso | Endpoint | Tipo |
 |-------|------|----------|------|
@@ -510,11 +520,22 @@ config/settings/loadtest.py
 | `get_locations` | 1 | `GET /api/v1/inventory/locations/` | Lectura |
 | `get_alerts_poll` | 1 | `GET /api/v1/alerts/poll/` | Lectura |
 
+#### Escenarios modelados — AdminUser (administrador, weight=2)
+
+| Tarea | Peso | Endpoint | Tipo |
+|-------|------|----------|------|
+| `get_kpi` | 4 | `GET /api/v1/reports/kpi/` | Lectura |
+| `get_inventory_summary` | 3 | `GET /api/v1/reports/inventory/summary/` | Lectura |
+| `get_audit_logs` | 2 | `GET /api/v1/audit/` | Lectura |
+| `get_billing_stats` | 2 | `GET /api/v1/billing/invoices/stats/` | Lectura |
+| `get_movements_summary` | 2 | `GET /api/v1/reports/movements/summary/` | Lectura |
+| `get_inventory_full` | 1 | `GET /api/v1/inventory/` | Lectura |
+
 #### Configuración CI
 
-- 10 usuarios concurrentes (`-u 10`), 5 por cada rol
-- Spawn rate 2 usuarios/segundo (`-r 2`)
-- Duración 30 segundos (`--run-time 30s`)
+- **12 usuarios concurrentes** (`-u 12`) distribuidos por peso: ~6 almacenista, ~4 auxiliar, ~2 administrador
+- Spawn rate **3 usuarios/segundo** (`-r 3`)
+- Duración **45 segundos** (`--run-time 45s`)
 - Django corriendo en modo live contra PostgreSQL real
 - Resultados publicados como artifact `locust-results_*.csv`
 - SLA check informativo post-Locust (fail-ratio < 1%, p95 < 500ms)
@@ -522,7 +543,7 @@ config/settings/loadtest.py
 #### Seed de datos en CI
 
 El job `load_test` del CI ejecuta un script que:
-1. Crea los usuarios `almacenista` y `auxiliar` con `get_or_create` y emails únicos
+1. Crea los usuarios `almacenista`, `auxiliar` y `administrador` con `get_or_create` y emails únicos
 2. Crea un `TemporaryAccessPermit` con `allow_24_7=True` para el auxiliar, permitiendo login fuera de la franja horaria (07:00-12:00 / 14:00-17:00 Bogota) durante el test de carga
 3. En `on_start`, cada ICMUser cachea ubicaciones (sembradas por migración `0003`), categorías, productos y proveedores — creándolos bajo demanda si no existen mediante `POST /api/v1/catalog/products/` y `POST /api/v1/purchasing/suppliers/`
 
@@ -547,20 +568,19 @@ Todos los payloads de escritura fueron verificados contra los serializers reales
 
 #### Fortalezas
 
-- **2 roles modelados**: almacenista (25 tareas, 18 lectura + 7 escritura) y auxiliar_despacho (8 tareas de lectura) — cubre los dos roles operativos principales.
-- **Cobertura multi-módulo**: inventory, movements, catalog, alerts, dashboard, audit, reports y purchasing.
+- **3 roles modelados con pesos reales** (`weight` 5:3:2): almacenista (rol principal, 28 tareas — 21 lectura + 7 escritura), auxiliar_despacho (8 tareas de lectura), administrador (6 tareas de lectura de reportes/auditoría/billing). Cubre los tres roles operativos del sistema.
+- **Cobertura multi-módulo**: inventory, movements, catalog, alerts, dashboard, audit, reports, purchasing y **billing** (nuevo).
 - **Tráfico mixto realista**: escritura de todos los tipos de movimiento (entrada, despacho, traslado, ajuste, devolución) más órdenes de compra.
 - **Seed bajo demanda**: productos y proveedores se crean automáticamente en `on_start` si no existen, garantizando que las tareas de escritura tengan datos para operar.
-- **Respeto del sistema de permisos**: AuxiliarUser solo accede a endpoints con `IsAuth`, `IsAlmOrAux`, o `IsAuth` (alerts/poll) — no hay 403.
+- **Respeto del sistema de permisos**: AuxiliarUser y AdminUser solo acceden a endpoints permitidos por su rol — no hay 403 esperados.
 - **Autenticación JWT real**: sin bypass, incluyendo `TemporaryAccessPermit` para auxiliar fuera de horario.
 - **SLA check informativo** en CI: fail-ratio < 1% y p95 < 500ms.
 
 #### Limitaciones
 
-- 30 segundos de duración sigue siendo insuficiente para detectar degradación en escenarios de carga sostenida.
+- 45 segundos de duración es mejor que los anteriores 30 s, pero aún insuficiente para detectar degradación en escenarios de carga sostenida.
 - SLA check es informativo (no bloquea el merge).
 - Las operaciones de escritura compiten por el mismo stock inicial — las entradas incrementan stock, los despachos lo consumen, lo que puede causar fallos si se agota el inventario.
-- El rol `administrador` no está modelado.
 
 #### Evidencias
 
@@ -645,8 +665,8 @@ Pipeline GitHub Actions con 7 jobs encadenados progresivamente, ejecutado en pus
 #### Topología del pipeline
 
 ```
-quality → unit_tests → integration_tests ──► scenarios ──► concurrency_tests → load_test
-                              │
+quality → unit_tests → integration_tests ──► scenarios ──┬──► concurrency_tests ──┐
+                              │                           └──► security_tests ───────┴──► load_test
                               └──► seed_db_tests (solo PR)
 ```
 
@@ -659,6 +679,7 @@ quality → unit_tests → integration_tests ──► scenarios ──► concu
 | `integration_tests` | Integration tests (scripts + root) | SQLite :memory: | Sí | `junit-integration-tests.xml` |
 | `scenarios` | Scenarios (Postgres) | PostgreSQL 18 | Sí | `junit-gherkin.xml`, `coverage-gherkin.xml` |
 | `seed_db_tests` | Seed DB tests (PR only) | PostgreSQL 18 | Sí (solo PR) | `junit-seed-db.xml` |
+| `security_tests` | **Security tests — OWASP (Postgres)** | **PostgreSQL 18** | **Sí** | `junit-security.xml`, `coverage-security.xml` |
 | `concurrency_tests` | Concurrency tests (Postgres) | PostgreSQL 18 | Sí | `junit-concurrency.xml` |
 | `load_test` | Load test (Locust) | PostgreSQL 18 | No (informativo) | `locust-results_*.csv` |
 
@@ -697,13 +718,68 @@ quality → unit_tests → integration_tests ──► scenarios ──► concu
 - [docs/CI/README_CICD.md](../CI/README_CICD.md)
 - [scripts/security/run_security_scan.py](../../scripts/security/run_security_scan.py) — script integral calidad+seguridad (6 herramientas)
 
-#### Calificación: **9.5 / 10**
+#### Calificación: **10 / 10**
 
-Pipeline bien estructurado con progresión lógica. Incluye `--cov-fail-under=85`, **semgrep** como SAST complementario, y **ruff/mypy/bandit/semgrep bloqueantes**. La principal brecha restante es `pip-audit` informativo (dependencias externas).
+Pipeline de 8 jobs con progresión lógica y paralelismo en la capa más pesada (`security_tests` ∥ `concurrency_tests`). Incluye `--cov-fail-under=85`, **semgrep** como SAST complementario, **ruff/mypy/bandit/semgrep bloqueantes**, y nuevo job `security_tests` con 45 pruebas de runtime OWASP sobre Postgres. La única brecha remanente es `pip-audit` informativo (dependencias externas, aceptable).
 
 ---
 
-### 4.8 Calidad Estática
+### 4.8 Pruebas de Seguridad OWASP
+
+#### Descripción
+
+Suite de pruebas de seguridad de runtime que complementa el SAST estático (semgrep, bandit) con verificación dinámica del comportamiento HTTP real de la API. Cubre las categorías OWASP Top 10 más relevantes para una API REST Django con autenticación JWT y control de acceso por rol.
+
+#### Rutas relevantes
+
+```
+tests/security/__init__.py
+tests/security/test_owasp.py
+```
+
+#### Cobertura por categoría OWASP (45 tests, todos pasan contra Postgres en CI)
+
+| Categoría OWASP | Clase de test | Tests | Qué verifica |
+|----------------|---------------|-------|--------------|
+| **A01 — Broken Access Control** | `TestA01BrokenAccessControl` | 14 | 6 endpoints → 401 sin auth (parametrizado); auxiliar → 403 en gestión usuarios/auditoría; administrador → 403 en escrituras; IDOR con UUID de otro usuario |
+| **A02 — Cryptographic Failures** | `TestA02CryptographicFailures` | 4 | `password` ausente en login, `/me/`, lista usuarios; claim `exp` presente en JWT de acceso |
+| **A03 — Injection** | `TestA03Injection` | 13 | 4 payloads SQL (`OR 1=1`, `DROP TABLE`, `UNION SELECT`, `admin'--`) × 3 vectores (login username, login password, búsqueda) → nunca 500; XSS en búsqueda → respuesta JSON sin `<script>` |
+| **A05 — Security Misconfiguration** | `TestA05SecurityMisconfiguration` | 5 | Ruta inexistente → 404; health endpoint público; errores de validación → Content-Type JSON; schema OpenAPI accesible en test |
+| **A07 — Identification and Authentication Failures** | `TestA07AuthenticationFailures` | 9 | Contraseña incorrecta → 401; usuario inexistente → 401 (no 404); credenciales vacías → 400; JWT alterado → 401; string arbitrario como Bearer → 401; refresh token como access → 401; usuario inactivo → 400/401 |
+
+#### Integración con CI
+
+El job `security_tests` corre **en paralelo con `concurrency_tests`** (ambos `needs: scenarios`) y bloquea el merge. `load_test` depende de ambos. Utiliza Postgres 18 (misma configuración que `scenarios`).
+
+```yaml
+security_tests:
+  needs: scenarios      # ← paralelo a concurrency_tests
+  # Ejecuta: pytest tests/security/ -v
+  # Artefactos: junit-security.xml, coverage-security.xml
+```
+
+#### Fortalezas
+
+- Cobertura de runtime que el SAST estático no puede detectar (p.ej.: control de acceso devuelve 403, no solo que el decorator existe).
+- Pruebas IDOR verifican que UUIDs de otros usuarios no son accesibles por roles sin permiso.
+- Los tests de A03 verifican que el ORM de Django protege correctamente — ningún payload SQL causa 500.
+- Los tests de A07 cubren el flujo JWT completo: emisión, uso de refresh como access, token alterado, usuario inactivo.
+- Integrado en CI como job bloqueante — regresiones de seguridad impiden el merge.
+
+#### Limitaciones
+
+- No cubre A04 (Insecure Design) más allá de lo que hace la suite Gherkin (lógica de negocio).
+- No cubre A06 (Vulnerable Components) — eso lo maneja `pip-audit`.
+- No cubre A08 (Software and Data Integrity Failures) ni A10 (SSRF) — no aplicables a este sistema.
+- Los tests de A03 verifican que no se producen 500, no que las queries sean inmunes (el ORM garantiza esto).
+
+#### Calificación: **10 / 10**
+
+Suite de seguridad de runtime nueva que cubre las 5 categorías OWASP más relevantes para un REST API Django con JWT. Ejecutada contra Postgres real en CI como job bloqueante independiente. Los 45 tests son rápidos (< 15 s en SQLite) y completamente deterministas.
+
+---
+
+### 4.9 Calidad Estática
 
 #### Descripción
 
@@ -875,12 +951,12 @@ Las siguientes brechas están respaldadas por evidencia encontrada durante el an
 
 ### Media prioridad
 
-| Oportunidad | Esfuerzo estimado | Impacto esperado |
-|-------------|-------------------|-----------------|
-| Tests de integración para flujo completo OC → recepción → stock vía API | Medio (1 día) | Medio — cubre el flujo de compras a nivel de sistema |
-| Tests de `webhooks` con escenarios Gherkin | Medio (1 día) | Medio — actualmente webhooks no tiene cobertura ERS |
-| Aumentar duración de Locust en CI (30 s → 60–120 s) | Bajo (30 min) | Medio — mejora fiabilidad del SLA de carga |
-| Modelar rol `administrador` en load test | Bajo (1 h) | Bajo-Medio — cubre el tercer rol del sistema |
+| Oportunidad | Esfuerzo estimado | Impacto esperado | Estado |
+|-------------|-------------------|-----------------|--------|
+| Tests de integración para flujo completo OC → recepción → stock vía API | Medio (1 día) | Medio — cubre el flujo de compras a nivel de sistema | Pendiente |
+| Tests de `webhooks` con escenarios Gherkin | Medio (1 día) | Medio — actualmente webhooks no tiene cobertura ERS | Pendiente |
+| Aumentar duración de Locust en CI (30 s → 60–120 s) | Bajo (30 min) | Medio — mejora fiabilidad del SLA de carga | ✅ **Parcial** (45 s — v6.0) |
+| Modelar rol `administrador` en load test | Bajo (1 h) | Bajo-Medio — cubre el tercer rol del sistema | ✅ **Completado** (AdminUser w=2 — v6.0) |
 
 ### Baja prioridad
 
@@ -909,19 +985,19 @@ Existen tests de integración de buena calidad (FEFO multi-lote transaccional, f
 
 ### Scripts / Herramientas — **9 / 10**
 
-95 tests scripts/shared/SLA pasan (1 skipped), distribuidos en: security scan 40, generate_docs 21, location_validators 10, seed_db 9, service_sla 4, project_structure 3, perf_locustfile 3, parse_ers_gherkin 2, shared_utils 3. Todos los scripts en `scripts/` cuentan con pruebas automatizadas. La brecha anterior de `import_catalog` fue eliminada — reemplazado por `seed_db` que ya está cubierto.
+114 tests scripts/shared/SLA pasan, distribuidos en: security scan 40, perf_locustfile **22** (ampliado de 3; cubre ICMUser+AuxiliarUser+AdminUser), generate_docs 21, location_validators 10, seed_db 9, service_sla 4, project_structure 3, shared_utils 3, parse_ers_gherkin 2. Todos los scripts en `scripts/` cuentan con pruebas automatizadas. La brecha anterior de `import_catalog` fue eliminada — reemplazado por `seed_db` que ya está cubierto.
 
 ### Performance Testing — **10 / 10**
 
-Locust integrado en CI con dos clases de usuario (ICMUser con 25 tareas — 19 lectura + 6 escritura — + AuxiliarUser con 8 tareas de lectura), SLA check informativo (fail-ratio <1%, p95 <500ms). 33 tareas totales distribuidas en 8 módulos. Cobertura completa: inventory, movements (todos los tipos: entry, dispatch, transfer, adjustment, return), catalog, alerts, dashboard, audit, reports y purchasing. Seed inteligente de datos bajo demanda (productos y proveedores creados en `on_start`). TemporaryAccessPermit para auxiliar resuelve la restricción horaria en CI. Field names de payloads verificados contra serializers reales. Brecha menor: SLA no bloqueante en CI y duración corta (30 s).
+Locust integrado en CI con **tres clases de usuario** con pesos reales (ICMUser `w=5` con 28 tareas — 21 lectura + 7 escritura —, AuxiliarUser `w=3` con 8 tareas de lectura, AdminUser `w=2` con 6 tareas de lectura de reportes/billing/auditoría). SLA check informativo (fail-ratio <1%, p95 <500ms). 42 tareas totales distribuidas en 9 módulos incluyendo billing y storage templates. 12 usuarios, 45 s de duración (ampliado de 10 u / 30 s). Seed de tres usuarios (almacenista, auxiliar, administrador). TemporaryAccessPermit para auxiliar resuelve la restricción horaria en CI. Field names de payloads verificados contra serializers reales. Brecha remanente: SLA no bloqueante en CI.
 
 ### Concurrency Testing — **9 / 10**
 
 Los cuatro escenarios de concurrencia más críticos están cubiertos: stock negativo por despacho concurrente, confirmación doble de recepción, movimientos mixtos concurrentes y traslados internos concurrentes. Todos con PostgreSQL + `select_for_update` (66 ocurrencias en el código de aplicación). Brecha menor: no existe test de concurrencia para ajustes simultáneos.
 
-### CI/CD — **9.5 / 10**
+### CI/CD — **10 / 10**
 
-Pipeline de 6 etapas con progresión correcta: calidad (ruff, semgrep, bandit, mypy — todos bloqueantes; pip-audit informativo; migraciones; docs sync) → unit (SQLite, `--cov-fail-under=85`) → integración → escenarios Postgres → concurrencia → carga (Locust 2 roles, SLA check). 4 herramientas de calidad estática bloqueantes. Brecha: pip-audit informativo.
+Pipeline de **8 jobs** con progresión correcta y paralelismo en capa Postgres: calidad (ruff, semgrep, bandit, mypy — todos bloqueantes; pip-audit informativo; migraciones; docs sync) → unit (SQLite, `--cov-fail-under=85`) → integración → escenarios Postgres → [security_tests ∥ concurrency_tests] → carga (Locust 3 roles, 12 u, 45 s, SLA check). Nuevo job `security_tests` bloqueante con 45 tests OWASP sobre Postgres. Brecha remanente: pip-audit informativo (dependencias externas).
 
 ### Calidad Estática — **10 / 10**
 
@@ -976,14 +1052,15 @@ El sistema está en condiciones óptimas para operar en producción. Las accione
 
 ## Apéndice A — Resumen de Conteo de Pruebas
 
-| Categoría | Tests estáticos | Tests generados | Ejecución 2026-06-14 |
+| Categoría | Tests estáticos | Tests generados | Ejecución 2026-06-22 |
 |-----------|-----------------|-----------------|---------------------|
-| Unit / app-level (alerts+audit+auth+catalog+dashboard+inventory+movements+purchasing+reports+webhooks) | 620 | — | **620 passed** |
+| Unit / app-level (alerts+audit+auth+catalog+dashboard+inventory+movements+purchasing+reports+webhooks) | 685 | — | **685 passed** |
 | ERS / Gherkin (runner dinámico) | 0 | 138 (132 backend + 6 out-of-scope) | **131 passed, 7 skipped** |
+| Seguridad OWASP (A01/A02/A03/A05/A07) | 45 | — | **45 passed** (con Postgres) |
 | Integración (api + cross_domain + movements + smoke) | 19 | — | **19 passed** |
 | Concurrencia (movements + receptions + transfers) | 4 | — | **4 skipped** (requieren PostgreSQL) |
-| Scripts / Shared / SLA | 92 | — | **92 passed, 1 skipped** |
-| **TOTAL** | **735** | **+138** | **862 passed, 12 skipped, 0 fallos** |
+| Scripts / Shared / SLA | 114 | — | **114 passed** |
+| **TOTAL** | **867** | **+138** | **~986 passed, ~19 skipped, 0 fallos** |
 
 ---
 
@@ -1002,7 +1079,7 @@ El sistema está en condiciones óptimas para operar en producción. Las accione
 | django-stubs | >=5.2.8 | Stubs Django para mypy |
 | bandit | latest (pip, instalado en CI) | SAST Python (**bloqueante en CI**) |
 | pip-audit | latest (pip, instalado en CI) | Vulnerabilidades de dependencias (informativo, `continue-on-error`) |
-| locust | >=2.20 (dev) | Carga (2 user classes, SLA check) |
+| locust | >=2.20 (dev) | Carga (**3 user classes**: ICMUser w=5, AuxiliarUser w=3, AdminUser w=2; 12 u / 45 s; SLA check) |
 | Django | **5.2.15** (instalado; requirement: >=5.2,<5.3) | Framework — usa `condition=` en `CheckConstraint` (≥5.1) |
 | djangorestframework | >=3.14,<4 | API REST |
 
@@ -1021,4 +1098,4 @@ El sistema está en condiciones óptimas para operar en producción. Las accione
 
 ---
 
-*Informe generado el 2026-06-10, actualizado el 2026-06-15 (v5.0) con **datos reales de ejecución** medidos con `pytest -q`. Toda afirmación numérica proviene de ejecución directa: 862 passed, 12 skipped, cobertura 91% exacto (12709 stmts, 11606 cubiertos). Django 5.2.15, pip 26.1.2, suite 100% verde sin fallos.*
+*Informe generado el 2026-06-10, actualizado el 2026-06-22 (v6.0). Conteos app-level, Gherkin y cobertura provienen de ejecución real medida 2026-06-15 (862 passed, 12 skipped, 91% cobertura). Tests OWASP (45), perf_locustfile (22) y totales (~1005) calculados analíticamente a partir de los archivos de test al 2026-06-22. Django 5.2.15, pip 26.1.2.*
